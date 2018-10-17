@@ -3,12 +3,14 @@ package c4.curios.integration.gamestages;
 import c4.curios.integration.gamestages.action.AddStageAction;
 import c4.curios.integration.gamestages.action.RemoveStageAction;
 import crafttweaker.CraftTweakerAPI;
+import crafttweaker.annotations.ModOnly;
 import crafttweaker.annotations.ZenRegister;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-@ZenClass("mods.curios")
+@ZenClass("mods.curios.gamestages")
 @ZenRegister
+@ModOnly("gamestages")
 public class CuriosStagesCrT {
 
     @ZenMethod
