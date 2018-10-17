@@ -36,7 +36,11 @@ minecraft {
 repositories {
 
     maven {
-        url 'https://maven.mcmoddev.com/'
+        url 'https://maven.mcmoddev.com'
+    }
+
+    maven {
+        url 'http://maven.blamejared.com'
     }
 }
 
@@ -61,8 +65,10 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    deobfCompile "net.darkhax.gamestages:GameStages-1.12.2:2.0.108"
-    deobfCompile "net.darkhax.bookshelf:Bookshelf-1.12.2:2.3.566"
+    deobfProvided "net.darkhax.gamestages:GameStages-1.12.2:2.0.108"
+    deobfProvided "net.darkhax.bookshelf:Bookshelf-1.12.2:2.3.566"
+
+    deobfProvided "CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.9.6"
 }
 
 processResources {
