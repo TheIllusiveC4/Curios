@@ -5,6 +5,7 @@ import c4.curios.api.inventory.CurioSlotInfo;
 import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurio;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketEntityEquipment;
@@ -55,11 +56,10 @@ public class SlotCurio extends SlotItemHandler {
 
     @Override
     public boolean canTakeStack(EntityPlayer playerIn) {
-        ICurio curio = CuriosAPI.getCurio(getStack());
-        if (curio != null) {
-            return super.canTakeStack(playerIn) && curio.canUnequip(getStack(), playerIn);
-        }
-        return super.canTakeStack(playerIn);
+        ItemStack stack = this.getStack();
+        ICurio curio = CuriosAPI.getCurio(stack);
+        return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
+                && (curio == null || curio.canUnequip(stack, playerIn)) && super.canTakeStack(playerIn);
     }
 
     @Override
