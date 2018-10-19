@@ -6,6 +6,7 @@ import c4.curios.api.capability.CapCurioInventory;
 import c4.curios.api.capability.CapCurioItem;
 import c4.curios.api.capability.ICurioItemHandler;
 import c4.curios.api.inventory.CurioSlot;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -76,7 +77,9 @@ public class CommonEventHandler {
                     ItemStack stack = curioSlots.get(i).getStack();
 
                     if (!stack.isEmpty()) {
-                        entityItems.add(this.getDroppedItem(stack, player));
+                        if (!EnchantmentHelper.hasVanishingCurse(stack)) {
+                            entityItems.add(this.getDroppedItem(stack, player));
+                        }
                         curios.setStackInSlot(i, ItemStack.EMPTY);
                     }
                 }
