@@ -110,6 +110,10 @@ public class CommonEventHandler {
                         int i = Math.min(orb.xpValue * 2, stack.getItemDamage());
                         orb.xpValue -= i / 2;
                         stack.setItemDamage(stack.getItemDamage() - i);
+
+                        if (orb.xpValue > 0) {
+                            player.addExperience(orb.xpValue);
+                        }
                         orb.setDead();
                         return;
                     }
