@@ -9,8 +9,10 @@ import c4.curios.api.inventory.CurioSlot;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.NonNullList;
@@ -18,6 +20,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -81,6 +84,34 @@ public class CommonEventHandler {
                             entityItems.add(this.getDroppedItem(stack, player));
                         }
                         curios.setStackInSlot(i, ItemStack.EMPTY);
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerXPPickUp(PlayerPickupXpEvent evt) {
+        EntityPlayer player = evt.getEntityPlayer();
+
+        if (!player.world.isRemote) {
+            ICurioItemHandler curios = CuriosAPI.getCuriosHandler(player);
+
+            if (curios != null) {
+                for (CurioSlot slot : curios.getCurioStacks()) {
+                    ItemStack stack = slot.getStack();
+
+                    if (!stack.isEmpty() && stack.isItemDamaged() && EnchantmentHelper.getEnchantmentLevel(
+                            Enchantments.MENDING, stack) > 0) {
+                        evt.setCanceled(true);
+                        EntityXPOrb orb = evt.getOrb();
+                        player.xpCooldown = 2;
+                        player.onItemPickup(orb, 1);
+                        int i = Math.min(orb.xpValue * 2, stack.getItemDamage());
+                        orb.xpValue -= i / 2;
+                        stack.setItemDamage(stack.getItemDamage() - i);
+                        orb.setDead();
+                        return;
                     }
                 }
             }
