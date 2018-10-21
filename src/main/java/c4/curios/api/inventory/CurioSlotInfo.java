@@ -17,49 +17,18 @@ public class CurioSlotInfo {
 
     private final String identifier;
     private final ResourceLocation slotOverlay;
-    private final List<Tuple<ItemStack, Integer>> validStacks;
-    private final int maxSlots;
 
-    public CurioSlotInfo(String identifier, @Nullable ResourceLocation slotOverlay, int maxSlots) {
-        this.identifier = identifier;
-        this.validStacks = new ArrayList<>();
+    public CurioSlotInfo(String identifier) {
+        this(identifier, null);
+    }
+
+    public CurioSlotInfo(String identifier, @Nullable ResourceLocation slotOverlay) {
+        this.identifier = identifier.toLowerCase();
         this.slotOverlay = slotOverlay;
-        this.maxSlots = maxSlots;
     }
 
     public String getIdentifier() {
         return identifier;
-    }
-
-    public List<Tuple<ItemStack, Integer>> getValidStacks() {
-        return ImmutableList.copyOf(validStacks);
-    }
-
-    public int getMaxSlots() {
-        return maxSlots;
-    }
-
-    public int getStackLimit(ItemStack stack) {
-        for (Tuple<ItemStack, Integer> tuple : validStacks) {
-            ItemStack present = tuple.getFirst();
-            if (ItemStack.areItemStacksEqual(present, stack)) {
-                return tuple.getSecond();
-            }
-        }
-        return 64;
-    }
-
-    public boolean addValidStack(ItemStack stack, int stackSize) {
-
-        for (Tuple<ItemStack, Integer> tuple : validStacks) {
-            ItemStack present = tuple.getFirst();
-            if (ItemStack.areItemStacksEqual(present, stack)) {
-                return false;
-            }
-        }
-
-        validStacks.add(new Tuple<>(stack, stackSize));
-        return true;
     }
 
     public String getTranslationKey() {

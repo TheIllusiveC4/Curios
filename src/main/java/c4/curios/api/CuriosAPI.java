@@ -25,18 +25,10 @@ public class CuriosAPI {
     private static Map<String, TextureAtlasSprite> idToSprite = new HashMap<>();
 
     public static boolean registerCurioSlot(@Nonnull String identifier) {
-        return registerCurioSlot(identifier, null, 1);
-    }
-
-    public static boolean registerCurioSlot(@Nonnull String identifier, int maxSlots) {
-        return registerCurioSlot(identifier, null, maxSlots);
+        return registerCurioSlot(identifier, null);
     }
 
     public static boolean registerCurioSlot(@Nonnull String identifier, @Nullable ResourceLocation overlay) {
-        return registerCurioSlot(identifier, overlay, 1);
-    }
-
-    public static boolean registerCurioSlot(@Nonnull String identifier, @Nullable ResourceLocation overlay, int maxSlots) {
 
         identifier = identifier.toLowerCase();
 
@@ -52,36 +44,15 @@ public class CuriosAPI {
                 overlay = existingInfo.getSlotOverlay();
                 addNewOverlay = false;
             }
-            if (existingInfo.getMaxSlots() > maxSlots) {
-                maxSlots = existingInfo.getMaxSlots();
-            }
         }
 
         if (addNewOverlay) {
             idToResource.put(identifier, overlay);
         }
 
-        CurioSlotInfo slot = new CurioSlotInfo(identifier, overlay, maxSlots);
+        CurioSlotInfo slot = new CurioSlotInfo(identifier, overlay);
         idToSlot.put(identifier, slot);
         return true;
-    }
-
-    public static boolean registerItemStackToSlot(ItemStack stack, String... identifiers) {
-        return registerItemStackToSlot(stack, stack.getMaxStackSize(), identifiers);
-    }
-
-    public static boolean registerItemStackToSlot(ItemStack stack, int stackLimit, String... identifiers) {
-        boolean didSomething = false;
-
-        for (String s : identifiers) {
-            CurioSlotInfo slot = getSlotFromID(s);
-            if (slot != null) {
-                if(slot.addValidStack(stack, stackLimit) && !didSomething) {
-                    didSomething = true;
-                }
-            }
-        }
-        return didSomething;
     }
 
     public static List<CurioSlotInfo> getSlotList() {
