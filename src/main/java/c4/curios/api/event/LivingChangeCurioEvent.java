@@ -3,19 +3,20 @@ package c4.curios.api.event;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 import javax.annotation.Nonnull;
 
-public class PlayerCurioChangeEvent extends PlayerEvent {
+public class LivingChangeCurioEvent extends LivingEvent {
 
     private final String slot;
     private final ItemStack from;
     private final ItemStack to;
 
-    public PlayerCurioChangeEvent(EntityPlayer player, String slot, @Nonnull ItemStack from, @Nonnull ItemStack to)
+    public LivingChangeCurioEvent(EntityLivingBase living, String slot, @Nonnull ItemStack from, @Nonnull ItemStack to)
     {
-        super(player);
+        super(living);
         this.slot = slot;
         this.from = from;
         this.to = to;

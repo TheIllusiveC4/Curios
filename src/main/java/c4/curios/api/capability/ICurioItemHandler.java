@@ -12,4 +12,8 @@ public interface ICurioItemHandler extends IItemHandlerModifiable {
     NonNullList<CurioSlot> getCurioStacks();
 
     void setCurioStacks(NonNullList<CurioSlot> curioStacks);
+
+    NonNullList<CurioSlot> getPreviousCurioStacks();
+
+    void setPreviousCurioStacks(NonNullList<CurioSlot> prevStacks);
 }

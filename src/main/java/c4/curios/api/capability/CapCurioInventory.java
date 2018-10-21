@@ -71,21 +71,22 @@ public class CapCurioInventory {
     public static class CurioInventoryWrapper implements ICurioItemHandler {
 
         NonNullList<CurioSlot> curioStacks;
+        NonNullList<CurioSlot> prevCurioStacks;
 
         public CurioInventoryWrapper() {
             this.curioStacks = NonNullList.create();
+            this.prevCurioStacks = NonNullList.create();
         }
 
         public CurioInventoryWrapper(EntityPlayer player) {
             this.curioStacks = initCurios();
+            this.prevCurioStacks = initCurios();
         }
 
         private NonNullList<CurioSlot> initCurios() {
             NonNullList<CurioSlot> curios = NonNullList.create();
             for (CurioSlotInfo info : CuriosAPI.getSlotList()) {
-                for (int i = 0; i < info.getMaxSlots(); i++) {
-                    curios.add(new CurioSlot(info));
-                }
+                curios.add(new CurioSlot(info));
             }
             return curios;
         }
@@ -200,6 +201,19 @@ public class CapCurioInventory {
 
             for (int i = 0; i < this.curioStacks.size() && i < curioStacks.size(); i++) {
                 this.curioStacks.set(i, curioStacks.get(i));
+            }
+        }
+
+        @Override
+        public NonNullList<CurioSlot> getPreviousCurioStacks() {
+            return prevCurioStacks;
+        }
+
+        @Override
+        public void setPreviousCurioStacks(NonNullList<CurioSlot> prevStacks) {
+
+            for (int i = 0; i < this.prevCurioStacks.size() && i < curioStacks.size(); i++) {
+                this.prevCurioStacks.set(i, prevCurioStacks.get(i));
             }
         }
     }

@@ -14,6 +14,7 @@ public class NetworkHandler {
     public static void init() {
         registerMessage(CPacketOpenCurios.MessageHandler.class, CPacketOpenCurios.class, Side.SERVER);
         registerMessage(CPacketOpenVanilla.MessageHandler.class, CPacketOpenVanilla.class, Side.SERVER);
+        registerMessage(SPacketEntityCurios.MessageHandler.class, SPacketEntityCurios.class, Side.CLIENT);
     }
 
     @SuppressWarnings("unchecked")

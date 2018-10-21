@@ -3,37 +3,66 @@ package c4.curios.common;
 import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurio;
 import c4.curios.api.capability.ICurioItemHandler;
+import c4.curios.api.event.LivingChangeCurioEvent;
 import c4.curios.api.inventory.CurioSlot;
-import com.google.common.collect.Maps;
+import c4.curios.common.network.NetworkHandler;
+import c4.curios.common.network.SPacketEntityCurios;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-
-import java.util.Map;
-import java.util.UUID;
 
 public class CurioEventHandler {
 
-    private static final Map<UUID, NonNullList<CurioSlot>> curioMap = Maps.newHashMap();
-
     @SubscribeEvent
-    public void onCurioTick(TickEvent.PlayerTickEvent evt) {
+    public void onCurioTick(LivingEvent.LivingUpdateEvent evt) {
+        EntityLivingBase entitiylivingbase = evt.getEntityLiving();
+        ICurioItemHandler curioHandler = CuriosAPI.getCuriosHandler(entitiylivingbase);
 
-        if (evt.phase == TickEvent.Phase.END) {
-            EntityPlayer player = evt.player;
-            ICurioItemHandler curioHandler = CuriosAPI.getCuriosHandler(player);
+        if (curioHandler != null) {
 
-            if (curioHandler != null) {
+            if (!entitiylivingbase.world.isRemote) {
                 NonNullList<CurioSlot> curios = curioHandler.getCurioStacks();
+                NonNullList<CurioSlot> prevCurios = curioHandler.getPreviousCurioStacks();
 
                 for (int i = 0; i < curios.size(); i++) {
                     ItemStack stack = curioHandler.getStackInSlot(i);
-                    ICurio curio = CuriosAPI.getCurio(stack);
+                    ItemStack prevStack = prevCurios.get(i).getStack();
 
-                    if (curio != null) {
-                        curio.onCurioTick(stack, player);
+                    if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
+
+                        if (!ItemStack.areItemStacksEqualUsingNBTShareTag(stack, prevStack)
+                                && entitiylivingbase.world instanceof WorldServer) {
+                            EntityTracker tracker = ((WorldServer) entitiylivingbase.world).getEntityTracker();
+
+                            for (EntityPlayer player : tracker.getTrackingPlayers(entitiylivingbase)) {
+
+                                if (player instanceof EntityPlayerMP) {
+                                    NetworkHandler.INSTANCE.sendTo(new SPacketEntityCurios(entitiylivingbase.getEntityId(),
+                                                    i, stack), (EntityPlayerMP)player);
+                                }
+                            }
+                        }
+
+                        String identifier = curios.get(i).getInfo().getIdentifier();
+                        MinecraftForge.EVENT_BUS.post(new LivingChangeCurioEvent(entitiylivingbase, identifier, prevStack, stack));
+                        ICurio prevCurio = CuriosAPI.getCurio(prevStack);
+                        ICurio curio = CuriosAPI.getCurio(stack);
+
+                        if (!prevStack.isEmpty() && prevCurio != null) {
+                            entitiylivingbase.getAttributeMap().removeAttributeModifiers(prevCurio.getAttributeModifiers(identifier,
+                                    prevStack));
+                        }
+
+                        if (!stack.isEmpty() && curio != null) {
+                            entitiylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier, stack));
+                        }
                     }
                 }
             }
