@@ -1,17 +1,13 @@
-package c4.curios.common.network;
+package c4.curios.common.network.server;
 
-import c4.curios.Curios;
 import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurioItemHandler;
-import c4.curios.client.GuiHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IThreadListener;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;

@@ -1,6 +1,9 @@
 package c4.curios.common.network;
 
 import c4.curios.Curios;
+import c4.curios.common.network.client.CPacketOpenCurios;
+import c4.curios.common.network.client.CPacketOpenVanilla;
+import c4.curios.common.network.server.SPacketEntityCurios;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;

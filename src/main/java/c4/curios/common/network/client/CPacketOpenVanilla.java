@@ -1,18 +1,15 @@
-package c4.curios.common.network;
+package c4.curios.common.network.client;
 
-import c4.curios.Curios;
-import c4.curios.client.GuiHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.IThreadListener;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class CPacketOpenCurios implements IMessage {
+public class CPacketOpenVanilla implements IMessage {
 
-    public CPacketOpenCurios() {
+    public CPacketOpenVanilla() {
 
     }
 
@@ -26,16 +23,14 @@ public class CPacketOpenCurios implements IMessage {
 
     }
 
-    public static class MessageHandler implements IMessageHandler<CPacketOpenCurios, IMessage> {
+    public static class MessageHandler implements IMessageHandler<CPacketOpenVanilla, IMessage> {
 
         @Override
-        public IMessage onMessage(CPacketOpenCurios message, MessageContext ctx) {
+        public IMessage onMessage(CPacketOpenVanilla message, MessageContext ctx) {
             IThreadListener mainThread = ctx.getServerHandler().player.getServerWorld();
             mainThread.addScheduledTask(() -> {
                 EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
-                BlockPos pos = serverPlayer.getPosition();
-                serverPlayer.openGui(Curios.MODID, GuiHandler.GUI_CURIO_ID, serverPlayer.world, pos.getX(),
-                        pos.getY(), pos.getZ());
+                serverPlayer.openContainer = serverPlayer.inventoryContainer;
             });
             return null;
         }

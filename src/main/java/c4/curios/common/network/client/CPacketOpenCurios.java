@@ -1,4 +1,4 @@
-package c4.curios.common.network;
+package c4.curios.common.network.client;
 
 import c4.curios.Curios;
 import c4.curios.client.GuiHandler;
@@ -10,9 +10,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class CPacketOpenVanilla implements IMessage {
+public class CPacketOpenCurios implements IMessage {
 
-    public CPacketOpenVanilla() {
+    public CPacketOpenCurios() {
 
     }
 
@@ -26,14 +26,16 @@ public class CPacketOpenVanilla implements IMessage {
 
     }
 
-    public static class MessageHandler implements IMessageHandler<CPacketOpenVanilla, IMessage> {
+    public static class MessageHandler implements IMessageHandler<CPacketOpenCurios, IMessage> {
 
         @Override
-        public IMessage onMessage(CPacketOpenVanilla message, MessageContext ctx) {
+        public IMessage onMessage(CPacketOpenCurios message, MessageContext ctx) {
             IThreadListener mainThread = ctx.getServerHandler().player.getServerWorld();
             mainThread.addScheduledTask(() -> {
                 EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
-                serverPlayer.openContainer = serverPlayer.inventoryContainer;
+                BlockPos pos = serverPlayer.getPosition();
+                serverPlayer.openGui(Curios.MODID, GuiHandler.GUI_CURIO_ID, serverPlayer.world, pos.getX(),
+                        pos.getY(), pos.getZ());
             });
             return null;
         }
