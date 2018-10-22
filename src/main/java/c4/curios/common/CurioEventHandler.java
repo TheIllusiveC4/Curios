@@ -6,7 +6,7 @@ import c4.curios.api.capability.ICurioItemHandler;
 import c4.curios.api.event.LivingChangeCurioEvent;
 import c4.curios.api.inventory.CurioSlot;
 import c4.curios.common.network.NetworkHandler;
-import c4.curios.common.network.SPacketEntityCurios;
+import c4.curios.common.network.server.SPacketEntityCurios;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.player.EntityPlayer;
@@ -56,12 +56,13 @@ public class CurioEventHandler {
                         ICurio curio = CuriosAPI.getCurio(stack);
 
                         if (!prevStack.isEmpty() && prevCurio != null) {
-                            entitiylivingbase.getAttributeMap().removeAttributeModifiers(prevCurio.getAttributeModifiers(identifier,
-                                    prevStack));
+                            prevCurio.onUnequipped(prevStack, entitiylivingbase);
+                            entitiylivingbase.getAttributeMap().removeAttributeModifiers(prevCurio.getAttributeModifiers(prevStack));
                         }
 
                         if (!stack.isEmpty() && curio != null) {
-                            entitiylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier, stack));
+                            curio.onEquipped(stack, entitiylivingbase);
+                            entitiylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(stack));
                         }
                     }
                 }
