@@ -61,7 +61,8 @@ public class CapCurioInventory {
                         CurioSlotEntry entry = CuriosAPI.getSlotEntryForID(identifier);
 
                         if (entry != null) {
-                            NonNullList<ItemStack> stacks = NonNullList.create();
+                            NonNullList<ItemStack> stacks = NonNullList.withSize(instance.getStackHandler(identifier).getSlots(),
+                                    ItemStack.EMPTY);
                             ItemStackHelper.loadAllItems(itemtag, stacks);
                             curioMap.put(identifier, new CurioStackHandler(entry, stacks));
                         }

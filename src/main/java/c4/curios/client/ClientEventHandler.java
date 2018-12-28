@@ -70,13 +70,11 @@ public class ClientEventHandler {
 
                             if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
                                 amount = amount + player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
-
                                 amount = amount + (double) EnchantmentHelper.getModifierForCreature(stack,
                                         EnumCreatureAttribute.UNDEFINED);
                                 flag = true;
                             } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
-                                amount += player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED)
-                                        .getBaseValue();
+                                amount += player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
                                 flag = true;
                             }
 

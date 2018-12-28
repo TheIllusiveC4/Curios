@@ -19,7 +19,6 @@ public class SlotCurio extends SlotItemHandler {
     private final CurioSlotEntry entry;
     private final EntityPlayer player;
     private final String slotOverlay;
-    private final int index;
 
     public SlotCurio(EntityPlayer player, IItemHandler handler, int index, CurioSlotEntry info, int xPosition,
                      int yPosition) {
@@ -27,7 +26,6 @@ public class SlotCurio extends SlotItemHandler {
         this.entry = info;
         this.player = player;
         this.slotOverlay = entry.getIcon() == null ? null : entry.getIcon().toString();
-        this.index = index;
     }
 
     public String getSlotName() {

@@ -33,11 +33,7 @@ public interface ICurio {
         return HashMultimap.create();
     }
 
-    default boolean hasKeybinding() {
-        return false;
-    }
-
-    default void onKeybinding(ItemStack stack, EntityLivingBase entityLivingBase) {}
+    default boolean hasRender(ItemStack stack, EntityLivingBase entityLivingBase) { return false; }
 
     default void doRender(EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks,
                           float ageInTicks, float netHeadYaw, float headPitch, float scale) {}

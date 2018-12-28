@@ -40,6 +40,12 @@ public class CurioEventHandler {
                         ItemStack stack = stackHandler.getStackInSlot(i);
                         ItemStack prevStack = prevStackHandler.getStackInSlot(i);
 
+                        ICurio curio = CuriosAPI.getCurio(stack);
+
+                        if (curio != null) {
+                            curio.onCurioTick(stack, entitylivingbase);
+                        }
+
                         if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
 
                             if (!ItemStack.areItemStacksEqualUsingNBTShareTag(stack, prevStack)
@@ -56,7 +62,6 @@ public class CurioEventHandler {
                             }
                             MinecraftForge.EVENT_BUS.post(new LivingChangeCurioEvent(entitylivingbase, identifier, prevStack, stack));
                             ICurio prevCurio = CuriosAPI.getCurio(prevStack);
-                            ICurio curio = CuriosAPI.getCurio(stack);
 
                             if (!prevStack.isEmpty() && prevCurio != null) {
                                 prevCurio.onUnequipped(prevStack, entitylivingbase);
