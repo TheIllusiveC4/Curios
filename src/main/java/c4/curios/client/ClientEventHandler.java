@@ -2,8 +2,8 @@ package c4.curios.client;
 
 import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurio;
-import c4.curios.common.network.client.CPacketOpenCurios;
 import c4.curios.common.network.NetworkHandler;
+import c4.curios.common.network.client.CPacketOpenCurios;
 import com.google.common.collect.Multimap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -11,7 +11,6 @@ import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;

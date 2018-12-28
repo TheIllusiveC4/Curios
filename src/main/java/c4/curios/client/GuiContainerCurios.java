@@ -5,12 +5,11 @@ import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurioItemHandler;
 import c4.curios.common.inventory.ContainerCurios;
 import c4.curios.common.inventory.SlotCurio;
-import c4.curios.common.network.CPacketOpenVanilla;
 import c4.curios.common.network.NetworkHandler;
+import c4.curios.common.network.client.CPacketOpenVanilla;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
-import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
@@ -124,7 +123,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
                 (float)(j + 75 - 50) - mouseY, this.mc.player);
         ICurioItemHandler itemHandler = CuriosAPI.getCuriosHandler(this.mc.player);
         if (itemHandler != null) {
-            int slotCount = itemHandler.getCurioStacks().size();
+            int slotCount = itemHandler.getSlots();
             int yOffset = 17;
             for (int k = 0; k < Math.min(3, slotCount / 3 + 1); k++) {
                 int xOffset = 97;

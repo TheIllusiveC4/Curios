@@ -17,14 +17,16 @@ public class SPacketEntityCurios implements IMessage {
 
     private int entityId;
     private int slotId;
+    private String curioId;
     private ItemStack stack = ItemStack.EMPTY;
 
     public SPacketEntityCurios() {}
 
-    public SPacketEntityCurios(int entityId, int slotId, ItemStack stack) {
+    public SPacketEntityCurios(int entityId, String curioId, int slotId, ItemStack stack) {
         this.entityId = entityId;
         this.slotId = slotId;
         this.stack = stack.copy();
+        this.curioId = curioId;
     }
 
     @Override
@@ -32,6 +34,7 @@ public class SPacketEntityCurios implements IMessage {
         buf.writeInt(entityId);
         buf.writeInt(slotId);
         ByteBufUtils.writeItemStack(buf, stack);
+        ByteBufUtils.writeUTF8String(buf, curioId);
     }
 
     @Override
@@ -39,6 +42,7 @@ public class SPacketEntityCurios implements IMessage {
         this.entityId = buf.readInt();
         this.slotId = buf.readInt();
         this.stack = ByteBufUtils.readItemStack(buf);
+        this.curioId = ByteBufUtils.readUTF8String(buf);
     }
 
     public static class MessageHandler implements IMessageHandler<SPacketEntityCurios, IMessage> {
@@ -53,7 +57,7 @@ public class SPacketEntityCurios implements IMessage {
                     ICurioItemHandler handler = CuriosAPI.getCuriosHandler((EntityLivingBase)entity);
 
                     if (handler != null) {
-                        handler.setStackInSlot(message.slotId, message.stack);
+                        handler.setStackInSlot(message.curioId, message.slotId, message.stack);
                     }
                 }
             });

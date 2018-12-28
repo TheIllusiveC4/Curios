@@ -1,24 +1,24 @@
 package c4.curios.common.inventory;
 
-import c4.curios.api.capability.ICurio;
-import c4.curios.api.inventory.CurioSlot;
-import c4.curios.api.inventory.CurioSlotInfo;
 import c4.curios.api.CuriosAPI;
+import c4.curios.api.capability.ICurio;
 import c4.curios.api.capability.ICurioItemHandler;
+import c4.curios.api.inventory.CurioStackHandler;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.*;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Map;
 
 public class ContainerCurios extends Container {
 
@@ -93,18 +93,18 @@ public class ContainerCurios extends Container {
         });
 
         if (curios != null) {
-            NonNullList<CurioSlot> curioStacks = curios.getCurioStacks();
-            int slotCount = curioStacks.size();
+            Map<String, CurioStackHandler> curioMap = this.curios.getCurioMap();
+            int slotCount = this.curios.getSlots();
             int yOffset = 18;
-            for (int k = 0; k < Math.min(3, slotCount / 3 + 1); k++) {
-                int xOffset = 98;
-                for (int l = 0; l < Math.min(3, slotCount - (k * 3)); l++) {
-                    int index = k * 3 + l;
-                    this.addSlotToContainer(new SlotCurio(player, curios, index, curioStacks.get(index).getInfo(),
-                            xOffset, yOffset));
+            int xOffset = 98;
+
+            for (String identifier : curioMap.keySet()) {
+                CurioStackHandler stackHandler = curioMap.get(identifier);
+
+                for (int i = 0; i < stackHandler.getSlots(); i++) {
+                    this.addSlotToContainer(new SlotCurio(player, stackHandler, i, stackHandler.getEntry(), xOffset, yOffset));
                     xOffset += 18;
                 }
-                yOffset += 18;
             }
         }
     }
@@ -148,17 +148,23 @@ public class ContainerCurios extends Container {
                 }
             } else if (index < 41 && CuriosAPI.getCurio(itemstack1) != null) {
                 ICurio curio = CuriosAPI.getCurio(itemstack1);
-                assert curio != null;
                 ICurioItemHandler curioHandler = CuriosAPI.getCuriosHandler(playerIn);
-                if (curioHandler != null) {
-                    NonNullList<CurioSlot> curioSlots = curioHandler.getCurioStacks();
-                    for (int i = 0; i < curioSlots.size(); i++) {
-                        CurioSlot curioSlot = curioSlots.get(i);
-                        if (curio.getCurioSlots(itemstack1).contains(curioSlot.getInfo().getIdentifier())) {
-                            ItemStack currentCurio = curioSlot.getStack();
-                            if (curio.canEquip(itemstack1, playerIn) && currentCurio.isEmpty()
-                                    && !this.mergeItemStack(itemstack1, 41 + i, 41 + i + 1, false)) {
-                                return ItemStack.EMPTY;
+
+                if (curio != null && curioHandler != null) {
+                    Map<String, CurioStackHandler> curioSlots = curioHandler.getCurioMap();
+
+                    for (String identifier : curioSlots.keySet()) {
+
+                        if (curio.getCurioSlots(itemstack1).contains(identifier)) {
+                            CurioStackHandler stackHandler = curioSlots.get(identifier);
+
+                            for (int i = 0; i < stackHandler.getSlots(); i++) {
+                                ItemStack stack = stackHandler.getStackInSlot(i);
+
+                                if (curio.canEquip(itemstack1, playerIn) && stack.isEmpty() &&
+                                        !this.mergeItemStack(itemstack1, 41 + i, 41 + i + 1, false)) {
+                                    return ItemStack.EMPTY;
+                                }
                             }
                         }
                     }

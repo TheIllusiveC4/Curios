@@ -1,3 +1,5 @@
 curios.gui.container=Curios
 
 curios.name=Curio
+
+curios.modifiers=When as accessory:

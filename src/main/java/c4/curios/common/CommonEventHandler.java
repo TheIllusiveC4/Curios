@@ -1,11 +1,11 @@
 package c4.curios.common;
 
 import c4.curios.api.CuriosAPI;
-import c4.curios.api.capability.ICurio;
 import c4.curios.api.capability.CapCurioInventory;
 import c4.curios.api.capability.CapCurioItem;
+import c4.curios.api.capability.ICurio;
 import c4.curios.api.capability.ICurioItemHandler;
-import c4.curios.api.inventory.CurioSlot;
+import c4.curios.api.inventory.CurioStackHandler;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -14,8 +14,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatList;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
@@ -24,8 +22,8 @@ import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 public class CommonEventHandler {
 
@@ -61,7 +59,7 @@ public class CommonEventHandler {
             ICurioItemHandler newCurios = CuriosAPI.getCuriosHandler(player);
 
             if (originalCurios != null && newCurios != null) {
-                newCurios.setCurioStacks(originalCurios.getCurioStacks());
+                newCurios.setCurioMap(originalCurios.getCurioMap());
             }
         }
     }
@@ -75,15 +73,19 @@ public class CommonEventHandler {
 
             if (curios != null) {
                 List<EntityItem> entityItems = evt.getDrops();
-                NonNullList<CurioSlot> curioSlots = curios.getCurioStacks();
-                for (int i = 0; i < curioSlots.size(); i++) {
-                    ItemStack stack = curioSlots.get(i).getStack();
+                Map<String, CurioStackHandler> curioMap = curios.getCurioMap();
+                for (String identifier : curioMap.keySet()) {
+                    CurioStackHandler stacks = curioMap.get(identifier);
 
-                    if (!stack.isEmpty()) {
-                        if (!EnchantmentHelper.hasVanishingCurse(stack)) {
-                            entityItems.add(this.getDroppedItem(stack, player));
+                    for (int i = 0; i < stacks.getSlots(); i++) {
+                        ItemStack stack = stacks.getStackInSlot(i);
+
+                        if (!stack.isEmpty()) {
+                            if (!EnchantmentHelper.hasVanishingCurse(stack)) {
+                                entityItems.add(this.getDroppedItem(stack, player));
+                            }
+                            stacks.setStackInSlot(i, ItemStack.EMPTY);
                         }
-                        curios.setStackInSlot(i, ItemStack.EMPTY);
                     }
                 }
             }
@@ -98,24 +100,30 @@ public class CommonEventHandler {
             ICurioItemHandler curios = CuriosAPI.getCuriosHandler(player);
 
             if (curios != null) {
-                for (CurioSlot slot : curios.getCurioStacks()) {
-                    ItemStack stack = slot.getStack();
+                Map<String, CurioStackHandler> curioMap = curios.getCurioMap();
 
-                    if (!stack.isEmpty() && stack.isItemDamaged() && EnchantmentHelper.getEnchantmentLevel(
-                            Enchantments.MENDING, stack) > 0) {
-                        evt.setCanceled(true);
-                        EntityXPOrb orb = evt.getOrb();
-                        player.xpCooldown = 2;
-                        player.onItemPickup(orb, 1);
-                        int i = Math.min(orb.xpValue * 2, stack.getItemDamage());
-                        orb.xpValue -= i / 2;
-                        stack.setItemDamage(stack.getItemDamage() - i);
+                for (String identifier : curioMap.keySet()) {
+                    CurioStackHandler stacks = curioMap.get(identifier);
 
-                        if (orb.xpValue > 0) {
-                            player.addExperience(orb.xpValue);
+                    for (int i = 0; i < stacks.getSlots(); i++) {
+                        ItemStack stack = stacks.getStackInSlot(i);
+
+                        if (!stack.isEmpty() && stack.isItemDamaged() && EnchantmentHelper.getEnchantmentLevel(
+                                Enchantments.MENDING, stack) > 0) {
+                            evt.setCanceled(true);
+                            EntityXPOrb orb = evt.getOrb();
+                            player.xpCooldown = 2;
+                            player.onItemPickup(orb, 1);
+                            int toRepair = Math.min(orb.xpValue * 2, stack.getItemDamage());
+                            orb.xpValue -= toRepair / 2;
+                            stack.setItemDamage(stack.getItemDamage() - toRepair);
+
+                            if (orb.xpValue > 0) {
+                                player.addExperience(orb.xpValue);
+                            }
+                            orb.setDead();
+                            return;
                         }
-                        orb.setDead();
-                        return;
                     }
                 }
             }

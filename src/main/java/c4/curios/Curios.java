@@ -1,7 +1,7 @@
 package c4.curios;
 
-import c4.curios.api.capability.CapCurioInventory;
 import c4.curios.api.CuriosAPI;
+import c4.curios.api.capability.CapCurioInventory;
 import c4.curios.api.capability.CapCurioItem;
 import c4.curios.client.GuiHandler;
 import c4.curios.common.CommonEventHandler;
@@ -45,8 +45,7 @@ public class Curios
     @EventHandler
     public void preInit(FMLPreInitializationEvent evt) {
         logger = evt.getModLog();
-        CuriosAPI.registerCurioSlot("ring", new ResourceLocation(Curios.MODID, "gui/empty_ring_slot"),
-                13);
+        CuriosAPI.createSlot("ring").icon(new ResourceLocation(MODID, "items/empty_ring_slot")).size(2);
         MinecraftForge.EVENT_BUS.register(this);
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
         NetworkHandler.init();

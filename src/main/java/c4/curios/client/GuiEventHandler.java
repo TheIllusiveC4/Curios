@@ -1,7 +1,7 @@
 package c4.curios.client;
 
-import c4.curios.common.network.CPacketOpenCurios;
 import c4.curios.common.network.NetworkHandler;
+import c4.curios.common.network.client.CPacketOpenCurios;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.gui.inventory.GuiInventory;

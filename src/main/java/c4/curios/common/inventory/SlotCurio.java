@@ -1,46 +1,44 @@
 package c4.curios.common.inventory;
 
-import c4.curios.api.event.LivingChangeCurioEvent;
-import c4.curios.api.inventory.CurioSlotInfo;
 import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurio;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import c4.curios.api.inventory.CurioSlotEntry;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class SlotCurio extends SlotItemHandler {
 
-    private final CurioSlotInfo slotInfo;
+    private final CurioSlotEntry entry;
     private final EntityPlayer player;
-    private final TextureAtlasSprite slotOverlay;
+    private final String slotOverlay;
     private final int index;
 
-    public SlotCurio(EntityPlayer player, IItemHandler handler, int index, CurioSlotInfo info, int xPosition,
+    public SlotCurio(EntityPlayer player, IItemHandler handler, int index, CurioSlotEntry info, int xPosition,
                      int yPosition) {
         super(handler, index, xPosition, yPosition);
-        this.slotInfo = info;
+        this.entry = info;
         this.player = player;
-        this.slotOverlay = CuriosAPI.getSpriteFromID(slotInfo.getIdentifier());
+        this.slotOverlay = entry.getIcon() == null ? null : entry.getIcon().toString();
         this.index = index;
     }
 
     public String getSlotName() {
-        return slotInfo.getFormattedName();
+        return entry.getFormattedName();
     }
 
     @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
         ICurio curio = CuriosAPI.getCurio(stack);
         if (curio != null) {
-            return curio.getCurioSlots(stack).contains(slotInfo.getIdentifier()) && curio.canEquip(stack, player)
+            return curio.getCurioSlots(stack).contains(entry.getIdentifier()) && curio.canEquip(stack, player)
                     && super.isItemValid(stack);
         }
         return false;
@@ -54,9 +52,10 @@ public class SlotCurio extends SlotItemHandler {
                 && (curio == null || curio.canUnequip(stack, playerIn)) && super.canTakeStack(playerIn);
     }
 
-    @Override
+    @Nullable
     @SideOnly(Side.CLIENT)
-    public TextureAtlasSprite getBackgroundSprite() {
+    @Override
+    public String getSlotTexture() {
         return slotOverlay;
     }
 }

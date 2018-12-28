@@ -1,22 +1,17 @@
 package c4.curios.proxy;
 
 import c4.curios.Curios;
-import c4.curios.api.CuriosAPI;
 import c4.curios.client.ClientEventHandler;
 import c4.curios.client.GuiEventHandler;
 import c4.curios.client.KeyRegistry;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -38,9 +33,6 @@ public class ClientProxy implements IProxy {
 
     @SubscribeEvent
     public static void onTextureStitch(TextureStitchEvent.Pre evt) {
-        for (String identifier : CuriosAPI.getResourceMap().keySet()) {
-            TextureAtlasSprite sprite = evt.getMap().registerSprite(CuriosAPI.getResourceMap().get(identifier));
-            CuriosAPI.registerSpriteToID(identifier, sprite);
-        }
+        evt.getMap().registerSprite(new ResourceLocation("curios:items/empty_ring_slot"));
     }
 }

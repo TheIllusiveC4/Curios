@@ -4,80 +4,46 @@ import c4.curios.api.capability.CapCurioInventory;
 import c4.curios.api.capability.CapCurioItem;
 import c4.curios.api.capability.ICurio;
 import c4.curios.api.capability.ICurioItemHandler;
-import c4.curios.api.inventory.CurioSlotInfo;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import c4.curios.api.event.LivingGetCuriosEvent;
+import c4.curios.api.inventory.CurioSlotEntry;
+import c4.curios.api.inventory.CurioStackHandler;
+import com.google.common.collect.Maps;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CuriosAPI {
 
-    private static Map<String, CurioSlotInfo> idToSlot = new HashMap<>();
-    private static Map<String, ResourceLocation> idToResource = new HashMap<>();
-    private static Map<String, TextureAtlasSprite> idToSprite = new HashMap<>();
+    private static Map<String, CurioSlotEntry> idToEntry = new HashMap<>();
 
-    public static boolean registerCurioSlot(@Nonnull String identifier) {
-        return registerCurioSlot(identifier, null);
+    public static CurioSlotEntry createSlot(@Nonnull String identifier) {
+        CurioSlotEntry entry = new CurioSlotEntry(identifier);
+        idToEntry.put(identifier, entry);
+        return entry;
     }
 
-    public static boolean registerCurioSlot(@Nonnull String identifier, @Nullable ResourceLocation overlay) {
+    public static CurioSlotEntry getSlotEntryForID(String identifier) {
+        return idToEntry.get(identifier);
+    }
 
-        identifier = identifier.toLowerCase();
+    public static Map<String, CurioStackHandler> getSlotsMap(EntityLivingBase livingBase) {
+        Map<String, CurioStackHandler> map = Maps.newLinkedHashMap();
 
-        if (identifier.isEmpty()) {
-            return false;
-        }
-
-        boolean addNewOverlay = overlay != null && !idToResource.containsKey(identifier);
-
-        if (idToSlot.containsKey(identifier)) {
-            CurioSlotInfo existingInfo = idToSlot.get(identifier);
-            if (existingInfo.getSlotOverlay() != null) {
-                overlay = existingInfo.getSlotOverlay();
-                addNewOverlay = false;
+        for (String id : idToEntry.keySet()) {
+            CurioSlotEntry entry = idToEntry.get(id);
+            CurioStackHandler stackHandler = new CurioStackHandler(entry);
+            LivingGetCuriosEvent evt = new LivingGetCuriosEvent(livingBase, id, stackHandler.getSlots());
+            if (!MinecraftForge.EVENT_BUS.post(evt)) {
+                stackHandler.setSize(evt.getSize(), livingBase);
+                map.put(id, stackHandler);
             }
         }
-
-        if (addNewOverlay) {
-            idToResource.put(identifier, overlay);
-        }
-
-        CurioSlotInfo slot = new CurioSlotInfo(identifier, overlay);
-        idToSlot.put(identifier, slot);
-        return true;
-    }
-
-    public static List<CurioSlotInfo> getSlotList() {
-        return ImmutableList.copyOf(idToSlot.values());
-    }
-
-    public static Map<String, ResourceLocation> getResourceMap() {
-        return ImmutableMap.copyOf(idToResource);
-    }
-
-    @Nullable
-    public static CurioSlotInfo getSlotFromID(String identifier) {
-        return idToSlot.get(identifier);
-    }
-
-    public static void registerSpriteToID(String identifier, TextureAtlasSprite sprite) {
-        if (idToSprite.get(identifier) != null) {
-            return;
-        }
-        idToSprite.put(identifier, sprite);
-    }
-
-    @Nullable
-    public static TextureAtlasSprite getSpriteFromID(String identifier) {
-        return idToSprite.get(identifier);
+        return map;
     }
 
     @Nullable

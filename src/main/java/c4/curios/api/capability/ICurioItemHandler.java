@@ -1,19 +1,21 @@
 package c4.curios.api.capability;
 
-import c4.curios.api.inventory.CurioSlot;
-import c4.curios.api.inventory.CurioSlotInfo;
+import c4.curios.api.inventory.CurioStackHandler;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.Tuple;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
-public interface ICurioItemHandler extends IItemHandlerModifiable {
+import java.util.Map;
 
-    NonNullList<CurioSlot> getCurioStacks();
+public interface ICurioItemHandler {
 
-    void setCurioStacks(NonNullList<CurioSlot> curioStacks);
+    Map<String, CurioStackHandler> getCurioMap();
 
-    NonNullList<CurioSlot> getPreviousCurioStacks();
+    void setCurioMap(Map<String, CurioStackHandler> map);
 
-    void setPreviousCurioStacks(NonNullList<CurioSlot> prevStacks);
+    int getSlots();
+
+    CurioStackHandler getStackHandler(String identifier);
+
+    ItemStack getStackInSlot(String identifier, int slot);
+
+    void setStackInSlot(String identifier, int slot, ItemStack stack);
 }

@@ -1,10 +1,12 @@
 package c4.curios.api.capability;
 
 import c4.curios.Curios;
-import c4.curios.api.inventory.CurioSlot;
-import c4.curios.api.inventory.CurioSlotInfo;
 import c4.curios.api.CuriosAPI;
-import net.minecraft.entity.player.EntityPlayer;
+import c4.curios.api.inventory.CurioSlotEntry;
+import c4.curios.api.inventory.CurioStackHandler;
+import com.google.common.collect.Maps;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,10 +16,10 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Map;
 
 public class CapCurioInventory {
 
@@ -32,34 +34,40 @@ public class CapCurioInventory {
             @Override
             public NBTBase writeNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance,
                                     EnumFacing side) {
-                NBTTagList nbtTagList = new NBTTagList();
-                NonNullList<CurioSlot> curioStacks = instance.getCurioStacks();
+                Map<String, CurioStackHandler> curioMap = instance.getCurioMap();
+                NBTTagCompound compound = new NBTTagCompound();
+                NBTTagList taglist = new NBTTagList();
 
-                for (CurioSlot slot : curioStacks) {
-                    NBTTagCompound itemTag = new NBTTagCompound();
-                    itemTag.setString("Identifier", slot.getInfo().getIdentifier());
-                    slot.getStack().writeToNBT(itemTag);
-                    nbtTagList.appendTag(itemTag);
+                for (String identifier : curioMap.keySet()) {
+                    NBTTagCompound itemtag = new NBTTagCompound();
+                    itemtag.setString("Identifier", identifier);
+                    CurioStackHandler stackHandler = curioMap.get(identifier);
+                    ItemStackHelper.saveAllItems(itemtag, stackHandler.getStacks());
+                    taglist.appendTag(itemtag);
                 }
-                NBTTagCompound nbt = new NBTTagCompound();
-                nbt.setTag("Items", nbtTagList);
-                return nbt;
+                compound.setTag("Curios", taglist);
+                return compound;
             }
 
             @Override
             public void readNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, EnumFacing side, NBTBase nbt) {
-                NBTTagList tagList = ((NBTTagCompound)nbt).getTagList("Items", Constants.NBT.TAG_COMPOUND);
-                NonNullList<CurioSlot> curioStacks = NonNullList.create();
+                NBTTagList tagList = ((NBTTagCompound)nbt).getTagList("Curios", Constants.NBT.TAG_COMPOUND);
+                Map<String, CurioStackHandler> curioMap = Maps.newLinkedHashMap();
 
-                for (int i = 0; i < tagList.tagCount(); i++) {
-                    NBTTagCompound itemTags = tagList.getCompoundTagAt(i);
-                    CurioSlotInfo info = CuriosAPI.getSlotFromID(itemTags.getString("Identifier"));
+                if (!tagList.isEmpty()) {
+                    for (int i = 0; i < tagList.tagCount(); i++) {
+                        NBTTagCompound itemtag = tagList.getCompoundTagAt(i);
+                        String identifier = itemtag.getString("Identifier");
+                        CurioSlotEntry entry = CuriosAPI.getSlotEntryForID(identifier);
 
-                    if (info != null) {
-                        curioStacks.add(new CurioSlot(info, new ItemStack(itemTags)));
+                        if (entry != null) {
+                            NonNullList<ItemStack> stacks = NonNullList.create();
+                            ItemStackHelper.loadAllItems(itemtag, stacks);
+                            curioMap.put(identifier, new CurioStackHandler(entry, stacks));
+                        }
                     }
+                    instance.setCurioMap(curioMap);
                 }
-                instance.setCurioStacks(curioStacks);
             }
         }, CurioInventoryWrapper::new);
     }
@@ -70,151 +78,56 @@ public class CapCurioInventory {
 
     public static class CurioInventoryWrapper implements ICurioItemHandler {
 
-        NonNullList<CurioSlot> curioStacks;
-        NonNullList<CurioSlot> prevCurioStacks;
+        Map<String, CurioStackHandler> curioSlots;
+        Map<String, CurioStackHandler> prevCurioSlots;
 
         public CurioInventoryWrapper() {
-            this.curioStacks = NonNullList.create();
-            this.prevCurioStacks = NonNullList.create();
+            this.curioSlots = Maps.newLinkedHashMap();
+            this.prevCurioSlots = Maps.newLinkedHashMap();
         }
 
-        public CurioInventoryWrapper(EntityPlayer player) {
-            this.curioStacks = initCurios();
-            this.prevCurioStacks = initCurios();
-        }
-
-        private NonNullList<CurioSlot> initCurios() {
-            NonNullList<CurioSlot> curios = NonNullList.create();
-            for (CurioSlotInfo info : CuriosAPI.getSlotList()) {
-                curios.add(new CurioSlot(info));
-            }
-            return curios;
+        public CurioInventoryWrapper(EntityLivingBase livingBase) {
+            this.curioSlots = CuriosAPI.getSlotsMap(livingBase);
+            this.prevCurioSlots = CuriosAPI.getSlotsMap(livingBase);
         }
 
         @Override
-        public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
-            validateSlotIndex(slot);
-            this.curioStacks.get(slot).setStack(stack);
-            onContentsChanged(slot);
+        public void setStackInSlot(String identifier, int slot, @Nonnull ItemStack stack) {
+            this.curioSlots.get(identifier).setStackInSlot(slot, stack);
         }
 
         @Override
         public int getSlots() {
-            return curioStacks.size();
+            int totalSlots = 0;
+
+            for (int i = 0; i < curioSlots.size(); i++) {
+
+                for (CurioStackHandler stacks : curioSlots.values()) {
+                    totalSlots += stacks.getSlots();
+                }
+            }
+            return totalSlots;
         }
 
         @Nonnull
-        @Override
-        public ItemStack getStackInSlot(int slot) {
-            return curioStacks.get(slot).getStack();
+        public ItemStack getStackInSlot(String identifier, int slot) {
+            return this.curioSlots.get(identifier).getStackInSlot(slot);
         }
 
-        @Nonnull
+        @Nullable
         @Override
-        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-
-            if (stack.isEmpty()) return ItemStack.EMPTY;
-
-            validateSlotIndex(slot);
-
-            ItemStack existing = this.curioStacks.get(slot).getStack();
-
-            int limit = getStackLimit(slot, stack);
-
-            if (!existing.isEmpty()) {
-                if (!ItemHandlerHelper.canItemStacksStack(stack, existing)) return stack;
-                limit -= existing.getCount();
-            }
-
-            if (limit <= 0) return stack;
-
-            boolean reachedLimit = stack.getCount() > limit;
-
-            if (!simulate) {
-                if (existing.isEmpty()) {
-                    this.curioStacks.get(slot).setStack(reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) :
-                            stack);
-                }
-                else {
-                    existing.grow(reachedLimit ? limit : stack.getCount());
-                }
-                onContentsChanged(slot);
-            }
-
-            return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount()- limit) : ItemStack.EMPTY;
-        }
-
-        @Nonnull
-        @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate) {
-
-            if (amount == 0) return ItemStack.EMPTY;
-
-            validateSlotIndex(slot);
-
-            ItemStack existing = this.curioStacks.get(slot).getStack();
-
-            if (existing.isEmpty()) return ItemStack.EMPTY;
-
-            int toExtract = Math.min(amount, existing.getMaxStackSize());
-
-            if (existing.getCount() <= toExtract) {
-                if (!simulate) {
-                    this.curioStacks.get(slot).setStack(ItemStack.EMPTY);
-                    onContentsChanged(slot);
-                }
-                return existing;
-            }
-            else {
-                if (!simulate) {
-                    this.curioStacks.get(slot).setStack(ItemHandlerHelper.copyStackWithSize(existing, existing.getCount() - toExtract));
-                    onContentsChanged(slot);
-                }
-
-                return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
-            }
+        public CurioStackHandler getStackHandler(String identifier) {
+            return this.curioSlots.get(identifier);
         }
 
         @Override
-        public int getSlotLimit(int slot) {
-            return 64;
-        }
-
-        protected int getStackLimit(int slot, @Nonnull ItemStack stack) {
-            return Math.min(getSlotLimit(slot), stack.getMaxStackSize());
-        }
-
-        protected void validateSlotIndex(int slot) {
-            if (slot < 0 || slot >= curioStacks.size())
-                throw new RuntimeException("Slot " + slot + " not in valid range - [0," + curioStacks.size() + ")");
-        }
-
-        protected void onContentsChanged(int slot) {}
-
-        @Override
-        public NonNullList<CurioSlot> getCurioStacks() {
-            return curioStacks;
+        public Map<String, CurioStackHandler> getCurioMap() {
+            return this.curioSlots;
         }
 
         @Override
-        public void setCurioStacks(NonNullList<CurioSlot> curioStacks) {
-
-            for (int i = 0; i < this.curioStacks.size() && i < curioStacks.size(); i++) {
-                this.curioStacks.set(i, curioStacks.get(i));
-            }
-        }
-
-        @Override
-        public NonNullList<CurioSlot> getPreviousCurioStacks() {
-            return prevCurioStacks;
-        }
-
-        @Override
-        public void setPreviousCurioStacks(NonNullList<CurioSlot> prevStacks) {
-
-            for (int i = 0; i < this.prevCurioStacks.size() && i < curioStacks.size(); i++) {
-                this.prevCurioStacks.set(i, prevCurioStacks.get(i));
-            }
+        public void setCurioMap(Map<String, CurioStackHandler> map) {
+            this.curioSlots = map;
         }
     }
 
