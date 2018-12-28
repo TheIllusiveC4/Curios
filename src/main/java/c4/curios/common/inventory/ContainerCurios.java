@@ -152,20 +152,20 @@ public class ContainerCurios extends Container {
 
                 if (curio != null && curioHandler != null) {
                     Map<String, CurioStackHandler> curioSlots = curioHandler.getCurioMap();
+                    int curioIndex = 0;
 
                     for (String identifier : curioSlots.keySet()) {
+                        CurioStackHandler stackHandler = curioSlots.get(identifier);
 
-                        if (curio.getCurioSlots(itemstack1).contains(identifier)) {
-                            CurioStackHandler stackHandler = curioSlots.get(identifier);
+                        for (int i = 0; i < stackHandler.getSlots(); i++) {
+                            ItemStack stack = stackHandler.getStackInSlot(i);
 
-                            for (int i = 0; i < stackHandler.getSlots(); i++) {
-                                ItemStack stack = stackHandler.getStackInSlot(i);
-
-                                if (curio.canEquip(itemstack1, playerIn) && stack.isEmpty() &&
-                                        !this.mergeItemStack(itemstack1, 41 + i, 41 + i + 1, false)) {
-                                    return ItemStack.EMPTY;
-                                }
+                            if (curio.getCurioSlots(itemstack1).contains(identifier) && curio.canEquip(itemstack1, playerIn)
+                                    && stack.isEmpty() && !this.mergeItemStack(itemstack1, 41 + curioIndex,
+                                    41 + curioIndex + 1, false)) {
+                                return ItemStack.EMPTY;
                             }
+                            curioIndex++;
                         }
                     }
                 }

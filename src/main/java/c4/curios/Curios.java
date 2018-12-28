@@ -6,6 +6,7 @@ import c4.curios.api.capability.CapCurioItem;
 import c4.curios.client.GuiHandler;
 import c4.curios.common.CommonEventHandler;
 import c4.curios.common.CurioEventHandler;
+import c4.curios.common.item.ItemAmulet;
 import c4.curios.common.item.ItemRing;
 import c4.curios.common.network.NetworkHandler;
 import c4.curios.proxy.IProxy;
@@ -42,10 +43,14 @@ public class Curios
     @GameRegistry.ObjectHolder("curios:ring")
     public static final Item ring = null;
 
+    @GameRegistry.ObjectHolder("curios:amulet")
+    public static final Item amulet = null;
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent evt) {
         logger = evt.getModLog();
         CuriosAPI.createSlot("ring").icon(new ResourceLocation(MODID, "items/empty_ring_slot")).size(2);
+        CuriosAPI.createSlot("amulet").icon(new ResourceLocation(MODID, "items/empty_amulet_slot"));
         MinecraftForge.EVENT_BUS.register(this);
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
         NetworkHandler.init();
@@ -68,6 +73,6 @@ public class Curios
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> evt) {
-        evt.getRegistry().register(new ItemRing());
+        evt.getRegistry().registerAll(new ItemRing(), new ItemAmulet());
     }
 }

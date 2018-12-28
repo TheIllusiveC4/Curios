@@ -43,10 +43,13 @@ public class ClientProxy implements IProxy {
     public static void onModelRegister(ModelRegistryEvent evt) {
         ModelLoader.setCustomModelResourceLocation(Curios.ring, 0, new ModelResourceLocation(Curios.ring
                 .getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Curios.amulet, 0, new ModelResourceLocation(Curios.amulet
+                .getRegistryName(), "inventory"));
     }
 
     @SubscribeEvent
     public static void onTextureStitch(TextureStitchEvent.Pre evt) {
         evt.getMap().registerSprite(new ResourceLocation("curios:items/empty_ring_slot"));
+        evt.getMap().registerSprite(new ResourceLocation("curios:items/empty_amulet_slot"));
     }
 }

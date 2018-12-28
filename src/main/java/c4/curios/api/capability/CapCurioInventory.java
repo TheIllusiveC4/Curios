@@ -52,7 +52,6 @@ public class CapCurioInventory {
             @Override
             public void readNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, EnumFacing side, NBTBase nbt) {
                 NBTTagList tagList = ((NBTTagCompound)nbt).getTagList("Curios", Constants.NBT.TAG_COMPOUND);
-                Map<String, CurioStackHandler> curioMap = Maps.newLinkedHashMap();
 
                 if (!tagList.isEmpty()) {
                     for (int i = 0; i < tagList.tagCount(); i++) {
@@ -64,10 +63,9 @@ public class CapCurioInventory {
                             NonNullList<ItemStack> stacks = NonNullList.withSize(instance.getStackHandler(identifier).getSlots(),
                                     ItemStack.EMPTY);
                             ItemStackHelper.loadAllItems(itemtag, stacks);
-                            curioMap.put(identifier, new CurioStackHandler(entry, stacks));
+                            instance.getCurioMap().put(identifier, new CurioStackHandler(entry, stacks));
                         }
                     }
-                    instance.setCurioMap(curioMap);
                 }
             }
         }, CurioInventoryWrapper::new);
