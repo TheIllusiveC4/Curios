@@ -99,11 +99,8 @@ public class CapCurioInventory {
         public int getSlots() {
             int totalSlots = 0;
 
-            for (int i = 0; i < curioSlots.size(); i++) {
-
-                for (CurioStackHandler stacks : curioSlots.values()) {
-                    totalSlots += stacks.getSlots();
-                }
+            for (CurioStackHandler stacks : curioSlots.values()) {
+                totalSlots += stacks.getSlots();
             }
             return totalSlots;
         }

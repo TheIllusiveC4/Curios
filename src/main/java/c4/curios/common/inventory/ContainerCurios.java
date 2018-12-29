@@ -4,13 +4,12 @@ import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurio;
 import c4.curios.api.capability.ICurioItemHandler;
 import c4.curios.api.inventory.CurioStackHandler;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.*;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -23,19 +22,26 @@ import java.util.Map;
 public class ContainerCurios extends Container {
 
     private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[] {EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
-    /** Determines if inventory manipulation should be handled. */
+    public InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
+    public InventoryCraftResult craftResult = new InventoryCraftResult();
     private final EntityPlayer player;
-    private final ICurioItemHandler curios;
+    public final ICurioItemHandler curios;
 
     public ContainerCurios(InventoryPlayer playerInventory, EntityPlayer playerIn) {
         this.player = playerIn;
         this.curios = CuriosAPI.getCuriosHandler(playerIn);
+        this.addSlotToContainer(new SlotCrafting(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154, 28));
 
-        for (int k = 0; k < 4; ++k)
-        {
+        for (int i = 0; i < 2; ++i) {
+
+            for (int j = 0; j < 2; ++j) {
+                this.addSlotToContainer(new Slot(this.craftMatrix, j + i * 2, 98 + j * 18, 18 + i * 18));
+            }
+        }
+
+        for (int k = 0; k < 4; ++k) {
             final EntityEquipmentSlot entityequipmentslot = VALID_EQUIPMENT_SLOTS[k];
-            this.addSlotToContainer(new Slot(playerInventory, 36 + (3 - k), 8, 8 + k * 18)
-            {
+            this.addSlotToContainer(new Slot(playerInventory, 36 + (3 - k), 8, 8 + k * 18) {
                 /**
                  * Returns the maximum stack size for a given slot (usually the same as getInventoryStackLimit(), but 1
                  * in the case of armor slots)
@@ -48,15 +54,13 @@ public class ContainerCurios extends Container {
                  * Check if the stack is allowed to be placed in this slot, used for armor slots as well as furnace
                  * fuel.
                  */
-                public boolean isItemValid(ItemStack stack)
-                {
+                public boolean isItemValid(ItemStack stack) {
                     return stack.getItem().isValidArmor(stack, entityequipmentslot, player);
                 }
                 /**
                  * Return whether this slot's stack can be taken from this slot.
                  */
-                public boolean canTakeStack(EntityPlayer playerIn)
-                {
+                public boolean canTakeStack(EntityPlayer playerIn) {
                     ItemStack itemstack = this.getStack();
                     return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse
                             (itemstack)) && super.canTakeStack(playerIn);
@@ -70,21 +74,17 @@ public class ContainerCurios extends Container {
             });
         }
 
-        for (int l = 0; l < 3; ++l)
-        {
-            for (int j1 = 0; j1 < 9; ++j1)
-            {
+        for (int l = 0; l < 3; ++l) {
+
+            for (int j1 = 0; j1 < 9; ++j1) {
                 this.addSlotToContainer(new Slot(playerInventory, j1 + (l + 1) * 9, 8 + j1 * 18, 84 + l * 18));
             }
         }
 
-        for (int i1 = 0; i1 < 9; ++i1)
-        {
+        for (int i1 = 0; i1 < 9; ++i1) {
             this.addSlotToContainer(new Slot(playerInventory, i1, 8 + i1 * 18, 142));
         }
-
-        this.addSlotToContainer(new Slot(playerInventory, 40, 77, 62)
-        {
+        this.addSlotToContainer(new Slot(playerInventory, 40, 77, 62) {
             @SideOnly(Side.CLIENT)
             public String getSlotTexture()
             {
@@ -94,20 +94,60 @@ public class ContainerCurios extends Container {
 
         if (curios != null) {
             Map<String, CurioStackHandler> curioMap = this.curios.getCurioMap();
-            int slotCount = this.curios.getSlots();
-            int yOffset = 18;
-            int xOffset = 98;
+            int slots = 0;
+            int yOffset = 12;
 
             for (String identifier : curioMap.keySet()) {
                 CurioStackHandler stackHandler = curioMap.get(identifier);
 
-                for (int i = 0; i < stackHandler.getSlots(); i++) {
-                    this.addSlotToContainer(new SlotCurio(player, stackHandler, i, stackHandler.getEntry(), xOffset, yOffset));
-                    xOffset += 18;
+                for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+                    this.addSlotToContainer(new SlotCurio(player, stackHandler, i, stackHandler.getEntry(), -18, yOffset));
+                    yOffset += 18;
+                    slots++;
+                }
+            }
+        }
+        this.scrollTo(0.0F);
+    }
+
+    public void scrollTo(float pos) {
+        int j = (int)((double)(pos * (float)this.curios.getSlots()) + 0.5D);
+
+        if (j < 0) {
+            j = 0;
+        }
+        Map<String, CurioStackHandler> curioMap = this.curios.getCurioMap();
+        int slots = 0;
+        int yOffset = 12;
+
+        for (String identifier : curioMap.keySet()) {
+            CurioStackHandler stackHandler = curioMap.get(identifier);
+
+            for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+                this.inventorySlots.set(46 + slots, new SlotCurio(player, stackHandler, i, stackHandler.getEntry(), -18, yOffset));
+                yOffset += 18;
+                slots++;
+            }
+        }
+
+        for (int k = 0; k < 5; ++k) {
+
+            for (int l = 0; l < 9; ++l) {
+                int i1 = l + (k + j) * 9;
+
+                if (i1 >= 0 && i1 < this.curios.getSlots()) {
+//                    this.inventorySlots.set(46, new SlotCurio())
+                } else {
+//                    GuiContainerCreative.basicInventory.setInventorySlotContents(l + k * 9, ItemStack.EMPTY);
                 }
             }
         }
     }
+
+    public boolean canScroll() {
+        return this.curios.getSlots() > 45;
+    }
+
     /**
      * Determines whether supplied player can use this container
      */

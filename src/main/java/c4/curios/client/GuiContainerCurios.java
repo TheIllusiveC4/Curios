@@ -7,29 +7,31 @@ import c4.curios.common.inventory.ContainerCurios;
 import c4.curios.common.inventory.SlotCurio;
 import c4.curios.common.network.NetworkHandler;
 import c4.curios.common.network.client.CPacketOpenVanilla;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Mouse;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
 @SideOnly(Side.CLIENT)
 public class GuiContainerCurios extends InventoryEffectRenderer {
 
-    public static final ResourceLocation INVENTORY_BACKGROUND =
-            new ResourceLocation(Curios.MODID, "textures/gui/inventory.png");
+    public static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID, "textures/gui/inventory.png");
 
+    private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
     private static final Field OLD_MOUSE_X = ReflectionHelper.findField(GuiInventory.class, "oldMouseX",
             "field_147048_u");
     private static final Field OLD_MOUSE_Y = ReflectionHelper.findField(GuiInventory.class, "oldMouseY",
@@ -40,10 +42,13 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     /** The old y position of the mouse pointer */
     private float oldMouseY;
     private boolean widthTooNarrow;
-    private ArrowButton prevPageButton;
-    private ArrowButton nextPageButton;
-    private int totalPages;
-    private int currentPage;
+
+    /** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
+    private float currentScroll;
+    /** True if the scrollbar is being dragged */
+    private boolean isScrolling;
+    /** True if the left mouse button was held down last time drawScreen was called. */
+    private boolean wasClicking;
 
     static {
         OLD_MOUSE_X.setAccessible(true);
@@ -65,57 +70,59 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         super.initGui();
         this.widthTooNarrow = this.width < 379;
         this.guiLeft = (this.width - this.xSize) / 2;
-        this.addButton(new GuiButtonImage(44, this.guiLeft + 125, this.height / 2 - 22, 20, 18, 199, 0, 19,
-                INVENTORY_BACKGROUND));
-        this.totalPages = 1;
-        this.currentPage = 1;
-        ICurioItemHandler curiosHandler = CuriosAPI.getCuriosHandler(this.mc.player);
-        if (curiosHandler != null) {
-            this.totalPages = (int)Math.ceil(curiosHandler.getSlots() / 9);
-            if (totalPages > 1) {
-                this.nextPageButton = this.addButton(new ArrowButton(45, this.guiLeft + 100, this.height / 2 - 22, true));
-                this.prevPageButton = this.addButton(new ArrowButton(46, this.guiLeft + 50, this.height / 2 - 22, false));
-            }
-        }
-    }
-
-    /**
-     * Draw the foreground layer for the GuiContainer (everything in front of the items)
-     */
-    @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        this.fontRenderer.drawString(I18n.format(Curios.MODID + ".gui.container"), 97, 8, 4210752);
-        if (this.mc.player.inventory.getItemStack().isEmpty() && this.getSlotUnderMouse() != null) {
-            Slot slot = this.getSlotUnderMouse();
-            if (slot instanceof SlotCurio && !slot.getHasStack()) {
-                SlotCurio slotCurio = (SlotCurio)slot;
-                this.drawHoveringText(slotCurio.getSlotName(), mouseX - this.guiLeft, mouseY - this.guiTop);
-            }
-        }
+        this.addButton(new GuiButtonImage(44, this.guiLeft + 125, this.height / 2 - 22, 20,
+                18, 50, 0, 19, CURIO_INVENTORY));
     }
 
     /**
      * Draws the screen and all the components in it.
      */
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.hasActivePotionEffects = true;
+
+        boolean flag = Mouse.isButtonDown(0);
+        int i = this.guiLeft;
+        int j = this.guiTop;
+        int k = i + 175;
+        int l = j + 18;
+        int i1 = k + 14;
+        int j1 = l + 112;
+
+        if (!this.wasClicking && flag && mouseX >= k && mouseY >= l && mouseX < i1 && mouseY < j1) {
+            this.isScrolling = this.needsScrollBars();
+        }
+
+        if (!flag) {
+            this.isScrolling = false;
+        }
+        this.wasClicking = flag;
+
+        if (this.isScrolling) {
+            this.currentScroll = ((float)(mouseY - l) - 7.5F) / ((float)(j1 - l) - 15.0F);
+            this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
+            ((ContainerCurios)this.inventorySlots).scrollTo(this.currentScroll);
+        }
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
         this.oldMouseX = (float)mouseX;
         this.oldMouseY = (float)mouseY;
     }
 
+    @Override
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        this.fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
+    }
+
+
     /**
      * Draws the background layer of this container (behind the items).
      */
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
-    {
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(INVENTORY_BACKGROUND);
+        this.mc.getTextureManager().bindTexture(GuiInventory.INVENTORY_BACKGROUND);
         int i = this.guiLeft;
         int j = this.guiTop;
         this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
@@ -124,15 +131,15 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         ICurioItemHandler itemHandler = CuriosAPI.getCuriosHandler(this.mc.player);
         if (itemHandler != null) {
             int slotCount = itemHandler.getSlots();
-            int yOffset = 17;
-            for (int k = 0; k < Math.min(3, slotCount / 3 + 1); k++) {
-                int xOffset = 97;
-                for (int l = 0; l < Math.min(3, slotCount - (k * 3)); l++) {
-                    this.mc.getTextureManager().bindTexture(INVENTORY_BACKGROUND);
-                    this.drawTexturedModalRect(i + xOffset, j + yOffset, 179, 38, 18, 18);
-                    xOffset += 18;
-                }
-                yOffset += 18;
+            int upperHeight = 7 + slotCount * 18;
+            this.mc.getTextureManager().bindTexture(CURIO_INVENTORY);
+            this.drawTexturedModalRect(i - 26, j + 4, 0, 0, 27, upperHeight);
+            this.drawTexturedModalRect(i - 26, j + 4 + upperHeight, 0, 151, 27, 7);
+
+            if (slotCount > 8) {
+                this.drawTexturedModalRect(i - 42, j + 4, 27, 0, 23, 158);
+                this.mc.getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
+                this.drawTexturedModalRect(i - 34, j + 12 + (int)((float)(this.guiTop + 130) * this.currentScroll), 232, 0, 12, 15);
             }
         }
     }
@@ -142,8 +149,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
      * pointY
      */
     @Override
-    protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight, int pointX, int pointY)
-    {
+    protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight, int pointX, int pointY) {
         return !this.widthTooNarrow && super.isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
     }
 
@@ -152,8 +158,35 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
      */
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+
         if (!this.widthTooNarrow) {
             super.mouseClicked(mouseX, mouseY, mouseButton);
+        }
+    }
+
+    private boolean needsScrollBars() {
+        return ((ContainerCurios)this.inventorySlots).canScroll();
+    }
+
+    @Override
+    public void handleMouseInput() throws IOException {
+        super.handleMouseInput();
+        int i = Mouse.getEventDWheel();
+
+        if (i != 0 && this.needsScrollBars()) {
+            int j = (((ContainerCurios)this.inventorySlots).curios.getSlots() + 9 - 1) / 9 - 5;
+
+            if (i > 0) {
+                i = 1;
+            }
+
+            if (i < 0) {
+                i = -1;
+            }
+
+            this.currentScroll = (float)((double)this.currentScroll - (double)i / (double)j);
+            this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
+            ((ContainerCurios)this.inventorySlots).scrollTo(this.currentScroll);
         }
     }
 
@@ -162,6 +195,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
      */
     @Override
     protected void actionPerformed(GuiButton button) {
+
         if (button.id == 44) {
             GuiInventory inventory = new GuiInventory(this.mc.player);
             try {
@@ -172,49 +206,6 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
             }
             this.mc.displayGuiScreen(inventory);
             NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    static class ArrowButton extends GuiButton {
-
-        private final boolean forward;
-
-        public ArrowButton(int buttonID, int x, int y, boolean forward)
-        {
-            super(buttonID, x, y, 12, 19, "");
-            this.forward = forward;
-        }
-
-        /**
-         * Draws this button to the screen.
-         */
-        public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY, float partialTicks)
-        {
-            if (this.visible)
-            {
-                mc.getTextureManager().bindTexture(INVENTORY_BACKGROUND);
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                boolean flag = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-                int i = 0;
-                int j = 220;
-
-                if (!this.enabled)
-                {
-                    j += this.width * 2;
-                }
-                else if (flag)
-                {
-                    j += this.width;
-                }
-
-                if (!this.forward)
-                {
-                    i += this.height;
-                }
-
-                this.drawTexturedModalRect(this.x, this.y, j, i, this.width, this.height);
-            }
         }
     }
 }

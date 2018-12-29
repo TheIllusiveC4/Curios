@@ -49,7 +49,7 @@ public class Curios
     @EventHandler
     public void preInit(FMLPreInitializationEvent evt) {
         logger = evt.getModLog();
-        CuriosAPI.createSlot("ring").icon(new ResourceLocation(MODID, "items/empty_ring_slot")).size(2);
+        CuriosAPI.createSlot("ring").icon(new ResourceLocation(MODID, "items/empty_ring_slot")).size(10);
         CuriosAPI.createSlot("amulet").icon(new ResourceLocation(MODID, "items/empty_amulet_slot"));
         MinecraftForge.EVENT_BUS.register(this);
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
