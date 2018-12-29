@@ -111,7 +111,8 @@ public class ContainerCurios extends Container {
     }
 
     public void scrollTo(float pos) {
-        int j = (int)((double)(pos * (float)this.curios.getSlots()) + 0.5D);
+        int k = (this.curios.getSlots() - 8);
+        int j = (int)((double)(pos * (float)k) + 0.5D);
 
         if (j < 0) {
             j = 0;
@@ -119,33 +120,25 @@ public class ContainerCurios extends Container {
         Map<String, CurioStackHandler> curioMap = this.curios.getCurioMap();
         int slots = 0;
         int yOffset = 12;
+        int index = 0;
 
         for (String identifier : curioMap.keySet()) {
             CurioStackHandler stackHandler = curioMap.get(identifier);
 
             for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
-                this.inventorySlots.set(46 + slots, new SlotCurio(player, stackHandler, i, stackHandler.getEntry(), -18, yOffset));
-                yOffset += 18;
-                slots++;
-            }
-        }
 
-        for (int k = 0; k < 5; ++k) {
-
-            for (int l = 0; l < 9; ++l) {
-                int i1 = l + (k + j) * 9;
-
-                if (i1 >= 0 && i1 < this.curios.getSlots()) {
-//                    this.inventorySlots.set(46, new SlotCurio())
-                } else {
-//                    GuiContainerCreative.basicInventory.setInventorySlotContents(l + k * 9, ItemStack.EMPTY);
+                if (index >= j) {
+                    this.inventorySlots.set(46 + slots, new SlotCurio(player, stackHandler, i, stackHandler.getEntry(), -18, yOffset));
+                    yOffset += 18;
+                    slots++;
                 }
+                index++;
             }
         }
     }
 
     public boolean canScroll() {
-        return this.curios.getSlots() > 45;
+        return this.curios.getSlots() > 8;
     }
 
     /**

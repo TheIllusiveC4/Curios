@@ -85,10 +85,10 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         boolean flag = Mouse.isButtonDown(0);
         int i = this.guiLeft;
         int j = this.guiTop;
-        int k = i + 175;
-        int l = j + 18;
+        int k = i - 34;
+        int l = j + 12;
         int i1 = k + 14;
-        int j1 = l + 112;
+        int j1 = l + 139;
 
         if (!this.wasClicking && flag && mouseX >= k && mouseY >= l && mouseX < i1 && mouseY < j1) {
             this.isScrolling = this.needsScrollBars();
@@ -134,12 +134,13 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
             int upperHeight = 7 + slotCount * 18;
             this.mc.getTextureManager().bindTexture(CURIO_INVENTORY);
             this.drawTexturedModalRect(i - 26, j + 4, 0, 0, 27, upperHeight);
-            this.drawTexturedModalRect(i - 26, j + 4 + upperHeight, 0, 151, 27, 7);
 
-            if (slotCount > 8) {
+            if (slotCount <= 8) {
+                this.drawTexturedModalRect(i - 26, j + 4 + upperHeight, 0, 151, 27, 7);
+            } else {
                 this.drawTexturedModalRect(i - 42, j + 4, 27, 0, 23, 158);
                 this.mc.getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
-                this.drawTexturedModalRect(i - 34, j + 12 + (int)((float)(this.guiTop + 130) * this.currentScroll), 232, 0, 12, 15);
+                this.drawTexturedModalRect(i - 34, j + 12 + (int)(127f * this.currentScroll), 232, 0, 12, 15);
             }
         }
     }
@@ -174,7 +175,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         int i = Mouse.getEventDWheel();
 
         if (i != 0 && this.needsScrollBars()) {
-            int j = (((ContainerCurios)this.inventorySlots).curios.getSlots() + 9 - 1) / 9 - 5;
+            int j = (((ContainerCurios)this.inventorySlots).curios.getSlots());
 
             if (i > 0) {
                 i = 1;
