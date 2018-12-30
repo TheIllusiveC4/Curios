@@ -29,7 +29,7 @@ public interface ICurio {
         return true;
     }
 
-    default Multimap<String, AttributeModifier> getAttributeModifiers(ItemStack stack) {
+    default Multimap<String, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack) {
         return HashMultimap.create();
     }
 

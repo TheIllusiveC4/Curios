@@ -125,6 +125,16 @@ public class CapCurioInventory {
         public void setCurioMap(Map<String, CurioStackHandler> map) {
             this.curioSlots = map;
         }
+
+        @Override
+        public Map<String, CurioStackHandler> getPreviousCurioMap() {
+            return this.prevCurioSlots;
+        }
+
+        @Override
+        public void setPreviousCurioMap(Map<String, CurioStackHandler> map) {
+            this.prevCurioSlots = map;
+        }
     }
 
     public static class Provider implements ICapabilitySerializable<NBTBase> {

@@ -9,7 +9,11 @@ public interface ICurioItemHandler {
 
     Map<String, CurioStackHandler> getCurioMap();
 
+    Map<String, CurioStackHandler> getPreviousCurioMap();
+
     void setCurioMap(Map<String, CurioStackHandler> map);
+
+    void setPreviousCurioMap(Map<String, CurioStackHandler> map);
 
     int getSlots();
 

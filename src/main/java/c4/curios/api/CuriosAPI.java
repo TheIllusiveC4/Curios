@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class CuriosAPI {
 
@@ -25,6 +26,10 @@ public class CuriosAPI {
         CurioSlotEntry entry = new CurioSlotEntry(identifier);
         idToEntry.put(identifier, entry);
         return entry;
+    }
+
+    public static Set<String> getRegisteredIds() {
+        return idToEntry.keySet();
     }
 
     public static CurioSlotEntry getSlotEntryForID(String identifier) {

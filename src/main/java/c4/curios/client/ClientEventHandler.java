@@ -60,48 +60,50 @@ public class ClientEventHandler {
                     }
                 }
 
-                Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(stack);
+                for (String identifier : CuriosAPI.getRegisteredIds()) {
+                    Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier, stack);
 
-                if (!multimap.isEmpty()) {
-                    EntityPlayer player = evt.getEntityPlayer();
-                    tooltip.add("");
-                    tooltip.add(I18n.format("curios.modifiers"));
+                    if (!multimap.isEmpty()) {
+                        EntityPlayer player = evt.getEntityPlayer();
+                        tooltip.add("");
+                        tooltip.add(I18n.format("curios.modifiers", identifier));
 
-                    for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
-                        AttributeModifier attributemodifier = entry.getValue();
-                        double amount = attributemodifier.getAmount();
-                        boolean flag = false;
+                        for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
+                            AttributeModifier attributemodifier = entry.getValue();
+                            double amount = attributemodifier.getAmount();
+                            boolean flag = false;
 
-                        if (player != null) {
+                            if (player != null) {
 
-                            if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
-                                amount = amount + player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
-                                amount = amount + (double) EnchantmentHelper.getModifierForCreature(stack,
-                                        EnumCreatureAttribute.UNDEFINED);
-                                flag = true;
-                            } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
-                                amount += player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
-                                flag = true;
-                            }
+                                if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
+                                    amount = amount + player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
+                                    amount = amount + (double) EnchantmentHelper.getModifierForCreature(stack,
+                                            EnumCreatureAttribute.UNDEFINED);
+                                    flag = true;
+                                } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
+                                    amount += player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
+                                    flag = true;
+                                }
 
-                            double d1;
+                                double d1;
 
-                            if (attributemodifier.getOperation() != 1 && attributemodifier.getOperation() != 2) {
-                                d1 = amount;
-                            } else {
-                                d1 = amount * 100.0D;
-                            }
+                                if (attributemodifier.getOperation() != 1 && attributemodifier.getOperation() != 2) {
+                                    d1 = amount;
+                                } else {
+                                    d1 = amount * 100.0D;
+                                }
 
-                            if (flag) {
-                                tooltip.add(" " + I18n.format("attribute.modifier.equals." + attributemodifier.getOperation(),
-                                        ItemStack.DECIMALFORMAT.format(d1), I18n.format("attribute.name." + entry.getKey())));
-                            } else if (amount > 0.0D) {
-                                tooltip.add(TextFormatting.BLUE + " " + I18n.format("attribute.modifier.plus." + attributemodifier.getOperation(),
-                                        ItemStack.DECIMALFORMAT.format(d1), I18n.format("attribute.name." + entry.getKey())));
-                            } else if (amount < 0.0D) {
-                                d1 = d1 * -1.0D;
-                                tooltip.add(TextFormatting.RED + " " + I18n.format("attribute.modifier.take." + attributemodifier.getOperation(),
-                                        ItemStack.DECIMALFORMAT.format(d1), I18n.format("attribute.name." + entry.getKey())));
+                                if (flag) {
+                                    tooltip.add(" " + I18n.format("attribute.modifier.equals." + attributemodifier.getOperation(),
+                                            ItemStack.DECIMALFORMAT.format(d1), I18n.format("attribute.name." + entry.getKey())));
+                                } else if (amount > 0.0D) {
+                                    tooltip.add(TextFormatting.BLUE + " " + I18n.format("attribute.modifier.plus." + attributemodifier.getOperation(),
+                                            ItemStack.DECIMALFORMAT.format(d1), I18n.format("attribute.name." + entry.getKey())));
+                                } else if (amount < 0.0D) {
+                                    d1 = d1 * -1.0D;
+                                    tooltip.add(TextFormatting.RED + " " + I18n.format("attribute.modifier.take." + attributemodifier.getOperation(),
+                                            ItemStack.DECIMALFORMAT.format(d1), I18n.format("attribute.name." + entry.getKey())));
+                                }
                             }
                         }
                     }

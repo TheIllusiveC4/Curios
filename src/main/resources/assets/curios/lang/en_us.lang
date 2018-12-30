@@ -1,5 +1,3 @@
-curios.gui.container=Curios
-
 curios.name=Curio
 
-curios.modifiers=When as accessory:
+curios.modifiers=When worn as %s:

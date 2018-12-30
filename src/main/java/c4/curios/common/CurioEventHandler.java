@@ -30,7 +30,7 @@ public class CurioEventHandler {
 
             if (!entitylivingbase.world.isRemote) {
                 Map<String, CurioStackHandler> curios = curioHandler.getCurioMap();
-                Map<String, CurioStackHandler> prevCurios = curioHandler.getCurioMap();
+                Map<String, CurioStackHandler> prevCurios = curioHandler.getPreviousCurioMap();
 
                 for (String identifier : curios.keySet()) {
                     CurioStackHandler stackHandler = curios.get(identifier);
@@ -65,13 +65,14 @@ public class CurioEventHandler {
 
                             if (!prevStack.isEmpty() && prevCurio != null) {
                                 prevCurio.onUnequipped(prevStack, entitylivingbase);
-                                entitylivingbase.getAttributeMap().removeAttributeModifiers(prevCurio.getAttributeModifiers(prevStack));
+                                entitylivingbase.getAttributeMap().removeAttributeModifiers(prevCurio.getAttributeModifiers(identifier, prevStack));
                             }
 
                             if (!stack.isEmpty() && curio != null) {
                                 curio.onEquipped(stack, entitylivingbase);
-                                entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(stack));
+                                entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier, stack));
                             }
+                            prevStackHandler.setStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
                         }
                     }
                 }

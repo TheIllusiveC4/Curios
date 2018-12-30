@@ -114,6 +114,13 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         this.fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
+        if (this.mc.player.inventory.getItemStack().isEmpty() && this.getSlotUnderMouse() != null) {
+            Slot slot = this.getSlotUnderMouse();
+            if (slot instanceof SlotCurio && !slot.getHasStack()) {
+                SlotCurio slotCurio = (SlotCurio)slot;
+                this.drawHoveringText(slotCurio.getSlotName(), mouseX - this.guiLeft, mouseY - this.guiTop);
+            }
+        }
     }
 
 

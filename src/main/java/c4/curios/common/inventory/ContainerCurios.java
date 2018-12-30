@@ -6,6 +6,8 @@ import c4.curios.api.capability.ICurioItemHandler;
 import c4.curios.api.inventory.CurioStackHandler;
 import c4.curios.common.network.NetworkHandler;
 import c4.curios.common.network.client.CPacketScrollCurios;
+import c4.curios.common.network.server.SPacketScrollCurios;
+import com.google.common.collect.Lists;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
@@ -20,6 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 
 public class ContainerCurios extends Container {
@@ -30,6 +33,7 @@ public class ContainerCurios extends Container {
     private final EntityPlayer player;
     public final ICurioItemHandler curios;
     public final boolean isLocalWorld;
+    private int lastScrollIndex;
 
     public ContainerCurios(InventoryPlayer playerInventory, EntityPlayer playerIn) {
         this.player = playerIn;
@@ -112,43 +116,51 @@ public class ContainerCurios extends Container {
                 }
             }
         }
-        this.scrollTo(0.0F);
+        this.scrollToIndex(0);
     }
 
-    public void scrollTo(float pos) {
-
-        if (this.isLocalWorld) {
-            NetworkHandler.INSTANCE.sendToServer(new CPacketScrollCurios(this.windowId, pos));
-        }
-
-        int k = (this.curios.getSlots() - 8);
-        int j = (int)((double)(pos * (float)k) + 0.5D);
-
-        if (j < 0) {
-            j = 0;
-        }
+    public void scrollToIndex(int indexIn) {
         Map<String, CurioStackHandler> curioMap = this.curios.getCurioMap();
         int slots = 0;
         int yOffset = 12;
         int index = 0;
-
-        while (this.inventorySlots.size() > 46) {
-            this.inventorySlots.remove(46);
-            this.inventoryItemStacks.remove(46);
-        }
+        this.inventorySlots.subList(46, this.inventorySlots.size()).clear();
+        this.inventoryItemStacks.subList(46, this.inventoryItemStacks.size()).clear();
 
         for (String identifier : curioMap.keySet()) {
             CurioStackHandler stackHandler = curioMap.get(identifier);
 
             for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
-                if (index >= j) {
+                if (index >= indexIn) {
                     this.addSlotToContainer(new SlotCurio(player, stackHandler, i, stackHandler.getEntry(), -18, yOffset));
                     yOffset += 18;
                     slots++;
                 }
                 index++;
             }
+        }
+
+        if (!this.isLocalWorld) {
+            NetworkHandler.INSTANCE.sendTo(new SPacketScrollCurios(this.windowId, indexIn), (EntityPlayerMP)this.player);
+        }
+        lastScrollIndex = indexIn;
+    }
+
+    public void scrollTo(float pos) {
+        int k = (this.curios.getSlots() - 8);
+        int j = (int)((double)(pos * (float)k) + 0.5D);
+
+        if (j < 0) {
+            j = 0;
+        }
+
+        if (j == this.lastScrollIndex) {
+            return;
+        }
+
+        if (this.isLocalWorld) {
+            NetworkHandler.INSTANCE.sendToServer(new CPacketScrollCurios(this.windowId, j));
         }
     }
 
