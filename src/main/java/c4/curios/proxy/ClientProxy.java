@@ -51,5 +51,6 @@ public class ClientProxy implements IProxy {
     public static void onTextureStitch(TextureStitchEvent.Pre evt) {
         evt.getMap().registerSprite(new ResourceLocation("curios:items/empty_ring_slot"));
         evt.getMap().registerSprite(new ResourceLocation("curios:items/empty_amulet_slot"));
+        evt.getMap().registerSprite(new ResourceLocation("curios:items/empty_generic_slot"));
     }
 }

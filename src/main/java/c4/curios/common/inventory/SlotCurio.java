@@ -25,7 +25,7 @@ public class SlotCurio extends SlotItemHandler {
         super(handler, index, xPosition, yPosition);
         this.entry = info;
         this.player = player;
-        this.slotOverlay = entry.getIcon() == null ? null : entry.getIcon().toString();
+        this.slotOverlay = entry.getIcon() == null ? "curios:items/empty_generic_slot" : entry.getIcon().toString();
     }
 
     public String getSlotName() {

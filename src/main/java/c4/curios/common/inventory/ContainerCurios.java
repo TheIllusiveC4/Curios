@@ -206,6 +206,7 @@ public class ContainerCurios extends Container {
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
             EntityEquipmentSlot entityequipmentslot = EntityLiving.getSlotForItemStack(itemstack);
+            ICurio curio = CuriosAPI.getCurio(itemstack);
 
             if (index == 0) {
 
@@ -229,6 +230,11 @@ public class ContainerCurios extends Container {
                 if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
                     return ItemStack.EMPTY;
                 }
+            } else if (curio != null) {
+
+                if (curio.canEquip(itemstack1, playerIn) && !this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
+                    return ItemStack.EMPTY;
+                }
             } else if (entityequipmentslot == EntityEquipmentSlot.OFFHAND && !(this.inventorySlots.get(45)).getHasStack()) {
 
                 if (!this.mergeItemStack(itemstack1, 45, 46, false)) {
@@ -243,19 +249,6 @@ public class ContainerCurios extends Container {
 
                 if (!this.mergeItemStack(itemstack1, 9, 36, false)) {
                     return ItemStack.EMPTY;
-                }
-            } else if (index >= 46) {
-                ICurio curio = CuriosAPI.getCurio(itemstack1);
-
-                if (curio != null) {
-                    SlotCurio curioSlot = (SlotCurio) this.inventorySlots.get(index);
-                    String identifier = curioSlot.getCurioSlotEntry().getIdentifier();
-                    int slots = curioSlot.getItemHandler().getSlots();
-
-                    if (curio.getCurioSlots(itemstack1).contains(identifier) && curio.canEquip(itemstack1, playerIn)
-                            && !this.mergeItemStack(itemstack1, 46, 46 + slots, false)) {
-                        return ItemStack.EMPTY;
-                    }
                 }
             } else if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
                 return ItemStack.EMPTY;
