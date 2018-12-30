@@ -72,6 +72,8 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         this.guiLeft = (this.width - this.xSize) / 2;
         this.addButton(new GuiButtonImage(44, this.guiLeft + 125, this.height / 2 - 22, 20,
                 18, 50, 0, 19, CURIO_INVENTORY));
+        this.addButton(new GuiButtonImage(10, this.guiLeft + 104, this.height / 2 - 22, 20,
+                18, 178, 0, 19, INVENTORY_BACKGROUND));
     }
 
     /**
@@ -80,8 +82,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        this.hasActivePotionEffects = true;
-
+        this.hasActivePotionEffects = false;
         boolean flag = Mouse.isButtonDown(0);
         int i = this.guiLeft;
         int j = this.guiTop;

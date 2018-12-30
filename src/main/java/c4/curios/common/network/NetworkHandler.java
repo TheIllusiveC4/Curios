@@ -3,6 +3,7 @@ package c4.curios.common.network;
 import c4.curios.Curios;
 import c4.curios.common.network.client.CPacketOpenCurios;
 import c4.curios.common.network.client.CPacketOpenVanilla;
+import c4.curios.common.network.client.CPacketScrollCurios;
 import c4.curios.common.network.server.SPacketEntityCurios;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -17,6 +18,7 @@ public class NetworkHandler {
     public static void init() {
         registerMessage(CPacketOpenCurios.MessageHandler.class, CPacketOpenCurios.class, Side.SERVER);
         registerMessage(CPacketOpenVanilla.MessageHandler.class, CPacketOpenVanilla.class, Side.SERVER);
+        registerMessage(CPacketScrollCurios.MessageHandler.class, CPacketScrollCurios.class, Side.SERVER);
         registerMessage(SPacketEntityCurios.MessageHandler.class, SPacketEntityCurios.class, Side.CLIENT);
     }
 
