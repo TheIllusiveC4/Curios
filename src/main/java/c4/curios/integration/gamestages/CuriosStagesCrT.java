@@ -14,12 +14,12 @@ import stanhebben.zenscript.annotations.ZenMethod;
 public class CuriosStagesCrT {
 
     @ZenMethod
-    public static void addStageSlotSize(String stage, String identifier, int slotChange) {
-        CraftTweakerAPI.apply(new AddSlotSizeStageAction(stage, identifier, slotChange));
+    public static void addSlotSizeStage(String stage, int slotChange, String... identifiers) {
+        CraftTweakerAPI.apply(new AddSlotSizeStageAction(stage, slotChange, identifiers));
     }
 
     @ZenMethod
-    public static void addStage(String stage, String identifier) {
+    public static void addEnableSlotStage(String stage, String... identifier) {
         CraftTweakerAPI.apply(new AddStageAction(stage, identifier));
     }
 }

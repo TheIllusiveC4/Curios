@@ -60,7 +60,7 @@ public class ClientEventHandler {
                     }
                 }
 
-                for (String identifier : CuriosAPI.getRegisteredIds()) {
+                for (String identifier : CuriosAPI.getRegistry().keySet()) {
                     Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier, stack);
 
                     if (!multimap.isEmpty()) {

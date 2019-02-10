@@ -9,7 +9,6 @@ import c4.curios.common.CurioEventHandler;
 import c4.curios.common.item.ItemAmulet;
 import c4.curios.common.item.ItemRing;
 import c4.curios.common.network.NetworkHandler;
-import c4.curios.integration.crafttweaker.CuriosCrT;
 import c4.curios.proxy.IProxy;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -69,7 +68,6 @@ public class Curios
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent evt) {
-        CuriosCrT.setOverrides();
         proxy.postInit(evt);
     }
 
