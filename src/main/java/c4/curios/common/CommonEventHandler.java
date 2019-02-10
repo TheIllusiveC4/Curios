@@ -28,17 +28,9 @@ import java.util.Map;
 public class CommonEventHandler {
 
     @SubscribeEvent
-    public void debug(TickEvent.PlayerTickEvent evt) {
-        if (evt.player instanceof EntityPlayerMP) {
-            EntityPlayerMP playerMP = (EntityPlayerMP)evt.player;
-        }
-    }
-
-    @SubscribeEvent
     public void onCapabilitiesEntity(AttachCapabilitiesEvent<Entity> evt) {
         if (evt.getObject() instanceof EntityPlayer) {
-            evt.addCapability(CapCurioInventory.ID, CapCurioInventory.createProvider(
-                    new CapCurioInventory.CurioInventoryWrapper((EntityPlayer)evt.getObject())));
+            evt.addCapability(CapCurioInventory.ID, CapCurioInventory.createProvider(new CapCurioInventory.CurioInventoryWrapper()));
         }
     }
 

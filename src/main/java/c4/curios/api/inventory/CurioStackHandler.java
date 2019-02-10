@@ -13,15 +13,20 @@ public class CurioStackHandler implements IItemHandlerModifiable {
 
     private final CurioSlotEntry entry;
     private NonNullList<ItemStack> stacks;
+    private boolean isEnabled;
 
     public CurioStackHandler(@Nonnull CurioSlotEntry entry) {
-        this.entry = entry;
-        this.stacks = NonNullList.withSize(entry.getSize(), ItemStack.EMPTY);
+        this(entry, NonNullList.withSize(entry.getSize(), ItemStack.EMPTY));
     }
 
     public CurioStackHandler(@Nonnull CurioSlotEntry entry, NonNullList<ItemStack> stacks) {
+        this(entry, stacks, entry.isEnabled());
+    }
+
+    public CurioStackHandler(@Nonnull CurioSlotEntry entry, NonNullList<ItemStack> stacks, boolean isEnabled) {
         this.entry = entry;
-        this.stacks = stacks;
+        this.stacks = isEnabled ? stacks : NonNullList.withSize(entry.getSize(), ItemStack.EMPTY);
+        this.isEnabled = isEnabled;
     }
 
     @Nonnull
@@ -73,12 +78,20 @@ public class CurioStackHandler implements IItemHandlerModifiable {
 
     @Override
     public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-        return true;
+        return isEnabled;
     }
 
     @Override
     public int getSlots() {
         return stacks.size();
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 
     @Nonnull

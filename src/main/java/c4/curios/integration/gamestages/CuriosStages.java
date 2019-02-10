@@ -2,7 +2,6 @@ package c4.curios.integration.gamestages;
 
 import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurioItemHandler;
-import c4.curios.api.event.LivingGetCuriosEvent;
 import c4.curios.common.inventory.ContainerCurios;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -23,35 +22,6 @@ public class CuriosStages {
 
     private static final Map<String, Set<String>> SLOT_STAGES = Maps.newHashMap();
     private static final Map<String, List<Tuple<String, Integer>>> SLOT_CHANGE_STAGES = Maps.newHashMap();
-
-    @SubscribeEvent
-    public void onGetCurio(LivingGetCuriosEvent evt) {
-
-        if (evt.getEntityLiving() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer)evt.getEntityLiving();
-            String identifier = evt.getIdentifier();
-
-            if (SLOT_STAGES.containsKey(identifier)) {
-                Set<String> stages = getStages(identifier);
-
-                if (stages != null) {
-
-                    if (!GameStageHelper.hasAllOf(player, stages)) {
-                        evt.setCanceled(true);
-                    } else if (SLOT_CHANGE_STAGES.containsKey(identifier)) {
-                        List<Tuple<String, Integer>> list = SLOT_CHANGE_STAGES.get(identifier);
-
-                        for (Tuple<String, Integer> entry : list) {
-
-                            if (GameStageHelper.hasStage(player, entry.getFirst())) {
-                                evt.setSize(evt.getSize() + entry.getSecond());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     @SubscribeEvent
     public void onAddedStage(GameStageEvent.Added evt) {
@@ -81,6 +51,7 @@ public class CuriosStages {
             v.add(stage);
             return v;
         });
+        CuriosAPI.disableSlot(identifier);
     }
 
 

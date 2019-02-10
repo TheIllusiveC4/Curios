@@ -2,13 +2,13 @@
 {
   "modid": "curios",
   "name": "Curios",
-  "description": "Example placeholder mod.",
+  "description": "A flexible and expandable accessory API for modders and modpack developers.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["C4"],
+  "credits": "",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

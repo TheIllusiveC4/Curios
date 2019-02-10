@@ -13,8 +13,6 @@ public interface ICurioItemHandler {
 
     void setCurioMap(Map<String, CurioStackHandler> map);
 
-    void setPreviousCurioMap(Map<String, CurioStackHandler> map);
-
     int getSlots();
 
     CurioStackHandler getStackHandler(String identifier);

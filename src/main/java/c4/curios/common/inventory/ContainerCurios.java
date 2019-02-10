@@ -52,7 +52,7 @@ public class ContainerCurios extends Container {
             final EntityEquipmentSlot entityequipmentslot = VALID_EQUIPMENT_SLOTS[k];
             this.addSlotToContainer(new Slot(playerInventory, 36 + (3 - k), 8, 8 + k * 18) {
                 /**
-                 * Returns the maximum stack size for a given slot (usually the same as getInventoryStackLimit(), but 1
+                 * Returns the maximum stack setSize for a given slot (usually the same as getInventoryStackLimit(), but 1
                  * in the case of armor slots)
                  */
                 public int getSlotStackLimit()

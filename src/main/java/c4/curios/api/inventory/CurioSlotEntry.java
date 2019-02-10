@@ -11,10 +11,12 @@ public class CurioSlotEntry {
     private final String identifier;
     private ResourceLocation icon;
     private int size;
+    private boolean isEnabled;
 
     public CurioSlotEntry(String identifier) {
         this.identifier = identifier;
         this.size = 1;
+        this.isEnabled = true;
     }
 
     public String getIdentifier() {
@@ -38,13 +40,22 @@ public class CurioSlotEntry {
         return this.size;
     }
 
-    public final CurioSlotEntry icon(@Nonnull ResourceLocation icon) {
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public final CurioSlotEntry setIcon(@Nonnull ResourceLocation icon) {
         this.icon = icon;
         return this;
     }
 
-    public final CurioSlotEntry size(int size) {
+    public final CurioSlotEntry setSize(int size) {
         this.size = size;
+        return this;
+    }
+
+    public final CurioSlotEntry disable() {
+        this.isEnabled = false;
         return this;
     }
 }

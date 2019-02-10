@@ -4,13 +4,13 @@ import c4.curios.api.capability.CapCurioInventory;
 import c4.curios.api.capability.CapCurioItem;
 import c4.curios.api.capability.ICurio;
 import c4.curios.api.capability.ICurioItemHandler;
-import c4.curios.api.event.LivingGetCuriosEvent;
 import c4.curios.api.inventory.CurioSlotEntry;
 import c4.curios.api.inventory.CurioStackHandler;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,27 +28,8 @@ public class CuriosAPI {
         return entry;
     }
 
-    public static Set<String> getRegisteredIds() {
-        return idToEntry.keySet();
-    }
-
-    public static CurioSlotEntry getSlotEntryForID(String identifier) {
-        return idToEntry.get(identifier);
-    }
-
-    public static Map<String, CurioStackHandler> getSlotsMap(EntityLivingBase livingBase) {
-        Map<String, CurioStackHandler> map = Maps.newLinkedHashMap();
-
-        for (String id : idToEntry.keySet()) {
-            CurioSlotEntry entry = idToEntry.get(id);
-            CurioStackHandler stackHandler = new CurioStackHandler(entry);
-            LivingGetCuriosEvent evt = new LivingGetCuriosEvent(livingBase, id, stackHandler.getSlots());
-            if (!MinecraftForge.EVENT_BUS.post(evt)) {
-                stackHandler.setSize(evt.getSize(), livingBase);
-                map.put(id, stackHandler);
-            }
-        }
-        return map;
+    public static ImmutableMap<String, CurioSlotEntry> getRegistry() {
+        return ImmutableMap.copyOf(idToEntry);
     }
 
     @Nullable
@@ -69,5 +50,68 @@ public class CuriosAPI {
             return entityLivingBase.getCapability(CapCurioInventory.CURIO_INV_CAP, CapCurioInventory.DEFAULT_FACING);
         }
         return null;
+    }
+
+    public static void disableSlot(String id) {
+        CurioSlotEntry entry = idToEntry.get(id);
+
+        if (entry != null) {
+            entry.disable();
+        }
+    }
+
+    public static void addSlotToEntity(String id, final EntityLivingBase entityLivingBase) {
+        addSlotsToEntity(id, 1, entityLivingBase);
+    }
+
+    public static void addSlotsToEntity(String id, int amount, final EntityLivingBase entityLivingBase) {
+        ICurioItemHandler handler = getCuriosHandler(entityLivingBase);
+
+        if (handler != null) {
+            CurioStackHandler stackHandler = handler.getCurioMap().get(id);
+
+            if (stackHandler != null) {
+                stackHandler.setSize(stackHandler.getSlots() + amount, entityLivingBase);
+            }
+        }
+    }
+
+    public static void enableSlotForEntity(String id, final EntityLivingBase entityLivingBase) {
+        ICurioItemHandler handler = getCuriosHandler(entityLivingBase);
+
+        if (handler != null) {
+            CurioStackHandler stackHandler = handler.getCurioMap().get(id);
+
+            if (stackHandler != null) {
+                stackHandler.setEnabled(true);
+            }
+        }
+    }
+
+    public static void disableSlotForEntity(String id, final EntityLivingBase entityLivingBase) {
+        ICurioItemHandler handler = getCuriosHandler(entityLivingBase);
+
+        if (handler != null) {
+            CurioStackHandler stackHandler = handler.getCurioMap().get(id);
+
+            if (stackHandler != null) {
+                stackHandler.setEnabled(false);
+
+                for (int i = 0; i < stackHandler.getSlots(); i++) {
+                    ItemStack stack = stackHandler.getStackInSlot(i);
+
+                    if (!stack.isEmpty()) {
+                        ItemStack copy = stack.copy();
+
+                        if (entityLivingBase instanceof EntityPlayer) {
+                            ItemHandlerHelper.giveItemToPlayer((EntityPlayer)entityLivingBase, copy);
+                        } else {
+                            entityLivingBase.entityDropItem(copy, 0.0f);
+                        }
+                        stackHandler.setStackInSlot(i, ItemStack.EMPTY);
+                    }
+                }
+            }
+        }
     }
 }

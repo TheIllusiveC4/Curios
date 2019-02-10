@@ -9,6 +9,7 @@ import c4.curios.common.CurioEventHandler;
 import c4.curios.common.item.ItemAmulet;
 import c4.curios.common.item.ItemRing;
 import c4.curios.common.network.NetworkHandler;
+import c4.curios.integration.crafttweaker.CuriosCrT;
 import c4.curios.proxy.IProxy;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -49,8 +50,8 @@ public class Curios
     @EventHandler
     public void preInit(FMLPreInitializationEvent evt) {
         logger = evt.getModLog();
-        CuriosAPI.createSlot("ring").icon(new ResourceLocation(MODID, "items/empty_ring_slot")).size(10);
-        CuriosAPI.createSlot("amulet").icon(new ResourceLocation(MODID, "items/empty_amulet_slot"));
+        CuriosAPI.createSlot("ring").setIcon(new ResourceLocation(MODID, "items/empty_ring_slot")).setSize(10);
+        CuriosAPI.createSlot("amulet").setIcon(new ResourceLocation(MODID, "items/empty_amulet_slot"));
         MinecraftForge.EVENT_BUS.register(this);
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
         NetworkHandler.init();
@@ -68,6 +69,7 @@ public class Curios
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent evt) {
+        CuriosCrT.setOverrides();
         proxy.postInit(evt);
     }
 
