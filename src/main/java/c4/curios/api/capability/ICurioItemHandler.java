@@ -1,23 +1,31 @@
 package c4.curios.api.capability;
 
-import c4.curios.api.inventory.CurioStackHandler;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.Map;
 
 public interface ICurioItemHandler {
 
-    Map<String, CurioStackHandler> getCurioMap();
+    ImmutableMap<String, ItemStackHandler> getCurioMap();
 
-    Map<String, CurioStackHandler> getPreviousCurioMap();
+    ImmutableMap<String, ItemStackHandler> getPreviousCurioMap();
 
-    void setCurioMap(Map<String, CurioStackHandler> map);
+    void setCurioMap(Map<String, ItemStackHandler> map);
 
+    /**
+    * Returns the total number of Curio slots across all identifiers
+    */
     int getSlots();
 
-    CurioStackHandler getStackHandler(String identifier);
+    ItemStackHandler getStackHandler(String identifier);
 
     ItemStack getStackInSlot(String identifier, int slot);
 
     void setStackInSlot(String identifier, int slot, ItemStack stack);
+
+    void addCurioSlot(String identifier);
+
+    void removeCurioSlot(String identifier);
 }

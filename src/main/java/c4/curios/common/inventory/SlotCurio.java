@@ -32,8 +32,6 @@ public class SlotCurio extends SlotItemHandler {
         return entry.getFormattedName();
     }
 
-    public CurioSlotEntry getCurioSlotEntry() { return entry; }
-
     @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
         ICurio curio = CuriosAPI.getCurio(stack);

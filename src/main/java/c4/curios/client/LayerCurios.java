@@ -3,15 +3,16 @@ package c4.curios.client;
 import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurio;
 import c4.curios.api.capability.ICurioItemHandler;
-import c4.curios.api.inventory.CurioStackHandler;
+import c4.curios.common.ConfigHandler;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
 
 public class LayerCurios implements LayerRenderer<EntityLivingBase> {
 
@@ -19,19 +20,20 @@ public class LayerCurios implements LayerRenderer<EntityLivingBase> {
     public void doRenderLayer(@Nonnull EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount,
                               float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 
-        if (entitylivingbaseIn.isPotionActive(MobEffects.INVISIBILITY)) {
+        if (!ConfigHandler.renderCurios || entitylivingbaseIn.isPotionActive(MobEffects.INVISIBILITY)) {
             return;
         }
         GlStateManager.pushMatrix();
         ICurioItemHandler handler = CuriosAPI.getCuriosHandler(entitylivingbaseIn);
 
         if (handler != null) {
-            Map<String, CurioStackHandler> curios = handler.getCurioMap();
+            ImmutableMap<String, ItemStackHandler> curios = handler.getCurioMap();
 
             for (String id : curios.keySet()) {
-                CurioStackHandler stackHandler = curios.get(id);
+                ItemStackHandler stackHandler = curios.get(id);
 
-                for (ItemStack stack : stackHandler.getStacks()) {
+                for (int i = 0; i < stackHandler.getSlots(); i++) {
+                    ItemStack stack = stackHandler.getStackInSlot(i);
 
                     if (!stack.isEmpty()) {
                         ICurio curio = CuriosAPI.getCurio(stack);

@@ -3,18 +3,12 @@ package c4.curios.integration.gamestages;
 import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurioItemHandler;
 import c4.curios.common.inventory.ContainerCurios;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import net.darkhax.gamestages.GameStageHelper;
 import net.darkhax.gamestages.event.GameStageEvent;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 

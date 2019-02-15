@@ -1,11 +1,9 @@
 package c4.curios.common.network.server;
 
 import c4.curios.common.inventory.ContainerCurios;
-import c4.curios.common.network.client.CPacketScrollCurios;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.IThreadListener;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

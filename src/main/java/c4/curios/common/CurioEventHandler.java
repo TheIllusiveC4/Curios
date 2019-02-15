@@ -4,9 +4,9 @@ import c4.curios.api.CuriosAPI;
 import c4.curios.api.capability.ICurio;
 import c4.curios.api.capability.ICurioItemHandler;
 import c4.curios.api.event.LivingChangeCurioEvent;
-import c4.curios.api.inventory.CurioStackHandler;
 import c4.curios.common.network.NetworkHandler;
 import c4.curios.common.network.server.SPacketEntityCurios;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,9 +16,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-
-import java.util.Map;
+import net.minecraftforge.items.ItemStackHandler;
 
 public class CurioEventHandler {
 
@@ -30,12 +28,12 @@ public class CurioEventHandler {
         if (curioHandler != null) {
 
             if (!entitylivingbase.world.isRemote) {
-                Map<String, CurioStackHandler> curios = curioHandler.getCurioMap();
-                Map<String, CurioStackHandler> prevCurios = curioHandler.getPreviousCurioMap();
+                ImmutableMap<String, ItemStackHandler> curios = curioHandler.getCurioMap();
+                ImmutableMap<String, ItemStackHandler> prevCurios = curioHandler.getPreviousCurioMap();
 
                 for (String identifier : curios.keySet()) {
-                    CurioStackHandler stackHandler = curios.get(identifier);
-                    CurioStackHandler prevStackHandler = prevCurios.get(identifier);
+                    ItemStackHandler stackHandler = curios.get(identifier);
+                    ItemStackHandler prevStackHandler = prevCurios.get(identifier);
 
                     for (int i = 0; i < stackHandler.getSlots(); i++) {
                         ItemStack stack = stackHandler.getStackInSlot(i);

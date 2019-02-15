@@ -5,6 +5,7 @@ import c4.curios.api.capability.CapCurioInventory;
 import c4.curios.api.capability.CapCurioItem;
 import c4.curios.client.GuiHandler;
 import c4.curios.common.CommonEventHandler;
+import c4.curios.common.ConfigHandler;
 import c4.curios.common.CurioEventHandler;
 import c4.curios.common.item.ItemAmulet;
 import c4.curios.common.item.ItemRing;
@@ -68,6 +69,10 @@ public class Curios
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent evt) {
+
+        for (String id : ConfigHandler.disabledCurios) {
+            CuriosAPI.setSlotEnabled(id, false);
+        }
         proxy.postInit(evt);
     }
 

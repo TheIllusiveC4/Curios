@@ -2,6 +2,8 @@ package c4.curios.api.inventory;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -27,6 +29,7 @@ public class CurioSlotEntry {
         return "curios.identifier." + identifier;
     }
 
+    @SideOnly(Side.CLIENT)
     public String getFormattedName() {
         return I18n.format(getTranslationKey());
     }
@@ -54,8 +57,8 @@ public class CurioSlotEntry {
         return this;
     }
 
-    public final CurioSlotEntry disable() {
-        this.isEnabled = false;
+    public final CurioSlotEntry setEnabled(boolean enabled) {
+        this.isEnabled = enabled;
         return this;
     }
 }

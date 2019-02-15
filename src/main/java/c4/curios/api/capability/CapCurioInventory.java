@@ -3,9 +3,8 @@ package c4.curios.api.capability;
 import c4.curios.Curios;
 import c4.curios.api.CuriosAPI;
 import c4.curios.api.inventory.CurioSlotEntry;
-import c4.curios.api.inventory.CurioStackHandler;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -16,6 +15,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,16 +34,14 @@ public class CapCurioInventory {
             @Override
             public NBTBase writeNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance,
                                     EnumFacing side) {
-                Map<String, CurioStackHandler> curioMap = instance.getCurioMap();
+                ImmutableMap<String, ItemStackHandler> curioMap = instance.getCurioMap();
                 NBTTagCompound compound = new NBTTagCompound();
                 NBTTagList taglist = new NBTTagList();
 
                 for (String identifier : curioMap.keySet()) {
-                    NBTTagCompound itemtag = new NBTTagCompound();
+                    ItemStackHandler stackHandler = curioMap.get(identifier);
+                    NBTTagCompound itemtag = stackHandler.serializeNBT();
                     itemtag.setString("Identifier", identifier);
-                    CurioStackHandler stackHandler = curioMap.get(identifier);
-                    itemtag.setBoolean("Enabled", stackHandler.isEnabled());
-                    ItemStackHelper.saveAllItems(itemtag, stackHandler.getStacks());
                     taglist.appendTag(itemtag);
                 }
                 compound.setTag("Curios", taglist);
@@ -53,21 +51,28 @@ public class CapCurioInventory {
             @Override
             public void readNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, EnumFacing side, NBTBase nbt) {
                 NBTTagList tagList = ((NBTTagCompound)nbt).getTagList("Curios", Constants.NBT.TAG_COMPOUND);
+                Map<String, ItemStackHandler> curios = Maps.newLinkedHashMap();
+                curios.putAll(instance.getCurioMap());
 
                 if (!tagList.isEmpty()) {
+
                     for (int i = 0; i < tagList.tagCount(); i++) {
                         NBTTagCompound itemtag = tagList.getCompoundTagAt(i);
                         String identifier = itemtag.getString("Identifier");
                         CurioSlotEntry entry = CuriosAPI.getRegistry().get(identifier);
-                        boolean isEnabled = itemtag.getBoolean("Enabled");
 
                         if (entry != null) {
-                            NonNullList<ItemStack> stacks = NonNullList.withSize(instance.getStackHandler(identifier).getSlots(),
-                                    ItemStack.EMPTY);
-                            ItemStackHelper.loadAllItems(itemtag, stacks);
-                            instance.getCurioMap().put(identifier, new CurioStackHandler(entry, stacks, isEnabled));
+                            ItemStackHandler stackHandler = instance.getStackHandler(identifier);
+
+                            if (stackHandler != null) {
+                                NonNullList<ItemStack> stacks = NonNullList.withSize(instance.getStackHandler(identifier).getSlots(),
+                                        ItemStack.EMPTY);
+                                ItemStackHelper.loadAllItems(itemtag, stacks);
+                                curios.put(identifier, new ItemStackHandler(stacks));
+                            }
                         }
                     }
+                    instance.setCurioMap(curios);
                 }
             }
         }, CurioInventoryWrapper::new);
@@ -79,12 +84,14 @@ public class CapCurioInventory {
 
     public static class CurioInventoryWrapper implements ICurioItemHandler {
 
-        Map<String, CurioStackHandler> curioSlots;
-        Map<String, CurioStackHandler> prevCurioSlots;
+        Map<String, ItemStackHandler> curioSlots;
+        Map<String, ItemStackHandler> prevCurioSlots;
+        NonNullList<ItemStack> itemCache;
 
         public CurioInventoryWrapper() {
             this.curioSlots = this.initCurioSlots();
-            this.prevCurioSlots = Maps.newLinkedHashMap();
+            this.prevCurioSlots = this.initCurioSlots();
+            this.itemCache = NonNullList.create();
         }
 
         @Override
@@ -92,13 +99,16 @@ public class CapCurioInventory {
             this.curioSlots.get(identifier).setStackInSlot(slot, stack);
         }
 
-        private Map<String, CurioStackHandler> initCurioSlots() {
-            Map<String, CurioStackHandler> slots = Maps.newLinkedHashMap();
+        private Map<String, ItemStackHandler> initCurioSlots() {
+            Map<String, ItemStackHandler> slots = Maps.newLinkedHashMap();
             Map<String, CurioSlotEntry> registry = CuriosAPI.getRegistry();
 
             for (String id : registry.keySet()) {
                 CurioSlotEntry entry = registry.get(id);
-                slots.put(id, new CurioStackHandler(entry));
+
+                if (entry.isEnabled()) {
+                    slots.put(id, new ItemStackHandler(entry.getSize()));
+                }
             }
             return slots;
         }
@@ -107,7 +117,7 @@ public class CapCurioInventory {
         public int getSlots() {
             int totalSlots = 0;
 
-            for (CurioStackHandler stacks : curioSlots.values()) {
+            for (ItemStackHandler stacks : curioSlots.values()) {
                 totalSlots += stacks.getSlots();
             }
             return totalSlots;
@@ -120,23 +130,44 @@ public class CapCurioInventory {
 
         @Nullable
         @Override
-        public CurioStackHandler getStackHandler(String identifier) {
+        public ItemStackHandler getStackHandler(String identifier) {
             return this.curioSlots.get(identifier);
         }
 
         @Override
-        public Map<String, CurioStackHandler> getCurioMap() {
-            return this.curioSlots;
+        public ImmutableMap<String, ItemStackHandler> getCurioMap() {
+            return ImmutableMap.copyOf(this.curioSlots);
         }
 
         @Override
-        public void setCurioMap(Map<String, CurioStackHandler> map) {
+        public void setCurioMap(Map<String, ItemStackHandler> map) {
+
+            for (String id : map.keySet()) {
+
+                if (!CuriosAPI.getRegistry().containsKey(id)) {
+                    map.remove(id);
+                }
+            }
             this.curioSlots = map;
         }
 
         @Override
-        public Map<String, CurioStackHandler> getPreviousCurioMap() {
-            return this.prevCurioSlots;
+        public ImmutableMap<String, ItemStackHandler> getPreviousCurioMap() {
+            return ImmutableMap.copyOf(this.prevCurioSlots);
+        }
+
+        @Override
+        public void addCurioSlot(String identifier) {
+            CurioSlotEntry entry = CuriosAPI.getRegistry().get(identifier);
+
+            if (entry != null) {
+                this.curioSlots.putIfAbsent(identifier, new ItemStackHandler(entry.getSize()));
+            }
+        }
+
+        @Override
+        public void removeCurioSlot(String identifier) {
+            this.curioSlots.remove(identifier);
         }
     }
 

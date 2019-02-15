@@ -5,13 +5,12 @@ import c4.curios.api.capability.CapCurioInventory;
 import c4.curios.api.capability.CapCurioItem;
 import c4.curios.api.capability.ICurio;
 import c4.curios.api.capability.ICurioItemHandler;
-import c4.curios.api.inventory.CurioStackHandler;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -20,10 +19,9 @@ import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.List;
-import java.util.Map;
 
 public class CommonEventHandler {
 
@@ -65,9 +63,10 @@ public class CommonEventHandler {
 
             if (curios != null) {
                 List<EntityItem> entityItems = evt.getDrops();
-                Map<String, CurioStackHandler> curioMap = curios.getCurioMap();
+                ImmutableMap<String, ItemStackHandler> curioMap = curios.getCurioMap();
+
                 for (String identifier : curioMap.keySet()) {
-                    CurioStackHandler stacks = curioMap.get(identifier);
+                    ItemStackHandler stacks = curioMap.get(identifier);
 
                     for (int i = 0; i < stacks.getSlots(); i++) {
                         ItemStack stack = stacks.getStackInSlot(i);
@@ -92,10 +91,10 @@ public class CommonEventHandler {
             ICurioItemHandler curios = CuriosAPI.getCuriosHandler(player);
 
             if (curios != null) {
-                Map<String, CurioStackHandler> curioMap = curios.getCurioMap();
+                ImmutableMap<String, ItemStackHandler> curioMap = curios.getCurioMap();
 
                 for (String identifier : curioMap.keySet()) {
-                    CurioStackHandler stacks = curioMap.get(identifier);
+                    ItemStackHandler stacks = curioMap.get(identifier);
 
                     for (int i = 0; i < stacks.getSlots(); i++) {
                         ItemStack stack = stacks.getStackInSlot(i);
