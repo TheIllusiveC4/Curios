@@ -1,58 +1,60 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
 
-version = "1.0"
-group = "com.yourname.modid"
-archivesBaseName = "modid"
+version = "${version_minecraft}-${version_mod}"
+group = "${mod_group}.${mod_id}"
+archivesBaseName = "${mod_id}"
 
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    version = "1.12.2-14.23.5.2768"
-    runDir = "run"
-    mappings = "stable_39"
-}
-
-repositories {
-
-    maven {
-        url 'https://maven.mcmoddev.com'
-    }
-
-    maven {
-        url 'http://maven.blamejared.com'
+    mappings channel: 'snapshot', version: '20180921-1.13'
+	
+    runs {
+        client = {
+            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+            properties 'forge.logging.console.level': 'debug'
+            workingDirectory project.file('run').canonicalPath
+            source sourceSets.main
+        }
+        server = {
+            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+            properties 'forge.logging.console.level': 'debug'
+            workingDirectory project.file('run').canonicalPath
+            source sourceSets.main
+        }
     }
 }
 
 dependencies {
-    deobfProvided "net.darkhax.gamestages:GameStages-1.12.2:2.0.108"
-    deobfProvided "net.darkhax.bookshelf:Bookshelf-1.12.2:2.3.566"
-
-    deobfProvided "CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.9.6"
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.21'
 }
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-    
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+sourceSets {
+    main {
+        resources {
+            srcDirs += 'docs'
+        }
     }
-    
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+}
+
+jar {
+    manifest {
+        attributes(["Specification-Title": "curios",
+                    "Specification-Vendor": "C4",
+                    "Specification-Version": "24.0",
+                    "Implementation-Title": project.name,
+                    "Implementation-Version": "${version}",
+                    "Implementation-Vendor" :"C4",
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
     }
 }
