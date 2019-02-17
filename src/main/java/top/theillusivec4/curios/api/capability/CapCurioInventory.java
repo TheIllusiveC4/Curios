@@ -17,7 +17,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioSlotEntry;
+import top.theillusivec4.curios.api.CurioType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,9 +60,9 @@ public class CapCurioInventory {
                     for (int i = 0; i < tagList.size(); i++) {
                         NBTTagCompound itemtag = tagList.getCompound(i);
                         String identifier = itemtag.getString("Identifier");
-                        CurioSlotEntry entry = CuriosAPI.getRegistry().get(identifier);
+                        CurioType type = CuriosAPI.getType(identifier);
 
-                        if (entry != null) {
+                        if (type != null) {
                             ItemStackHandler stackHandler = instance.getStackHandler(identifier);
 
                             if (stackHandler != null) {
@@ -108,10 +108,10 @@ public class CapCurioInventory {
 
         private Map<String, ItemStackHandler> initCurioSlots() {
             Map<String, ItemStackHandler> slots = Maps.newLinkedHashMap();
-            Map<String, CurioSlotEntry> registry = CuriosAPI.getRegistry();
+            Map<String, CurioType> registry = CuriosAPI.getTypeRegistry();
 
             for (String id : registry.keySet()) {
-                CurioSlotEntry entry = registry.get(id);
+                CurioType entry = registry.get(id);
 
                 if (entry.isEnabled()) {
                     slots.put(id, new ItemStackHandler(entry.getSize()));
@@ -151,7 +151,7 @@ public class CapCurioInventory {
 
             for (String id : map.keySet()) {
 
-                if (!CuriosAPI.getRegistry().containsKey(id)) {
+                if (CuriosAPI.getType(id) != null) {
                     map.remove(id);
                 }
             }
@@ -165,10 +165,10 @@ public class CapCurioInventory {
 
         @Override
         public void addCurioSlot(String identifier) {
-            CurioSlotEntry entry = CuriosAPI.getRegistry().get(identifier);
+            CurioType type = CuriosAPI.getType(identifier);
 
-            if (entry != null) {
-                this.curioSlots.putIfAbsent(identifier, new ItemStackHandler(entry.getSize()));
+            if (type != null) {
+                this.curioSlots.putIfAbsent(identifier, new ItemStackHandler(type.getSize()));
             }
         }
 

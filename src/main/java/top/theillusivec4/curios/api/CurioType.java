@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.api.inventory;
+package top.theillusivec4.curios.api;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
@@ -8,14 +8,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CurioSlotEntry {
+public class CurioType {
 
     private final String identifier;
     private ResourceLocation icon;
     private int size;
     private boolean isEnabled;
 
-    public CurioSlotEntry(String identifier) {
+    public CurioType(String identifier) {
         this.identifier = identifier;
         this.size = 1;
         this.isEnabled = true;
@@ -47,17 +47,17 @@ public class CurioSlotEntry {
         return isEnabled;
     }
 
-    public final CurioSlotEntry setIcon(@Nonnull ResourceLocation icon) {
+    public final CurioType setIcon(@Nonnull ResourceLocation icon) {
         this.icon = icon;
         return this;
     }
 
-    public final CurioSlotEntry setSize(int size) {
+    public final CurioType setSize(int size) {
         this.size = size;
         return this;
     }
 
-    public final CurioSlotEntry setEnabled(boolean enabled) {
+    public final CurioType setEnabled(boolean enabled) {
         this.isEnabled = enabled;
         return this;
     }

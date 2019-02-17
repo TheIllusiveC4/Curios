@@ -8,16 +8,14 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
+import top.theillusivec4.curios.api.CuriosAPI;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public interface ICurio {
-
-    default List<String> getCurioSlots(ItemStack stack) {
-        return new ArrayList<>();
-    }
 
     default void onCurioTick(ItemStack stack, EntityLivingBase entityLivingBase) {}
 
@@ -38,9 +36,7 @@ public interface ICurio {
     }
 
     default Set<String> getCurioTypes(ItemStack stack) {
-        Set<String> types = Sets.newHashSet();
-        ItemTags.getCollection().getTagMap();
-        return Sets.newHashSet("generic");
+        return CuriosAPI.getCurioTags(stack.getItem());
     }
 
     default boolean hasRender(ItemStack stack, EntityLivingBase entityLivingBase) { return false; }

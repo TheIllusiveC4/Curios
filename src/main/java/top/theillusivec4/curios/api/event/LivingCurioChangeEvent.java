@@ -6,13 +6,13 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 
 import javax.annotation.Nonnull;
 
-public class LivingChangeCurioEvent extends LivingEvent {
+public class LivingCurioChangeEvent extends LivingEvent {
 
     private final String slot;
     private final ItemStack from;
     private final ItemStack to;
 
-    public LivingChangeCurioEvent(EntityLivingBase living, String slot, @Nonnull ItemStack from, @Nonnull ItemStack to)
+    public LivingCurioChangeEvent(EntityLivingBase living, String slot, @Nonnull ItemStack from, @Nonnull ItemStack to)
     {
         super(living);
         this.slot = slot;

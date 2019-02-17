@@ -1,13 +1,9 @@
-package c4.curios.common;
+package top.theillusivec4.curios.common;
 
-import c4.curios.api.CuriosAPI;
-import c4.curios.api.capability.CapCurioInventory;
-import c4.curios.api.capability.CapCurioItem;
-import c4.curios.api.capability.ICurio;
-import c4.curios.api.capability.ICurioItemHandler;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,26 +14,19 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.ItemStackHandler;
+import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.capability.CapCurioInventory;
 
-import java.util.List;
+import java.util.Collection;
 
 public class CommonEventHandler {
 
     @SubscribeEvent
     public void onCapabilitiesEntity(AttachCapabilitiesEvent<Entity> evt) {
         if (evt.getObject() instanceof EntityPlayer) {
-            evt.addCapability(CapCurioInventory.ID, CapCurioInventory.createProvider(new CapCurioInventory.CurioInventoryWrapper()));
-        }
-    }
-
-    @SubscribeEvent
-    public void onCapabilitiesItemStack(AttachCapabilitiesEvent<ItemStack> evt) {
-        ItemStack stack = evt.getObject();
-
-        if (!stack.isEmpty() && stack.getItem() instanceof ICurio) {
-            evt.addCapability(CapCurioItem.ID, CapCurioItem.createProvider((ICurio)stack.getItem()));
+            evt.addCapability(CapCurioInventory.ID, CapCurioInventory.createProvider((EntityPlayer)evt.getObject()));
         }
     }
 
@@ -45,12 +34,10 @@ public class CommonEventHandler {
     public void onPlayerClone(PlayerEvent.Clone evt) {
         EntityPlayer player = evt.getEntityPlayer();
         if (!evt.isWasDeath() || player.world.getGameRules().getBoolean("keepInventory")) {
-            ICurioItemHandler originalCurios = CuriosAPI.getCuriosHandler(evt.getOriginal());
-            ICurioItemHandler newCurios = CuriosAPI.getCuriosHandler(player);
 
-            if (originalCurios != null && newCurios != null) {
-                newCurios.setCurioMap(originalCurios.getCurioMap());
-            }
+            CuriosAPI.getCuriosHandler(evt.getOriginal()).ifPresent(originalHandler ->
+                    CuriosAPI.getCuriosHandler(player).ifPresent(newHandler ->
+                            newHandler.setCurioMap(originalHandler.getCurioMap())));
         }
     }
 
@@ -59,11 +46,9 @@ public class CommonEventHandler {
         EntityPlayer player = evt.getEntityPlayer();
 
         if (!player.world.getGameRules().getBoolean("keepInventory") && !player.isSpectator()) {
-            ICurioItemHandler curios = CuriosAPI.getCuriosHandler(player);
-
-            if (curios != null) {
-                List<EntityItem> entityItems = evt.getDrops();
-                ImmutableMap<String, ItemStackHandler> curioMap = curios.getCurioMap();
+            CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
+                Collection<EntityItem> entityItems = evt.getDrops();
+                ImmutableMap<String, ItemStackHandler> curioMap = handler.getCurioMap();
 
                 for (String identifier : curioMap.keySet()) {
                     ItemStackHandler stacks = curioMap.get(identifier);
@@ -79,7 +64,7 @@ public class CommonEventHandler {
                         }
                     }
                 }
-            }
+            });
         }
     }
 
@@ -88,10 +73,8 @@ public class CommonEventHandler {
         EntityPlayer player = evt.getEntityPlayer();
 
         if (!player.world.isRemote) {
-            ICurioItemHandler curios = CuriosAPI.getCuriosHandler(player);
-
-            if (curios != null) {
-                ImmutableMap<String, ItemStackHandler> curioMap = curios.getCurioMap();
+            CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
+                ImmutableMap<String, ItemStackHandler> curioMap = handler.getCurioMap();
 
                 for (String identifier : curioMap.keySet()) {
                     ItemStackHandler stacks = curioMap.get(identifier);
@@ -99,25 +82,25 @@ public class CommonEventHandler {
                     for (int i = 0; i < stacks.getSlots(); i++) {
                         ItemStack stack = stacks.getStackInSlot(i);
 
-                        if (!stack.isEmpty() && stack.isItemDamaged() && EnchantmentHelper.getEnchantmentLevel(
-                                Enchantments.MENDING, stack) > 0) {
+                        if (!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0
+                                && stack.isDamaged()) {
                             evt.setCanceled(true);
                             EntityXPOrb orb = evt.getOrb();
                             player.xpCooldown = 2;
                             player.onItemPickup(orb, 1);
-                            int toRepair = Math.min(orb.xpValue * 2, stack.getItemDamage());
+                            int toRepair = Math.min(orb.xpValue * 2, stack.getDamage());
                             orb.xpValue -= toRepair / 2;
-                            stack.setItemDamage(stack.getItemDamage() - toRepair);
+                            stack.setDamage(stack.getDamage() - toRepair);
 
                             if (orb.xpValue > 0) {
-                                player.addExperience(orb.xpValue);
+                                player.giveExperiencePoints(orb.xpValue);
                             }
-                            orb.setDead();
+                            orb.remove();
                             return;
                         }
                     }
                 }
-            }
+            });
         }
     }
 

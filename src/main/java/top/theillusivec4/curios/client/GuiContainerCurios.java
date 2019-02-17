@@ -1,14 +1,8 @@
-package c4.curios.client;
+package top.theillusivec4.curios.client;
 
-import c4.curios.Curios;
-import c4.curios.api.CuriosAPI;
-import c4.curios.api.capability.ICurioItemHandler;
-import c4.curios.common.inventory.ContainerCurios;
-import c4.curios.common.inventory.SlotCurio;
-import c4.curios.common.network.NetworkHandler;
-import c4.curios.common.network.client.CPacketOpenVanilla;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
@@ -16,69 +10,59 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Mouse;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.common.inventory.ContainerCurios;
+import top.theillusivec4.curios.common.inventory.SlotCurio;
+import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class GuiContainerCurios extends InventoryEffectRenderer {
 
     public static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID, "textures/gui/inventory.png");
 
     private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
-    private static final Field OLD_MOUSE_X = ReflectionHelper.findField(GuiInventory.class, "oldMouseX",
-            "field_147048_u");
-    private static final Field OLD_MOUSE_Y = ReflectionHelper.findField(GuiInventory.class, "oldMouseY",
-            "field_147047_v");
 
-    /** The old x position of the mouse pointer */
     private float oldMouseX;
-    /** The old y position of the mouse pointer */
     private float oldMouseY;
     private boolean widthTooNarrow;
-
-    /** Amount scrolled in Creative mode inventory (0 = top, 1 = bottom) */
     private float currentScroll;
-    /** True if the scrollbar is being dragged */
     private boolean isScrolling;
-    /** True if the left mouse button was held down last time drawScreen was called. */
     private boolean wasClicking;
-
-    static {
-        OLD_MOUSE_X.setAccessible(true);
-        OLD_MOUSE_Y.setAccessible(true);
-    }
 
     public GuiContainerCurios(ContainerCurios containerCurios) {
         super(containerCurios);
         this.allowUserInput = true;
     }
 
-    /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
-     */
     @Override
     public void initGui() {
-        this.buttonList.clear();
+        this.buttons.clear();
         super.initGui();
         this.widthTooNarrow = this.width < 379;
         this.guiLeft = (this.width - this.xSize) / 2;
         this.addButton(new GuiButtonImage(44, this.guiLeft + 125, this.height / 2 - 22, 20,
-                18, 50, 0, 19, CURIO_INVENTORY));
-        this.addButton(new GuiButtonImage(10, this.guiLeft + 104, this.height / 2 - 22, 20,
-                18, 178, 0, 19, INVENTORY_BACKGROUND));
+                18, 50, 0, 19, CURIO_INVENTORY) {
+
+            @Override
+            public void onClick(double mouseX, double mouseY) {
+                GuiInventory inventory = new GuiInventory(GuiContainerCurios.this.mc.player);
+                GuiContainerCurios.this.mc.displayGuiScreen(inventory);
+                NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
+            }
+        });
     }
 
     /**
      * Draws the screen and all the components in it.
      */
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+    public void render(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         this.hasActivePotionEffects = false;
         boolean flag = Mouse.isButtonDown(0);
@@ -103,7 +87,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
             this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
             ((ContainerCurios)this.inventorySlots).scrollTo(this.currentScroll);
         }
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
         this.oldMouseX = (float)mouseX;
         this.oldMouseY = (float)mouseY;
@@ -112,6 +96,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         this.fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
+
         if (this.mc.player.inventory.getItemStack().isEmpty() && this.getSlotUnderMouse() != null) {
             Slot slot = this.getSlotUnderMouse();
             if (slot instanceof SlotCurio && !slot.getHasStack()) {
@@ -127,16 +112,15 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
      */
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(GuiInventory.INVENTORY_BACKGROUND);
         int i = this.guiLeft;
         int j = this.guiTop;
         this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
         GuiInventory.drawEntityOnScreen(i + 51, j + 75, 30, (float)(i + 51) - mouseX,
                 (float)(j + 75 - 50) - mouseY, this.mc.player);
-        ICurioItemHandler itemHandler = CuriosAPI.getCuriosHandler(this.mc.player);
-        if (itemHandler != null) {
-            int slotCount = itemHandler.getSlots();
+        CuriosAPI.getCuriosHandler(this.mc.player).ifPresent(handler -> {
+            int slotCount = handler.getSlots();
             int upperHeight = 7 + slotCount * 18;
             this.mc.getTextureManager().bindTexture(CURIO_INVENTORY);
             this.drawTexturedModalRect(i - 26, j + 4, 0, 0, 27, upperHeight);
@@ -148,7 +132,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
                 this.mc.getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
                 this.drawTexturedModalRect(i - 34, j + 12 + (int)(127f * this.currentScroll), 232, 0, 12, 15);
             }
-        }
+        });
     }
 
     /**
@@ -194,25 +178,6 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
             this.currentScroll = (float)((double)this.currentScroll - (double)i / (double)j);
             this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
             ((ContainerCurios)this.inventorySlots).scrollTo(this.currentScroll);
-        }
-    }
-
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
-    @Override
-    protected void actionPerformed(GuiButton button) {
-
-        if (button.id == 44) {
-            GuiInventory inventory = new GuiInventory(this.mc.player);
-            try {
-                OLD_MOUSE_X.setFloat(inventory, this.oldMouseX);
-                OLD_MOUSE_Y.setFloat(inventory, this.oldMouseY);
-            } catch(IllegalAccessException e) {
-                //Throw error message
-            }
-            this.mc.displayGuiScreen(inventory);
-            NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
         }
     }
 }

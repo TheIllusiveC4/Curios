@@ -1,13 +1,12 @@
 package top.theillusivec4.curios.client;
 
 import com.google.common.collect.Multimap;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -21,12 +20,15 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+
+import static net.minecraft.item.ItemStack.DECIMALFORMAT;
 
 public class EventHandlerClient {
 
-    protected static final UUID ATTACK_DAMAGE_MODIFIER = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
-    protected static final UUID ATTACK_SPEED_MODIFIER = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
+    private static final UUID ATTACK_DAMAGE_MODIFIER = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
+    private static final UUID ATTACK_SPEED_MODIFIER = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
 
     @SubscribeEvent
     public void onKeyInput(TickEvent.ClientTickEvent evt) {
@@ -46,23 +48,19 @@ public class EventHandlerClient {
             CuriosAPI.getCurio(evt.getItemStack()).ifPresent(curio -> {
                 List<ITextComponent> tooltip = evt.getToolTip();
                 tooltip.add(new TextComponentTranslation("curios.name").applyTextStyle(TextFormatting.AQUA));
-                List<String> slots = curio.getCurioSlots(stack);
+                Set<String> slots = curio.getCurioTypes(stack);
 
-                if (slots.isEmpty()) {
-                    tooltip.add(" -" + I18n.format("curios.identifier.generic"));
-                } else {
-                    for (String s : curio.getCurioSlots(stack)) {
-                        tooltip.add(" -" + I18n.format("curios.identifier." + s));
-                    }
+                for (String s : slots) {
+                    tooltip.add(new TextComponentString(" -").appendSibling(new TextComponentTranslation("curios.identifier." + s)));
                 }
 
-                for (String identifier : CuriosAPI.getRegistry().keySet()) {
+                for (String identifier : CuriosAPI.getTypeRegistry().keySet()) {
                     Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier, stack);
 
                     if (!multimap.isEmpty()) {
                         EntityPlayer player = evt.getEntityPlayer();
-                        tooltip.add("");
-                        tooltip.add(I18n.format("curios.modifiers", identifier));
+                        tooltip.add(new TextComponentString(""));
+                        tooltip.add(new TextComponentTranslation("curios.modifiers", identifier));
 
                         for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
                             AttributeModifier attributemodifier = entry.getValue();
@@ -72,12 +70,11 @@ public class EventHandlerClient {
                             if (player != null) {
 
                                 if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
-                                    amount = amount + player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
-                                    amount = amount + (double) EnchantmentHelper.getModifierForCreature(stack,
-                                            EnumCreatureAttribute.UNDEFINED);
+                                    amount = amount + player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
+                                    amount = amount + (double) EnchantmentHelper.getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
                                     flag = true;
                                 } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
-                                    amount += player.getEntityAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
+                                    amount += player.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
                                     flag = true;
                                 }
 
@@ -90,15 +87,12 @@ public class EventHandlerClient {
                                 }
 
                                 if (flag) {
-                                    tooltip.add(" " + I18n.format("attribute.modifier.equals." + attributemodifier.getOperation(),
-                                            ItemStack.DECIMALFORMAT.format(d1), I18n.format("attribute.name." + entry.getKey())));
+                                    tooltip.add((new TextComponentString(" ")).appendSibling(new TextComponentTranslation("attribute.modifier.equals." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.DARK_GREEN));
                                 } else if (amount > 0.0D) {
-                                    tooltip.add(TextFormatting.BLUE + " " + I18n.format("attribute.modifier.plus." + attributemodifier.getOperation(),
-                                            ItemStack.DECIMALFORMAT.format(d1), I18n.format("attribute.name." + entry.getKey())));
+                                    tooltip.add((new TextComponentTranslation("attribute.modifier.plus." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.BLUE));
                                 } else if (amount < 0.0D) {
                                     d1 = d1 * -1.0D;
-                                    tooltip.add(TextFormatting.RED + " " + I18n.format("attribute.modifier.take." + attributemodifier.getOperation(),
-                                            ItemStack.DECIMALFORMAT.format(d1), I18n.format("attribute.name." + entry.getKey())));
+                                    tooltip.add((new TextComponentTranslation("attribute.modifier.take." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.RED));
                                 }
                             }
                         }

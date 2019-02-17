@@ -1,11 +1,5 @@
-package c4.curios.common;
+package top.theillusivec4.curios.common;
 
-import c4.curios.api.CuriosAPI;
-import c4.curios.api.capability.ICurio;
-import c4.curios.api.capability.ICurioItemHandler;
-import c4.curios.api.event.LivingChangeCurioEvent;
-import c4.curios.common.network.NetworkHandler;
-import c4.curios.common.network.server.SPacketEntityCurios;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityTracker;
@@ -14,22 +8,27 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.ItemStackHandler;
+import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
+import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.network.server.SPacketEntityCurios;
 
 public class CurioEventHandler {
 
     @SubscribeEvent
     public void onCurioTick(LivingEvent.LivingUpdateEvent evt) {
         EntityLivingBase entitylivingbase = evt.getEntityLiving();
-        ICurioItemHandler curioHandler = CuriosAPI.getCuriosHandler(entitylivingbase);
-
-        if (curioHandler != null) {
+        CuriosAPI.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
 
             if (!entitylivingbase.world.isRemote) {
-                ImmutableMap<String, ItemStackHandler> curios = curioHandler.getCurioMap();
-                ImmutableMap<String, ItemStackHandler> prevCurios = curioHandler.getPreviousCurioMap();
+                ImmutableMap<String, ItemStackHandler> curios = handler.getCurioMap();
+                ImmutableMap<String, ItemStackHandler> prevCurios = handler.getPreviousCurioMap();
 
                 for (String identifier : curios.keySet()) {
                     ItemStackHandler stackHandler = curios.get(identifier);
@@ -39,43 +38,37 @@ public class CurioEventHandler {
                         ItemStack stack = stackHandler.getStackInSlot(i);
                         ItemStack prevStack = prevStackHandler.getStackInSlot(i);
 
-                        ICurio curio = CuriosAPI.getCurio(stack);
-
-                        if (curio != null) {
-                            curio.onCurioTick(stack, entitylivingbase);
-                        }
+                        LazyOptional<ICurio> currentCurio = CuriosAPI.getCurio(stack);
+                        currentCurio.ifPresent(curio -> curio.onCurioTick(stack, entitylivingbase));
 
                         if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
 
-                            if (!ItemStack.areItemStacksEqualUsingNBTShareTag(stack, prevStack)
-                                    && entitylivingbase.world instanceof WorldServer) {
+                            if (!stack.equals(prevStack, true) && entitylivingbase.world instanceof WorldServer) {
                                 EntityTracker tracker = ((WorldServer) entitylivingbase.world).getEntityTracker();
 
                                 for (EntityPlayer player : tracker.getTrackingPlayers(entitylivingbase)) {
 
                                     if (player instanceof EntityPlayerMP) {
-                                        NetworkHandler.INSTANCE.sendTo(new SPacketEntityCurios(entitylivingbase.getEntityId(),
-                                                identifier, i, stack), (EntityPlayerMP)player);
+                                        NetworkHandler.INSTANCE.sendTo(
+                                                new SPacketEntityCurios(entitylivingbase.getEntityId(), identifier, i, stack),
+                                                ((EntityPlayerMP)player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                                     }
                                 }
                             }
-                            MinecraftForge.EVENT_BUS.post(new LivingChangeCurioEvent(entitylivingbase, identifier, prevStack, stack));
-                            ICurio prevCurio = CuriosAPI.getCurio(prevStack);
-
-                            if (!prevStack.isEmpty() && prevCurio != null) {
-                                prevCurio.onUnequipped(prevStack, entitylivingbase);
-                                entitylivingbase.getAttributeMap().removeAttributeModifiers(prevCurio.getAttributeModifiers(identifier, prevStack));
-                            }
-
-                            if (!stack.isEmpty() && curio != null) {
+                            MinecraftForge.EVENT_BUS.post(new LivingCurioChangeEvent(entitylivingbase, identifier, prevStack, stack));
+                            CuriosAPI.getCurio(prevStack).ifPresent(curio -> {
+                                curio.onUnequipped(prevStack, entitylivingbase);
+                                entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, prevStack));
+                            });
+                            currentCurio.ifPresent(curio -> {
                                 curio.onEquipped(stack, entitylivingbase);
                                 entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier, stack));
-                            }
+                            });
                             prevStackHandler.setStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
                         }
                     }
                 }
             }
-        }
+        });
     }
 }

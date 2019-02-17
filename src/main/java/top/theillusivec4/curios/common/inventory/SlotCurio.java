@@ -1,57 +1,61 @@
-package c4.curios.common.inventory;
+package top.theillusivec4.curios.common.inventory;
 
-import c4.curios.api.CuriosAPI;
-import c4.curios.api.capability.ICurio;
-import c4.curios.api.inventory.CurioSlotEntry;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import top.theillusivec4.curios.api.CurioType;
+import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.capability.ICurio;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class SlotCurio extends SlotItemHandler {
 
-    private final CurioSlotEntry entry;
+    private final CurioType curioType;
     private final EntityPlayer player;
     private final String slotOverlay;
 
-    public SlotCurio(EntityPlayer player, IItemHandler handler, int index, CurioSlotEntry info, int xPosition,
-                     int yPosition) {
+    public SlotCurio(EntityPlayer player, IItemHandler handler, int index, CurioType type, int xPosition, int yPosition) {
         super(handler, index, xPosition, yPosition);
-        this.entry = info;
+        this.curioType = type;
         this.player = player;
-        this.slotOverlay = entry.getIcon() == null ? "curios:items/empty_generic_slot" : entry.getIcon().toString();
+        this.slotOverlay = curioType.getIcon() == null ? "curios:items/empty_generic_slot" : curioType.getIcon().toString();
     }
 
     public String getSlotName() {
-        return entry.getFormattedName();
+        return curioType.getFormattedName();
     }
 
     @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
-        ICurio curio = CuriosAPI.getCurio(stack);
-        if (curio != null) {
-            return curio.getCurioSlots(stack).contains(entry.getIdentifier()) && curio.canEquip(stack, player)
-                    && super.isItemValid(stack);
-        }
-        return false;
+        return CuriosAPI.getCurio(stack).map(curio -> {
+            if (curio.getCurioTypes(stack).contains(curioType.getIdentifier()) && curio.canEquip(stack, player)
+                    && super.isItemValid(stack)) {
+                return 1;
+            }
+            return 0;
+        }).orElse(0) == 1;
     }
 
     @Override
     public boolean canTakeStack(EntityPlayer playerIn) {
         ItemStack stack = this.getStack();
-        ICurio curio = CuriosAPI.getCurio(stack);
-        return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
-                && (curio == null || curio.canUnequip(stack, playerIn)) && super.canTakeStack(playerIn);
+        return CuriosAPI.getCurio(stack).map(curio -> {
+            if ((stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) && curio.canUnequip(stack, playerIn)
+                    && super.canTakeStack(playerIn)) {
+                return 1;
+            }
+            return 0;
+        }).orElse(0) == 1;
     }
 
     @Nullable
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public String getSlotTexture() {
         return slotOverlay;

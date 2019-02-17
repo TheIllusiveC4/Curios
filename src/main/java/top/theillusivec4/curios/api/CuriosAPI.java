@@ -18,26 +18,32 @@ import top.theillusivec4.curios.api.capability.CapCurioInventory;
 import top.theillusivec4.curios.api.capability.CapCurioItem;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
-import top.theillusivec4.curios.api.inventory.CurioSlotEntry;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CuriosAPI {
 
-    private static Map<String, CurioSlotEntry> idToEntry = Maps.newHashMap();
+    private static Map<String, CurioType> idToType = Maps.newHashMap();
     private static Map<String, Tag<Item>> idToTag = Maps.newHashMap();
+    private static Map<Item, Set<String>> itemToTypes = Maps.newHashMap();
 
-    public static CurioSlotEntry createSlot(@Nonnull String identifier) {
-        CurioSlotEntry entry = new CurioSlotEntry(identifier);
-        idToEntry.put(identifier, entry);
+    public static CurioType registerType(@Nonnull String identifier) {
+        CurioType entry = new CurioType(identifier);
+        idToType.put(identifier, entry);
         return entry;
     }
 
-    public static ImmutableMap<String, CurioSlotEntry> getRegistry() {
-        return ImmutableMap.copyOf(idToEntry);
+    @Nullable
+    public static CurioType getType(String identifier) {
+        return idToType.get(identifier);
+    }
+
+    public static ImmutableMap<String, CurioType> getTypeRegistry() {
+        return ImmutableMap.copyOf(idToType);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -50,19 +56,19 @@ public class CuriosAPI {
         return entityLivingBase.getCapability(CapCurioInventory.CURIO_INV_CAP);
     }
 
-    public static void setSlotEnabled(String id, boolean enabled) {
-        CurioSlotEntry entry = idToEntry.get(id);
+    public static void setTypeEnabled(String id, boolean enabled) {
+        CurioType entry = idToType.get(id);
 
         if (entry != null) {
             entry.setEnabled(enabled);
         }
     }
 
-    public static void addSlotToEntity(String id, final EntityLivingBase entityLivingBase) {
-        addSlotsToEntity(id, 1, entityLivingBase);
+    public static void addTypeSlotToEntity(String id, final EntityLivingBase entityLivingBase) {
+        addTypeSlotsToEntity(id, 1, entityLivingBase);
     }
 
-    public static void addSlotsToEntity(String id, int amount, final EntityLivingBase entityLivingBase) {
+    public static void addTypeSlotsToEntity(String id, int amount, final EntityLivingBase entityLivingBase) {
 
         getCuriosHandler(entityLivingBase).ifPresent(handler -> {
             ItemStackHandler stackHandler = handler.getCurioMap().get(id);
@@ -110,13 +116,13 @@ public class CuriosAPI {
         });
     }
 
-    public static void enableSlotForEntity(String id, final EntityLivingBase entityLivingBase) {
+    public static void enableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> {
             handler.addCurioSlot(id);
         });
     }
 
-    public static void disableSlotForEntity(String id, final EntityLivingBase entityLivingBase) {
+    public static void disableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> {
             ItemStackHandler stackHandler = handler.getCurioMap().get(id);
 
@@ -153,21 +159,32 @@ public class CuriosAPI {
     }
 
     public static Set<String> getCurioTags(Item item) {
-        Set<String> tags = Sets.newHashSet();
 
-        for (String identifier : idToTag.keySet()) {
+        if (itemToTypes.containsKey(item)) {
+            return itemToTypes.get(item);
+        } else {
+            Set<String> tags = Sets.newHashSet();
 
-            if (idToTag.get(identifier).contains(item)) {
-                tags.add(identifier);
+            for (String identifier : idToTag.keySet()) {
+
+                if (idToTag.get(identifier).contains(item)) {
+                    tags.add(identifier);
+                }
             }
+
+            if (tags.isEmpty()) {
+                tags.add("generic");
+            }
+            itemToTypes.put(item, tags);
+            return tags;
         }
-        return tags;
     }
 
-    public static void reloadCurioTags() {
+    public static void refreshTags() {
         idToTag = ItemTags.getCollection().getTagMap().entrySet()
                 .stream()
                 .filter(map -> map.getKey().getNamespace().equals(Curios.MODID))
                 .collect(Collectors.toMap(entry -> entry.getKey().getPath(), Map.Entry::getValue));
+        itemToTypes.clear();
     }
 }
