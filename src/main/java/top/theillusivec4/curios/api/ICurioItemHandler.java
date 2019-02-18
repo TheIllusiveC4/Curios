@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.api.capability;
+package top.theillusivec4.curios.api;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.entity.EntityLivingBase;

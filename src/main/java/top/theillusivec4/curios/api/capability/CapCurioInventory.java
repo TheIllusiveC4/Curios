@@ -18,10 +18,12 @@ import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.CurioType;
+import top.theillusivec4.curios.api.ICurioItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CapCurioInventory {
 
@@ -87,17 +89,15 @@ public class CapCurioInventory {
 
         Map<String, ItemStackHandler> curioSlots;
         Map<String, ItemStackHandler> prevCurioSlots;
-        NonNullList<ItemStack> itemCache;
         EntityLivingBase wearer;
 
         public CurioInventoryWrapper() {
-            this.curioSlots = this.initCurioSlots();
-            this.prevCurioSlots = this.initCurioSlots();
-            this.itemCache = NonNullList.create();
+            this(null);
         }
 
         public CurioInventoryWrapper(final EntityLivingBase livingBase) {
-            this();
+            this.curioSlots = this.initCurioSlots();
+            this.prevCurioSlots = this.initCurioSlots();
             this.wearer = livingBase;
         }
 
@@ -149,13 +149,15 @@ public class CapCurioInventory {
         @Override
         public void setCurioMap(Map<String, ItemStackHandler> map) {
 
-            for (String id : map.keySet()) {
+            this.curioSlots = map.entrySet()
+                    .stream()
+                    .filter(entry -> CuriosAPI.getType(entry.getKey()) != null)
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-                if (CuriosAPI.getType(id) != null) {
-                    map.remove(id);
-                }
+            this.prevCurioSlots.clear();
+            for (Map.Entry<String, ItemStackHandler> entry : this.curioSlots.entrySet()) {
+                this.prevCurioSlots.put(entry.getKey(), new ItemStackHandler(entry.getValue().getSlots()));
             }
-            this.curioSlots = map;
         }
 
         @Override
@@ -169,12 +171,14 @@ public class CapCurioInventory {
 
             if (type != null) {
                 this.curioSlots.putIfAbsent(identifier, new ItemStackHandler(type.getSize()));
+                this.prevCurioSlots.putIfAbsent(identifier, new ItemStackHandler(type.getSize()));
             }
         }
 
         @Override
         public void removeCurioSlot(String identifier) {
             this.curioSlots.remove(identifier);
+            this.prevCurioSlots.remove(identifier);
         }
 
         @Nullable

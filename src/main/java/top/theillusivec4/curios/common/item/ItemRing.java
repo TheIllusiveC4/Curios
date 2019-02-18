@@ -14,7 +14,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.capability.CapCurioItem;
-import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.curios.api.ICurio;
 
 import java.util.UUID;
 

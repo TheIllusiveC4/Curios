@@ -9,7 +9,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.capability.ICurio;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

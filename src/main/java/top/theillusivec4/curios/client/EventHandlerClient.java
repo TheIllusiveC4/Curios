@@ -54,7 +54,7 @@ public class EventHandlerClient {
                     tooltip.add(new TextComponentString(" -").appendSibling(new TextComponentTranslation("curios.identifier." + s)));
                 }
 
-                for (String identifier : CuriosAPI.getTypeRegistry().keySet()) {
+                for (String identifier : slots) {
                     Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier, stack);
 
                     if (!multimap.isEmpty()) {

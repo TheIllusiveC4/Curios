@@ -16,8 +16,6 @@ import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.capability.CapCurioInventory;
 import top.theillusivec4.curios.api.capability.CapCurioItem;
-import top.theillusivec4.curios.api.capability.ICurio;
-import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -112,14 +110,27 @@ public class CuriosAPI {
                 for (int i = 0; i < copy.size(); i++) {
                     stackHandler.setStackInSlot(i, copy.get(i));
                 }
+
+                ItemStackHandler prevStackHandler = handler.getPreviousCurioMap().get(id);
+
+                if (prevStackHandler != null) {
+                    NonNullList<ItemStack> copyPrevious = NonNullList.create();
+
+                    for (int i = 0; i < prevStackHandler.getSlots(); i++) {
+                        copyPrevious.add(prevStackHandler.getStackInSlot(i).copy());
+                    }
+                    prevStackHandler.setSize(stackHandler.getSlots() + amount);
+
+                    for (int i = 0; i < copy.size(); i++) {
+                        prevStackHandler.setStackInSlot(i, copyPrevious.get(i));
+                    }
+                }
             }
         });
     }
 
     public static void enableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
-        getCuriosHandler(entityLivingBase).ifPresent(handler -> {
-            handler.addCurioSlot(id);
-        });
+        getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.addCurioSlot(id));
     }
 
     public static void disableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
@@ -132,14 +143,13 @@ public class CuriosAPI {
 
                 for (int i = 0; i < stackHandler.getSlots(); i++) {
                     ItemStack stack = stackHandler.getStackInSlot(i);
-                    drops.add(stackHandler.getStackInSlot(i));
+                    drops.add(stack.copy());
                     getCurio(stack).ifPresent(curio -> {
                         if (!stack.isEmpty()) {
                             curio.onUnequipped(stack, entityLivingBase);
                             entityLivingBase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(id, stack));
                         }
                     });
-                    stackHandler.setStackInSlot(i, ItemStack.EMPTY);
                 }
 
                 if (entityLivingBase instanceof EntityPlayer) {
@@ -170,10 +180,6 @@ public class CuriosAPI {
                 if (idToTag.get(identifier).contains(item)) {
                     tags.add(identifier);
                 }
-            }
-
-            if (tags.isEmpty()) {
-                tags.add("generic");
             }
             itemToTypes.put(item, tags);
             return tags;

@@ -7,6 +7,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.ICurio;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

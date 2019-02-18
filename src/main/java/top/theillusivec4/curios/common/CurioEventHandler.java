@@ -6,20 +6,63 @@ import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.curios.api.ICurio;
 import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.SPacketEntityCurios;
 
+import java.util.Set;
+
 public class CurioEventHandler {
+
+    @SubscribeEvent
+    public void onCurioRightClick(PlayerInteractEvent.RightClickItem evt) {
+        EntityLivingBase entitylivingbase = evt.getEntityLiving();
+        ItemStack stack = evt.getItemStack();
+        CuriosAPI.getCurio(stack).ifPresent(curio -> {
+
+            if (curio.canRightClickEquip(stack) && curio.canEquip(stack, entitylivingbase)) {
+                CuriosAPI.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
+
+                    if (!entitylivingbase.world.isRemote) {
+                        ImmutableMap<String, ItemStackHandler> curios = handler.getCurioMap();
+                        Set<String> tags = curio.getCurioTypes(stack);
+
+                        for (String id : tags) {
+                            ItemStackHandler stackHandler = curios.get(id);
+
+                            if (stackHandler != null) {
+
+                                for (int i = 0; i < stackHandler.getSlots(); i++) {
+
+                                    if (stackHandler.getStackInSlot(i).isEmpty()) {
+                                        stackHandler.setStackInSlot(i, stack.copy());
+                                        stack.shrink(1);
+                                        evt.setCancellationResult(EnumActionResult.SUCCESS);
+                                        evt.setCanceled(true);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                evt.setCancellationResult(EnumActionResult.FAIL);
+                evt.setCanceled(true);
+            }
+        });
+    }
 
     @SubscribeEvent
     public void onCurioTick(LivingEvent.LivingUpdateEvent evt) {
@@ -36,7 +79,7 @@ public class CurioEventHandler {
 
                     for (int i = 0; i < stackHandler.getSlots(); i++) {
                         ItemStack stack = stackHandler.getStackInSlot(i);
-                        ItemStack prevStack = prevStackHandler.getStackInSlot(i);
+                        ItemStack prevStack = stackHandler.getStackInSlot(i);
 
                         LazyOptional<ICurio> currentCurio = CuriosAPI.getCurio(stack);
                         currentCurio.ifPresent(curio -> curio.onCurioTick(stack, entitylivingbase));
@@ -55,7 +98,7 @@ public class CurioEventHandler {
                                     }
                                 }
                             }
-                            MinecraftForge.EVENT_BUS.post(new LivingCurioChangeEvent(entitylivingbase, identifier, prevStack, stack));
+                            MinecraftForge.EVENT_BUS.post(new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
                             CuriosAPI.getCurio(prevStack).ifPresent(curio -> {
                                 curio.onUnequipped(prevStack, entitylivingbase);
                                 entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, prevStack));

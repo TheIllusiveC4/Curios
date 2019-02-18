@@ -15,7 +15,7 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.capability.ICurioItemHandler;
+import top.theillusivec4.curios.api.ICurioItemHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;

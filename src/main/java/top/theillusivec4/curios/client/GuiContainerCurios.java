@@ -1,8 +1,7 @@
 package top.theillusivec4.curios.client;
 
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
-import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
@@ -34,6 +33,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     private float currentScroll;
     private boolean isScrolling;
     private boolean wasClicking;
+    private boolean buttonClicked;
 
     public GuiContainerCurios(ContainerCurios containerCurios) {
         super(containerCurios);
@@ -41,21 +41,31 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     }
 
     @Override
-    public void initGui() {
-        this.buttons.clear();
-        super.initGui();
-        this.widthTooNarrow = this.width < 379;
-        this.guiLeft = (this.width - this.xSize) / 2;
-        this.addButton(new GuiButtonImage(44, this.guiLeft + 125, this.height / 2 - 22, 20,
-                18, 50, 0, 19, CURIO_INVENTORY) {
+    public void tick() {
+        if (this.mc.playerController.isInCreativeMode()) {
+            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.player));
+        }
+    }
 
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                GuiInventory inventory = new GuiInventory(GuiContainerCurios.this.mc.player);
-                GuiContainerCurios.this.mc.displayGuiScreen(inventory);
-                NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
-            }
-        });
+    @Override
+    public void initGui() {
+        if (this.mc.playerController.isInCreativeMode()) {
+            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.player));
+        } else {
+            super.initGui();
+            this.widthTooNarrow = this.width < 379;
+            this.guiLeft = (this.width - this.xSize) / 2;
+            this.addButton(new GuiButtonImage(44, this.guiLeft + 125, this.height / 2 - 22, 20,
+                    18, 50, 0, 19, CURIO_INVENTORY) {
+
+                @Override
+                public void onClick(double mouseX, double mouseY) {
+                    GuiInventory inventory = new GuiInventory(GuiContainerCurios.this.mc.player);
+                    GuiContainerCurios.this.mc.displayGuiScreen(inventory);
+                    NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
+                }
+            });
+        }
     }
 
     /**
@@ -140,7 +150,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
      * pointY
      */
     @Override
-    protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight, int pointX, int pointY) {
+    protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight, double pointX, double pointY) {
         return !this.widthTooNarrow && super.isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
     }
 
@@ -148,10 +158,18 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+        return this.widthTooNarrow && super.mouseClicked(mouseX, mouseY, mouseButton);
+    }
 
-        if (!this.widthTooNarrow) {
-            super.mouseClicked(mouseX, mouseY, mouseButton);
+    @Override
+    public boolean mouseReleased(double mouseReleased1, double mouseReleased3, int mouseReleased5) {
+
+        if (this.buttonClicked) {
+            this.buttonClicked = false;
+            return true;
+        } else {
+            return super.mouseReleased(mouseReleased1, mouseReleased3, mouseReleased5);
         }
     }
 
