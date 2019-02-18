@@ -9,7 +9,7 @@ import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
-import top.theillusivec4.curios.common.network.server.SPacketEntityCurios;
+import top.theillusivec4.curios.common.network.server.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
 
 import java.util.function.BiConsumer;
@@ -32,7 +32,7 @@ public class NetworkHandler {
         registerMessage(CPacketOpenCurios.class, CPacketOpenCurios::encode, CPacketOpenCurios::decode, CPacketOpenCurios::handle);
         registerMessage(CPacketOpenVanilla.class, CPacketOpenVanilla::encode, CPacketOpenVanilla::decode, CPacketOpenVanilla::handle);
         registerMessage(CPacketScrollCurios.class, CPacketScrollCurios::encode, CPacketScrollCurios::decode, CPacketScrollCurios::handle);
-        registerMessage(SPacketEntityCurios.class, SPacketEntityCurios::encode, SPacketEntityCurios::decode, SPacketEntityCurios::handle);
+        registerMessage(SPacketSyncCurios.class, SPacketSyncCurios::encode, SPacketSyncCurios::decode, SPacketSyncCurios::handle);
         registerMessage(SPacketScrollCurios.class, SPacketScrollCurios::encode, SPacketScrollCurios::decode, SPacketScrollCurios::handle);
     }
 

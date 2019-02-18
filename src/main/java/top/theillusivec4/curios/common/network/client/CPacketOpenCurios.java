@@ -22,10 +22,8 @@ public class CPacketOpenCurios {
             EntityPlayerMP sender = ctx.get().getSender();
 
             if (sender != null) {
-                sender.closeContainer();
-                NetworkHooks.openGui(sender, new CurioContainerHandler(), null);
+                NetworkHooks.openGui(sender, new CurioContainerHandler());
             }
         });
-        ctx.get().setPacketHandled(true);
     }
 }

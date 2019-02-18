@@ -12,17 +12,17 @@ import java.util.Set;
 
 public interface ICurio {
 
-    default void onCurioTick(ItemStack stack, EntityLivingBase entityLivingBase) {}
+    default void onCurioTick(ItemStack stack, String identifier, EntityLivingBase entityLivingBase) {}
 
-    default void onEquipped(ItemStack stack, EntityLivingBase entityLivingBase) {}
+    default void onEquipped(ItemStack stack, String identifier, EntityLivingBase entityLivingBase) {}
 
-    default void onUnequipped(ItemStack stack, EntityLivingBase entityLivingBase) {}
+    default void onUnequipped(ItemStack stack, String identifier, EntityLivingBase entityLivingBase) {}
 
-    default boolean canEquip(ItemStack stack, EntityLivingBase entityLivingBase) {
+    default boolean canEquip(ItemStack stack, String identifier, EntityLivingBase entityLivingBase) {
         return true;
     }
 
-    default boolean canUnequip(ItemStack stack, EntityLivingBase entityLivingBase) {
+    default boolean canUnequip(ItemStack stack, String identifier, EntityLivingBase entityLivingBase) {
         return true;
     }
 
@@ -37,9 +37,9 @@ public interface ICurio {
     default boolean canRightClickEquip(ItemStack stack) { return false; }
 
     @OnlyIn(Dist.CLIENT)
-    default boolean hasRender(ItemStack stack, EntityLivingBase entityLivingBase) { return false; }
+    default boolean hasRender(ItemStack stack, String identifier, EntityLivingBase entityLivingBase) { return false; }
 
     @OnlyIn(Dist.CLIENT)
-    default void doRender(EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks,
+    default void doRender(String identifier, EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks,
                           float ageInTicks, float netHeadYaw, float headPitch, float scale) {}
 }

@@ -31,7 +31,6 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     private boolean widthTooNarrow;
     private float currentScroll;
     private boolean isScrolling;
-    private boolean wasClicking;
     private boolean buttonClicked;
 
     public GuiContainerCurios(ContainerCurios containerCurios) {
@@ -59,8 +58,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
 
                 @Override
                 public void onClick(double mouseX, double mouseY) {
-                    GuiInventory inventory = new GuiInventory(GuiContainerCurios.this.mc.player);
-                    GuiContainerCurios.this.mc.displayGuiScreen(inventory);
+                    GuiContainerCurios.this.mc.displayGuiScreen(new GuiInventory(GuiContainerCurios.this.mc.player));
                     NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
                 }
             });
@@ -102,7 +100,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
 
 
     /**
-     * Draws the background layer of this container (behind the items).
+     * Draws the background layer of this container (behind the item).
      */
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
@@ -148,7 +146,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
             this.isScrolling = this.needsScrollBars();
             return true;
         }
-        return this.widthTooNarrow && super.mouseClicked(mouseX, mouseY, mouseButton);
+        return !this.widthTooNarrow && super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override

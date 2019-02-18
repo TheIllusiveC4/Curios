@@ -19,7 +19,7 @@ import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.ICurio;
 import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
 import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.server.SPacketEntityCurios;
+import top.theillusivec4.curios.common.network.server.SPacketSyncCurios;
 
 import java.util.Set;
 
@@ -31,7 +31,7 @@ public class CurioEventHandler {
         ItemStack stack = evt.getItemStack();
         CuriosAPI.getCurio(stack).ifPresent(curio -> {
 
-            if (curio.canRightClickEquip(stack) && curio.canEquip(stack, entitylivingbase)) {
+            if (curio.canRightClickEquip(stack)) {
                 CuriosAPI.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
 
                     if (!entitylivingbase.world.isRemote) {
@@ -39,18 +39,21 @@ public class CurioEventHandler {
                         Set<String> tags = curio.getCurioTypes(stack);
 
                         for (String id : tags) {
-                            ItemStackHandler stackHandler = curios.get(id);
 
-                            if (stackHandler != null) {
+                            if (curio.canEquip(stack, id, entitylivingbase)) {
+                                ItemStackHandler stackHandler = curios.get(id);
 
-                                for (int i = 0; i < stackHandler.getSlots(); i++) {
+                                if (stackHandler != null) {
 
-                                    if (stackHandler.getStackInSlot(i).isEmpty()) {
-                                        stackHandler.setStackInSlot(i, stack.copy());
-                                        stack.shrink(1);
-                                        evt.setCancellationResult(EnumActionResult.SUCCESS);
-                                        evt.setCanceled(true);
-                                        return;
+                                    for (int i = 0; i < stackHandler.getSlots(); i++) {
+
+                                        if (stackHandler.getStackInSlot(i).isEmpty()) {
+                                            stackHandler.setStackInSlot(i, stack.copy());
+                                            stack.shrink(1);
+                                            evt.setCancellationResult(EnumActionResult.SUCCESS);
+                                            evt.setCanceled(true);
+                                            return;
+                                        }
                                     }
                                 }
                             }
@@ -82,7 +85,7 @@ public class CurioEventHandler {
                         ItemStack prevStack = stackHandler.getStackInSlot(i);
 
                         LazyOptional<ICurio> currentCurio = CuriosAPI.getCurio(stack);
-                        currentCurio.ifPresent(curio -> curio.onCurioTick(stack, entitylivingbase));
+                        currentCurio.ifPresent(curio -> curio.onCurioTick(stack, identifier, entitylivingbase));
 
                         if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
 
@@ -93,18 +96,18 @@ public class CurioEventHandler {
 
                                     if (player instanceof EntityPlayerMP) {
                                         NetworkHandler.INSTANCE.sendTo(
-                                                new SPacketEntityCurios(entitylivingbase.getEntityId(), identifier, i, stack),
+                                                new SPacketSyncCurios(entitylivingbase.getEntityId(), identifier, i, stack),
                                                 ((EntityPlayerMP)player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                                     }
                                 }
                             }
                             MinecraftForge.EVENT_BUS.post(new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
                             CuriosAPI.getCurio(prevStack).ifPresent(curio -> {
-                                curio.onUnequipped(prevStack, entitylivingbase);
+                                curio.onUnequipped(prevStack, identifier, entitylivingbase);
                                 entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, prevStack));
                             });
                             currentCurio.ifPresent(curio -> {
-                                curio.onEquipped(stack, entitylivingbase);
+                                curio.onEquipped(stack, identifier, entitylivingbase);
                                 entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier, stack));
                             });
                             prevStackHandler.setStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());

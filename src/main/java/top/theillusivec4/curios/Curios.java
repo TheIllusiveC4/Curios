@@ -19,6 +19,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.FMLPlayMessages;
 import top.theillusivec4.curios.api.CuriosAPI;
@@ -40,8 +41,9 @@ public class Curios {
 
     public Curios() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, CuriosConfig.serverSpec);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CuriosConfig.commonSpec);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CuriosConfig.clientSpec);
+        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> Curios::getGuiContainer);
         eventBus.addListener(this::setup);
         eventBus.addListener(this::postSetup);
     }
@@ -52,15 +54,29 @@ public class Curios {
         NetworkHandler.register();
         MinecraftForge.EVENT_BUS.register(new CommonEventHandler());
         MinecraftForge.EVENT_BUS.register(new CurioEventHandler());
-        CuriosAPI.registerType("ring").setIcon(new ResourceLocation(MODID, "items/empty_ring_slot")).setSize(10);
-        CuriosAPI.registerType("amulet").setIcon(new ResourceLocation(MODID, "items/empty_amulet_slot"));
+        CuriosAPI.registerType("ring").setIcon(new ResourceLocation(MODID, "item/empty_ring_slot")).setSize(10);
+        CuriosAPI.registerType("amulet").setIcon(new ResourceLocation(MODID, "item/empty_amulet_slot"));
     }
 
     private void postSetup(FMLLoadCompleteEvent evt) {
 
-        for (String id : CuriosConfig.SERVER.disabledCurios.get()) {
+        for (String id : CuriosConfig.COMMON.disabledCurios.get()) {
             CuriosAPI.setTypeEnabled(id, false);
         }
+    }
+
+    @SubscribeEvent
+    public void onServerStarting(FMLServerStartedEvent evt) {
+        CuriosAPI.refreshTags();
+    }
+
+    private static GuiScreen getGuiContainer(FMLPlayMessages.OpenContainer msg) {
+
+        if (msg.getId().equals(CurioContainerHandler.ID)) {
+            EntityPlayerSP sp = Minecraft.getInstance().player;
+            return new GuiContainerCurios(new ContainerCurios(sp.inventory, sp));
+        }
+        return null;
     }
 
     @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -70,8 +86,8 @@ public class Curios {
         public static void setupClient(FMLClientSetupEvent evt) {
             MinecraftForge.EVENT_BUS.register(new EventHandlerClient());
             MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
+            MinecraftForge.EVENT_BUS.addListener(ClientProxy::onTextureStitch);
             KeyRegistry.registerKeys();
-            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> ClientProxy::registerContainerHandler);
         }
 
         @SubscribeEvent
@@ -83,22 +99,12 @@ public class Curios {
             }
         }
 
-        @SubscribeEvent
         public static void onTextureStitch(TextureStitchEvent.Pre evt) {
             TextureMap map = evt.getMap();
             IResourceManager manager = Minecraft.getInstance().getResourceManager();
-            map.registerSprite(manager, new ResourceLocation("curios:items/empty_ring_slot"));
-            map.registerSprite(manager, new ResourceLocation("curios:items/empty_amulet_slot"));
-            map.registerSprite(manager, new ResourceLocation("curios:items/empty_generic_slot"));
-        }
-
-        private static GuiScreen registerContainerHandler(FMLPlayMessages.OpenContainer msg) {
-
-            if (msg.getId().equals(CurioContainerHandler.ID)) {
-                EntityPlayerSP sp = Minecraft.getInstance().player;
-                return new GuiContainerCurios(new ContainerCurios(sp.inventory, sp));
-            }
-            return null;
+            map.registerSprite(manager, new ResourceLocation("curios:item/empty_ring_slot"));
+            map.registerSprite(manager, new ResourceLocation("curios:item/empty_amulet_slot"));
+            map.registerSprite(manager, new ResourceLocation("curios:item/empty_generic_slot"));
         }
     }
 }

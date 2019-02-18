@@ -23,7 +23,7 @@ public class SlotCurio extends SlotItemHandler {
         super(handler, index, xPosition, yPosition);
         this.curioType = type;
         this.player = player;
-        this.slotOverlay = curioType.getIcon() == null ? "curios:items/empty_generic_slot" : curioType.getIcon().toString();
+        this.slotOverlay = curioType.getIcon() == null ? "curios:item/empty_generic_slot" : curioType.getIcon().toString();
     }
 
     public String getSlotName() {
@@ -33,7 +33,7 @@ public class SlotCurio extends SlotItemHandler {
     @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
         return CuriosAPI.getCurio(stack).map(curio -> {
-            if (curio.getCurioTypes(stack).contains(curioType.getIdentifier()) && curio.canEquip(stack, player)
+            if (curio.getCurioTypes(stack).contains(curioType.getIdentifier()) && curio.canEquip(stack, curioType.getIdentifier(), player)
                     && super.isItemValid(stack)) {
                 return 1;
             }
@@ -45,7 +45,7 @@ public class SlotCurio extends SlotItemHandler {
     public boolean canTakeStack(EntityPlayer playerIn) {
         ItemStack stack = this.getStack();
         return CuriosAPI.getCurio(stack).map(curio -> {
-            if ((stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) && curio.canUnequip(stack, playerIn)
+            if ((stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) && curio.canUnequip(stack, curioType.getIdentifier(), playerIn)
                     && super.canTakeStack(playerIn)) {
                 return 1;
             }

@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 
 public class ContainerCurios extends Container {
 
-    private static final String[] EMPTY_SLOT_NAMES = new String[]{"item/empty_armor_slot_boots", "item/empty_armor_slot_leggings", "item/empty_armor_slot_chestplate", "item/empty_armor_slot_helmet"};
+    private static final String[] EMPTY_SLOT_NAMES = new String[]{"minecraft:item/empty_armor_slot_boots", "minecraft:item/empty_armor_slot_leggings", "minecraft:item/empty_armor_slot_chestplate", "minecraft:item/empty_armor_slot_helmet"};
     private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[] {EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
     public InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
     public InventoryCraftResult craftResult = new InventoryCraftResult();
@@ -90,7 +90,7 @@ public class ContainerCurios extends Container {
             @OnlyIn(Dist.CLIENT)
             public String getSlotTexture()
             {
-                return "items/empty_armor_slot_shield";
+                return "minecraft:item/empty_armor_slot_shield";
             }
         });
 
@@ -240,11 +240,9 @@ public class ContainerCurios extends Container {
                 if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (index < 46) {
+            } else if (index < 46 && CuriosAPI.getCurio(itemstack).isPresent()) {
 
-                if (CuriosAPI.getCurio(itemstack).filter(
-                        curio -> curio.canEquip(itemstack1, playerIn) && !this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false))
-                        .isPresent()) {
+                if (this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
                     return ItemStack.EMPTY;
                 }
             } else if (entityequipmentslot == EntityEquipmentSlot.OFFHAND && !(this.inventorySlots.get(45)).getHasStack()) {

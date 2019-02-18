@@ -20,8 +20,7 @@ public class GuiEventHandler {
     public void onInventoryGui(GuiScreenEvent.InitGuiEvent.Post evt) {
         if (evt.getGui() instanceof GuiInventory) {
             GuiInventory gui = (GuiInventory)evt.getGui();
-            List<GuiButton> buttons = evt.getButtonList();
-            buttons.add(new GuiButtonImage(44, gui.getGuiLeft() + 125, gui.height / 2 - 22, 20, 18, 50, 0,
+            evt.addButton(new GuiButtonImage(44, gui.getGuiLeft() + 125, gui.height / 2 - 22, 20, 18, 50, 0,
                     19, INVENTORY_BACKGROUND) {
 
                 @Override

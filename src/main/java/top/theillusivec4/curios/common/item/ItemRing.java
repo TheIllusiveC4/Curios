@@ -49,6 +49,11 @@ public class ItemRing extends Item implements ICurio {
                 }
                 return atts;
             }
+
+            @Override
+            public boolean canRightClickEquip(ItemStack stack) {
+                return true;
+            }
         });
     }
 

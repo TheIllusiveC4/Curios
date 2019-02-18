@@ -9,7 +9,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagCollection;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
@@ -19,6 +21,7 @@ import top.theillusivec4.curios.api.capability.CapCurioItem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -170,6 +173,10 @@ public class CuriosAPI {
 
     public static Set<String> getCurioTags(Item item) {
 
+        if (idToTag.isEmpty()) {
+            refreshTags();
+        }
+
         if (itemToTypes.containsKey(item)) {
             return itemToTypes.get(item);
         } else {
@@ -187,6 +194,7 @@ public class CuriosAPI {
     }
 
     public static void refreshTags() {
+        Map<ResourceLocation, Tag<Item>> tags = ItemTags.getCollection().getTagMap();
         idToTag = ItemTags.getCollection().getTagMap().entrySet()
                 .stream()
                 .filter(map -> map.getKey().getNamespace().equals(Curios.MODID))

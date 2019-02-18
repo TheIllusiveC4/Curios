@@ -32,11 +32,11 @@ public class LayerCurios implements LayerRenderer<EntityLivingBase> {
 
                     if (!stack.isEmpty()) {
                         CuriosAPI.getCurio(stack).ifPresent(curio -> {
-                            if (curio.hasRender(stack, entitylivingbaseIn)) {
+                            if (curio.hasRender(stack, id, entitylivingbaseIn)) {
                                 GlStateManager.pushMatrix();
                                 GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-                                curio.doRender(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw,
-                                        headPitch, scale);
+                                curio.doRender(id, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks,
+                                        netHeadYaw, headPitch, scale);
                                 GlStateManager.popMatrix();
                             }
                         });
