@@ -1,10 +1,10 @@
 package top.theillusivec4.curios.common.network.client;
 
-import c4.curios.common.inventory.ContainerCurios;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
+import top.theillusivec4.curios.common.inventory.ContainerCurios;
 
 import java.util.function.Supplier;
 

@@ -5,6 +5,8 @@ import com.google.common.collect.Multimap;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Set;
 
@@ -34,8 +36,10 @@ public interface ICurio {
 
     default boolean canRightClickEquip(ItemStack stack) { return false; }
 
+    @OnlyIn(Dist.CLIENT)
     default boolean hasRender(ItemStack stack, EntityLivingBase entityLivingBase) { return false; }
 
+    @OnlyIn(Dist.CLIENT)
     default void doRender(EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks,
                           float ageInTicks, float netHeadYaw, float headPitch, float scale) {}
 }

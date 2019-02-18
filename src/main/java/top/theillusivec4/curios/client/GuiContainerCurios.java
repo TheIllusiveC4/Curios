@@ -13,12 +13,11 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.ICurioItemHandler;
 import top.theillusivec4.curios.common.inventory.ContainerCurios;
 import top.theillusivec4.curios.common.inventory.SlotCurio;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
-
-import java.io.IOException;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiContainerCurios extends InventoryEffectRenderer {
@@ -68,35 +67,20 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         }
     }
 
-    /**
-     * Draws the screen and all the components in it.
-     */
-    @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        this.drawDefaultBackground();
-        this.hasActivePotionEffects = false;
-        boolean flag = Mouse.isButtonDown(0);
+    protected boolean inScrollBar(double mouseX, double mouseY) {
         int i = this.guiLeft;
         int j = this.guiTop;
         int k = i - 34;
         int l = j + 12;
         int i1 = k + 14;
         int j1 = l + 139;
+        return mouseX >= (double)k && mouseY >= (double)l && mouseX < (double)i1 && mouseY < (double)j1;
+    }
 
-        if (!this.wasClicking && flag && mouseX >= k && mouseY >= l && mouseX < i1 && mouseY < j1) {
-            this.isScrolling = this.needsScrollBars();
-        }
-
-        if (!flag) {
-            this.isScrolling = false;
-        }
-        this.wasClicking = flag;
-
-        if (this.isScrolling) {
-            this.currentScroll = ((float)(mouseY - l) - 7.5F) / ((float)(j1 - l) - 15.0F);
-            this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
-            ((ContainerCurios)this.inventorySlots).scrollTo(this.currentScroll);
-        }
+    @Override
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        this.drawDefaultBackground();
+        this.hasActivePotionEffects = false;
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
         this.oldMouseX = (float)mouseX;
@@ -159,11 +143,20 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
      */
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+
+        if (this.inScrollBar(mouseX, mouseY)) {
+            this.isScrolling = this.needsScrollBars();
+            return true;
+        }
         return this.widthTooNarrow && super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public boolean mouseReleased(double mouseReleased1, double mouseReleased3, int mouseReleased5) {
+
+        if (mouseReleased5 == 0) {
+            this.isScrolling = false;
+        }
 
         if (this.buttonClicked) {
             this.buttonClicked = false;
@@ -173,29 +166,34 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         }
     }
 
-    private boolean needsScrollBars() {
-        return ((ContainerCurios)this.inventorySlots).canScroll();
+    @Override
+    public boolean mouseDragged(double pMouseDragged1, double pMouseDragged3, int pMouseDragged5, double pMouseDragged6, double pMouseDragged8) {
+        if (this.isScrolling) {
+            int i = this.guiTop + 18;
+            int j = i + 112;
+            this.currentScroll = ((float)pMouseDragged3 - (float)i - 7.5F) / ((float)(j - i) - 15.0F);
+            this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
+            ((ContainerCurios)this.inventorySlots).scrollTo(this.currentScroll);
+            return true;
+        } else {
+            return super.mouseDragged(pMouseDragged1, pMouseDragged3, pMouseDragged5, pMouseDragged6, pMouseDragged8);
+        }
     }
 
     @Override
-    public void handleMouseInput() throws IOException {
-        super.handleMouseInput();
-        int i = Mouse.getEventDWheel();
-
-        if (i != 0 && this.needsScrollBars()) {
-            int j = (((ContainerCurios)this.inventorySlots).curios.getSlots());
-
-            if (i > 0) {
-                i = 1;
-            }
-
-            if (i < 0) {
-                i = -1;
-            }
-
-            this.currentScroll = (float)((double)this.currentScroll - (double)i / (double)j);
+    public boolean mouseScrolled(double pMouseScrolled1) {
+        if (!this.needsScrollBars()) {
+            return false;
+        } else {
+            int i = ((ContainerCurios)this.inventorySlots).curios.map(ICurioItemHandler::getSlots).orElse(1);
+            this.currentScroll = (float)((double)this.currentScroll - pMouseScrolled1 / (double)i);
             this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
             ((ContainerCurios)this.inventorySlots).scrollTo(this.currentScroll);
+            return true;
         }
+    }
+
+    private boolean needsScrollBars() {
+        return ((ContainerCurios)this.inventorySlots).canScroll();
     }
 }

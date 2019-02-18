@@ -1,11 +1,11 @@
 package top.theillusivec4.curios.common.network.server;
 
-import c4.curios.common.inventory.ContainerCurios;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.inventory.Container;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
+import top.theillusivec4.curios.common.inventory.ContainerCurios;
 
 import java.util.function.Supplier;
 

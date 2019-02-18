@@ -3,7 +3,6 @@ package top.theillusivec4.curios.api.event;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import top.theillusivec4.curios.api.CurioType;
 
 import javax.annotation.Nonnull;
 

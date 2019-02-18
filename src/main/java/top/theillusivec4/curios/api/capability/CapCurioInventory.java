@@ -11,13 +11,16 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.capabilities.*;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.CurioType;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.ICurioItemHandler;
 
 import javax.annotation.Nonnull;

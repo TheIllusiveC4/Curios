@@ -1,6 +1,5 @@
 package top.theillusivec4.curios.client;
 
-import c4.curios.common.ConfigHandler;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
@@ -8,6 +7,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.common.CuriosConfig;
 
 import javax.annotation.Nonnull;
 
@@ -17,7 +17,7 @@ public class LayerCurios implements LayerRenderer<EntityLivingBase> {
     public void render(@Nonnull EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks,
                        float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 
-        if (!ConfigHandler.renderCurios) {
+        if (!CuriosConfig.CLIENT.renderCurios.get()) {
             return;
         }
         GlStateManager.pushMatrix();
