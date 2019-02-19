@@ -5,7 +5,6 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,7 +19,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.FMLPlayMessages;
 import top.theillusivec4.curios.api.CuriosAPI;
@@ -30,8 +29,9 @@ import top.theillusivec4.curios.client.*;
 import top.theillusivec4.curios.client.gui.GuiContainerCurios;
 import top.theillusivec4.curios.client.gui.GuiEventHandler;
 import top.theillusivec4.curios.client.render.LayerCurios;
-import top.theillusivec4.curios.common.CommonEventHandler;
-import top.theillusivec4.curios.common.CurioEventHandler;
+import top.theillusivec4.curios.common.CommandCurios;
+import top.theillusivec4.curios.common.event.CommonEventHandler;
+import top.theillusivec4.curios.common.event.CurioEventHandler;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.inventory.ContainerCurios;
 import top.theillusivec4.curios.common.inventory.CurioContainerHandler;
@@ -45,12 +45,13 @@ public class Curios {
     public static final String MODID = "curios";
 
     public Curios() {
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        eventBus.addListener(this::setup);
+        eventBus.addListener(this::postSetup);
+        MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CuriosConfig.commonSpec);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CuriosConfig.clientSpec);
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> Curios::getGuiContainer);
-        eventBus.addListener(this::setup);
-        eventBus.addListener(this::postSetup);
     }
 
     private void setup(FMLCommonSetupEvent evt) {
@@ -70,9 +71,8 @@ public class Curios {
         }
     }
 
-    @SubscribeEvent
-    public void onServerStarting(FMLServerStartedEvent evt) {
-        CuriosAPI.refreshTags();
+    private void onServerStarting(FMLServerStartingEvent evt) {
+        CommandCurios.register(evt.getCommandDispatcher());
     }
 
     private static GuiScreen getGuiContainer(FMLPlayMessages.OpenContainer msg) {

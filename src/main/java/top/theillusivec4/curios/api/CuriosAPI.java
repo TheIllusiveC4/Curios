@@ -9,7 +9,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
-import net.minecraft.tags.TagCollection;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
@@ -21,7 +20,6 @@ import top.theillusivec4.curios.api.capability.CapCurioItem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -70,70 +68,11 @@ public class CuriosAPI {
     }
 
     public static void addTypeSlotsToEntity(String id, int amount, final EntityLivingBase entityLivingBase) {
-
-        getCuriosHandler(entityLivingBase).ifPresent(handler -> {
-            ItemStackHandler stackHandler = handler.getCurioMap().get(id);
-
-            if (stackHandler != null) {
-
-                if (amount < 0) {
-                    NonNullList<ItemStack> drops = NonNullList.create();
-
-                    for (int i = stackHandler.getSlots() - 1; i >= stackHandler.getSlots() + amount; i--) {
-                        ItemStack stack = stackHandler.getStackInSlot(i);
-                        drops.add(stackHandler.getStackInSlot(i));
-                        getCurio(stack).ifPresent(curio -> {
-                            if (!stack.isEmpty()) {
-                                curio.onUnequipped(stack, id, entityLivingBase);
-                                entityLivingBase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(id, stack));
-                            }
-                        });
-                        stackHandler.setStackInSlot(i, ItemStack.EMPTY);
-                    }
-
-                    if (entityLivingBase instanceof EntityPlayer) {
-
-                        for (ItemStack drop : drops) {
-                            ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entityLivingBase, drop);
-                        }
-                    } else {
-
-                        for (ItemStack drop : drops) {
-                            entityLivingBase.entityDropItem(drop, 0.0f);
-                        }
-                    }
-                }
-                NonNullList<ItemStack> copy = NonNullList.create();
-
-                for (int i = 0; i < stackHandler.getSlots(); i++) {
-                    copy.add(stackHandler.getStackInSlot(i).copy());
-                }
-                stackHandler.setSize(stackHandler.getSlots() + amount);
-
-                for (int i = 0; i < copy.size(); i++) {
-                    stackHandler.setStackInSlot(i, copy.get(i));
-                }
-
-                ItemStackHandler prevStackHandler = handler.getPreviousCurioMap().get(id);
-
-                if (prevStackHandler != null) {
-                    NonNullList<ItemStack> copyPrevious = NonNullList.create();
-
-                    for (int i = 0; i < prevStackHandler.getSlots(); i++) {
-                        copyPrevious.add(prevStackHandler.getStackInSlot(i).copy());
-                    }
-                    prevStackHandler.setSize(stackHandler.getSlots() + amount);
-
-                    for (int i = 0; i < copy.size(); i++) {
-                        prevStackHandler.setStackInSlot(i, copyPrevious.get(i));
-                    }
-                }
-            }
-        });
+        getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.addCurioSlot(id, amount));
     }
 
     public static void enableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
-        getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.addCurioSlot(id));
+        getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.enableCurio(id));
     }
 
     public static void disableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
@@ -166,7 +105,7 @@ public class CuriosAPI {
                         entityLivingBase.entityDropItem(drop, 0.0f);
                     }
                 }
-                handler.removeCurioSlot(id);
+                handler.disableCurio(id);
             }
         });
     }

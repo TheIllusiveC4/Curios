@@ -3,6 +3,8 @@ package top.theillusivec4.curios.api.capability;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.INBTBase;
@@ -17,11 +19,17 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.ICurioItemHandler;
+import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.network.server.SPacketEditCurios;
+import top.theillusivec4.curios.common.network.server.SPacketSyncCurios;
+import top.theillusivec4.curios.common.network.server.SPacketSyncSize;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -58,7 +66,6 @@ public class CapCurioInventory {
             public void readNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, EnumFacing side, INBTBase nbt) {
                 NBTTagList tagList = ((NBTTagCompound)nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
                 Map<String, ItemStackHandler> curios = Maps.newLinkedHashMap();
-                curios.putAll(instance.getCurioMap());
 
                 if (!tagList.isEmpty()) {
 
@@ -71,9 +78,16 @@ public class CapCurioInventory {
                             ItemStackHandler stackHandler = instance.getStackHandler(identifier);
 
                             if (stackHandler != null) {
-                                NonNullList<ItemStack> stacks = NonNullList.withSize(instance.getStackHandler(identifier).getSlots(),
-                                        ItemStack.EMPTY);
-                                ItemStackHelper.loadAllItems(itemtag, stacks);
+                                NBTTagList nbttaglist = itemtag.getList("Items", 10);
+                                NonNullList<ItemStack> stacks = NonNullList.withSize(nbttaglist.size(), ItemStack.EMPTY);
+
+                                for(int j = 0; j < nbttaglist.size(); j++) {
+                                    NBTTagCompound nbttagcompound = nbttaglist.getCompound(j);
+                                    int l = nbttagcompound.getByte("Slot") & 255;
+                                    if (l < stacks.size()) {
+                                        stacks.set(j, ItemStack.read(nbttagcompound));
+                                    }
+                                }
                                 curios.put(identifier, new ItemStackHandler(stacks));
                             }
                         }
@@ -169,19 +183,98 @@ public class CapCurioInventory {
         }
 
         @Override
-        public void addCurioSlot(String identifier) {
+        public void enableCurio(String identifier) {
             CurioType type = CuriosAPI.getType(identifier);
 
             if (type != null) {
                 this.curioSlots.putIfAbsent(identifier, new ItemStackHandler(type.getSize()));
                 this.prevCurioSlots.putIfAbsent(identifier, new ItemStackHandler(type.getSize()));
+
+                if (wearer.isServerWorld() && wearer instanceof EntityPlayerMP) {
+                    NetworkHandler.INSTANCE.sendTo(new SPacketEditCurios(wearer.getEntityId(), identifier, false),
+                            ((EntityPlayerMP)wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                }
             }
         }
 
         @Override
-        public void removeCurioSlot(String identifier) {
+        public void disableCurio(String identifier) {
             this.curioSlots.remove(identifier);
             this.prevCurioSlots.remove(identifier);
+
+            if (wearer.isServerWorld() && wearer instanceof EntityPlayerMP) {
+                NetworkHandler.INSTANCE.sendTo(new SPacketEditCurios(wearer.getEntityId(), identifier, true),
+                        ((EntityPlayerMP)wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+            }
+        }
+
+        @Override
+        public void addCurioSlot(String identifier, int amount) {
+            ItemStackHandler stackHandler = this.curioSlots.get(identifier);
+
+            if (stackHandler != null) {
+
+                if (wearer.isServerWorld()) {
+
+                    if (amount < 0) {
+                        NonNullList<ItemStack> drops = NonNullList.create();
+
+                        for (int i = stackHandler.getSlots() - 1; i >= stackHandler.getSlots() + amount; i--) {
+                            ItemStack stack = stackHandler.getStackInSlot(i);
+                            drops.add(stackHandler.getStackInSlot(i));
+                            CuriosAPI.getCurio(stack).ifPresent(curio -> {
+                                if (!stack.isEmpty()) {
+                                    curio.onUnequipped(stack, identifier, wearer);
+                                    wearer.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, stack));
+                                }
+                            });
+                            stackHandler.setStackInSlot(i, ItemStack.EMPTY);
+                        }
+
+                        if (wearer instanceof EntityPlayer) {
+
+                            for (ItemStack drop : drops) {
+                                ItemHandlerHelper.giveItemToPlayer((EntityPlayer) wearer, drop);
+                            }
+                        } else {
+
+                            for (ItemStack drop : drops) {
+                                wearer.entityDropItem(drop, 0.0f);
+                            }
+                        }
+                    }
+
+                    if (wearer instanceof EntityPlayerMP) {
+                        NetworkHandler.INSTANCE.sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount),
+                                ((EntityPlayerMP) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                    }
+                }
+                NonNullList<ItemStack> copy = NonNullList.create();
+
+                for (int i = 0; i < stackHandler.getSlots(); i++) {
+                    copy.add(stackHandler.getStackInSlot(i).copy());
+                }
+                stackHandler.setSize(stackHandler.getSlots() + amount);
+
+                for (int i = 0; i < copy.size(); i++) {
+                    stackHandler.setStackInSlot(i, copy.get(i));
+                }
+
+                ItemStackHandler prevStackHandler = this.prevCurioSlots.get(identifier);
+
+                if (prevStackHandler != null) {
+                    NonNullList<ItemStack> copyPrevious = NonNullList.create();
+
+                    for (int i = 0; i < prevStackHandler.getSlots(); i++) {
+                        copyPrevious.add(prevStackHandler.getStackInSlot(i).copy());
+                    }
+                    prevStackHandler.setSize(stackHandler.getSlots() + amount);
+
+                    for (int i = 0; i < copy.size(); i++) {
+                        prevStackHandler.setStackInSlot(i, copyPrevious.get(i));
+                    }
+                }
+            }
         }
 
         @Nullable

@@ -42,6 +42,10 @@ public interface ICurio {
         playerSP.playSound(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 1.0f, 1.0f);
     }
 
+    default boolean doAutoSync(ItemStack stack, EntityLivingBase entityLivingBase) {
+        return false;
+    }
+
     @OnlyIn(Dist.CLIENT)
     default boolean hasRender(ItemStack stack, String identifier, EntityLivingBase entityLivingBase) { return false; }
 

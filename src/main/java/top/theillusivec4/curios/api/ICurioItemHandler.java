@@ -26,9 +26,11 @@ public interface ICurioItemHandler {
 
     void setStackInSlot(String identifier, int slot, ItemStack stack);
 
-    void addCurioSlot(String identifier);
+    void enableCurio(String identifier);
 
-    void removeCurioSlot(String identifier);
+    void disableCurio(String identifier);
+
+    void addCurioSlot(String identifier, int amount);
 
     EntityLivingBase getWearer();
 }

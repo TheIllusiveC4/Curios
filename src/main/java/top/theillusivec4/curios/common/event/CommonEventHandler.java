@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.common;
+package top.theillusivec4.curios.common.event;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.enchantment.EnchantmentHelper;

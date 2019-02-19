@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.common;
+package top.theillusivec4.curios.common.event;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.entity.EntityLivingBase;
@@ -91,14 +91,14 @@ public class CurioEventHandler {
 
                         if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
 
-                            if (!stack.equals(prevStack, true) && entitylivingbase.world instanceof WorldServer) {
+                            if (currentCurio.map(curio -> curio.doAutoSync(stack, entitylivingbase)).orElse(false)
+                                    && !stack.equals(prevStack, true) && entitylivingbase.world instanceof WorldServer) {
                                 EntityTracker tracker = ((WorldServer) entitylivingbase.world).getEntityTracker();
 
                                 for (EntityPlayer player : tracker.getTrackingPlayers(entitylivingbase)) {
 
                                     if (player instanceof EntityPlayerMP) {
-                                        NetworkHandler.INSTANCE.sendTo(
-                                                new SPacketSyncCurios(entitylivingbase.getEntityId(), identifier, i, stack),
+                                        NetworkHandler.INSTANCE.sendTo(new SPacketSyncCurios(entitylivingbase.getEntityId(), identifier, i, stack),
                                                 ((EntityPlayerMP)player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                                     }
                                 }
@@ -109,16 +109,15 @@ public class CurioEventHandler {
                                 entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, prevStack));
                             });
                             currentCurio.ifPresent(curio -> {
-                                NetworkHandler.INSTANCE.sendTo(new SPacketPlayEquip(stack),
-                                        ((EntityPlayerMP)entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                NetworkHandler.INSTANCE.sendTo(new SPacketPlayEquip(stack), ((EntityPlayerMP)entitylivingbase).connection.getNetworkManager(),
+                                        NetworkDirection.PLAY_TO_CLIENT);
                                 curio.onEquipped(stack, identifier, entitylivingbase);
                                 entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier, stack));
                             });
                             prevStackHandler.setStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
 
                             if (entitylivingbase instanceof EntityPlayerMP) {
-                                NetworkHandler.INSTANCE.sendTo(
-                                        new SPacketSyncCurios(entitylivingbase.getEntityId(), identifier, i, stack),
+                                NetworkHandler.INSTANCE.sendTo(new SPacketSyncCurios(entitylivingbase.getEntityId(), identifier, i, stack),
                                         ((EntityPlayerMP)entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                             }
                         }
