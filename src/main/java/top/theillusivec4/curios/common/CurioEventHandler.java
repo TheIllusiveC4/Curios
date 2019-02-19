@@ -5,6 +5,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.world.WorldServer;
@@ -19,6 +20,7 @@ import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.ICurio;
 import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
 import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.network.server.SPacketPlayEquip;
 import top.theillusivec4.curios.common.network.server.SPacketSyncCurios;
 
 import java.util.Set;
@@ -27,20 +29,20 @@ public class CurioEventHandler {
 
     @SubscribeEvent
     public void onCurioRightClick(PlayerInteractEvent.RightClickItem evt) {
-        EntityLivingBase entitylivingbase = evt.getEntityLiving();
+        EntityPlayer player = evt.getEntityPlayer();
         ItemStack stack = evt.getItemStack();
         CuriosAPI.getCurio(stack).ifPresent(curio -> {
 
             if (curio.canRightClickEquip(stack)) {
-                CuriosAPI.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
+                CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
 
-                    if (!entitylivingbase.world.isRemote) {
+                    if (!player.world.isRemote) {
                         ImmutableMap<String, ItemStackHandler> curios = handler.getCurioMap();
                         Set<String> tags = curio.getCurioTypes(stack);
 
                         for (String id : tags) {
 
-                            if (curio.canEquip(stack, id, entitylivingbase)) {
+                            if (curio.canEquip(stack, id, player)) {
                                 ItemStackHandler stackHandler = curios.get(id);
 
                                 if (stackHandler != null) {
@@ -82,7 +84,7 @@ public class CurioEventHandler {
 
                     for (int i = 0; i < stackHandler.getSlots(); i++) {
                         ItemStack stack = stackHandler.getStackInSlot(i);
-                        ItemStack prevStack = stackHandler.getStackInSlot(i);
+                        ItemStack prevStack = prevStackHandler.getStackInSlot(i);
 
                         LazyOptional<ICurio> currentCurio = CuriosAPI.getCurio(stack);
                         currentCurio.ifPresent(curio -> curio.onCurioTick(stack, identifier, entitylivingbase));
@@ -107,10 +109,18 @@ public class CurioEventHandler {
                                 entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, prevStack));
                             });
                             currentCurio.ifPresent(curio -> {
+                                NetworkHandler.INSTANCE.sendTo(new SPacketPlayEquip(stack),
+                                        ((EntityPlayerMP)entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                                 curio.onEquipped(stack, identifier, entitylivingbase);
                                 entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier, stack));
                             });
                             prevStackHandler.setStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
+
+                            if (entitylivingbase instanceof EntityPlayerMP) {
+                                NetworkHandler.INSTANCE.sendTo(
+                                        new SPacketSyncCurios(entitylivingbase.getEntityId(), identifier, i, stack),
+                                        ((EntityPlayerMP)entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                            }
                         }
                     }
                 }

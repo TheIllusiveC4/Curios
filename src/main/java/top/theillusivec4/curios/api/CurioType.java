@@ -14,11 +14,13 @@ public class CurioType {
     private ResourceLocation icon;
     private int size;
     private boolean isEnabled;
+    private boolean hideGUI;
 
     public CurioType(String identifier) {
         this.identifier = identifier;
         this.size = 1;
         this.isEnabled = true;
+        this.hideGUI = false;
     }
 
     public String getIdentifier() {
@@ -47,6 +49,8 @@ public class CurioType {
         return isEnabled;
     }
 
+    public boolean isHidden() { return hideGUI; }
+
     public final CurioType setIcon(@Nonnull ResourceLocation icon) {
         this.icon = icon;
         return this;
@@ -59,6 +63,11 @@ public class CurioType {
 
     public final CurioType setEnabled(boolean enabled) {
         this.isEnabled = enabled;
+        return this;
+    }
+
+    public final CurioType hideGUI(boolean hideGUI) {
+        this.hideGUI = hideGUI;
         return this;
     }
 }

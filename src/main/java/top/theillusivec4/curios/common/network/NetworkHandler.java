@@ -9,6 +9,7 @@ import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
+import top.theillusivec4.curios.common.network.server.SPacketPlayEquip;
 import top.theillusivec4.curios.common.network.server.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
 
@@ -34,6 +35,7 @@ public class NetworkHandler {
         registerMessage(CPacketScrollCurios.class, CPacketScrollCurios::encode, CPacketScrollCurios::decode, CPacketScrollCurios::handle);
         registerMessage(SPacketSyncCurios.class, SPacketSyncCurios::encode, SPacketSyncCurios::decode, SPacketSyncCurios::handle);
         registerMessage(SPacketScrollCurios.class, SPacketScrollCurios::encode, SPacketScrollCurios::decode, SPacketScrollCurios::handle);
+        registerMessage(SPacketPlayEquip.class, SPacketPlayEquip::encode, SPacketPlayEquip::decode, SPacketPlayEquip::handle);
     }
 
     private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder,

@@ -33,7 +33,7 @@ public class ItemRing extends Item implements ICurio {
         return CapCurioItem.createProvider(new ICurio() {
 
             @Override
-            public void onCurioTick(ItemStack stack, EntityLivingBase entityLivingBase) {
+            public void onCurioTick(ItemStack stack, String identifier, EntityLivingBase entityLivingBase) {
                 if (!entityLivingBase.getEntityWorld().isRemote && entityLivingBase.ticksExisted % 19 == 0) {
                     entityLivingBase.addPotionEffect(new PotionEffect(MobEffects.HASTE, 20, 0, true, true));
                 }

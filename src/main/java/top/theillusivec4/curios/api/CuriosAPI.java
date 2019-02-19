@@ -84,7 +84,7 @@ public class CuriosAPI {
                         drops.add(stackHandler.getStackInSlot(i));
                         getCurio(stack).ifPresent(curio -> {
                             if (!stack.isEmpty()) {
-                                curio.onUnequipped(stack, entityLivingBase);
+                                curio.onUnequipped(stack, id, entityLivingBase);
                                 entityLivingBase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(id, stack));
                             }
                         });
@@ -149,7 +149,7 @@ public class CuriosAPI {
                     drops.add(stack.copy());
                     getCurio(stack).ifPresent(curio -> {
                         if (!stack.isEmpty()) {
-                            curio.onUnequipped(stack, entityLivingBase);
+                            curio.onUnequipped(stack, id, entityLivingBase);
                             entityLivingBase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(id, stack));
                         }
                     });

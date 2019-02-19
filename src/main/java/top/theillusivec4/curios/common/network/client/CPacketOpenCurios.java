@@ -4,7 +4,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkHooks;
-import top.theillusivec4.curios.client.CurioContainerHandler;
+import top.theillusivec4.curios.common.inventory.CurioContainerHandler;
 
 import java.util.function.Supplier;
 

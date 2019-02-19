@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.client;
+package top.theillusivec4.curios.common.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -8,7 +8,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IInteractionObject;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.common.inventory.ContainerCurios;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

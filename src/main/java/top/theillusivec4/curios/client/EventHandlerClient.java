@@ -1,6 +1,7 @@
 package top.theillusivec4.curios.client;
 
 import com.google.common.collect.Multimap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -15,6 +16,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.common.inventory.ContainerCurios;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
@@ -35,7 +37,9 @@ public class EventHandlerClient {
 
         if (evt.phase != TickEvent.Phase.END) return;
 
-        if (KeyRegistry.openCurios.isPressed()) {
+        Minecraft mc = Minecraft.getInstance();
+
+        if (KeyRegistry.openCurios.isPressed() && mc.isGameFocused()) {
             NetworkHandler.INSTANCE.sendToServer(new CPacketOpenCurios());
         }
     }
@@ -51,7 +55,7 @@ public class EventHandlerClient {
                 Set<String> slots = curio.getCurioTypes(stack);
 
                 for (String s : slots) {
-                    tooltip.add(new TextComponentString(" -").appendSibling(new TextComponentTranslation("curios.identifier." + s)));
+                    tooltip.add(new TextComponentString(" -").appendSibling(new TextComponentTranslation("curios.identifier." + s)).applyTextStyle(TextFormatting.GRAY));
                 }
 
                 for (String identifier : slots) {
@@ -60,7 +64,7 @@ public class EventHandlerClient {
                     if (!multimap.isEmpty()) {
                         EntityPlayer player = evt.getEntityPlayer();
                         tooltip.add(new TextComponentString(""));
-                        tooltip.add(new TextComponentTranslation("curios.modifiers", identifier));
+                        tooltip.add(new TextComponentTranslation("curios.modifiers", identifier).applyTextStyle(TextFormatting.GRAY));
 
                         for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
                             AttributeModifier attributemodifier = entry.getValue();

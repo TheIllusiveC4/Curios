@@ -1,11 +1,11 @@
-package top.theillusivec4.curios.client;
+package top.theillusivec4.curios.client.gui;
 
-import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -14,10 +14,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.ICurioItemHandler;
+import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.common.inventory.ContainerCurios;
 import top.theillusivec4.curios.common.inventory.SlotCurio;
-import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiContainerCurios extends InventoryEffectRenderer {
@@ -26,12 +25,12 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
 
     private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 
-    private float oldMouseX;
-    private float oldMouseY;
     private boolean widthTooNarrow;
     private float currentScroll;
     private boolean isScrolling;
     private boolean buttonClicked;
+    private float oldMouseX;
+    private float oldMouseY;
 
     public GuiContainerCurios(ContainerCurios containerCurios) {
         super(containerCurios);
@@ -53,15 +52,8 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
             super.initGui();
             this.widthTooNarrow = this.width < 379;
             this.guiLeft = (this.width - this.xSize) / 2;
-            this.addButton(new GuiButtonImage(44, this.guiLeft + 125, this.height / 2 - 22, 20,
-                    18, 50, 0, 19, CURIO_INVENTORY) {
-
-                @Override
-                public void onClick(double mouseX, double mouseY) {
-                    GuiContainerCurios.this.mc.displayGuiScreen(new GuiInventory(GuiContainerCurios.this.mc.player));
-                    NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
-                }
-            });
+            this.addButton(new GuiButtonCurios(this, 44, this.guiLeft + 125, this.height / 2 - 22, 20,
+                    18, 50, 0, 19, CURIO_INVENTORY));
         }
     }
 
@@ -81,8 +73,19 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         this.hasActivePotionEffects = false;
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
-        this.oldMouseX = (float)mouseX;
-        this.oldMouseY = (float)mouseY;
+        oldMouseX = (float)mouseX;
+        oldMouseY = (float)mouseY;
+    }
+
+    @Override
+    public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
+
+        if (KeyRegistry.openCurios.isActiveAndMatches(InputMappings.getInputByCode(p_keyPressed_1_, p_keyPressed_2_))) {
+            this.mc.player.closeScreen();
+            return true;
+        } else {
+            return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+        }
     }
 
     @Override

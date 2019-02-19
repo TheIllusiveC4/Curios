@@ -103,7 +103,7 @@ public class ContainerCurios extends Container {
                 ItemStackHandler stackHandler = curioMap.get(identifier);
                 CurioType type = CuriosAPI.getType(identifier);
 
-                if (type != null) {
+                if (type != null && !type.isHidden()) {
 
                     for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
                         this.addSlot(new SlotCurio(player, stackHandler, i, type, -18, yOffset));
@@ -206,7 +206,7 @@ public class ContainerCurios extends Container {
 
     /**
      * Handle when the stack in slot {@code index} is shift-clicked. Normally this moves the stack between the player
-     * inventory and the other inventory(s).
+     * gui and the other gui(s).
      */
     @Nonnull
     @Override

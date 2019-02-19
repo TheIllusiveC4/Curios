@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.client;
+package top.theillusivec4.curios.client.render;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.GlStateManager;
@@ -35,8 +35,8 @@ public class LayerCurios implements LayerRenderer<EntityLivingBase> {
                             if (curio.hasRender(stack, id, entitylivingbaseIn)) {
                                 GlStateManager.pushMatrix();
                                 GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-                                curio.doRender(id, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks,
-                                        netHeadYaw, headPitch, scale);
+                                curio.doRender(stack, id, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks,
+                                        ageInTicks, netHeadYaw, headPitch, scale);
                                 GlStateManager.popMatrix();
                             }
                         });

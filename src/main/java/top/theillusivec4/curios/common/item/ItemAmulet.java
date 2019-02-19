@@ -24,7 +24,7 @@ public class ItemAmulet extends Item implements ICurio {
         return CapCurioItem.createProvider(new ICurio() {
 
             @Override
-            public void onCurioTick(ItemStack stack, EntityLivingBase entityLivingBase) {
+            public void onCurioTick(ItemStack stack, String identifier, EntityLivingBase entityLivingBase) {
 
                 if (!entityLivingBase.getEntityWorld().isRemote && entityLivingBase.ticksExisted % 40 == 0) {
                     entityLivingBase.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 80, 0, true, true));
