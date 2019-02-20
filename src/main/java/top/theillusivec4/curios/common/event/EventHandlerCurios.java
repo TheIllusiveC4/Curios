@@ -168,7 +168,7 @@ public class EventHandlerCurios {
 
                     if (!player.world.isRemote) {
                         ImmutableMap<String, ItemStackHandler> curios = handler.getCurioMap();
-                        Set<String> tags = curio.getCurioTypes(stack);
+                        Set<String> tags = CuriosAPI.getCurioTags(stack.getItem());
 
                         for (String id : tags) {
 

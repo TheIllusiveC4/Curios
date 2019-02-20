@@ -48,14 +48,15 @@ public class EventHandlerClient {
         ItemStack stack = evt.getItemStack();
 
         if (!stack.isEmpty()) {
-            CuriosAPI.getCurio(evt.getItemStack()).ifPresent(curio -> {
-                List<ITextComponent> tooltip = evt.getToolTip();
-                tooltip.add(new TextComponentTranslation("curios.name").applyTextStyle(TextFormatting.AQUA));
-                Set<String> slots = curio.getCurioTypes(stack);
+            List<ITextComponent> tooltip = evt.getToolTip();
+            tooltip.add(new TextComponentTranslation("curios.name").applyTextStyle(TextFormatting.AQUA));
+            Set<String> slots = CuriosAPI.getCurioTags(stack.getItem());
 
-                for (String s : slots) {
-                    tooltip.add(new TextComponentString(" -").appendSibling(new TextComponentTranslation("curios.identifier." + s)).applyTextStyle(TextFormatting.GRAY));
-                }
+            for (String s : slots) {
+                tooltip.add(new TextComponentString(" -").appendSibling(new TextComponentTranslation("curios.identifier." + s)).applyTextStyle(TextFormatting.GRAY));
+            }
+
+            CuriosAPI.getCurio(stack).ifPresent(curio -> {
 
                 for (String identifier : slots) {
                     Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier, stack);

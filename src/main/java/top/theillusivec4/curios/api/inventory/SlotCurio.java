@@ -45,8 +45,9 @@ public final class SlotCurio extends SlotItemHandler {
 
     @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
-        return CuriosAPI.getCurio(stack).map(curio -> curio.getCurioTypes(stack).contains(curioType.getIdentifier())
-                && curio.canEquip(stack, curioType.getIdentifier(), player) && super.isItemValid(stack)).orElse(false);
+        return CuriosAPI.getCurioTags(stack.getItem()).contains(curioType.getIdentifier())
+                && CuriosAPI.getCurio(stack).map(curio -> curio.canEquip(stack, curioType.getIdentifier(), player)).orElse(true)
+                && super.isItemValid(stack);
     }
 
     @Override
