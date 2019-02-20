@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.common.network.server;
+package top.theillusivec4.curios.common.network.server.sync;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -9,29 +9,29 @@ import top.theillusivec4.curios.api.CuriosAPI;
 
 import java.util.function.Supplier;
 
-public class SPacketEditCurios {
+public class SPacketSyncActive {
 
     private int entityId;
     private String curioId;
     private boolean remove;
 
-    public SPacketEditCurios(int entityId, String curioId, boolean remove) {
+    public SPacketSyncActive(int entityId, String curioId, boolean remove) {
         this.entityId = entityId;
         this.curioId = curioId;
         this.remove = remove;
     }
 
-    public static void encode(SPacketEditCurios msg, PacketBuffer buf) {
+    public static void encode(SPacketSyncActive msg, PacketBuffer buf) {
         buf.writeInt(msg.entityId);
         buf.writeString(msg.curioId);
         buf.writeBoolean(msg.remove);
     }
 
-    public static SPacketEditCurios decode(PacketBuffer buf) {
-        return new SPacketEditCurios(buf.readInt(), buf.readString(25), buf.readBoolean());
+    public static SPacketSyncActive decode(PacketBuffer buf) {
+        return new SPacketSyncActive(buf.readInt(), buf.readString(25), buf.readBoolean());
     }
 
-    public static void handle(SPacketEditCurios msg, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(SPacketSyncActive msg, Supplier<NetworkEvent.Context> ctx) {
 
         ctx.get().enqueueWork(() -> {
             Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);

@@ -10,10 +10,8 @@ import java.util.function.Supplier;
 
 public class CPacketScrollCurios {
 
-    int windowId;
-    int index;
-
-    public CPacketScrollCurios() {}
+    private int windowId;
+    private int index;
 
     public CPacketScrollCurios(int windowId, int index) {
         this.windowId = windowId;

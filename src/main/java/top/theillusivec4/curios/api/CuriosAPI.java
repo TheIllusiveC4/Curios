@@ -15,8 +15,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.capability.CapCurioInventory;
-import top.theillusivec4.curios.api.capability.CapCurioItem;
+import top.theillusivec4.curios.common.capability.CapCurioInventory;
+import top.theillusivec4.curios.common.capability.CapCurioItem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,12 +47,12 @@ public class CuriosAPI {
 
     @SuppressWarnings("ConstantConditions")
     public static LazyOptional<ICurio> getCurio(ItemStack stack) {
-        return stack.getCapability(CapCurioItem.CURIO_CAP);
+        return stack.getCapability(CuriosCapability.ITEM);
     }
 
     @SuppressWarnings("ConstantConditions")
     public static LazyOptional<ICurioItemHandler> getCuriosHandler(@Nonnull final EntityLivingBase entityLivingBase) {
-        return entityLivingBase.getCapability(CapCurioInventory.CURIO_INV_CAP);
+        return entityLivingBase.getCapability(CuriosCapability.INVENTORY);
     }
 
     public static void setTypeEnabled(String id, boolean enabled) {

@@ -16,6 +16,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.ICurioItemHandler;
+import top.theillusivec4.curios.api.inventory.SlotCurio;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
@@ -24,13 +25,20 @@ import javax.annotation.Nonnull;
 
 public class ContainerCurios extends Container {
 
-    private static final String[] EMPTY_SLOT_NAMES = new String[]{"minecraft:item/empty_armor_slot_boots", "minecraft:item/empty_armor_slot_leggings", "minecraft:item/empty_armor_slot_chestplate", "minecraft:item/empty_armor_slot_helmet"};
-    private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[] {EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
-    public InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
-    public InventoryCraftResult craftResult = new InventoryCraftResult();
-    private final EntityPlayer player;
+    private static final String[] EMPTY_SLOT_NAMES = new String[]{  "minecraft:item/empty_armor_slot_boots",
+                                                                    "minecraft:item/empty_armor_slot_leggings",
+                                                                    "minecraft:item/empty_armor_slot_chestplate",
+                                                                    "minecraft:item/empty_armor_slot_helmet"};
+    private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[] {EntityEquipmentSlot.HEAD,
+            EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
+
     public final LazyOptional<ICurioItemHandler> curios;
-    public final boolean isLocalWorld;
+
+    private final EntityPlayer player;
+    private final boolean isLocalWorld;
+
+    private InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
+    private InventoryCraftResult craftResult = new InventoryCraftResult();
     private int lastScrollIndex;
 
     public ContainerCurios(InventoryPlayer playerInventory, EntityPlayer playerIn) {
@@ -195,19 +203,12 @@ public class ContainerCurios extends Container {
         }).orElse(0) == 1;
     }
 
-    /**
-     * Determines whether supplied player can use this container
-     */
     @Override
     public boolean canInteractWith(@Nonnull EntityPlayer playerIn)
     {
         return true;
     }
 
-    /**
-     * Handle when the stack in slot {@code index} is shift-clicked. Normally this moves the stack between the player
-     * gui and the other gui(s).
-     */
     @Nonnull
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {

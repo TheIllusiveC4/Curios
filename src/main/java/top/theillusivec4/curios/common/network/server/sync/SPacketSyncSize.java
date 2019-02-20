@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.common.network.server;
+package top.theillusivec4.curios.common.network.server.sync;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;

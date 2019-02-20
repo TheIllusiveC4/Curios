@@ -14,14 +14,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.ICurioItemHandler;
+import top.theillusivec4.curios.api.inventory.SlotCurio;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.common.inventory.ContainerCurios;
-import top.theillusivec4.curios.common.inventory.SlotCurio;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiContainerCurios extends InventoryEffectRenderer {
 
-    public static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID, "textures/gui/inventory.png");
+    static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID, "textures/gui/inventory.png");
 
     private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 
@@ -57,7 +57,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         }
     }
 
-    protected boolean inScrollBar(double mouseX, double mouseY) {
+    private boolean inScrollBar(double mouseX, double mouseY) {
         int i = this.guiLeft;
         int j = this.guiTop;
         int k = i - 34;
@@ -112,8 +112,8 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         int i = this.guiLeft;
         int j = this.guiTop;
         this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
-        GuiInventory.drawEntityOnScreen(i + 51, j + 75, 30, (float)(i + 51) - mouseX,
-                (float)(j + 75 - 50) - mouseY, this.mc.player);
+        GuiInventory.drawEntityOnScreen(i + 51, j + 75, 30, (float)(i + 51) - oldMouseX,
+                (float)(j + 75 - 50) - oldMouseY, this.mc.player);
         CuriosAPI.getCuriosHandler(this.mc.player).ifPresent(handler -> {
             int slotCount = handler.getSlots();
             int upperHeight = 7 + slotCount * 18;

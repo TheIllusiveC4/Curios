@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.common.inventory;
+package top.theillusivec4.curios.api.inventory;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,7 +13,7 @@ import top.theillusivec4.curios.api.CuriosAPI;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class SlotCurio extends SlotItemHandler {
+public final class SlotCurio extends SlotItemHandler {
 
     private final CurioType curioType;
     private final EntityPlayer player;
@@ -31,26 +31,29 @@ public class SlotCurio extends SlotItemHandler {
     }
 
     @Override
+    public void putStack(@Nonnull ItemStack stack) {
+        CuriosAPI.getCurio(stack).ifPresent(curio -> curio.onEquipped(stack, curioType.getIdentifier(), player));
+        super.putStack(stack);
+    }
+
+    @Nonnull
+    @Override
+    public ItemStack onTake(EntityPlayer thePlayer, @Nonnull ItemStack stack) {
+        CuriosAPI.getCurio(stack).ifPresent(curio -> curio.onUnequipped(stack, curioType.getIdentifier(), thePlayer));
+        return super.onTake(thePlayer, stack);
+    }
+
+    @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
-        return CuriosAPI.getCurio(stack).map(curio -> {
-            if (curio.getCurioTypes(stack).contains(curioType.getIdentifier()) && curio.canEquip(stack, curioType.getIdentifier(), player)
-                    && super.isItemValid(stack)) {
-                return 1;
-            }
-            return 0;
-        }).orElse(0) == 1;
+        return CuriosAPI.getCurio(stack).map(curio -> curio.getCurioTypes(stack).contains(curioType.getIdentifier())
+                && curio.canEquip(stack, curioType.getIdentifier(), player) && super.isItemValid(stack)).orElse(false);
     }
 
     @Override
     public boolean canTakeStack(EntityPlayer playerIn) {
         ItemStack stack = this.getStack();
-        return CuriosAPI.getCurio(stack).map(curio -> {
-            if ((stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) && curio.canUnequip(stack, curioType.getIdentifier(), playerIn)
-                    && super.canTakeStack(playerIn)) {
-                return 1;
-            }
-            return 0;
-        }).orElse(0) == 1;
+        return CuriosAPI.getCurio(stack).map(curio -> ((stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
+                && curio.canUnequip(stack, curioType.getIdentifier(), playerIn))).orElse(false);
     }
 
     @Nullable

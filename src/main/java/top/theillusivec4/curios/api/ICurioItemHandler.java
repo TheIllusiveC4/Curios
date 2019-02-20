@@ -1,19 +1,19 @@
 package top.theillusivec4.curios.api;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedMap;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 public interface ICurioItemHandler {
 
-    ImmutableMap<String, ItemStackHandler> getCurioMap();
+    ImmutableSortedMap<String, ItemStackHandler> getCurioMap();
 
-    ImmutableMap<String, ItemStackHandler> getPreviousCurioMap();
+    ImmutableSortedMap<String, ItemStackHandler> getPreviousCurioMap();
 
-    void setCurioMap(Map<String, ItemStackHandler> map);
+    void setCurioMap(SortedMap<String, ItemStackHandler> map);
 
     /**
     * Returns the total number of Curio slots across all identifiers

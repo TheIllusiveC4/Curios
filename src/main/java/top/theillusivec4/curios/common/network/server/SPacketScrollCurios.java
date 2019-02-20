@@ -11,8 +11,8 @@ import java.util.function.Supplier;
 
 public class SPacketScrollCurios {
 
-    int windowId;
-    int index;
+    private int windowId;
+    private int index;
 
     public SPacketScrollCurios(int windowId, int index) {
         this.windowId = windowId;

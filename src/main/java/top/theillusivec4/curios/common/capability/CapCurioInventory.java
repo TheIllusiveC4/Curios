@@ -1,54 +1,46 @@
-package top.theillusivec4.curios.api.capability;
+package top.theillusivec4.curios.common.capability;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Maps;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.ICurioItemHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.server.SPacketEditCurios;
-import top.theillusivec4.curios.common.network.server.SPacketSyncCurios;
-import top.theillusivec4.curios.common.network.server.SPacketSyncSize;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActive;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncSize;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.SortedMap;
 
 public class CapCurioInventory {
-
-    @CapabilityInject(ICurioItemHandler.class)
-    public static final Capability<ICurioItemHandler> CURIO_INV_CAP = null;
-
-    public static final ResourceLocation ID = new ResourceLocation(Curios.MODID, "curios_inventory");
 
     public static void register() {
         CapabilityManager.INSTANCE.register(ICurioItemHandler.class, new Capability.IStorage<ICurioItemHandler>() {
             @Override
             public INBTBase writeNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance,
                                      EnumFacing side) {
-                ImmutableMap<String, ItemStackHandler> curioMap = instance.getCurioMap();
+                ImmutableSortedMap<String, ItemStackHandler> curioMap = instance.getCurioMap();
                 NBTTagCompound compound = new NBTTagCompound();
                 NBTTagList taglist = new NBTTagList();
 
@@ -65,7 +57,7 @@ public class CapCurioInventory {
             @Override
             public void readNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, EnumFacing side, INBTBase nbt) {
                 NBTTagList tagList = ((NBTTagCompound)nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
-                Map<String, ItemStackHandler> curios = Maps.newLinkedHashMap();
+                SortedMap<String, ItemStackHandler> curios = Maps.newTreeMap();
 
                 if (!tagList.isEmpty()) {
 
@@ -104,15 +96,15 @@ public class CapCurioInventory {
 
     public static class CurioInventoryWrapper implements ICurioItemHandler {
 
-        Map<String, ItemStackHandler> curioSlots;
-        Map<String, ItemStackHandler> prevCurioSlots;
+        SortedMap<String, ItemStackHandler> curioSlots;
+        SortedMap<String, ItemStackHandler> prevCurioSlots;
         EntityLivingBase wearer;
 
-        public CurioInventoryWrapper() {
+        CurioInventoryWrapper() {
             this(null);
         }
 
-        public CurioInventoryWrapper(final EntityLivingBase livingBase) {
+        CurioInventoryWrapper(final EntityLivingBase livingBase) {
             this.curioSlots = this.initCurioSlots();
             this.prevCurioSlots = this.initCurioSlots();
             this.wearer = livingBase;
@@ -123,8 +115,8 @@ public class CapCurioInventory {
             this.curioSlots.get(identifier).setStackInSlot(slot, stack);
         }
 
-        private Map<String, ItemStackHandler> initCurioSlots() {
-            Map<String, ItemStackHandler> slots = Maps.newLinkedHashMap();
+        private SortedMap<String, ItemStackHandler> initCurioSlots() {
+            SortedMap<String, ItemStackHandler> slots = Maps.newTreeMap();
             Map<String, CurioType> registry = CuriosAPI.getTypeRegistry();
 
             for (String id : registry.keySet()) {
@@ -159,18 +151,14 @@ public class CapCurioInventory {
         }
 
         @Override
-        public ImmutableMap<String, ItemStackHandler> getCurioMap() {
-            return ImmutableMap.copyOf(this.curioSlots);
+        public ImmutableSortedMap<String, ItemStackHandler> getCurioMap() {
+            return ImmutableSortedMap.copyOf(this.curioSlots);
         }
 
         @Override
-        public void setCurioMap(Map<String, ItemStackHandler> map) {
+        public void setCurioMap(SortedMap<String, ItemStackHandler> map) {
 
-            this.curioSlots = map.entrySet()
-                    .stream()
-                    .filter(entry -> CuriosAPI.getType(entry.getKey()) != null)
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
+            this.curioSlots = map;
             this.prevCurioSlots.clear();
             for (Map.Entry<String, ItemStackHandler> entry : this.curioSlots.entrySet()) {
                 this.prevCurioSlots.put(entry.getKey(), new ItemStackHandler(entry.getValue().getSlots()));
@@ -178,8 +166,8 @@ public class CapCurioInventory {
         }
 
         @Override
-        public ImmutableMap<String, ItemStackHandler> getPreviousCurioMap() {
-            return ImmutableMap.copyOf(this.prevCurioSlots);
+        public ImmutableSortedMap<String, ItemStackHandler> getPreviousCurioMap() {
+            return ImmutableSortedMap.copyOf(this.prevCurioSlots);
         }
 
         @Override
@@ -191,7 +179,7 @@ public class CapCurioInventory {
                 this.prevCurioSlots.putIfAbsent(identifier, new ItemStackHandler(type.getSize()));
 
                 if (wearer.isServerWorld() && wearer instanceof EntityPlayerMP) {
-                    NetworkHandler.INSTANCE.sendTo(new SPacketEditCurios(wearer.getEntityId(), identifier, false),
+                    NetworkHandler.INSTANCE.sendTo(new SPacketSyncActive(wearer.getEntityId(), identifier, false),
                             ((EntityPlayerMP)wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                 }
             }
@@ -203,7 +191,7 @@ public class CapCurioInventory {
             this.prevCurioSlots.remove(identifier);
 
             if (wearer.isServerWorld() && wearer instanceof EntityPlayerMP) {
-                NetworkHandler.INSTANCE.sendTo(new SPacketEditCurios(wearer.getEntityId(), identifier, true),
+                NetworkHandler.INSTANCE.sendTo(new SPacketSyncActive(wearer.getEntityId(), identifier, true),
                         ((EntityPlayerMP)wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
             }
         }
@@ -284,7 +272,7 @@ public class CapCurioInventory {
         }
     }
 
-    public static class Provider implements ICapabilityProvider {
+    public static class Provider implements ICapabilitySerializable<INBTBase> {
 
         final LazyOptional<ICurioItemHandler> optional;
         final ICurioItemHandler handler;
@@ -298,7 +286,19 @@ public class CapCurioInventory {
         @Nonnull
         @Override
         public <T> LazyOptional<T> getCapability(@Nullable Capability<T> capability, EnumFacing facing) {
-            return CURIO_INV_CAP.orEmpty(capability, optional);
+            return CuriosCapability.INVENTORY.orEmpty(capability, optional);
+        }
+
+        @SuppressWarnings("ConstantConditions")
+        @Override
+        public INBTBase serializeNBT() {
+            return CuriosCapability.INVENTORY.writeNBT(handler, null);
+        }
+
+        @SuppressWarnings("ConstantConditions")
+        @Override
+        public void deserializeNBT(INBTBase nbt) {
+            CuriosCapability.INVENTORY.readNBT(handler, null, nbt);
         }
     }
 }

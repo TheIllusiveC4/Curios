@@ -2,10 +2,10 @@ package top.theillusivec4.curios.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButtonImage;
+import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.gui.recipebook.GuiRecipeBook;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -17,7 +17,7 @@ public class GuiButtonCurios extends GuiButtonImage {
     private final GuiContainer parentGui;
     private boolean isRecipeBookVisible = false;
 
-    public GuiButtonCurios(GuiContainer parentGui, int buttonId, int xIn, int yIn, int widthIn, int heightIn, int textureOffestX,
+    GuiButtonCurios(GuiContainer parentGui, int buttonId, int xIn, int yIn, int widthIn, int heightIn, int textureOffestX,
                           int textureOffestY, int yDiffText, ResourceLocation resource) {
         super(buttonId, xIn, yIn, widthIn, heightIn, textureOffestX, textureOffestY, yDiffText, resource);
         this.parentGui = parentGui;
@@ -43,7 +43,11 @@ public class GuiButtonCurios extends GuiButtonImage {
 
         if (parentGui instanceof GuiInventory) {
             boolean lastVisible = isRecipeBookVisible;
-            isRecipeBookVisible = ((GuiRecipeBook)parentGui.getFocused()).isVisible();
+            IGuiEventListener eventListener = parentGui.getFocused();
+
+            if (eventListener != null) {
+                isRecipeBookVisible = ((GuiRecipeBook)eventListener).isVisible();
+            }
 
             if (lastVisible != isRecipeBookVisible) {
                 this.setPosition(parentGui.getGuiLeft() + 125, parentGui.height / 2 - 22);

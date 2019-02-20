@@ -1,26 +1,19 @@
-package top.theillusivec4.curios.api.capability;
+package top.theillusivec4.curios.common.capability;
 
 import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.ICurio;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CapCurioItem {
-
-    @CapabilityInject(ICurio.class)
-    public static final Capability<ICurio> CURIO_CAP = null;
-
-    public static final ResourceLocation ID = new ResourceLocation(Curios.MODID, "curio_item");
 
     public static void register() {
         CapabilityManager.INSTANCE.register(ICurio.class, new Capability.IStorage<ICurio>() {
@@ -40,7 +33,7 @@ public class CapCurioItem {
         return new Provider(curio);
     }
 
-    public static class CurioWrapper implements ICurio {}
+    private static class CurioWrapper implements ICurio {}
 
     public static class Provider implements ICapabilityProvider {
 
@@ -54,7 +47,7 @@ public class CapCurioItem {
         @Nonnull
         @Override
         public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
-            return CURIO_CAP.orEmpty(cap, capability);
+            return CuriosCapability.ITEM.orEmpty(cap, capability);
         }
     }
 }
