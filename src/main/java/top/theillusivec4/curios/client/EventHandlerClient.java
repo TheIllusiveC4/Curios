@@ -50,60 +50,63 @@ public class EventHandlerClient {
 
         if (!stack.isEmpty()) {
             List<ITextComponent> tooltip = evt.getToolTip();
-            tooltip.add(new TextComponentTranslation("curios.name").applyTextStyle(TextFormatting.AQUA));
             Set<String> slots = CuriosRegistry.getCurioTags(stack.getItem());
 
-            for (String s : slots) {
-                tooltip.add(new TextComponentString(" -").appendSibling(new TextComponentTranslation("curios.identifier." + s)).applyTextStyle(TextFormatting.GRAY));
-            }
+            if (!slots.isEmpty()) {
+                tooltip.add(new TextComponentTranslation("curios.name").applyTextStyle(TextFormatting.AQUA));
 
-            CuriosHelper.getCurio(stack).ifPresent(curio -> {
+                for (String s : slots) {
+                    tooltip.add(new TextComponentString(" -").appendSibling(new TextComponentTranslation("curios.identifier." + s)).applyTextStyle(TextFormatting.GRAY));
+                }
 
-                for (String identifier : slots) {
-                    Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier, stack);
+                CuriosHelper.getCurio(stack).ifPresent(curio -> {
 
-                    if (!multimap.isEmpty()) {
-                        EntityPlayer player = evt.getEntityPlayer();
-                        tooltip.add(new TextComponentString(""));
-                        tooltip.add(new TextComponentTranslation("curios.modifiers", identifier).applyTextStyle(TextFormatting.GRAY));
+                    for (String identifier : slots) {
+                        Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier, stack);
 
-                        for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
-                            AttributeModifier attributemodifier = entry.getValue();
-                            double amount = attributemodifier.getAmount();
-                            boolean flag = false;
+                        if (!multimap.isEmpty()) {
+                            EntityPlayer player = evt.getEntityPlayer();
+                            tooltip.add(new TextComponentString(""));
+                            tooltip.add(new TextComponentTranslation("curios.modifiers", identifier).applyTextStyle(TextFormatting.GRAY));
 
-                            if (player != null) {
+                            for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
+                                AttributeModifier attributemodifier = entry.getValue();
+                                double amount = attributemodifier.getAmount();
+                                boolean flag = false;
 
-                                if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
-                                    amount = amount + player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
-                                    amount = amount + (double) EnchantmentHelper.getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
-                                    flag = true;
-                                } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
-                                    amount += player.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
-                                    flag = true;
-                                }
+                                if (player != null) {
 
-                                double d1;
+                                    if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
+                                        amount = amount + player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
+                                        amount = amount + (double) EnchantmentHelper.getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
+                                        flag = true;
+                                    } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
+                                        amount += player.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
+                                        flag = true;
+                                    }
 
-                                if (attributemodifier.getOperation() != 1 && attributemodifier.getOperation() != 2) {
-                                    d1 = amount;
-                                } else {
-                                    d1 = amount * 100.0D;
-                                }
+                                    double d1;
 
-                                if (flag) {
-                                    tooltip.add((new TextComponentString(" ")).appendSibling(new TextComponentTranslation("attribute.modifier.equals." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.DARK_GREEN));
-                                } else if (amount > 0.0D) {
-                                    tooltip.add((new TextComponentTranslation("attribute.modifier.plus." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.BLUE));
-                                } else if (amount < 0.0D) {
-                                    d1 = d1 * -1.0D;
-                                    tooltip.add((new TextComponentTranslation("attribute.modifier.take." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.RED));
+                                    if (attributemodifier.getOperation() != 1 && attributemodifier.getOperation() != 2) {
+                                        d1 = amount;
+                                    } else {
+                                        d1 = amount * 100.0D;
+                                    }
+
+                                    if (flag) {
+                                        tooltip.add((new TextComponentString(" ")).appendSibling(new TextComponentTranslation("attribute.modifier.equals." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.DARK_GREEN));
+                                    } else if (amount > 0.0D) {
+                                        tooltip.add((new TextComponentTranslation("attribute.modifier.plus." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.BLUE));
+                                    } else if (amount < 0.0D) {
+                                        d1 = d1 * -1.0D;
+                                        tooltip.add((new TextComponentTranslation("attribute.modifier.take." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.RED));
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
         }
     }
 }
