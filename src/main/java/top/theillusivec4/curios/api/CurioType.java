@@ -56,6 +56,7 @@ public class CurioType {
     public boolean isHidden() { return isHidden; }
 
     public final CurioType icon(@Nonnull ResourceLocation icon) {
+        CuriosRegistry.icons.put(this.identifier, icon);
         this.icon = icon;
         return this;
     }

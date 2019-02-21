@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import net.minecraft.item.Item;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
+import net.minecraft.util.ResourceLocation;
 import top.theillusivec4.curios.Curios;
 
 import javax.annotation.Nonnull;
@@ -19,6 +20,8 @@ public class CuriosRegistry {
     private static Map<String, CurioType> idToType = Maps.newHashMap();
     private static Map<String, Tag<Item>> idToTag = Maps.newHashMap();
     private static Map<Item, Set<String>> itemToTypes = Maps.newHashMap();
+
+    static Map<String, ResourceLocation> icons = Maps.newHashMap();
 
     public static CurioType registerType(@Nonnull String identifier) {
 
@@ -57,6 +60,12 @@ public class CuriosRegistry {
             itemToTypes.put(item, tags);
             return tags;
         }
+    }
+
+    public static Set<ResourceLocation> getResources() {
+        Set<ResourceLocation> resources = Sets.newHashSet(icons.values());
+        resources.add(new ResourceLocation("curios:item/empty_generic_slot"));
+        return resources;
     }
 
     private static void refreshTags() {

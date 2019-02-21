@@ -107,9 +107,10 @@ public class Curios {
         public static void onTextureStitch(TextureStitchEvent.Pre evt) {
             TextureMap map = evt.getMap();
             IResourceManager manager = Minecraft.getInstance().getResourceManager();
-            map.registerSprite(manager, new ResourceLocation("curios:item/empty_ring_slot"));
-            map.registerSprite(manager, new ResourceLocation("curios:item/empty_amulet_slot"));
-            map.registerSprite(manager, new ResourceLocation("curios:item/empty_generic_slot"));
+
+            for (ResourceLocation resource : CuriosRegistry.getResources()) {
+                map.registerSprite(manager, resource);
+            }
         }
     }
 }
