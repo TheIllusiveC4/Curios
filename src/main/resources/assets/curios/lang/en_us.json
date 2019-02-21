@@ -6,5 +6,6 @@
   "commands.curios.enable.success": "Slot %s has been enabled for %s",
   "commands.curios.disable.success": "Slot %s has been disabled for %s",
   "commands.curios.clear.success": "Slot %s has been cleared for %s",
-  "commands.curios.clearAll.success": "All slots have been cleared for %s"
+  "commands.curios.clearAll.success": "All slots have been cleared for %s",
+  "commands.curios.reset.success": "Reset slots for %s"
 }

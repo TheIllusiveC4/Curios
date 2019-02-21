@@ -195,6 +195,11 @@ public class CapCurioInventory {
 
                 if (stackHandler != null) {
                     stackHandler.addSize(amount);
+
+                    if (wearer instanceof EntityPlayerMP) {
+                        NetworkHandler.INSTANCE.sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount, false),
+                                ((EntityPlayerMP) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                    }
                 }
             }
         }
@@ -209,7 +214,7 @@ public class CapCurioInventory {
                     dropOrGiveLast(stackHandler, identifier, amount);
 
                     if (wearer instanceof EntityPlayerMP) {
-                        NetworkHandler.INSTANCE.sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount),
+                        NetworkHandler.INSTANCE.sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount, true),
                                 ((EntityPlayerMP) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                     }
                     stackHandler.removeSize(amount);

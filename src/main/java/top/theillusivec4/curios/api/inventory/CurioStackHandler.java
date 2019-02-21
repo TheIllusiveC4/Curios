@@ -21,12 +21,22 @@ public class CurioStackHandler extends ItemStackHandler {
 
     public CurioStackHandler(NonNullList<ItemStack> stacks) {
         this.stacks = stacks;
-        previousStacks = NonNullList.withSize(stacks.size(), ItemStack.EMPTY);
+        this.previousStacks = NonNullList.create();
+
+        for (ItemStack stack : stacks) {
+            previousStacks.add(ItemStack.EMPTY);
+        }
     }
 
+    @Override
     public void setSize(int size) {
-        stacks = NonNullList.withSize(size, ItemStack.EMPTY);
-        previousStacks = NonNullList.withSize(size, ItemStack.EMPTY);
+        this.stacks = NonNullList.create();
+        this.previousStacks = NonNullList.create();
+
+        for (int i = 0; i < size; i++) {
+            this.stacks.add(ItemStack.EMPTY);
+            this.previousStacks.add(ItemStack.EMPTY);
+        }
     }
 
     public void setPreviousStackInSlot(int slot, @Nonnull ItemStack stack) {
@@ -62,10 +72,14 @@ public class CurioStackHandler extends ItemStackHandler {
         if (amount < 0) {
             throw new IllegalArgumentException("Amount cannot be negative!");
         }
+        int targetSize = this.stacks.size() - amount;
 
-        for (int i = 0; i < amount && i < this.stacks.size() && i < this.previousStacks.size(); i++) {
+        while (this.stacks.size() > targetSize) {
             this.stacks.remove(this.stacks.size() - 1);
-            this.previousStacks.remove(this.stacks.size() - 1);
+        }
+
+        while (this.previousStacks.size() > targetSize) {
+            this.previousStacks.remove(this.previousStacks.size() - 1);
         }
     }
 }

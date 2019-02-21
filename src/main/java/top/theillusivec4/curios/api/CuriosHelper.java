@@ -51,6 +51,14 @@ public class CuriosHelper {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.addCurioSlot(id, amount));
     }
 
+    public static void removeTypeSlotFromEntity(String id, final EntityLivingBase entityLivingBase) {
+        removeTypeSlotsFromEntity(id, 1, entityLivingBase);
+    }
+
+    public static void removeTypeSlotsFromEntity(String id, int amount, final EntityLivingBase entityLivingBase) {
+        getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.removeCurioSlot(id, amount));
+    }
+
     public static void enableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.enableCurio(id));
     }
