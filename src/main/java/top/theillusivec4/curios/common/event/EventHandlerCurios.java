@@ -212,19 +212,19 @@ public class EventHandlerCurios {
     public void onCurioTick(LivingEvent.LivingUpdateEvent evt) {
         EntityLivingBase entitylivingbase = evt.getEntityLiving();
         CuriosHelper.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
+            SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
-            if (!entitylivingbase.world.isRemote) {
-                SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
-                entitylivingbase.isServerWorld();
-                for (String identifier : curios.keySet()) {
-                    CurioStackHandler stackHandler = curios.get(identifier);
+            for (String identifier : curios.keySet()) {
+                CurioStackHandler stackHandler = curios.get(identifier);
 
-                    for (int i = 0; i < stackHandler.getSlots(); i++) {
-                        ItemStack stack = stackHandler.getStackInSlot(i);
+                for (int i = 0; i < stackHandler.getSlots(); i++) {
+                    ItemStack stack = stackHandler.getStackInSlot(i);
+                    stack.inventoryTick(entitylivingbase.world, entitylivingbase, -1, false);
+                    LazyOptional<ICurio> currentCurio = CuriosHelper.getCurio(stack);
+                    currentCurio.ifPresent(curio -> curio.onCurioTick(stack, identifier, entitylivingbase));
+
+                    if (!entitylivingbase.world.isRemote) {
                         ItemStack prevStack = stackHandler.getPreviousStackInSlot(i);
-
-                        LazyOptional<ICurio> currentCurio = CuriosHelper.getCurio(stack);
-                        currentCurio.ifPresent(curio -> curio.onCurioTick(stack, identifier, entitylivingbase));
 
                         if (!stack.equals(prevStack, true)) {
 
@@ -236,7 +236,7 @@ public class EventHandlerCurios {
 
                                     if (player instanceof EntityPlayerMP) {
                                         NetworkHandler.INSTANCE.sendTo(new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack),
-                                                ((EntityPlayerMP)player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                                ((EntityPlayerMP) player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                                     }
                                 }
                             }
@@ -247,7 +247,7 @@ public class EventHandlerCurios {
 
                             if (entitylivingbase instanceof EntityPlayerMP) {
                                 NetworkHandler.INSTANCE.sendTo(new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack),
-                                        ((EntityPlayerMP)entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                        ((EntityPlayerMP) entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
 
                             }
                         }
