@@ -15,7 +15,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
@@ -50,13 +51,13 @@ public class EventHandlerClient {
         if (!stack.isEmpty()) {
             List<ITextComponent> tooltip = evt.getToolTip();
             tooltip.add(new TextComponentTranslation("curios.name").applyTextStyle(TextFormatting.AQUA));
-            Set<String> slots = CuriosAPI.getCurioTags(stack.getItem());
+            Set<String> slots = CuriosRegistry.getCurioTags(stack.getItem());
 
             for (String s : slots) {
                 tooltip.add(new TextComponentString(" -").appendSibling(new TextComponentTranslation("curios.identifier." + s)).applyTextStyle(TextFormatting.GRAY));
             }
 
-            CuriosAPI.getCurio(stack).ifPresent(curio -> {
+            CuriosHelper.getCurio(stack).ifPresent(curio -> {
 
                 for (String identifier : slots) {
                     Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier, stack);

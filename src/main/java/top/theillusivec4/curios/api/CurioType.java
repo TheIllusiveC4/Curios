@@ -14,13 +14,13 @@ public class CurioType {
     private ResourceLocation icon;
     private int size;
     private boolean isEnabled;
-    private boolean hideGUI;
+    private boolean isHidden;
 
     public CurioType(String identifier) {
         this.identifier = identifier;
         this.size = 1;
         this.isEnabled = true;
-        this.hideGUI = false;
+        this.isHidden = false;
     }
 
     public String getIdentifier() {
@@ -33,6 +33,10 @@ public class CurioType {
 
     @OnlyIn(Dist.CLIENT)
     public String getFormattedName() {
+
+        if (!I18n.hasKey(getTranslationKey())) {
+            return identifier.substring(0, 1).toUpperCase() + identifier.substring(1);
+        }
         return I18n.format(getTranslationKey());
     }
 
@@ -49,25 +53,25 @@ public class CurioType {
         return isEnabled;
     }
 
-    public boolean isHidden() { return hideGUI; }
+    public boolean isHidden() { return isHidden; }
 
-    public final CurioType setIcon(@Nonnull ResourceLocation icon) {
+    public final CurioType icon(@Nonnull ResourceLocation icon) {
         this.icon = icon;
         return this;
     }
 
-    public final CurioType setSize(int size) {
+    public final CurioType defaultSize(int size) {
         this.size = size;
         return this;
     }
 
-    public final CurioType setEnabled(boolean enabled) {
+    public final CurioType enabled(boolean enabled) {
         this.isEnabled = enabled;
         return this;
     }
 
-    public final CurioType hideGUI(boolean hideGUI) {
-        this.hideGUI = hideGUI;
+    public final CurioType hide(boolean hide) {
+        this.isHidden = hide;
         return this;
     }
 }

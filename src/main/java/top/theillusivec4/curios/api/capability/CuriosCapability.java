@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.api;
+package top.theillusivec4.curios.api.capability;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;

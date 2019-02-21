@@ -1,7 +1,5 @@
 package top.theillusivec4.curios.common.event;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedMap;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -27,10 +25,12 @@ import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.ItemStackHandler;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.ICurio;
+import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosRegistry;
+import top.theillusivec4.curios.api.capability.CuriosCapability;
+import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
+import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContents;
@@ -38,6 +38,7 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncMap;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.SortedMap;
 
 public class EventHandlerCurios {
 
@@ -54,7 +55,7 @@ public class EventHandlerCurios {
 
         if (entity instanceof EntityPlayerMP) {
             EntityPlayerMP mp = (EntityPlayerMP)entity;
-            CuriosAPI.getCuriosHandler(mp).ifPresent(handler -> NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()),
+            CuriosHelper.getCuriosHandler(mp).ifPresent(handler -> NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()),
                     mp.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT));
         }
     }
@@ -66,7 +67,7 @@ public class EventHandlerCurios {
 
         if (player instanceof EntityPlayerMP && target instanceof EntityLivingBase) {
             EntityLivingBase livingBase = (EntityLivingBase)target;
-            CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(livingBase.getEntityId(), handler.getCurioMap()),
+            CuriosHelper.getCuriosHandler(livingBase).ifPresent(handler -> NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(livingBase.getEntityId(), handler.getCurioMap()),
                     ((EntityPlayerMP)player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT));
         }
     }
@@ -76,8 +77,8 @@ public class EventHandlerCurios {
         EntityPlayer player = evt.getEntityPlayer();
         if (!evt.isWasDeath() || player.world.getGameRules().getBoolean("keepInventory")) {
 
-            CuriosAPI.getCuriosHandler(evt.getOriginal()).ifPresent(originalHandler ->
-                    CuriosAPI.getCuriosHandler(player).ifPresent(newHandler ->
+            CuriosHelper.getCuriosHandler(evt.getOriginal()).ifPresent(originalHandler ->
+                    CuriosHelper.getCuriosHandler(player).ifPresent(newHandler ->
                             newHandler.setCurioMap(originalHandler.getCurioMap())));
         }
     }
@@ -87,9 +88,9 @@ public class EventHandlerCurios {
         EntityPlayer player = evt.getEntityPlayer();
 
         if (!player.world.getGameRules().getBoolean("keepInventory") && !player.isSpectator()) {
-            CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
+            CuriosHelper.getCuriosHandler(player).ifPresent(handler -> {
                 Collection<EntityItem> entityItems = evt.getDrops();
-                ImmutableMap<String, ItemStackHandler> curioMap = handler.getCurioMap();
+                SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
 
                 for (String identifier : curioMap.keySet()) {
                     ItemStackHandler stacks = curioMap.get(identifier);
@@ -114,8 +115,8 @@ public class EventHandlerCurios {
         EntityPlayer player = evt.getEntityPlayer();
 
         if (!player.world.isRemote) {
-            CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
-                ImmutableMap<String, ItemStackHandler> curioMap = handler.getCurioMap();
+            CuriosHelper.getCuriosHandler(player).ifPresent(handler -> {
+                SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
 
                 for (String identifier : curioMap.keySet()) {
                     ItemStackHandler stacks = curioMap.get(identifier);
@@ -161,14 +162,14 @@ public class EventHandlerCurios {
     public void onCurioRightClick(PlayerInteractEvent.RightClickItem evt) {
         EntityPlayer player = evt.getEntityPlayer();
         ItemStack stack = evt.getItemStack();
-        CuriosAPI.getCurio(stack).ifPresent(curio -> {
+        CuriosHelper.getCurio(stack).ifPresent(curio -> {
 
             if (curio.canRightClickEquip(stack)) {
-                CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
+                CuriosHelper.getCuriosHandler(player).ifPresent(handler -> {
 
                     if (!player.world.isRemote) {
-                        ImmutableMap<String, ItemStackHandler> curios = handler.getCurioMap();
-                        Set<String> tags = CuriosAPI.getCurioTags(stack.getItem());
+                        SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
+                        Set<String> tags = CuriosRegistry.getCurioTags(stack.getItem());
 
                         for (String id : tags) {
 
@@ -203,21 +204,19 @@ public class EventHandlerCurios {
     @SubscribeEvent
     public void onCurioTick(LivingEvent.LivingUpdateEvent evt) {
         EntityLivingBase entitylivingbase = evt.getEntityLiving();
-        CuriosAPI.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
+        CuriosHelper.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
 
             if (entitylivingbase.isServerWorld()) {
-                ImmutableSortedMap<String, ItemStackHandler> curios = handler.getCurioMap();
-                ImmutableSortedMap<String, ItemStackHandler> prevCurios = handler.getPreviousCurioMap();
+                SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
                 for (String identifier : curios.keySet()) {
-                    ItemStackHandler stackHandler = curios.get(identifier);
-                    ItemStackHandler prevStackHandler = prevCurios.get(identifier);
+                    CurioStackHandler stackHandler = curios.get(identifier);
 
                     for (int i = 0; i < stackHandler.getSlots(); i++) {
                         ItemStack stack = stackHandler.getStackInSlot(i);
-                        ItemStack prevStack = prevStackHandler.getStackInSlot(i);
+                        ItemStack prevStack = stackHandler.getPreviousStackInSlot(i);
 
-                        LazyOptional<ICurio> currentCurio = CuriosAPI.getCurio(stack);
+                        LazyOptional<ICurio> currentCurio = CuriosHelper.getCurio(stack);
                         currentCurio.ifPresent(curio -> curio.onCurioTick(stack, identifier, entitylivingbase));
 
                         if (!stack.equals(prevStack, true)) {
@@ -235,9 +234,9 @@ public class EventHandlerCurios {
                                 }
                             }
                             MinecraftForge.EVENT_BUS.post(new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
-                            CuriosAPI.getCurio(prevStack).ifPresent(curio -> entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, prevStack)));
+                            CuriosHelper.getCurio(prevStack).ifPresent(curio -> entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, prevStack)));
                             currentCurio.ifPresent(curio -> entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier, stack)));
-                            prevStackHandler.setStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
+                            stackHandler.setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
 
                             if (entitylivingbase instanceof EntityPlayerMP) {
                                 NetworkHandler.INSTANCE.sendTo(new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack),

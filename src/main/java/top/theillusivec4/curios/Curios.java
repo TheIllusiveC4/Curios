@@ -22,7 +22,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.FMLPlayMessages;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.client.EventHandlerClient;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.GuiContainerCurios;
@@ -59,14 +60,14 @@ public class Curios {
         CapCurioItem.register();
         NetworkHandler.register();
         MinecraftForge.EVENT_BUS.register(new EventHandlerCurios());
-        CuriosAPI.registerType("ring").setIcon(new ResourceLocation(MODID, "item/empty_ring_slot")).setSize(10);
-        CuriosAPI.registerType("amulet").setIcon(new ResourceLocation(MODID, "item/empty_amulet_slot"));
+        CuriosRegistry.registerType("ring").icon(new ResourceLocation(MODID, "item/empty_ring_slot")).defaultSize(10);
+        CuriosRegistry.registerType("amulet").icon(new ResourceLocation(MODID, "item/empty_amulet_slot"));
     }
 
     private void postSetup(FMLLoadCompleteEvent evt) {
 
         for (String id : CuriosConfig.COMMON.disabledCurios.get()) {
-            CuriosAPI.setTypeEnabled(id, false);
+            CuriosHelper.setTypeEnabled(id, false);
         }
     }
 

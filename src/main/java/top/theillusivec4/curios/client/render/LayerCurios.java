@@ -1,15 +1,15 @@
 package top.theillusivec4.curios.client.render;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.CuriosConfig;
 
 import javax.annotation.Nonnull;
+import java.util.SortedMap;
 
 public class LayerCurios implements LayerRenderer<EntityLivingBase> {
 
@@ -21,17 +21,17 @@ public class LayerCurios implements LayerRenderer<EntityLivingBase> {
             return;
         }
         GlStateManager.pushMatrix();
-        CuriosAPI.getCuriosHandler(entitylivingbaseIn).ifPresent(handler -> {
-            ImmutableMap<String, ItemStackHandler> curios = handler.getCurioMap();
+        CuriosHelper.getCuriosHandler(entitylivingbaseIn).ifPresent(handler -> {
+            SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
             for (String id : curios.keySet()) {
-                ItemStackHandler stackHandler = curios.get(id);
+                CurioStackHandler stackHandler = curios.get(id);
 
                 for (int i = 0; i < stackHandler.getSlots(); i++) {
                     ItemStack stack = stackHandler.getStackInSlot(i);
 
                     if (!stack.isEmpty()) {
-                        CuriosAPI.getCurio(stack).ifPresent(curio -> {
+                        CuriosHelper.getCurio(stack).ifPresent(curio -> {
                             if (curio.hasRender(stack, id, entitylivingbaseIn)) {
                                 GlStateManager.pushMatrix();
                                 GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);

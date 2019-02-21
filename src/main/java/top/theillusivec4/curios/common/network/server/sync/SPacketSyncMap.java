@@ -7,8 +7,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.items.ItemStackHandler;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
 import java.util.Map;
 import java.util.SortedMap;
@@ -18,9 +18,9 @@ public class SPacketSyncMap {
 
     private int entityId;
     private int entrySize;
-    private SortedMap<String, ItemStackHandler> map;
+    private SortedMap<String, CurioStackHandler> map;
 
-    public SPacketSyncMap(int entityId, SortedMap<String, ItemStackHandler> map) {
+    public SPacketSyncMap(int entityId, SortedMap<String, CurioStackHandler> map) {
         this.entityId = entityId;
         this.entrySize = map.size();
         this.map = map;
@@ -30,7 +30,7 @@ public class SPacketSyncMap {
         buf.writeInt(msg.entityId);
         buf.writeInt(msg.entrySize);
 
-        for (Map.Entry<String, ItemStackHandler> entry : msg.map.entrySet()) {
+        for (Map.Entry<String, CurioStackHandler> entry : msg.map.entrySet()) {
             buf.writeString(entry.getKey());
             buf.writeCompoundTag(entry.getValue().serializeNBT());
         }
@@ -39,11 +39,11 @@ public class SPacketSyncMap {
     public static SPacketSyncMap decode(PacketBuffer buf) {
         int entityId = buf.readInt();
         int entrySize = buf.readInt();
-        SortedMap<String, ItemStackHandler> map = Maps.newTreeMap();
+        SortedMap<String, CurioStackHandler> map = Maps.newTreeMap();
 
         for (int i = 0; i < entrySize; i++) {
             String key = buf.readString(25);
-            ItemStackHandler stackHandler = new ItemStackHandler();
+            CurioStackHandler stackHandler = new CurioStackHandler();
             NBTTagCompound compound = buf.readCompoundTag();
 
             if (compound != null) {
@@ -60,7 +60,7 @@ public class SPacketSyncMap {
             Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
 
             if (entity instanceof EntityLivingBase) {
-                CuriosAPI.getCuriosHandler((EntityLivingBase) entity).ifPresent(handler -> handler.setCurioMap(msg.map));
+                CuriosHelper.getCuriosHandler((EntityLivingBase) entity).ifPresent(handler -> handler.setCurioMap(msg.map));
             }
         });
         ctx.get().setPacketHandled(true);

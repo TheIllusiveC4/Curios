@@ -1,6 +1,5 @@
 package top.theillusivec4.curios.common.inventory;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,14 +13,17 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CurioType;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.ICurioItemHandler;
+import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosRegistry;
+import top.theillusivec4.curios.api.capability.ICurioItemHandler;
+import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.api.inventory.SlotCurio;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
 
 import javax.annotation.Nonnull;
+import java.util.SortedMap;
 
 public class ContainerCurios extends Container {
 
@@ -44,7 +46,7 @@ public class ContainerCurios extends Container {
     public ContainerCurios(InventoryPlayer playerInventory, EntityPlayer playerIn) {
         this.player = playerIn;
         this.isLocalWorld = playerIn.world.isRemote;
-        this.curios = CuriosAPI.getCuriosHandler(playerIn);
+        this.curios = CuriosHelper.getCuriosHandler(playerIn);
         this.addSlot(new SlotCrafting(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154, 28));
 
         for (int i = 0; i < 2; ++i) {
@@ -103,13 +105,13 @@ public class ContainerCurios extends Container {
         });
 
         this.curios.ifPresent(curios -> {
-            ImmutableMap<String, ItemStackHandler> curioMap = curios.getCurioMap();
+            SortedMap<String, CurioStackHandler> curioMap = curios.getCurioMap();
             int slots = 0;
             int yOffset = 12;
 
             for (String identifier : curioMap.keySet()) {
                 ItemStackHandler stackHandler = curioMap.get(identifier);
-                CurioType type = CuriosAPI.getType(identifier);
+                CurioType type = CuriosRegistry.getType(identifier);
 
                 if (type != null && !type.isHidden()) {
 
@@ -126,7 +128,7 @@ public class ContainerCurios extends Container {
 
     public void scrollToIndex(int indexIn) {
         this.curios.ifPresent(curios -> {
-            ImmutableMap<String, ItemStackHandler> curioMap = curios.getCurioMap();
+            SortedMap<String, CurioStackHandler> curioMap = curios.getCurioMap();
             int slots = 0;
             int yOffset = 12;
             int index = 0;
@@ -137,7 +139,7 @@ public class ContainerCurios extends Container {
                 ItemStackHandler stackHandler = curioMap.get(identifier);
 
                 for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
-                    CurioType type = CuriosAPI.getType(identifier);
+                    CurioType type = CuriosRegistry.getType(identifier);
 
                     if (type != null) {
 
@@ -241,7 +243,7 @@ public class ContainerCurios extends Container {
                 if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (index < 46 && CuriosAPI.getCurio(itemstack).isPresent()) {
+            } else if (index < 46 && CuriosHelper.getCurio(itemstack).isPresent()) {
 
                 if (this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
                     return ItemStack.EMPTY;

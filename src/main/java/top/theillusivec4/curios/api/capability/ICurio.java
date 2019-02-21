@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.api;
+package top.theillusivec4.curios.api.capability;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -7,8 +7,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import java.util.Set;
+import top.theillusivec4.curios.api.CurioType;
 
 public interface ICurio {
 

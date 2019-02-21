@@ -13,8 +13,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.ICurio;
+import top.theillusivec4.curios.api.CuriosRegistry;
+import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 
 import java.util.UUID;
@@ -44,7 +44,7 @@ public class ItemRing extends Item implements ICurio {
             public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack) {
                 Multimap<String, AttributeModifier> atts = HashMultimap.create();
 
-                if (CuriosAPI.getCurioTags(stack.getItem()).contains(identifier)) {
+                if (CuriosRegistry.getCurioTags(stack.getItem()).contains(identifier)) {
                     atts.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(SPEED_UUID, "Speed bonus", 2, 2));
                     atts.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_UUID, "Armor bonus", 2, 0));
                 }
