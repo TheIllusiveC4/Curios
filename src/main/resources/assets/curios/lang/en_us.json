@@ -7,5 +7,9 @@
   "commands.curios.disable.success": "Slot %s has been disabled for %s",
   "commands.curios.clear.success": "Slot %s has been cleared for %s",
   "commands.curios.clearAll.success": "All slots have been cleared for %s",
-  "commands.curios.reset.success": "Reset slots for %s"
+  "commands.curios.reset.success": "Reset slots for %s",
+  "item.curios.amulet": "Curious Amulet",
+  "item.curios.ring": "Curious Ring",
+  "curios.identifier.amulet": "Amulet",
+  "curios.identifier.ring": "Ring"
 }

@@ -13,8 +13,9 @@ import top.theillusivec4.curios.api.CuriosRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Set;
 
-public final class SlotCurio extends SlotItemHandler {
+public class SlotCurio extends SlotItemHandler {
 
     private final CurioType curioType;
     private final EntityPlayer player;
@@ -46,16 +47,21 @@ public final class SlotCurio extends SlotItemHandler {
 
     @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
-        return CuriosRegistry.getCurioTags(stack.getItem()).contains(curioType.getIdentifier())
-                && CuriosHelper.getCurio(stack).map(curio -> curio.canEquip(stack, curioType.getIdentifier(), player)).orElse(true)
+        return hasValidTag(CuriosRegistry.getCurioTags(stack.getItem())) && CuriosHelper.getCurio(stack)
+                .map(curio -> curio.canEquip(stack, curioType.getIdentifier(), player)).orElse(true)
                 && super.isItemValid(stack);
+    }
+
+    protected boolean hasValidTag(Set<String> tags) {
+        return tags.contains(curioType.getIdentifier()) || tags.contains("generic");
     }
 
     @Override
     public boolean canTakeStack(EntityPlayer playerIn) {
         ItemStack stack = this.getStack();
-        return CuriosHelper.getCurio(stack).map(curio -> ((stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
-                && curio.canUnequip(stack, curioType.getIdentifier(), playerIn))).orElse(false);
+        return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
+                && CuriosHelper.getCurio(stack).map(curio -> curio.canUnequip(stack, curioType.getIdentifier(), playerIn)).orElse(true)
+                && super.canTakeStack(playerIn);
     }
 
     @Nullable

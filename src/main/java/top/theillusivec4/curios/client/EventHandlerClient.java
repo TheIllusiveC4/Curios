@@ -53,10 +53,14 @@ public class EventHandlerClient {
             Set<String> slots = CuriosRegistry.getCurioTags(stack.getItem());
 
             if (!slots.isEmpty()) {
-                tooltip.add(new TextComponentTranslation("curios.name").applyTextStyle(TextFormatting.AQUA));
 
-                for (String s : slots) {
-                    tooltip.add(new TextComponentString(" -").appendSibling(new TextComponentTranslation("curios.identifier." + s)).applyTextStyle(TextFormatting.GRAY));
+                if (slots.contains("generic")) {
+                    tooltip.add(new TextComponentTranslation("curios.name").applyTextStyle(TextFormatting.GOLD));
+                } else {
+
+                    for (String s : slots) {
+                        tooltip.add(new TextComponentTranslation("curios.identifier." + s).applyTextStyle(TextFormatting.GOLD));
+                    }
                 }
 
                 CuriosHelper.getCurio(stack).ifPresent(curio -> {

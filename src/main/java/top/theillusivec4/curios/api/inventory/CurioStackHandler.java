@@ -6,7 +6,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 
-public class CurioStackHandler extends ItemStackHandler {
+public final class CurioStackHandler extends ItemStackHandler {
 
     protected NonNullList<ItemStack> previousStacks;
 
