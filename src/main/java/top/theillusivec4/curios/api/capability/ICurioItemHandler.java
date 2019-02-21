@@ -44,4 +44,8 @@ public interface ICurioItemHandler {
     EntityLivingBase getWearer();
 
     SortedMap<String, CurioStackHandler> getDefaultSlots();
+
+    void addInvalid(ItemStack stack);
+
+    void dropInvalidCache();
 }

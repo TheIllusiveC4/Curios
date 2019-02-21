@@ -66,22 +66,19 @@ public class CapCurioInventory {
                         NBTTagCompound itemtag = tagList.getCompound(i);
                         String identifier = itemtag.getString("Identifier");
                         CurioType type = CuriosRegistry.getType(identifier);
+                        CurioStackHandler stackHandler = new CurioStackHandler();
+                        stackHandler.deserializeNBT(itemtag);
 
                         if (type != null) {
-                            CurioStackHandler stackHandler = instance.getStackHandler(identifier);
+                            curios.put(identifier, stackHandler);
+                        } else {
 
-                            if (stackHandler != null) {
-                                NBTTagList nbttaglist = itemtag.getList("Items", 10);
-                                NonNullList<ItemStack> stacks = NonNullList.withSize(nbttaglist.size(), ItemStack.EMPTY);
+                            for (int j = 0; j < stackHandler.getSlots(); j++) {
+                                ItemStack stack = stackHandler.getStackInSlot(j);
 
-                                for(int j = 0; j < nbttaglist.size(); j++) {
-                                    NBTTagCompound nbttagcompound = nbttaglist.getCompound(j);
-                                    int l = nbttagcompound.getByte("Slot") & 255;
-                                    if (l < stacks.size()) {
-                                        stacks.set(j, ItemStack.read(nbttagcompound));
-                                    }
+                                if (!stack.isEmpty()) {
+                                    instance.addInvalid(stackHandler.getStackInSlot(j));
                                 }
-                                curios.put(identifier, new CurioStackHandler(stacks));
                             }
                         }
                     }
@@ -98,6 +95,7 @@ public class CapCurioInventory {
     public static class CurioInventoryWrapper implements ICurioItemHandler {
 
         SortedMap<String, CurioStackHandler> curioSlots;
+        NonNullList<ItemStack> invalidCache;
         EntityLivingBase wearer;
 
         CurioInventoryWrapper() {
@@ -106,6 +104,7 @@ public class CapCurioInventory {
 
         CurioInventoryWrapper(final EntityLivingBase livingBase) {
             this.curioSlots = this.getDefaultSlots();
+            this.invalidCache = NonNullList.create();
             this.wearer = livingBase;
         }
 
@@ -166,7 +165,7 @@ public class CapCurioInventory {
             if (type != null) {
                 this.curioSlots.putIfAbsent(identifier, new CurioStackHandler(type.getSize()));
 
-                if (wearer.isServerWorld() && wearer instanceof EntityPlayerMP) {
+                if (!wearer.world.isRemote && wearer instanceof EntityPlayerMP) {
                     NetworkHandler.INSTANCE.sendTo(new SPacketSyncActive(wearer.getEntityId(), identifier, false),
                             ((EntityPlayerMP)wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                 }
@@ -224,12 +223,26 @@ public class CapCurioInventory {
             return this.wearer;
         }
 
+        @Override
+        public void addInvalid(ItemStack stack) {
+            this.invalidCache.add(stack);
+        }
+
+        @Override
+        public void dropInvalidCache() {
+
+            if (!this.invalidCache.isEmpty()) {
+                dropOrGive(this.invalidCache);
+                this.invalidCache = NonNullList.create();
+            }
+        }
+
         private void dropOrGiveLast(ItemStackHandler stackHandler, String identifier, int amount) {
 
-            if (wearer.isServerWorld()) {
+            if (!wearer.world.isRemote) {
                 NonNullList<ItemStack> drops = NonNullList.create();
 
-                for (int i = stackHandler.getSlots() - 1; i >= stackHandler.getSlots() + amount; i--) {
+                for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
                     ItemStack stack = stackHandler.getStackInSlot(i);
                     drops.add(stackHandler.getStackInSlot(i));
                     CuriosHelper.getCurio(stack).ifPresent(curio -> {
@@ -240,17 +253,21 @@ public class CapCurioInventory {
                     });
                     stackHandler.setStackInSlot(i, ItemStack.EMPTY);
                 }
+                dropOrGive(drops);
+            }
+        }
 
-                if (wearer instanceof EntityPlayer) {
+        private void dropOrGive(NonNullList<ItemStack> drops) {
 
-                    for (ItemStack drop : drops) {
-                        ItemHandlerHelper.giveItemToPlayer((EntityPlayer) wearer, drop);
-                    }
-                } else {
+            if (wearer instanceof EntityPlayer) {
 
-                    for (ItemStack drop : drops) {
-                        wearer.entityDropItem(drop, 0.0f);
-                    }
+                for (ItemStack drop : drops) {
+                    ItemHandlerHelper.giveItemToPlayer((EntityPlayer) wearer, drop);
+                }
+            } else {
+
+                for (ItemStack drop : drops) {
+                    wearer.entityDropItem(drop, 0.0f);
                 }
             }
         }

@@ -53,10 +53,17 @@ public class EventHandlerCurios {
     public void onEntityJoinWorld(EntityJoinWorldEvent evt) {
         Entity entity = evt.getEntity();
 
-        if (entity instanceof EntityPlayerMP) {
-            EntityPlayerMP mp = (EntityPlayerMP)entity;
-            CuriosHelper.getCuriosHandler(mp).ifPresent(handler -> NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()),
-                    mp.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT));
+        if (entity instanceof EntityLivingBase) {
+            EntityLivingBase livingBase = (EntityLivingBase)evt.getEntity();
+            CuriosHelper.getCuriosHandler(livingBase).ifPresent(handler -> {
+                handler.dropInvalidCache();
+
+                if (entity instanceof EntityPlayerMP) {
+                    EntityPlayerMP mp = (EntityPlayerMP)entity;
+                    NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()),
+                            mp.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                }
+            });
         }
     }
 
@@ -206,9 +213,9 @@ public class EventHandlerCurios {
         EntityLivingBase entitylivingbase = evt.getEntityLiving();
         CuriosHelper.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
 
-            if (entitylivingbase.isServerWorld()) {
+            if (!entitylivingbase.world.isRemote) {
                 SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
-
+                entitylivingbase.isServerWorld();
                 for (String identifier : curios.keySet()) {
                     CurioStackHandler stackHandler = curios.get(identifier);
 
