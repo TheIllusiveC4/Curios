@@ -12,8 +12,11 @@ public class CurioType {
 
     private final String identifier;
     private ResourceLocation icon;
+    /** The default number of slots*/
     private int size;
+    /** Enabled slots will be given to holders by default*/
     private boolean isEnabled;
+    /** Hidden slots will not show up in the default Curios GUI, but will still exist*/
     private boolean isHidden;
 
     public CurioType(String identifier) {
