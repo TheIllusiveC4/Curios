@@ -28,9 +28,7 @@ public class CuriosRegistry {
         if (identifier.isEmpty()) {
             throw new IllegalArgumentException("Identifier cannot be empty!");
         }
-        CurioType entry = new CurioType(identifier);
-        idToType.put(identifier, entry);
-        return entry;
+        return idToType.merge(identifier, new CurioType(identifier), (key, value) -> value);
     }
 
     @Nullable

@@ -65,7 +65,7 @@ public class CurioType {
     }
 
     public final CurioType defaultSize(int size) {
-        this.size = size;
+        this.size = Math.max(size, this.size);
         return this;
     }
 
