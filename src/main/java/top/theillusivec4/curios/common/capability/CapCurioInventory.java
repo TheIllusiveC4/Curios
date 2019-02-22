@@ -1,6 +1,8 @@
 package top.theillusivec4.curios.common.capability;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -8,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
@@ -32,6 +35,7 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncSize;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Set;
 import java.util.SortedMap;
 
 public class CapCurioInventory {
@@ -52,15 +56,29 @@ public class CapCurioInventory {
                     taglist.add(itemtag);
                 }
                 compound.setTag("Curios", taglist);
+
+                NBTTagList taglist1 = new NBTTagList();
+
+                for (String identifier : instance.getDisabled()) {
+                    taglist1.add(new NBTTagString(identifier));
+                }
+                compound.setTag("Disabled", taglist1);
                 return compound;
             }
 
             @Override
             public void readNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, EnumFacing side, INBTBase nbt) {
                 NBTTagList tagList = ((NBTTagCompound)nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
-                SortedMap<String, CurioStackHandler> curios = Maps.newTreeMap();
+                NBTTagList tagList1 = ((NBTTagCompound)nbt).getList("Disabled", Constants.NBT.TAG_STRING);
+                Set<String> disabled = Sets.newHashSet();
+
+                for (int k = 0; k < tagList1.size(); k++) {
+                    disabled.add(tagList1.getString(k));
+                }
+                instance.setDisabled(disabled);
 
                 if (!tagList.isEmpty()) {
+                    SortedMap<String, CurioStackHandler> curios = instance.getDefaultSlots();
 
                     for (int i = 0; i < tagList.size(); i++) {
                         NBTTagCompound itemtag = tagList.getCompound(i);
@@ -96,6 +114,7 @@ public class CapCurioInventory {
 
         SortedMap<String, CurioStackHandler> curioSlots;
         NonNullList<ItemStack> invalidCache;
+        Set<String> disabled;
         EntityLivingBase wearer;
 
         CurioInventoryWrapper() {
@@ -103,6 +122,7 @@ public class CapCurioInventory {
         }
 
         CurioInventoryWrapper(final EntityLivingBase livingBase) {
+            this.disabled = Sets.newHashSet();
             this.curioSlots = this.getDefaultSlots();
             this.invalidCache = NonNullList.create();
             this.wearer = livingBase;
@@ -118,10 +138,13 @@ public class CapCurioInventory {
             SortedMap<String, CurioStackHandler> slots = Maps.newTreeMap();
 
             for (String id : CuriosRegistry.getTypeIdentifiers()) {
-                CurioType type = CuriosRegistry.getType(id);
 
-                if (type != null && type.isEnabled()) {
-                    slots.put(id, new CurioStackHandler(type.getSize()));
+                if (disabled.isEmpty() || !disabled.contains(id)) {
+                    CurioType type = CuriosRegistry.getType(id);
+
+                    if (type != null && type.isEnabled()) {
+                        slots.put(id, new CurioStackHandler(type.getSize()));
+                    }
                 }
             }
             return slots;
@@ -164,6 +187,7 @@ public class CapCurioInventory {
 
             if (type != null) {
                 this.curioSlots.putIfAbsent(identifier, new CurioStackHandler(type.getSize()));
+                this.disabled.remove(identifier);
 
                 if (!wearer.world.isRemote && wearer instanceof EntityPlayerMP) {
                     NetworkHandler.INSTANCE.sendTo(new SPacketSyncActive(wearer.getEntityId(), identifier, false),
@@ -179,6 +203,7 @@ public class CapCurioInventory {
             if (stackHandler != null) {
                 dropOrGiveLast(stackHandler, identifier, stackHandler.getSlots());
                 this.curioSlots.remove(identifier);
+                this.disabled.add(identifier);
 
                 if (wearer instanceof EntityPlayerMP) {
                     NetworkHandler.INSTANCE.sendTo(new SPacketSyncActive(wearer.getEntityId(), identifier, true),
@@ -211,6 +236,7 @@ public class CapCurioInventory {
                 CurioStackHandler stackHandler = this.curioSlots.get(identifier);
 
                 if (stackHandler != null) {
+                    amount = Math.min(stackHandler.getSlots() - 1, amount);
                     dropOrGiveLast(stackHandler, identifier, amount);
 
                     if (wearer instanceof EntityPlayerMP) {
@@ -226,6 +252,16 @@ public class CapCurioInventory {
         @Override
         public EntityLivingBase getWearer() {
             return this.wearer;
+        }
+
+        @Override
+        public ImmutableSet<String> getDisabled() {
+            return ImmutableSet.copyOf(disabled);
+        }
+
+        @Override
+        public void setDisabled(Set<String> disabled) {
+            this.disabled = disabled;
         }
 
         @Override

@@ -1,10 +1,12 @@
 package top.theillusivec4.curios.api.capability;
 
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
+import java.util.Set;
 import java.util.SortedMap;
 
 public interface ICurioItemHandler {
@@ -89,8 +91,20 @@ public interface ICurioItemHandler {
     SortedMap<String, CurioStackHandler> getDefaultSlots();
 
     /**
+     * Used internally for retrieving a list of disabled identifiers
+     * @return A list of disabled {@link CurioType} by identifier for this handler
+     */
+    ImmutableSet<String> getDisabled();
+
+    /**
+     * Used internally for setting the list of disabled {@link CurioType} by identifier for this handler
+     * @param disabled List of disabled identifiers
+     */
+    void setDisabled(Set<String> disabled);
+
+    /**
      * Adds an ItemStack to the invalid cache
-     * An internal helper method for storing items found in the process of disabling/removing slots to be given back to
+     * Used internally for storing items found in the process of disabling/removing slots to be given back to
      * the player or dropped on the ground in other cases
      * @param stack The ItemStack to add
      */
@@ -98,7 +112,7 @@ public interface ICurioItemHandler {
 
     /**
      * Drops all of the ItemStacks found in the invalid cache
-     * An internal helper method for dropping items found in disabling/removing slots or giving them back to players
+     * Used internally for dropping items found in disabling/removing slots or giving them back to players
      */
     void dropInvalidCache();
 }
