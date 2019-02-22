@@ -4,7 +4,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.CuriosConfig;
 
@@ -21,7 +21,7 @@ public class LayerCurios implements LayerRenderer<EntityLivingBase> {
             return;
         }
         GlStateManager.pushMatrix();
-        CuriosHelper.getCuriosHandler(entitylivingbaseIn).ifPresent(handler -> {
+        CuriosAPI.getCuriosHandler(entitylivingbaseIn).ifPresent(handler -> {
             SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
             for (String id : curios.keySet()) {
@@ -31,7 +31,7 @@ public class LayerCurios implements LayerRenderer<EntityLivingBase> {
                     ItemStack stack = stackHandler.getStackInSlot(i);
 
                     if (!stack.isEmpty()) {
-                        CuriosHelper.getCurio(stack).ifPresent(curio -> {
+                        CuriosAPI.getCurio(stack).ifPresent(curio -> {
                             if (curio.hasRender(stack, id, entitylivingbaseIn)) {
                                 GlStateManager.pushMatrix();
                                 GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);

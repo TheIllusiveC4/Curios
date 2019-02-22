@@ -6,7 +6,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosAPI;
 
 import java.util.function.Supplier;
 
@@ -41,7 +41,7 @@ public class SPacketSyncContents {
             Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
 
             if (entity instanceof EntityLivingBase) {
-                CuriosHelper.getCuriosHandler((EntityLivingBase)entity).ifPresent(handler -> handler.setStackInSlot(msg.curioId, msg.slotId, msg.stack));
+                CuriosAPI.getCuriosHandler((EntityLivingBase)entity).ifPresent(handler -> handler.setStackInSlot(msg.curioId, msg.slotId, msg.stack));
             }
         });
         ctx.get().setPacketHandled(true);

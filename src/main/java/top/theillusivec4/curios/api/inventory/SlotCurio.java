@@ -8,7 +8,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import top.theillusivec4.curios.api.CurioType;
-import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.CuriosRegistry;
 
 import javax.annotation.Nonnull;
@@ -34,20 +34,20 @@ public class SlotCurio extends SlotItemHandler {
 
     @Override
     public void putStack(@Nonnull ItemStack stack) {
-        CuriosHelper.getCurio(stack).ifPresent(curio -> curio.onEquipped(stack, curioType.getIdentifier(), player));
+        CuriosAPI.getCurio(stack).ifPresent(curio -> curio.onEquipped(stack, curioType.getIdentifier(), player));
         super.putStack(stack);
     }
 
     @Nonnull
     @Override
     public ItemStack onTake(EntityPlayer thePlayer, @Nonnull ItemStack stack) {
-        CuriosHelper.getCurio(stack).ifPresent(curio -> curio.onUnequipped(stack, curioType.getIdentifier(), thePlayer));
+        CuriosAPI.getCurio(stack).ifPresent(curio -> curio.onUnequipped(stack, curioType.getIdentifier(), thePlayer));
         return super.onTake(thePlayer, stack);
     }
 
     @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
-        return hasValidTag(CuriosRegistry.getCurioTags(stack.getItem())) && CuriosHelper.getCurio(stack)
+        return hasValidTag(CuriosRegistry.getCurioTags(stack.getItem())) && CuriosAPI.getCurio(stack)
                 .map(curio -> curio.canEquip(stack, curioType.getIdentifier(), player)).orElse(true)
                 && super.isItemValid(stack);
     }
@@ -60,7 +60,7 @@ public class SlotCurio extends SlotItemHandler {
     public boolean canTakeStack(EntityPlayer playerIn) {
         ItemStack stack = this.getStack();
         return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
-                && CuriosHelper.getCurio(stack).map(curio -> curio.canUnequip(stack, curioType.getIdentifier(), playerIn)).orElse(true)
+                && CuriosAPI.getCurio(stack).map(curio -> curio.canUnequip(stack, curioType.getIdentifier(), playerIn)).orElse(true)
                 && super.canTakeStack(playerIn);
     }
 

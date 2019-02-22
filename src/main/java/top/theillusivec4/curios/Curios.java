@@ -22,7 +22,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.FMLPlayMessages;
-import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.client.EventHandlerClient;
 import top.theillusivec4.curios.client.KeyRegistry;
@@ -76,7 +76,7 @@ public class Curios {
     private void postSetup(FMLLoadCompleteEvent evt) {
 
         for (String id : CuriosConfig.COMMON.disabledCurios.get()) {
-            CuriosHelper.setTypeEnabled(id, false);
+            CuriosAPI.setTypeEnabled(id, false);
         }
     }
 

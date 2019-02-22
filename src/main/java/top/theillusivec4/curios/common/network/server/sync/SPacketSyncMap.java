@@ -7,7 +7,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
 import java.util.Map;
@@ -60,7 +60,7 @@ public class SPacketSyncMap {
             Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
 
             if (entity instanceof EntityLivingBase) {
-                CuriosHelper.getCuriosHandler((EntityLivingBase) entity).ifPresent(handler -> handler.setCurioMap(msg.map));
+                CuriosAPI.getCuriosHandler((EntityLivingBase) entity).ifPresent(handler -> handler.setCurioMap(msg.map));
             }
         });
         ctx.get().setPacketHandled(true);

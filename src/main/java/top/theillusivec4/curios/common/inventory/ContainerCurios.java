@@ -13,7 +13,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CurioType;
-import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
@@ -46,7 +46,7 @@ public class ContainerCurios extends Container {
     public ContainerCurios(InventoryPlayer playerInventory, EntityPlayer playerIn) {
         this.player = playerIn;
         this.isLocalWorld = playerIn.world.isRemote;
-        this.curios = CuriosHelper.getCuriosHandler(playerIn);
+        this.curios = CuriosAPI.getCuriosHandler(playerIn);
         this.addSlot(new SlotCrafting(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154, 28));
 
         for (int i = 0; i < 2; ++i) {
@@ -243,7 +243,7 @@ public class ContainerCurios extends Container {
                 if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (index < 46 && CuriosHelper.getCurio(itemstack).isPresent()) {
+            } else if (index < 46 && CuriosAPI.getCurio(itemstack).isPresent()) {
 
                 if (this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
                     return ItemStack.EMPTY;

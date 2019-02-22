@@ -5,7 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosAPI;
 
 import java.util.function.Supplier;
 
@@ -40,7 +40,7 @@ public class SPacketSyncSize {
             Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
 
             if (entity instanceof EntityLivingBase) {
-                CuriosHelper.getCuriosHandler((EntityLivingBase) entity).ifPresent(handler -> {
+                CuriosAPI.getCuriosHandler((EntityLivingBase) entity).ifPresent(handler -> {
 
                     if (msg.remove) {
                         handler.removeCurioSlot(msg.curioId, msg.amount);

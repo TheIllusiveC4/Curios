@@ -9,6 +9,7 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'maven-publish'
 
 version = "${version_minecraft}-${version_mod}"
 group = "${mod_group}.${mod_id}"
@@ -21,14 +22,14 @@ minecraft {
 	
     runs {
         client = {
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-            properties 'forge.logging.console.level': 'debug'
+//            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+//            properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
             source sourceSets.main
         }
         server = {
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-            properties 'forge.logging.console.level': 'debug'
+//            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+//            properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
             source sourceSets.main
         }
@@ -51,10 +52,41 @@ jar {
     manifest {
         attributes(["Specification-Title": "curios",
                     "Specification-Vendor": "C4",
-                    "Specification-Version": "24.0",
+                    "Specification-Version": "1.0",
                     "Implementation-Title": project.name,
                     "Implementation-Version": "${version}",
                     "Implementation-Vendor" :"C4",
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
+    }
+}
+
+publishing {
+
+    publications {
+
+        mavenJava(MavenPublication) {
+
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+            from components.java
+        }
+    }
+
+    repositories {
+
+        if (project.hasProperty('urlMaven')) {
+
+            if (project.hasProperty('userMaven') && project.hasProperty('passMaven')) {
+
+                maven {
+                    url urlMaven
+                    credentials {
+                        username userMaven
+                        password passMaven
+                    }
+                }
+            }
+        }
     }
 }

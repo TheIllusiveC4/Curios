@@ -9,7 +9,7 @@ import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 
 import javax.annotation.Nonnull;
 
-public class CuriosHelper {
+public class CuriosAPI {
 
     public static LazyOptional<ICurio> getCurio(ItemStack stack) {
         return stack.getCapability(CuriosCapability.ITEM);

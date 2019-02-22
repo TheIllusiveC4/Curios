@@ -12,7 +12,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.SlotCurio;
 import top.theillusivec4.curios.client.KeyRegistry;
@@ -114,7 +114,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
         this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
         GuiInventory.drawEntityOnScreen(i + 51, j + 75, 30, (float)(i + 51) - oldMouseX,
                 (float)(j + 75 - 50) - oldMouseY, this.mc.player);
-        CuriosHelper.getCuriosHandler(this.mc.player).ifPresent(handler -> {
+        CuriosAPI.getCuriosHandler(this.mc.player).ifPresent(handler -> {
             int slotCount = handler.getSlots();
             int upperHeight = 7 + slotCount * 18;
             this.mc.getTextureManager().bindTexture(CURIO_INVENTORY);

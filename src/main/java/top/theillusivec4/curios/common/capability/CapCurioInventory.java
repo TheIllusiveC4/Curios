@@ -23,7 +23,7 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CurioType;
-import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
@@ -286,7 +286,7 @@ public class CapCurioInventory {
                 for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
                     ItemStack stack = stackHandler.getStackInSlot(i);
                     drops.add(stackHandler.getStackInSlot(i));
-                    CuriosHelper.getCurio(stack).ifPresent(curio -> {
+                    CuriosAPI.getCurio(stack).ifPresent(curio -> {
                         if (!stack.isEmpty()) {
                             curio.onUnequipped(stack, identifier, wearer);
                             wearer.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, stack));

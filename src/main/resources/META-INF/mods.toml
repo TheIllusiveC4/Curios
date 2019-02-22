@@ -9,15 +9,15 @@ modId="curios"
 version="${file.jarVersion}"
 displayName="Curios API"
 description='''
-A flexible and expandable accessory/equipment API for modders and modpack developers.
+A flexible and expandable accessory/equipment API for users and developers.
 '''
-[[dependencies.comforts]]
+[[dependencies.curios]]
     modId="forge"
     mandatory=true
     versionRange="[25,)"
     ordering="NONE"
     side="BOTH"
-[[dependencies.comforts]]
+[[dependencies.curios]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.13,1.14)"

@@ -16,7 +16,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import top.theillusivec4.curios.api.CurioType;
-import top.theillusivec4.curios.api.CuriosHelper;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -74,31 +74,31 @@ public class CommandCurios {
     }
 
     private static int addSlotToPlayer(CommandSource source, EntityPlayerMP playerMP, String slot, int amount) {
-        CuriosHelper.addTypeSlotsToEntity(slot, amount, playerMP);
+        CuriosAPI.addTypeSlotsToEntity(slot, amount, playerMP);
         source.sendFeedback(new TextComponentTranslation("commands.curios.add.success", amount, slot, playerMP.getDisplayName()), true);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int removeSlotFromPlayer(CommandSource source, EntityPlayerMP playerMP, String slot, int amount) {
-        CuriosHelper.removeTypeSlotsFromEntity(slot, amount, playerMP);
+        CuriosAPI.removeTypeSlotsFromEntity(slot, amount, playerMP);
         source.sendFeedback(new TextComponentTranslation("commands.curios.remove.success", amount, slot, playerMP.getDisplayName()), true);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int enableSlotForPlayer(CommandSource source, EntityPlayerMP playerMP, String slot) {
-        CuriosHelper.enableTypeForEntity(slot, playerMP);
+        CuriosAPI.enableTypeForEntity(slot, playerMP);
         source.sendFeedback(new TextComponentTranslation("commands.curios.enable.success", slot, playerMP.getDisplayName()), true);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int disableSlotForPlayer(CommandSource source, EntityPlayerMP playerMP, String slot) {
-        CuriosHelper.disableTypeForEntity(slot, playerMP);
+        CuriosAPI.disableTypeForEntity(slot, playerMP);
         source.sendFeedback(new TextComponentTranslation("commands.curios.disable.success", slot, playerMP.getDisplayName()), true);
         return Command.SINGLE_SUCCESS;
     }
 
     private static int clearSlotsForPlayer(CommandSource source, EntityPlayerMP playerMP, String slot) {
-        CuriosHelper.getCuriosHandler(playerMP).ifPresent(handler -> {
+        CuriosAPI.getCuriosHandler(playerMP).ifPresent(handler -> {
             SortedMap<String, CurioStackHandler> map = handler.getCurioMap();
 
             if (!slot.isEmpty() && map.get(slot) != null) {
@@ -120,7 +120,7 @@ public class CommandCurios {
     }
 
     private static int resetSlotsForPlayer(CommandSource source, EntityPlayerMP playerMP) {
-        CuriosHelper.getCuriosHandler(playerMP).ifPresent(handler -> {
+        CuriosAPI.getCuriosHandler(playerMP).ifPresent(handler -> {
             SortedMap<String, CurioStackHandler> slots = Maps.newTreeMap();
 
             for (String id : CuriosRegistry.getTypeIdentifiers()) {
