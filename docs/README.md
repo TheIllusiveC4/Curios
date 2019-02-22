@@ -1,0 +1,2 @@
+# Curios API [![](http://cf.way2muchnoise.eu/versions/curios.svg)](https://minecraft.curseforge.com/projects/curios) [![](http://cf.way2muchnoise.eu/short_curios_downloads.svg)](https://minecraft.curseforge.com/projects/curios/files) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+A flexible and expandable accessory/equipment API for users and developers.
