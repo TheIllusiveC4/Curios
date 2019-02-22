@@ -45,6 +45,8 @@ public class Curios {
 
     public static final String MODID = "curios";
 
+    private static final boolean DEBUG = false;
+
     public Curios() {
         final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
@@ -60,8 +62,15 @@ public class Curios {
         CapCurioItem.register();
         NetworkHandler.register();
         MinecraftForge.EVENT_BUS.register(new EventHandlerCurios());
-        CuriosRegistry.registerType("ring").icon(new ResourceLocation(MODID, "item/empty_ring_slot")).defaultSize(10);
-        CuriosRegistry.registerType("amulet").icon(new ResourceLocation(MODID, "item/empty_amulet_slot"));
+
+        for (String id : CuriosConfig.COMMON.createCurios.get()) {
+            CuriosRegistry.registerType(id);
+        }
+
+        if (DEBUG) {
+            CuriosRegistry.registerType("ring").icon(new ResourceLocation(MODID, "item/empty_ring_slot")).defaultSize(10);
+            CuriosRegistry.registerType("amulet").icon(new ResourceLocation(MODID, "item/empty_amulet_slot"));
+        }
     }
 
     private void postSetup(FMLLoadCompleteEvent evt) {

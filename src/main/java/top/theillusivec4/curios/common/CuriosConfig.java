@@ -14,6 +14,7 @@ public class CuriosConfig {
     public static class Common {
 
         public final ForgeConfigSpec.ConfigValue<List<String>> disabledCurios;
+        public final ForgeConfigSpec.ConfigValue<List<String>> createCurios;
 
         Common(ForgeConfigSpec.Builder builder) {
             builder.push("common");
@@ -22,6 +23,11 @@ public class CuriosConfig {
                     .comment("List of curio types to disable by default")
                     .translation(CONFIG_PREFIX + "disabledCurios")
                     .define("disabledCurios", Lists.newArrayList());
+
+            createCurios = builder
+                    .comment("List of curio types to create")
+                    .translation(CONFIG_PREFIX + "createCurios")
+                    .define("createCurios", Lists.newArrayList());
 
             builder.pop();
         }
