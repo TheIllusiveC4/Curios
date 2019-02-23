@@ -73,15 +73,9 @@ public class EventHandlerClient {
 
             if (!slots.isEmpty()) {
 
-                if (slots.contains("generic")) {
-                    tooltip.add(new TextComponentTranslation("curios.name").applyTextStyle(TextFormatting.GOLD));
-                } else {
-
-                    for (String s : slots) {
-                        tooltip.add(new TextComponentTranslation("curios.identifier." + s).applyTextStyle(TextFormatting.GOLD));
-                    }
+                for (String s : slots) {
+                    tooltip.add(new TextComponentTranslation("curios.identifier." + s).applyTextStyle(TextFormatting.GOLD));
                 }
-
                 CuriosAPI.getCurio(stack).ifPresent(curio -> {
 
                     for (String identifier : slots) {

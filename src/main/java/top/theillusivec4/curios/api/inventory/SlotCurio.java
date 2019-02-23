@@ -72,7 +72,7 @@ public class SlotCurio extends SlotItemHandler {
     }
 
     protected boolean hasValidTag(Set<String> tags) {
-        return tags.contains(curioType.getIdentifier()) || tags.contains("generic");
+        return tags.contains(curioType.getIdentifier());
     }
 
     @Override
