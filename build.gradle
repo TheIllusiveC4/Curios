@@ -12,7 +12,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'maven-publish'
 
 version = "${version_minecraft}-${version_mod}"
-group = "${mod_group}.${mod_id}"
+group = "${mod_group}"
 archivesBaseName = "${mod_id}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
