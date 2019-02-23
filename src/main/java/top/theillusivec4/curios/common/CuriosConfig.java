@@ -41,11 +41,13 @@ public class CuriosConfig {
             disabledCurios = builder
                     .comment("List of curio types to disable by default")
                     .translation(CONFIG_PREFIX + "disabledCurios")
+                    .worldRestart()
                     .define("disabledCurios", Lists.newArrayList());
 
             createCurios = builder
                     .comment("List of curio types to create")
                     .translation(CONFIG_PREFIX + "createCurios")
+                    .worldRestart()
                     .define("createCurios", Lists.newArrayList());
 
             builder.pop();
