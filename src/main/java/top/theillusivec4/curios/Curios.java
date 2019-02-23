@@ -83,12 +83,12 @@ public class Curios {
         MinecraftForge.EVENT_BUS.register(new EventHandlerCurios());
 
         for (String id : CuriosConfig.COMMON.createCurios.get()) {
-            CuriosRegistry.registerType(id);
+            CuriosRegistry.getOrRegisterType(id);
         }
 
         if (DEBUG) {
-            CuriosRegistry.registerType("ring").icon(new ResourceLocation(MODID, "item/empty_ring_slot")).defaultSize(10);
-            CuriosRegistry.registerType("amulet").icon(new ResourceLocation(MODID, "item/empty_amulet_slot"));
+            CuriosRegistry.getOrRegisterType("ring").icon(new ResourceLocation(MODID, "item/empty_ring_slot")).defaultSize(10);
+            CuriosRegistry.getOrRegisterType("amulet").icon(new ResourceLocation(MODID, "item/empty_amulet_slot"));
         }
     }
 

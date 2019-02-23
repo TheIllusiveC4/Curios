@@ -42,7 +42,7 @@ public class CuriosRegistry {
 
     static Map<String, ResourceLocation> icons = Maps.newHashMap();
 
-    public static CurioType registerType(@Nonnull String identifier) {
+    public static CurioType getOrRegisterType(@Nonnull String identifier) {
 
         if (identifier.isEmpty()) {
             throw new IllegalArgumentException("Identifier cannot be empty!");
