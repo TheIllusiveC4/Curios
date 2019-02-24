@@ -190,7 +190,7 @@ public class EventHandlerCurios {
         ItemStack stack = evt.getItemStack();
         CuriosAPI.getCurio(stack).ifPresent(curio -> {
 
-            if (curio.canRightClickEquip(stack)) {
+            if (curio.canRightClickEquip()) {
                 CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
 
                     if (!player.world.isRemote) {
@@ -199,7 +199,7 @@ public class EventHandlerCurios {
 
                         for (String id : tags) {
 
-                            if (curio.canEquip(stack, id, player)) {
+                            if (curio.canEquip(id, player)) {
                                 ItemStackHandler stackHandler = curios.get(id);
 
                                 if (stackHandler != null) {
@@ -208,7 +208,7 @@ public class EventHandlerCurios {
 
                                         if (stackHandler.getStackInSlot(i).isEmpty()) {
                                             stackHandler.setStackInSlot(i, stack.copy());
-                                            curio.onEquipped(stack, id, player);
+                                            curio.onEquipped(id, player);
                                             stack.shrink(1);
                                             evt.setCancellationResult(EnumActionResult.SUCCESS);
                                             evt.setCanceled(true);
@@ -240,15 +240,17 @@ public class EventHandlerCurios {
                     ItemStack stack = stackHandler.getStackInSlot(i);
                     stack.inventoryTick(entitylivingbase.world, entitylivingbase, -1, false);
                     LazyOptional<ICurio> currentCurio = CuriosAPI.getCurio(stack);
-                    currentCurio.ifPresent(curio -> curio.onCurioTick(stack, identifier, entitylivingbase));
+                    currentCurio.ifPresent(curio -> curio.onCurioTick(identifier, entitylivingbase));
 
                     if (!entitylivingbase.world.isRemote) {
                         ItemStack prevStack = stackHandler.getPreviousStackInSlot(i);
 
                         if (!stack.equals(prevStack, true)) {
+                            LazyOptional<ICurio> prevCurio = CuriosAPI.getCurio(prevStack);
 
-                            if (currentCurio.map(curio -> curio.shouldSyncToTracking(stack, prevStack, identifier, entitylivingbase))
-                                    .orElse(stack.getItem() != prevStack.getItem())) {
+                            if (currentCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
+                                    .orElse(false) || prevCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
+                                    .orElse(false) || stack.getItem() != prevStack.getItem()) {
                                 EntityTracker tracker = ((WorldServer) entitylivingbase.world).getEntityTracker();
 
                                 for (EntityPlayer player : tracker.getTrackingPlayers(entitylivingbase)) {
@@ -260,8 +262,8 @@ public class EventHandlerCurios {
                                 }
                             }
                             MinecraftForge.EVENT_BUS.post(new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
-                            CuriosAPI.getCurio(prevStack).ifPresent(curio -> entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, prevStack)));
-                            currentCurio.ifPresent(curio -> entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier, stack)));
+                            prevCurio.ifPresent(curio -> entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier)));
+                            currentCurio.ifPresent(curio -> entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier)));
                             stackHandler.setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
 
                             if (entitylivingbase instanceof EntityPlayerMP) {

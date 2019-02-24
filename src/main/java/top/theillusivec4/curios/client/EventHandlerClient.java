@@ -85,7 +85,7 @@ public class EventHandlerClient {
                 CuriosAPI.getCurio(stack).ifPresent(curio -> {
 
                     for (String identifier : slots) {
-                        Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier, stack);
+                        Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier);
 
                         if (!multimap.isEmpty()) {
                             EntityPlayer player = evt.getEntityPlayer();

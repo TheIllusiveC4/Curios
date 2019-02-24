@@ -310,8 +310,8 @@ public class CapCurioInventory {
                     drops.add(stackHandler.getStackInSlot(i));
                     CuriosAPI.getCurio(stack).ifPresent(curio -> {
                         if (!stack.isEmpty()) {
-                            curio.onUnequipped(stack, identifier, wearer);
-                            wearer.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier, stack));
+                            curio.onUnequipped(identifier, wearer);
+                            wearer.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier));
                         }
                     });
                     stackHandler.setStackInSlot(i, ItemStack.EMPTY);

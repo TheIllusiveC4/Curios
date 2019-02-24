@@ -20,11 +20,13 @@
 package top.theillusivec4.curios.api;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
+import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
 import javax.annotation.Nonnull;
 
@@ -36,6 +38,25 @@ public class CuriosAPI {
 
     public static LazyOptional<ICurioItemHandler> getCuriosHandler(@Nonnull final EntityLivingBase entityLivingBase) {
         return entityLivingBase.getCapability(CuriosCapability.INVENTORY);
+    }
+
+    public static int getCurioEquippedOfType(String identifier, Item item, final EntityLivingBase entityLivingBase) {
+        return getCuriosHandler(entityLivingBase).map(handler -> {
+            CurioStackHandler stackHandler = handler.getStackHandler(identifier);
+
+            if (stackHandler != null) {
+                for (int i = 0; i < stackHandler.getSlots(); i++) {
+                    ItemStack stack1 = stackHandler.getStackInSlot(i);
+
+                    if (!stack1.isEmpty() && item == stack1.getItem()) {
+                        return i;
+                    }
+                }
+            } else {
+                return -1;
+            }
+            return -1;
+        }).orElse(-1);
     }
 
     public static void setTypeEnabled(String id, boolean enabled) {

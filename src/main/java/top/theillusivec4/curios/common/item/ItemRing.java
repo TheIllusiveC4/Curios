@@ -53,14 +53,14 @@ public class ItemRing extends Item implements ICurio {
         return CapCurioItem.createProvider(new ICurio() {
 
             @Override
-            public void onCurioTick(ItemStack stack, String identifier, EntityLivingBase entityLivingBase) {
+            public void onCurioTick(String identifier, EntityLivingBase entityLivingBase) {
                 if (!entityLivingBase.getEntityWorld().isRemote && entityLivingBase.ticksExisted % 19 == 0) {
                     entityLivingBase.addPotionEffect(new PotionEffect(MobEffects.HASTE, 20, 0, true, true));
                 }
             }
 
             @Override
-            public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack) {
+            public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
                 Multimap<String, AttributeModifier> atts = HashMultimap.create();
 
                 if (CuriosRegistry.getCurioTags(stack.getItem()).contains(identifier)) {
@@ -71,7 +71,7 @@ public class ItemRing extends Item implements ICurio {
             }
 
             @Override
-            public boolean canRightClickEquip(ItemStack stack) {
+            public boolean canRightClickEquip() {
                 return true;
             }
         });
