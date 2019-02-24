@@ -52,8 +52,6 @@ public class CuriosAPI {
                         return i;
                     }
                 }
-            } else {
-                return -1;
             }
             return -1;
         }).orElse(-1);
