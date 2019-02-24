@@ -21,6 +21,7 @@ package top.theillusivec4.curios.client;
 
 import com.google.common.collect.Multimap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -74,7 +75,12 @@ public class EventHandlerClient {
             if (!slots.isEmpty()) {
 
                 for (String s : slots) {
-                    tooltip.add(new TextComponentTranslation("curios.identifier." + s).applyTextStyle(TextFormatting.GOLD));
+                    String key = "curios.identifier." + s;
+                    if (I18n.hasKey(key)) {
+                        tooltip.add(new TextComponentTranslation("curios.identifier." + s).applyTextStyle(TextFormatting.GOLD));
+                    } else {
+                        tooltip.add(new TextComponentString(s.substring(0, 1).toUpperCase() + s.substring(1)).applyTextStyle(TextFormatting.GOLD));
+                    }
                 }
                 CuriosAPI.getCurio(stack).ifPresent(curio -> {
 
