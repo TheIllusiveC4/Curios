@@ -29,10 +29,21 @@ import java.util.function.Supplier;
 
 public class CPacketOpenCurios {
 
-    public static void encode(CPacketOpenCurios msg, PacketBuffer buf) {}
+    private float oldMouseX;
+    private float oldMouseY;
+
+    public CPacketOpenCurios(float oldMouseX, float oldMouseY) {
+        this.oldMouseX = oldMouseX;
+        this.oldMouseY = oldMouseY;
+    }
+
+    public static void encode(CPacketOpenCurios msg, PacketBuffer buf) {
+        buf.writeFloat(msg.oldMouseX);
+        buf.writeFloat(msg.oldMouseY);
+    }
 
     public static CPacketOpenCurios decode(PacketBuffer buf) {
-        return new CPacketOpenCurios();
+        return new CPacketOpenCurios(buf.readFloat(), buf.readFloat());
     }
 
     public static void handle(CPacketOpenCurios msg, Supplier<NetworkEvent.Context> ctx) {
@@ -41,7 +52,10 @@ public class CPacketOpenCurios {
             EntityPlayerMP sender = ctx.get().getSender();
 
             if (sender != null) {
-                NetworkHooks.openGui(sender, new CurioContainerHandler());
+                NetworkHooks.openGui(sender, new CurioContainerHandler(), buf -> {
+                    buf.writeFloat(msg.oldMouseX);
+                    buf.writeFloat(msg.oldMouseY);
+                });
             }
         });
     }

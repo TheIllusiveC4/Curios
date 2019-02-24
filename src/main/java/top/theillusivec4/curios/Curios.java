@@ -24,6 +24,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -107,7 +108,8 @@ public class Curios {
 
         if (msg.getId().equals(CurioContainerHandler.ID)) {
             EntityPlayerSP sp = Minecraft.getInstance().player;
-            return new GuiContainerCurios(new ContainerCurios(sp.inventory, sp));
+            PacketBuffer buffer = msg.getAdditionalData();
+            return new GuiContainerCurios(new ContainerCurios(sp.inventory, sp), buffer.readFloat(), buffer.readFloat());
         }
         return null;
     }

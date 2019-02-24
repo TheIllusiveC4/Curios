@@ -53,7 +53,9 @@ public class GuiButtonCurios extends GuiButtonImage {
             mc.displayGuiScreen(inventory);
             NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
         } else {
-            NetworkHandler.INSTANCE.sendToServer(new CPacketOpenCurios());
+            float oldMouseX = ObfuscationReflectionHelper.getPrivateValue(GuiInventory.class, (GuiInventory)parentGui, "field_147048_u");
+            float oldMouseY = ObfuscationReflectionHelper.getPrivateValue(GuiInventory.class, (GuiInventory)parentGui, "field_147047_v");
+            NetworkHandler.INSTANCE.sendToServer(new CPacketOpenCurios(oldMouseX, oldMouseY));
         }
     }
 

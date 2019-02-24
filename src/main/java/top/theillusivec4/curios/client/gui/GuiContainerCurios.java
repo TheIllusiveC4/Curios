@@ -44,16 +44,19 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
 
     private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 
+    public float oldMouseX;
+    public float oldMouseY;
+
     private boolean widthTooNarrow;
     private float currentScroll;
     private boolean isScrolling;
     private boolean buttonClicked;
-    private float oldMouseX;
-    private float oldMouseY;
 
-    public GuiContainerCurios(ContainerCurios containerCurios) {
+    public GuiContainerCurios(ContainerCurios containerCurios, float oldMouseX, float oldMouseY) {
         super(containerCurios);
         this.allowUserInput = true;
+        this.oldMouseX = oldMouseX;
+        this.oldMouseY = oldMouseY;
     }
 
     @Override
