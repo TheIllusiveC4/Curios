@@ -162,7 +162,10 @@ public class CapCurioInventory {
                     CurioType type = CuriosRegistry.getType(id);
 
                     if (type != null && type.isEnabled()) {
-                        slots.put(id, new CurioStackHandler(type.getSize()));
+                        CurioStackHandler handler = new CurioStackHandler(type.getSize());
+                        handler.setHidden(type.isHidden());
+                        handler.setIcon(type.getIcon() == null ? "" : type.getIcon().toString());
+                        slots.put(id, handler);
                     }
                 }
             }

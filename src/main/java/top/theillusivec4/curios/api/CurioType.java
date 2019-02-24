@@ -19,10 +19,7 @@
 
 package top.theillusivec4.curios.api;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,19 +44,6 @@ public class CurioType {
 
     public String getIdentifier() {
         return identifier;
-    }
-
-    public String getTranslationKey() {
-        return "curios.identifier." + identifier;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public String getFormattedName() {
-
-        if (!I18n.hasKey(getTranslationKey())) {
-            return identifier.substring(0, 1).toUpperCase() + identifier.substring(1);
-        }
-        return I18n.format(getTranslationKey());
     }
 
     @Nullable

@@ -30,10 +30,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.items.ItemStackHandler;
-import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.api.inventory.SlotCurio;
@@ -129,13 +126,12 @@ public class ContainerCurios extends Container {
             int yOffset = 12;
 
             for (String identifier : curioMap.keySet()) {
-                ItemStackHandler stackHandler = curioMap.get(identifier);
-                CurioType type = CuriosRegistry.getType(identifier);
+                CurioStackHandler stackHandler = curioMap.get(identifier);
 
-                if (type != null && !type.isHidden()) {
+                if (!stackHandler.isHidden()) {
 
                     for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
-                        this.addSlot(new SlotCurio(player, stackHandler, i, type, -18, yOffset));
+                        this.addSlot(new SlotCurio(player, stackHandler, i, identifier,-18, yOffset));
                         yOffset += 18;
                         slots++;
                     }
@@ -155,15 +151,14 @@ public class ContainerCurios extends Container {
             this.inventoryItemStacks.subList(46, this.inventoryItemStacks.size()).clear();
 
             for (String identifier : curioMap.keySet()) {
-                ItemStackHandler stackHandler = curioMap.get(identifier);
+                CurioStackHandler stackHandler = curioMap.get(identifier);
 
-                for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
-                    CurioType type = CuriosRegistry.getType(identifier);
+                if (!stackHandler.isHidden()) {
 
-                    if (type != null) {
+                    for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
                         if (index >= indexIn) {
-                            this.addSlot(new SlotCurio(player, stackHandler, i, type, -18, yOffset));
+                            this.addSlot(new SlotCurio(player, stackHandler, i, identifier,-18, yOffset));
                             yOffset += 18;
                             slots++;
                         }

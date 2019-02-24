@@ -20,7 +20,9 @@
 package top.theillusivec4.curios.api.inventory;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
@@ -28,6 +30,8 @@ import javax.annotation.Nonnull;
 public final class CurioStackHandler extends ItemStackHandler {
 
     protected NonNullList<ItemStack> previousStacks;
+    protected boolean isHidden = false;
+    protected String icon = "";
 
     public CurioStackHandler()
     {
@@ -46,6 +50,8 @@ public final class CurioStackHandler extends ItemStackHandler {
             previousStacks.add(ItemStack.EMPTY);
         }
     }
+
+
 
     @Override
     public void setSize(int size) {
@@ -100,5 +106,36 @@ public final class CurioStackHandler extends ItemStackHandler {
         while (this.previousStacks.size() > targetSize) {
             this.previousStacks.remove(this.previousStacks.size() - 1);
         }
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public boolean isHidden() {
+        return isHidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        isHidden = hidden;
+    }
+
+    @Override
+    public NBTTagCompound serializeNBT() {
+        NBTTagCompound compound = super.serializeNBT();
+        compound.setBoolean("Hidden", isHidden);
+        compound.setString("Icon", icon);
+        return compound;
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound nbt) {
+        this.isHidden = nbt.contains("Hidden", Constants.NBT.TAG_BYTE) && nbt.getBoolean("Hidden");
+        this.icon = nbt.contains("Icon", Constants.NBT.TAG_STRING) ? nbt.getString("Icon") : "";
+        super.deserializeNBT(nbt);
     }
 }
