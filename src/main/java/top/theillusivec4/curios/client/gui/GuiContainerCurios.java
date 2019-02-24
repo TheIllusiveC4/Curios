@@ -71,8 +71,8 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
             super.initGui();
             this.widthTooNarrow = this.width < 379;
             this.guiLeft = (this.width - this.xSize) / 2;
-            this.addButton(new GuiButtonCurios(this, 44, this.guiLeft + 125, this.height / 2 - 22, 20,
-                    18, 50, 0, 19, CURIO_INVENTORY));
+            this.addButton(new GuiButtonCurios(this,44, this.getGuiLeft() + 26, this.height / 2 - 75,
+                    14, 14, 50, 0, 14, CURIO_INVENTORY));
         }
     }
 

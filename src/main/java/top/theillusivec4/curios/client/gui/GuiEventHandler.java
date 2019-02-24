@@ -30,8 +30,8 @@ public class GuiEventHandler {
 
         if (evt.getGui() instanceof GuiInventory) {
             GuiInventory gui = (GuiInventory)evt.getGui();
-            evt.addButton(new GuiButtonCurios(gui,44, gui.getGuiLeft() + 125, gui.height / 2 - 22,
-                    20, 18, 50, 0, 19, GuiContainerCurios.CURIO_INVENTORY));
+            evt.addButton(new GuiButtonCurios(gui,44, gui.getGuiLeft() + 26, gui.height / 2 - 75,
+                    14, 14, 50, 0, 14, GuiContainerCurios.CURIO_INVENTORY));
         }
     }
 }

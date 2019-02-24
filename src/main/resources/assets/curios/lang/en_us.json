@@ -1,5 +1,5 @@
 {
-  "curios.name": "Curio",
+  "curios.name": "Curios",
   "curios.modifiers": "When worn as %s:",
   "commands.curios.add.success": "%d slots of type %s have been added to %s",
   "commands.curios.remove.success": "%d slots of type %s have been removed from %s",
@@ -11,5 +11,7 @@
   "item.curios.amulet": "Curious Amulet",
   "item.curios.ring": "Curious Ring",
   "curios.identifier.amulet": "Amulet",
-  "curios.identifier.ring": "Ring"
+  "curios.identifier.ring": "Ring",
+  "key.curios.category": "Curios",
+  "key.curios.open.desc": "Open/Close Curios Inventory"
 }
