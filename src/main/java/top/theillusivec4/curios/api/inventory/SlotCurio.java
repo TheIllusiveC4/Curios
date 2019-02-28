@@ -56,19 +56,6 @@ public class SlotCurio extends SlotItemHandler {
     }
 
     @Override
-    public void putStack(@Nonnull ItemStack stack) {
-        CuriosAPI.getCurio(stack).ifPresent(curio -> curio.onEquipped(identifier, player));
-        super.putStack(stack);
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack onTake(EntityPlayer thePlayer, @Nonnull ItemStack stack) {
-        CuriosAPI.getCurio(stack).ifPresent(curio -> curio.onUnequipped(identifier, thePlayer));
-        return super.onTake(thePlayer, stack);
-    }
-
-    @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
         return hasValidTag(CuriosRegistry.getCurioTags(stack.getItem())) && CuriosAPI.getCurio(stack)
                 .map(curio -> curio.canEquip(identifier, player)).orElse(true)

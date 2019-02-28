@@ -23,7 +23,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.ItemStack;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.util.SoundCategory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.api.CurioType;
@@ -36,20 +37,6 @@ public interface ICurio {
      * @param entityLivingBase  The wearer of the ItemStack
      */
     default void onCurioTick(String identifier, EntityLivingBase entityLivingBase) {}
-
-    /**
-     * Called when the ItemStack is equipped into a slot
-     * @param identifier        The {@link CurioType} identifier of the slot being equipped into
-     * @param entityLivingBase  The wearer of the ItemStack
-     */
-    default void onEquipped(String identifier, EntityLivingBase entityLivingBase) {}
-
-    /**
-     * Called when the ItemStack is unequipped from a slot
-     * @param identifier        The {@link CurioType} identifier of the slot being unequipped from
-     * @param entityLivingBase  The wearer of the ItemStack
-     */
-    default void onUnequipped(String identifier, EntityLivingBase entityLivingBase) {}
 
     /**
      * Determines if the ItemStack can be equipped into a slot
@@ -78,6 +65,16 @@ public interface ICurio {
      */
     default Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
         return HashMultimap.create();
+    }
+
+    /**
+     * Plays a sound server-side when a curio is equipped from right-clicking the ItemStack in hand
+     * This can be overriden to play nothing, but it is advised to always play something as an auditory feedback for players
+     * @param entityLivingBase  The wearer of the ItemStack
+     */
+    default void playEquipSound(EntityLivingBase entityLivingBase) {
+        entityLivingBase.world.playSound(null, entityLivingBase.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
+                SoundCategory.NEUTRAL, 1.0f, 1.0f);
     }
 
     /**

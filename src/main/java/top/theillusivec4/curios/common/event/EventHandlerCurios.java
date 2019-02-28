@@ -208,7 +208,7 @@ public class EventHandlerCurios {
 
                                         if (stackHandler.getStackInSlot(i).isEmpty()) {
                                             stackHandler.setStackInSlot(i, stack.copy());
-                                            curio.onEquipped(id, player);
+                                            curio.playEquipSound(player);
                                             stack.shrink(1);
                                             evt.setCancellationResult(EnumActionResult.SUCCESS);
                                             evt.setCanceled(true);
@@ -220,9 +220,6 @@ public class EventHandlerCurios {
                         }
                     }
                 });
-            } else {
-                evt.setCancellationResult(EnumActionResult.FAIL);
-                evt.setCanceled(true);
             }
         });
     }
@@ -245,12 +242,13 @@ public class EventHandlerCurios {
                     if (!entitylivingbase.world.isRemote) {
                         ItemStack prevStack = stackHandler.getPreviousStackInSlot(i);
 
-                        if (!stack.equals(prevStack, true)) {
+                        if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
                             LazyOptional<ICurio> prevCurio = CuriosAPI.getCurio(prevStack);
+                            boolean shouldSync = stack.equals(prevStack, true);
 
                             if (currentCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
                                     .orElse(false) || prevCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
-                                    .orElse(false) || stack.getItem() != prevStack.getItem()) {
+                                    .orElse(false) || shouldSync) {
                                 EntityTracker tracker = ((WorldServer) entitylivingbase.world).getEntityTracker();
 
                                 for (EntityPlayer player : tracker.getTrackingPlayers(entitylivingbase)) {
