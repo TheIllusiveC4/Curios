@@ -29,6 +29,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
@@ -53,6 +54,7 @@ import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContents;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContentsWithTag;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncMap;
 
 import java.util.Collection;
@@ -244,7 +246,7 @@ public class EventHandlerCurios {
 
                         if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
                             LazyOptional<ICurio> prevCurio = CuriosAPI.getCurio(prevStack);
-                            boolean shouldSync = stack.equals(prevStack, true);
+                            boolean shouldSync = !stack.equals(prevStack, true);
 
                             if (currentCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
                                     .orElse(false) || prevCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
@@ -254,8 +256,18 @@ public class EventHandlerCurios {
                                 for (EntityPlayer player : tracker.getTrackingPlayers(entitylivingbase)) {
 
                                     if (player instanceof EntityPlayerMP) {
-                                        NetworkHandler.INSTANCE.sendTo(new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack),
-                                                ((EntityPlayerMP) player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+
+                                        if (currentCurio.isPresent()) {
+                                            NBTTagCompound compound = currentCurio.map(ICurio::getSyncTag).orElse(new NBTTagCompound());
+
+                                            if (!compound.isEmpty()) {
+                                                NetworkHandler.INSTANCE.sendTo(new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i, stack, compound),
+                                                        ((EntityPlayerMP) player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                            }
+                                        } else {
+                                            NetworkHandler.INSTANCE.sendTo(new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack),
+                                                    ((EntityPlayerMP) player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                        }
                                     }
                                 }
                             }

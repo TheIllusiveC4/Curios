@@ -29,10 +29,7 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActive;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContents;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncMap;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncSize;
+import top.theillusivec4.curios.common.network.server.sync.*;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -59,6 +56,7 @@ public class NetworkHandler {
         registerMessage(SPacketSyncActive.class, SPacketSyncActive::encode, SPacketSyncActive::decode, SPacketSyncActive::handle);
         registerMessage(SPacketSyncSize.class, SPacketSyncSize::encode, SPacketSyncSize::decode, SPacketSyncSize::handle);
         registerMessage(SPacketSyncMap.class, SPacketSyncMap::encode, SPacketSyncMap::decode, SPacketSyncMap::handle);
+        registerMessage(SPacketSyncContentsWithTag.class, SPacketSyncContentsWithTag::encode, SPacketSyncContentsWithTag::decode, SPacketSyncContentsWithTag::handle);
     }
 
     private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder,

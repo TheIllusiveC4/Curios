@@ -24,10 +24,13 @@ import com.google.common.collect.Multimap;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.SoundCategory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.api.CurioType;
+
+import javax.annotation.Nonnull;
 
 public interface ICurio {
 
@@ -92,8 +95,22 @@ public interface ICurio {
      * @return  True to curios the ItemStack change to all tracking clients, false to do nothing
      */
     default boolean shouldSyncToTracking(String identifier, EntityLivingBase entityLivingBase) {
-        return hasRender(identifier, entityLivingBase);
+        return false;
     }
+
+    /**
+     * Gets a tag that is used to sync extra curio data from the server to the client
+     * Only used when {@link ICurio#shouldSyncToTracking(String, EntityLivingBase)} returns true
+     * @return  Data to be sent to the client
+     */
+    @Nonnull
+    default NBTTagCompound getSyncTag() { return new NBTTagCompound(); }
+
+    /**
+     * Used client-side to read data tags created by {@link ICurio#getSyncTag()} received from the server
+     * @param compound Data received from the server
+     */
+    default void readSyncTag(NBTTagCompound compound) {}
 
     /**
      * Determines if the ItemStack has rendering
