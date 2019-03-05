@@ -72,7 +72,7 @@ public class ItemRing extends Item implements ICurio {
                 Multimap<String, AttributeModifier> atts = HashMultimap.create();
 
                 if (CuriosRegistry.getCurioTags(stack.getItem()).contains(identifier)) {
-                    atts.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(SPEED_UUID, "Speed bonus", 2, 2));
+                    atts.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1, 2));
                     atts.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_UUID, "Armor bonus", 2, 0));
                 }
                 return atts;

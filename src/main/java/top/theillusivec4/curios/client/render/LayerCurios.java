@@ -43,6 +43,10 @@ public class LayerCurios implements LayerRenderer<EntityLivingBase> {
         CuriosAPI.getCuriosHandler(entitylivingbaseIn).ifPresent(handler -> {
             SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
+            if (entitylivingbaseIn.isSneaking()) {
+                GlStateManager.translatef(0.0f, 0.2f, 0.0f);
+            }
+
             for (String id : curios.keySet()) {
                 CurioStackHandler stackHandler = curios.get(id);
 

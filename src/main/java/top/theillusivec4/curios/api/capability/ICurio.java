@@ -21,13 +21,18 @@ package top.theillusivec4.curios.api.capability;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.renderer.entity.model.ModelBase;
+import net.minecraft.client.renderer.entity.model.ModelBiped;
+import net.minecraft.client.renderer.entity.model.ModelRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.SoundCategory;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.api.CurioType;
 
 import javax.annotation.Nonnull;
@@ -122,11 +127,52 @@ public interface ICurio {
 
     /**
      * Performs rendering of the ItemStack if {@link ICurio#hasRender(String, EntityLivingBase)} returns true
+     * Note that vertical sneaking translations are automatically applied before this rendering method is called
      * @param identifier            The identifier of the {@link CurioType} of the slot
      * @param entitylivingbaseIn    The EntityLivingBase that is wearing the ItemStack
      */
-    @OnlyIn(Dist.CLIENT)
-    default void doRender(String identifier, EntityLivingBase entitylivingbaseIn, float limbSwing,
-                          float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch,
-                          float scale) {}
+    default void doRender(String identifier, EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount,
+                          float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {}
+
+    /**
+     * Some helper methods for rendering curios
+     */
+    final class RenderHelper {
+
+        /**
+         * Rotates the rendering for the curio if the entity is sneaking
+         * The rotation angle is based on the body of a player model when sneaking, so this is typically used for items
+         * being rendered on the body
+         * @param entitylivingbaseIn    The wearer of the curio
+         */
+        public static void rotateIfSneaking(final EntityLivingBase entitylivingbaseIn) {
+
+            if (entitylivingbaseIn.isSneaking()) {
+                GlStateManager.rotatef(90.0F / (float) Math.PI, 1.0F, 0.0F, 0.0F);
+            }
+        }
+
+        /**
+         * Rotates the rendering for the model renderers based on the entity's head movement
+         * This will align the model renderers with the movements and rotations of the head
+         * This will do nothing if the entity does not implement {@link RenderLivingBase} or if the model does not have
+         * a head (aka does not implement {@link ModelBiped}).
+         * @param entitylivingbaseIn    The wearer of the curio
+         * @param renderers             The list of model renderers to align to the head movement
+         */
+        public static void followHeadRotations(final EntityLivingBase entitylivingbaseIn, ModelRenderer... renderers) {
+            Render render = Minecraft.getInstance().getRenderManager().getEntityRenderObject(entitylivingbaseIn);
+
+            if (render instanceof RenderLivingBase) {
+                ModelBase model = ((RenderLivingBase) render).getMainModel();
+
+                if (model instanceof ModelBiped) {
+
+                    for (ModelRenderer renderer : renderers) {
+                        ModelBiped.copyModelAngles(((ModelBiped) model).bipedHead, renderer);
+                    }
+                }
+            }
+        }
+    }
 }

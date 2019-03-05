@@ -26,6 +26,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.common.item.ItemAmulet;
+import top.theillusivec4.curios.common.item.ItemCrown;
 import top.theillusivec4.curios.common.item.ItemRing;
 
 @Mod.EventBusSubscriber(modid = Curios.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -37,8 +38,11 @@ public class ItemRegistry {
     @ObjectHolder("curios:amulet")
     public static final Item AMULET = null;
 
+    @ObjectHolder("curios:crown")
+    public static final Item CROWN = null;
+
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().registerAll(new ItemRing(), new ItemAmulet());
+        event.getRegistry().registerAll(new ItemRing(), new ItemAmulet(), new ItemCrown());
     }
 }

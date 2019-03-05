@@ -10,8 +10,10 @@
   "commands.curios.reset.success": "Reset slots for %s",
   "item.curios.amulet": "Curious Amulet",
   "item.curios.ring": "Curious Ring",
+  "item.curios.crown": "Curious Crown",
   "curios.identifier.amulet": "Amulet",
   "curios.identifier.ring": "Ring",
+  "curios.identifier.head": "Head",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Open/Close Curios Inventory"
 }
