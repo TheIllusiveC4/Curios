@@ -74,7 +74,6 @@ public class Curios {
         MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CuriosConfig.commonSpec);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CuriosConfig.clientSpec);
-        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> Curios::getGuiContainer);
     }
 
     private void setup(FMLCommonSetupEvent evt) {
@@ -104,16 +103,6 @@ public class Curios {
         CommandCurios.register(evt.getCommandDispatcher());
     }
 
-    private static GuiScreen getGuiContainer(FMLPlayMessages.OpenContainer msg) {
-
-        if (msg.getId().equals(CurioContainerHandler.ID)) {
-            EntityPlayerSP sp = Minecraft.getInstance().player;
-            PacketBuffer buffer = msg.getAdditionalData();
-            return new GuiContainerCurios(new ContainerCurios(sp.inventory, sp), buffer.readFloat(), buffer.readFloat());
-        }
-        return null;
-    }
-
     @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ClientProxy {
 
@@ -122,6 +111,7 @@ public class Curios {
             MinecraftForge.EVENT_BUS.register(new EventHandlerClient());
             MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
             MinecraftForge.EVENT_BUS.addListener(ClientProxy::onTextureStitch);
+            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> Curios.ClientProxy::getGuiContainer);
             KeyRegistry.registerKeys();
         }
 
@@ -141,6 +131,16 @@ public class Curios {
             for (ResourceLocation resource : CuriosRegistry.getResources()) {
                 map.registerSprite(manager, resource);
             }
+        }
+
+        private static GuiScreen getGuiContainer(FMLPlayMessages.OpenContainer msg) {
+
+            if (msg.getId().equals(CurioContainerHandler.ID)) {
+                EntityPlayerSP sp = Minecraft.getInstance().player;
+                PacketBuffer buffer = msg.getAdditionalData();
+                return new GuiContainerCurios(new ContainerCurios(sp.inventory, sp), buffer.readFloat(), buffer.readFloat());
+            }
+            return null;
         }
     }
 }

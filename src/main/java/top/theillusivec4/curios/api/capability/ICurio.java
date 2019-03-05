@@ -47,6 +47,20 @@ public interface ICurio {
     default void onCurioTick(String identifier, EntityLivingBase entityLivingBase) {}
 
     /**
+     * Called when the ItemStack is equipped into a slot
+     * @param identifier        The {@link CurioType} identifier of the slot being equipped into
+     * @param entityLivingBase  The wearer of the ItemStack
+     */
+    default void onEquipped(String identifier, EntityLivingBase entityLivingBase) {}
+
+    /**
+     * Called when the ItemStack is unequipped from a slot
+     * @param identifier        The {@link CurioType} identifier of the slot being unequipped from
+     * @param entityLivingBase  The wearer of the ItemStack
+     */
+    default void onUnequipped(String identifier, EntityLivingBase entityLivingBase) {}
+
+    /**
      * Determines if the ItemStack can be equipped into a slot
      * @param identifier        The {@link CurioType} identifier of the slot being equipped into
      * @param entityLivingBase  The wearer of the ItemStack
@@ -155,8 +169,8 @@ public interface ICurio {
         /**
          * Rotates the rendering for the model renderers based on the entity's head movement
          * This will align the model renderers with the movements and rotations of the head
-         * This will do nothing if the entity does not implement {@link RenderLivingBase} or if the model does not have
-         * a head (aka does not implement {@link ModelBiped}).
+         * This will do nothing if the entity render object does not implement {@link RenderLivingBase} or if the model
+         * does not have a head (aka does not implement {@link ModelBiped}).
          * @param entitylivingbaseIn    The wearer of the curio
          * @param renderers             The list of model renderers to align to the head movement
          */

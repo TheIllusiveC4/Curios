@@ -9,12 +9,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.capability.ICurio;
-import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
 import top.theillusivec4.curios.client.render.ModelCrown;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 
@@ -23,16 +20,6 @@ public class ItemCrown extends Item implements ICurio {
     public ItemCrown() {
         super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
         this.setRegistryName(Curios.MODID, "crown");
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    @SubscribeEvent
-    public void onCurioChange(LivingCurioChangeEvent evt) {
-        EntityLivingBase livingBase = evt.getEntityLiving();
-
-        if (evt.getFrom().getItem() == this) {
-            livingBase.removePotionEffect(MobEffects.NIGHT_VISION);
-        }
     }
 
     @Override
@@ -46,7 +33,16 @@ public class ItemCrown extends Item implements ICurio {
             public void onCurioTick(String identifier, EntityLivingBase entityLivingBase) {
 
                 if (!entityLivingBase.getEntityWorld().isRemote && entityLivingBase.ticksExisted % 20 == 0) {
-                    entityLivingBase.addPotionEffect(new PotionEffect(MobEffects.NIGHT_VISION, 300, 44, true, true));
+                    entityLivingBase.addPotionEffect(new PotionEffect(MobEffects.NIGHT_VISION, 300, -44, true, true));
+                }
+            }
+
+            @Override
+            public void onUnequipped(String identifier, EntityLivingBase entityLivingBase) {
+                PotionEffect effect = entityLivingBase.getActivePotionEffect(MobEffects.NIGHT_VISION);
+
+                if (effect != null && effect.getAmplifier() == -44) {
+                    entityLivingBase.removePotionEffect(MobEffects.NIGHT_VISION);
                 }
             }
 

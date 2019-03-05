@@ -272,8 +272,14 @@ public class EventHandlerCurios {
                                 }
                             }
                             MinecraftForge.EVENT_BUS.post(new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
-                            prevCurio.ifPresent(curio -> entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier)));
-                            currentCurio.ifPresent(curio -> entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier)));
+                            prevCurio.ifPresent(curio -> {
+                                entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier));
+                                curio.onUnequipped(identifier, entitylivingbase);
+                            });
+                            currentCurio.ifPresent(curio -> {
+                                entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier));
+                                curio.onEquipped(identifier, entitylivingbase);
+                            });
                             stackHandler.setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
 
                             if (entitylivingbase instanceof EntityPlayerMP) {
