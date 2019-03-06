@@ -30,6 +30,7 @@ import top.theillusivec4.curios.Curios;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,14 +58,14 @@ public class CuriosRegistry {
 
     public static ImmutableSet<String> getTypeIdentifiers() { return ImmutableSet.copyOf(idToType.keySet()); }
 
-    public static Set<String> getCurioTags(Item item) {
+    public static ImmutableSet<String> getCurioTags(Item item) {
 
         if (idToTag.isEmpty()) {
             refreshTags();
         }
 
         if (itemToTypes.containsKey(item)) {
-            return itemToTypes.get(item);
+            return ImmutableSet.copyOf(itemToTypes.get(item));
         } else {
             Set<String> tags = Sets.newHashSet();
 
@@ -75,14 +76,14 @@ public class CuriosRegistry {
                 }
             }
             itemToTypes.put(item, tags);
-            return tags;
+            return ImmutableSet.copyOf(tags);
         }
     }
 
-    public static Set<ResourceLocation> getResources() {
-        Set<ResourceLocation> resources = Sets.newHashSet(icons.values());
+    public static ImmutableSet<ResourceLocation> getResources() {
+        Collection<ResourceLocation> resources = icons.values();
         resources.add(new ResourceLocation("curios:item/empty_generic_slot"));
-        return resources;
+        return ImmutableSet.copyOf(resources);
     }
 
     private static void refreshTags() {
