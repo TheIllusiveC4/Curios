@@ -9,6 +9,7 @@ This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 - [API] Added ICurio#getSyncTag and ICurio#readSyncTag(NBTTagCompound) for additional data syncing
 - [API] Re-added ICurio#onEquipped(String, EntityLivingBase) and ICurio#onUnequipped(String, EntityLivingBase) methods
 - [API] Added RenderHelper for holding helpful rendering utility methods
+- [API] Change return of some CurioRegistry methods to be immutable to prevent access to certain registry data
 - Added crown item
 
 ### Changed
