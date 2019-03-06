@@ -32,6 +32,7 @@ import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class CuriosAPI {
 
@@ -64,6 +65,42 @@ public class CuriosAPI {
                         ItemStack stack = stackHandler.getStackInSlot(i);
 
                         if (!stack.isEmpty() && item == stack.getItem()) {
+                            return new Tuple<>(id, i);
+                        }
+                    }
+                }
+            }
+            return new Tuple<>("", 0);
+        }).orElse(new Tuple<>("", 0));
+
+        if (!found.getA().isEmpty()) {
+            return found;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Gets the first found ItemStack of the item type equipped in a curio slot that matches the filter, or null if no
+     * matches were found.
+     * @param filter            The filter to test the ItemStack against
+     * @param entityLivingBase  The wearer of the item to be found
+     * @return  A data pair indicating the identifier of the curio slot and the slot index of the first found ItemStack
+     * matching the parameters. Null if no matches were found.
+     */
+    @Nullable
+    public static Tuple<String, Integer> getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final EntityLivingBase entityLivingBase) {
+        Tuple<String, Integer> found = getCuriosHandler(entityLivingBase).map(handler -> {
+
+            for (String id : handler.getCurioMap().keySet()) {
+                CurioStackHandler stackHandler = handler.getStackHandler(id);
+
+                if (stackHandler != null) {
+
+                    for (int i = 0; i < stackHandler.getSlots(); i++) {
+                        ItemStack stack = stackHandler.getStackInSlot(i);
+
+                        if (!stack.isEmpty() && filter.test(stack)) {
                             return new Tuple<>(id, i);
                         }
                     }
