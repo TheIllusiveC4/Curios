@@ -131,6 +131,7 @@ public class Curios {
             for (ResourceLocation resource : CuriosRegistry.getResources()) {
                 map.registerSprite(manager, resource);
             }
+            map.registerSprite(manager, new ResourceLocation("curios:item/empty_generic_slot"));
         }
 
         private static GuiScreen getGuiContainer(FMLPlayMessages.OpenContainer msg) {

@@ -81,9 +81,7 @@ public class CuriosRegistry {
     }
 
     public static ImmutableSet<ResourceLocation> getResources() {
-        Collection<ResourceLocation> resources = icons.values();
-        resources.add(new ResourceLocation("curios:item/empty_generic_slot"));
-        return ImmutableSet.copyOf(resources);
+        return ImmutableSet.copyOf(icons.values());
     }
 
     private static void refreshTags() {
