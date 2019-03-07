@@ -48,12 +48,12 @@ public class CuriosAPI {
      * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no matches were found.
      * @param item              The item to find
      * @param entityLivingBase  The wearer of the item to be found
-     * @return  A data pair indicating the identifier of the curio slot and the slot index of the first found ItemStack
-     * matching the parameters. Null if no matches were found.
+     * @return  An instance of {@link FinderData} indicating the identifier of the curio slot, slot index, and the ItemStack
+     * of the first found ItemStack matching the parameters. Null if no matches were found.
      */
     @Nullable
-    public static Tuple<String, Integer> getCurioEquipped(Item item, @Nonnull final EntityLivingBase entityLivingBase) {
-        Tuple<String, Integer> found = getCuriosHandler(entityLivingBase).map(handler -> {
+    public static FinderData getCurioEquipped(Item item, @Nonnull final EntityLivingBase entityLivingBase) {
+        FinderData found = getCuriosHandler(entityLivingBase).map(handler -> {
             Set<String> tags = CuriosRegistry.getCurioTags(item);
 
             for (String id : tags) {
@@ -65,15 +65,15 @@ public class CuriosAPI {
                         ItemStack stack = stackHandler.getStackInSlot(i);
 
                         if (!stack.isEmpty() && item == stack.getItem()) {
-                            return new Tuple<>(id, i);
+                            return new FinderData(id, i, stack);
                         }
                     }
                 }
             }
-            return new Tuple<>("", 0);
-        }).orElse(new Tuple<>("", 0));
+            return new FinderData("", 0, ItemStack.EMPTY);
+        }).orElse(new FinderData("", 0, ItemStack.EMPTY));
 
-        if (!found.getA().isEmpty()) {
+        if (!found.getIdentifier().isEmpty()) {
             return found;
         } else {
             return null;
@@ -85,12 +85,12 @@ public class CuriosAPI {
      * matches were found.
      * @param filter            The filter to test the ItemStack against
      * @param entityLivingBase  The wearer of the item to be found
-     * @return  A data pair indicating the identifier of the curio slot and the slot index of the first found ItemStack
-     * matching the parameters. Null if no matches were found.
+     * @return  An instance of {@link FinderData} indicating the identifier of the curio slot, slot index, and the ItemStack
+     * of the first found ItemStack matching the parameters. Null if no matches were found.
      */
     @Nullable
-    public static Tuple<String, Integer> getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final EntityLivingBase entityLivingBase) {
-        Tuple<String, Integer> found = getCuriosHandler(entityLivingBase).map(handler -> {
+    public static FinderData getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final EntityLivingBase entityLivingBase) {
+        FinderData found = getCuriosHandler(entityLivingBase).map(handler -> {
 
             for (String id : handler.getCurioMap().keySet()) {
                 CurioStackHandler stackHandler = handler.getStackHandler(id);
@@ -101,15 +101,15 @@ public class CuriosAPI {
                         ItemStack stack = stackHandler.getStackInSlot(i);
 
                         if (!stack.isEmpty() && filter.test(stack)) {
-                            return new Tuple<>(id, i);
+                            return new FinderData(id, i, stack);
                         }
                     }
                 }
             }
-            return new Tuple<>("", 0);
-        }).orElse(new Tuple<>("", 0));
+            return new FinderData("", 0, ItemStack.EMPTY);
+        }).orElse(new FinderData("", 0, ItemStack.EMPTY));
 
-        if (!found.getA().isEmpty()) {
+        if (!found.getIdentifier().isEmpty()) {
             return found;
         } else {
             return null;
@@ -162,5 +162,30 @@ public class CuriosAPI {
 
     public static void disableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.disableCurio(id));
+    }
+
+    public final static class FinderData {
+
+        String identifier;
+        int index;
+        ItemStack stack;
+
+        public FinderData(String identifier, int index, ItemStack stack) {
+            this.identifier = identifier;
+            this.index = index;
+            this.stack = stack;
+        }
+
+        public String getIdentifier() {
+            return identifier;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public ItemStack getStack() {
+            return stack;
+        }
     }
 }
