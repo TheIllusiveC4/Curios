@@ -60,23 +60,12 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     }
 
     @Override
-    public void tick() {
-        if (this.mc.playerController.isInCreativeMode()) {
-            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.player));
-        }
-    }
-
-    @Override
     public void initGui() {
-        if (this.mc.playerController.isInCreativeMode()) {
-            this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.player));
-        } else {
-            super.initGui();
-            this.widthTooNarrow = this.width < 379;
-            this.guiLeft = (this.width - this.xSize) / 2;
-            this.addButton(new GuiButtonCurios(this,44, this.getGuiLeft() + 26, this.height / 2 - 75,
-                    14, 14, 50, 0, 14, CURIO_INVENTORY));
-        }
+        super.initGui();
+        this.widthTooNarrow = this.width < 379;
+        this.guiLeft = (this.width - this.xSize) / 2;
+        this.addButton(new GuiButtonCurios(this,44, this.getGuiLeft() + 26, this.height / 2 - 75,
+                14, 14, 50, 0, 14, CURIO_INVENTORY));
     }
 
     private boolean inScrollBar(double mouseX, double mouseY) {
