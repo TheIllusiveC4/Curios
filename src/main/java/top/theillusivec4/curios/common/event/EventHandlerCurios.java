@@ -247,23 +247,24 @@ public class EventHandlerCurios {
                         if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
                             LazyOptional<ICurio> prevCurio = CuriosAPI.getCurio(prevStack);
                             boolean shouldSync = !stack.equals(prevStack, true);
+                            NBTTagCompound syncTag = new NBTTagCompound();
 
                             if (currentCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
                                     .orElse(false) || prevCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
                                     .orElse(false) || shouldSync) {
                                 EntityTracker tracker = ((WorldServer) entitylivingbase.world).getEntityTracker();
 
+                                if (currentCurio.isPresent()) {
+                                    syncTag = currentCurio.map(ICurio::getSyncTag).orElse(syncTag);
+                                }
+
                                 for (EntityPlayer player : tracker.getTrackingPlayers(entitylivingbase)) {
 
                                     if (player instanceof EntityPlayerMP) {
 
-                                        if (currentCurio.isPresent()) {
-                                            NBTTagCompound compound = currentCurio.map(ICurio::getSyncTag).orElse(new NBTTagCompound());
-
-                                            if (!compound.isEmpty()) {
-                                                NetworkHandler.INSTANCE.sendTo(new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i, stack, compound),
-                                                        ((EntityPlayerMP) player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
-                                            }
+                                        if (!syncTag.isEmpty()) {
+                                            NetworkHandler.INSTANCE.sendTo(new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i, stack, syncTag),
+                                                    ((EntityPlayerMP) player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                                         } else {
                                             NetworkHandler.INSTANCE.sendTo(new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack),
                                                     ((EntityPlayerMP) player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
@@ -283,9 +284,14 @@ public class EventHandlerCurios {
                             stackHandler.setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
 
                             if (entitylivingbase instanceof EntityPlayerMP) {
-                                NetworkHandler.INSTANCE.sendTo(new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack),
-                                        ((EntityPlayerMP) entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
 
+                                if (!syncTag.isEmpty()) {
+                                    NetworkHandler.INSTANCE.sendTo(new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i, stack, syncTag),
+                                            ((EntityPlayerMP) entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                } else {
+                                    NetworkHandler.INSTANCE.sendTo(new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack),
+                                            ((EntityPlayerMP) entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                }
                             }
                         }
                     }
