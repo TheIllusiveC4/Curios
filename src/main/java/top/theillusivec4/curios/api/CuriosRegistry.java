@@ -20,7 +20,6 @@
 package top.theillusivec4.curios.api;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.item.Item;
 import net.minecraft.tags.ItemTags;
@@ -30,18 +29,20 @@ import top.theillusivec4.curios.Curios;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 public class CuriosRegistry {
 
-    private static Map<String, CurioType> idToType = Maps.newHashMap();
-    private static Map<String, Tag<Item>> idToTag = Maps.newHashMap();
-    private static Map<Item, Set<String>> itemToTypes = Maps.newHashMap();
+    private static ConcurrentMap<String, CurioType> idToType = new ConcurrentHashMap<>();
+    private static Map<String, Tag<Item>> idToTag = new HashMap<>();
+    private static Map<Item, Set<String>> itemToTypes = new HashMap<>();
 
-    static Map<String, ResourceLocation> icons = Maps.newHashMap();
+    static Map<String, ResourceLocation> icons = new HashMap<>();
 
     public static CurioType getOrRegisterType(@Nonnull String identifier) {
 
