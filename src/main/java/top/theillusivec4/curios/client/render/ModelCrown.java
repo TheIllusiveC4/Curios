@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.entity.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
 public class ModelCrown extends ModelBase {
+
     public ModelRenderer crown;
 
     public ModelCrown() {

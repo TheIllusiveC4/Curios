@@ -27,7 +27,8 @@ public class ItemCrown extends Item implements ICurio {
         return CapCurioItem.createProvider(new ICurio() {
 
             private final ResourceLocation CROWN_TEXTURE = new ResourceLocation(Curios.MODID, "textures/entity/crown.png");
-            private final ModelCrown crown = new ModelCrown();
+
+            private Object model;
 
             @Override
             public void onCurioTick(String identifier, EntityLivingBase entityLivingBase) {
@@ -54,6 +55,11 @@ public class ItemCrown extends Item implements ICurio {
             @Override
             public void doRender(String identifier, EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
                 Minecraft.getInstance().getTextureManager().bindTexture(CROWN_TEXTURE);
+
+                if (!(this.model instanceof ModelCrown)) {
+                    model = new ModelCrown();
+                }
+                ModelCrown crown = (ModelCrown) this.model;
                 ICurio.RenderHelper.followHeadRotations(entitylivingbaseIn, crown.crown);
                 crown.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             }

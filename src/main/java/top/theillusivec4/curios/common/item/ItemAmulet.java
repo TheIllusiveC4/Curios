@@ -46,7 +46,8 @@ public class ItemAmulet extends Item implements ICurio {
         return CapCurioItem.createProvider(new ICurio() {
 
             private final ResourceLocation AMULET_TEXTURE = new ResourceLocation(Curios.MODID, "textures/entity/amulet.png");
-            private final ModelAmulet amulet = new ModelAmulet();
+
+            private Object model;
 
             @Override
             public void onCurioTick(String identifier, EntityLivingBase entityLivingBase) {
@@ -65,7 +66,11 @@ public class ItemAmulet extends Item implements ICurio {
             public void doRender(String identifier, EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
                 Minecraft.getInstance().getTextureManager().bindTexture(AMULET_TEXTURE);
                 ICurio.RenderHelper.rotateIfSneaking(entitylivingbaseIn);
-                amulet.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+
+                if (!(this.model instanceof ModelAmulet)) {
+                    this.model = new ModelAmulet();
+                }
+                ((ModelAmulet) model).render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             }
         });
     }
