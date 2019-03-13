@@ -90,7 +90,7 @@ public class EventHandlerClient {
                         if (!multimap.isEmpty()) {
                             EntityPlayer player = evt.getEntityPlayer();
                             tooltip.add(new TextComponentString(""));
-                            tooltip.add(new TextComponentTranslation("curios.modifiers", identifier).applyTextStyle(TextFormatting.GRAY));
+                            tooltip.add(new TextComponentTranslation("curios.modifiers", identifier).applyTextStyle(TextFormatting.GOLD));
 
                             for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
                                 AttributeModifier attributemodifier = entry.getValue();
