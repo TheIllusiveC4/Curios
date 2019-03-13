@@ -49,6 +49,7 @@ sourceSets {
 }
 
 jar {
+    from sourceSets.main.output
     manifest {
         attributes(["Specification-Title": "curios",
                     "Specification-Vendor": "C4",
@@ -60,16 +61,28 @@ jar {
     }
 }
 
-publishing {
+task apiJar(type: Jar) {
+    classifier = 'api'
+    include 'top/theillusivec4/curios/api/**/*'
+    from sourceSets.main.allSource
+    from sourceSets.main.output
+}
 
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+tasks.build.dependsOn apiJar, sourcesJar
+
+publishing {
+    tasks.publish.dependsOn 'build'
     publications {
 
         mavenJava(MavenPublication) {
-
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
-            from components.java
+            artifact jar
+            artifact sourcesJar
+            artifact apiJar
         }
     }
 
