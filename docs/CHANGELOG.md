@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [0.8] - 2019.03.17
+### Added
+- Reobfuscation publishing
+- API and sources jars
+
+### Changed
+- Updated mod icon
+
 ## [0.7] - 2019.03.12
 ### Changed
 - Attribute tooltips for curios have been slightly modified to match vanilla semantics and are now gold-colored
