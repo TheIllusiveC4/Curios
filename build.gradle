@@ -19,25 +19,44 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 
 minecraft {
     mappings channel: 'snapshot', version: '20180921-1.13'
-	
+
     runs {
-        client = {
-//            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-//            properties 'forge.logging.console.level': 'debug'
-            workingDirectory project.file('run').canonicalPath
-            source sourceSets.main
+        client {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                curios {
+                    source sourceSets.main
+                }
+            }
         }
-        server = {
-//            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-//            properties 'forge.logging.console.level': 'debug'
-            workingDirectory project.file('run').canonicalPath
-            source sourceSets.main
+
+        server {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                curios {
+                    source sourceSets.main
+                }
+            }
         }
     }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.73'
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.84'
 }
 
 sourceSets {
@@ -61,6 +80,12 @@ jar {
     }
 }
 
+def reobfFile = file("build/reobfJar/output.jar")
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'reobfJar'
+}
+
 task apiJar(type: Jar) {
     classifier = 'api'
     include 'top/theillusivec4/curios/api/**/*'
@@ -80,9 +105,15 @@ publishing {
     publications {
 
         mavenJava(MavenPublication) {
-            artifact jar
-            artifact sourcesJar
-            artifact apiJar
+            artifact (reobfArtifact) {
+                artifactId project.archivesBaseName
+            }
+            artifact (sourcesJar) {
+                artifactId project.archivesBaseName
+            }
+            artifact (apiJar) {
+                artifactId project.archivesBaseName
+            }
         }
     }
 
