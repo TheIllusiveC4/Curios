@@ -36,10 +36,18 @@ import java.util.function.Predicate;
 
 public class CuriosAPI {
 
+    /**
+     * @param stack The ItemStack to get the curio capability from
+     * @return  LazyOptional of the curio capability attached to the ItemStack
+     */
     public static LazyOptional<ICurio> getCurio(ItemStack stack) {
         return stack.getCapability(CuriosCapability.ITEM);
     }
 
+    /**
+     * @param entityLivingBase  The ItemStack to get the curio inventory capability from
+     * @return  LazyOptional of the curio inventory capability attached to the entity
+     */
     public static LazyOptional<ICurioItemHandler> getCuriosHandler(@Nonnull final EntityLivingBase entityLivingBase) {
         return entityLivingBase.getCapability(CuriosCapability.INVENTORY);
     }
@@ -116,6 +124,15 @@ public class CuriosAPI {
         }
     }
 
+    /**
+     * Sets whether the {@link CurioType} with the associated identifier should be enabled or disabled
+     * Note that this affects only the registry and will not affect entities whose slots have already been initialized,
+     * so any calls to this in-game should be made with caution.
+     * This does not make any guarantees that entities can/cannot have this CurioType at all, only that they will/will not be
+     * given those slots upon initialization
+     * @param id        The identifier of the CurioType
+     * @param enabled   True to enable, false to disable
+     */
     public static void setTypeEnabled(String id, boolean enabled) {
         CurioType type = CuriosRegistry.getType(id);
 
@@ -124,6 +141,15 @@ public class CuriosAPI {
         }
     }
 
+    /**
+     * Sets the size for the {@link CurioType} with the associated identifier
+     * Note that this affects only the registry and will not affect entities whose slots have already been initialized,
+     * so any calls to this in-game should be made with caution
+     * This does not make any guarantees about how many slots entities can have for the given CurioType, only that they
+     * will be given this amount of slots upon initialization
+     * @param id    The identifier of the CurioType
+     * @param size  The number of default slots for the CurioType to give entities upon initialization
+     */
     public static void setTypeSize(String id, int size) {
         CurioType type = CuriosRegistry.getType(id);
 
@@ -132,6 +158,12 @@ public class CuriosAPI {
         }
     }
 
+    /**
+     * Sets whether the {@link CurioType} for the associated identifier will be hidden from the default GUI
+     * This will prevent the slot(s) from being handled by the default GUI but the slot(s) will still exist
+     * @param id    The identifier of the CurioType
+     * @param hide  True to hide from the GUI, otherwise false
+     */
     public static void setTypeHidden(String id, boolean hide) {
         CurioType type = CuriosRegistry.getType(id);
 
@@ -140,26 +172,66 @@ public class CuriosAPI {
         }
     }
 
+    /**
+     * Adds a single slot to the {@link CurioType} with the associated identifier
+     * If the slot to be added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
+     * for types that are not yet available, there must first be a call to {@link CuriosAPI#enableTypeForEntity(String, EntityLivingBase)}
+     * @param id                The identifier of the CurioType
+     * @param entityLivingBase  The holder of the slot(s)
+     */
     public static void addTypeSlotToEntity(String id, final EntityLivingBase entityLivingBase) {
         addTypeSlotsToEntity(id, 1, entityLivingBase);
     }
 
+    /**
+     * Adds multiple slots to the {@link CurioType} with the associated identifier
+     * If the slot to be added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
+     * for types that are not yet available, there must first be a call to {@link CuriosAPI#enableTypeForEntity(String, EntityLivingBase)}
+     * @param id                The identifier of the CurioType
+     * @param amount            The number of slots to add
+     * @param entityLivingBase  The holder of the slots
+     */
     public static void addTypeSlotsToEntity(String id, int amount, final EntityLivingBase entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.addCurioSlot(id, amount));
     }
 
+    /**
+     * Removes a single slot to the {@link CurioType} with the associated identifier
+     * If the slot to be removed is the last slot available, it will not be removed. For the removal of the last slot,
+     * please see {@link CuriosAPI#disableTypeForEntity(String, EntityLivingBase)}
+     * @param id                The identifier of the CurioType
+     * @param entityLivingBase  The holder of the slot(s)
+     */
     public static void removeTypeSlotFromEntity(String id, final EntityLivingBase entityLivingBase) {
         removeTypeSlotsFromEntity(id, 1, entityLivingBase);
     }
 
+    /**
+     * Removes multiple slots to the {@link CurioType} with the associated identifier
+     * If the slot to be removed is the last slot available, it will not be removed. For the removal of the last slot,
+     * please see {@link CuriosAPI#disableTypeForEntity(String, EntityLivingBase)}
+     * @param id                The identifier of the CurioType
+     * @param entityLivingBase  The holder of the slot(s)
+     */
     public static void removeTypeSlotsFromEntity(String id, int amount, final EntityLivingBase entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.removeCurioSlot(id, amount));
     }
 
+    /**
+     * Adds a {@link CurioType} to the entity
+     * The number of slots given is the type's default
+     * @param id                The identifier of the CurioType
+     * @param entityLivingBase  The holder of the slot(s)
+     */
     public static void enableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.enableCurio(id));
     }
 
+    /**
+     * Removes a {@link CurioType} from the entity
+     * @param id                The identifier of the CurioType
+     * @param entityLivingBase  The holder of the slot(s)
+     */
     public static void disableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.disableCurio(id));
     }
