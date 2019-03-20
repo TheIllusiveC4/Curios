@@ -220,6 +220,9 @@ public class EventHandlerCurios {
                                 }
                             }
                         }
+                    } else {
+                        evt.setCancellationResult(EnumActionResult.SUCCESS);
+                        evt.setCanceled(true);
                     }
                 });
             }
