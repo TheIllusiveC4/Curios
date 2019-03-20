@@ -107,6 +107,10 @@ public class CapCurioInventory {
                         stackHandler.deserializeNBT(itemtag);
 
                         if (type != null) {
+
+                            if (type.getIcon() != null) {
+                                stackHandler.setIcon(type.getIcon().toString());
+                            }
                             curios.put(identifier, stackHandler);
                         } else {
 
