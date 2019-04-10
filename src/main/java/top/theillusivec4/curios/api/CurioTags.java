@@ -1,0 +1,53 @@
+package top.theillusivec4.curios.api;
+
+import net.minecraft.item.Item;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
+import net.minecraft.util.ResourceLocation;
+import top.theillusivec4.curios.Curios;
+
+/**
+ * A reference class for storing a list of commonly used tags to avoid modders implementing duplicate slots
+ * If there is a tag that is commonly used that isn't already in this list, please submit a PR or issue ticket on GitHub
+ */
+public class CurioTags {
+
+    /**
+     * Used for capes, backpacks, or anything worn on the back.
+     */
+    public static final Tag<Item> BACK = tag("back");
+
+    /**
+     * Used for belts or anything worn around the waist.
+     */
+    public static final Tag<Item> BELT = tag("belt");
+
+    /**
+     * Used for cloaks, mantles, shirts, or anything worn around the torso.
+     */
+    public static final Tag<Item> BODY = tag("body");
+
+    /**
+     * Used for miscellaneous items that do not belong to any particular type.
+     */
+    public static final Tag<Item> CHARM = tag("charm");
+
+    /**
+     * Used for crowns, hats, or anything worn on top of the head.
+     */
+    public static final Tag<Item> HEAD = tag("head");
+
+    /**
+     * Used for amulets, necklaces, or anything worn around the neck.
+     */
+    public static final Tag<Item> NECKLACE = tag("necklace");
+
+    /**
+     * Used for rings or anything worn on the "fingers".
+     */
+    public static final Tag<Item> RING = tag("ring");
+
+    private static Tag<Item> tag(String name) {
+        return new ItemTags.Wrapper(new ResourceLocation(Curios.MODID, name));
+    }
+}
