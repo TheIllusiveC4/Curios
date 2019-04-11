@@ -33,17 +33,17 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.FMLPlayMessages;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.CuriosRegistry;
+import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 import top.theillusivec4.curios.client.EventHandlerClient;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.GuiContainerCurios;
@@ -70,7 +70,8 @@ public class Curios {
     public Curios() {
         final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
-        eventBus.addListener(this::postSetup);
+        eventBus.addListener(this::enqueue);
+        eventBus.addListener(this::process);
         MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CuriosConfig.commonSpec);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CuriosConfig.clientSpec);
@@ -81,22 +82,30 @@ public class Curios {
         CapCurioItem.register();
         NetworkHandler.register();
         MinecraftForge.EVENT_BUS.register(new EventHandlerCurios());
+    }
+
+    private void enqueue(InterModEnqueueEvent evt) {
 
         for (String id : CuriosConfig.COMMON.createCurios.get()) {
-            CuriosRegistry.getOrRegisterType(id);
+            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage(id));
+        }
+
+        for (String id : CuriosConfig.COMMON.disabledCurios.get()) {
+            send(CuriosAPI.IMC.MODIFY_TYPE, new CurioIMCMessage(id).setEnabled(false));
         }
 
         if (DEBUG) {
-            CuriosRegistry.getOrRegisterType("ring").icon(new ResourceLocation(MODID, "item/empty_ring_slot")).defaultSize(10);
-            CuriosRegistry.getOrRegisterType("amulet").icon(new ResourceLocation(MODID, "item/empty_amulet_slot"));
+            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("ring").setSize(10));
+            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("necklace"));
         }
     }
 
-    private void postSetup(FMLLoadCompleteEvent evt) {
+    private void process(InterModProcessEvent evt) {
+        CuriosRegistry.processCurioTypes(evt.getIMCStream(CuriosAPI.IMC.REGISTER_TYPE::equals), evt.getIMCStream(CuriosAPI.IMC.MODIFY_TYPE::equals));
+    }
 
-        for (String id : CuriosConfig.COMMON.disabledCurios.get()) {
-            CuriosAPI.setTypeEnabled(id, false);
-        }
+    private static void send(String id, Object msg) {
+        InterModComms.sendTo(MODID, id, () -> msg);
     }
 
     private void onServerStarting(FMLServerStartingEvent evt) {
@@ -113,6 +122,11 @@ public class Curios {
             MinecraftForge.EVENT_BUS.addListener(ClientProxy::onTextureStitch);
             ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> Curios.ClientProxy::getGuiContainer);
             KeyRegistry.registerKeys();
+
+            if (DEBUG) {
+                CuriosAPI.registerIcon("ring", new ResourceLocation(MODID, "item/empty_ring_slot"));
+                CuriosAPI.registerIcon("necklace", new ResourceLocation(MODID, "item/empty_amulet_slot"));
+            }
         }
 
         @SubscribeEvent
@@ -127,8 +141,9 @@ public class Curios {
         public static void onTextureStitch(TextureStitchEvent.Pre evt) {
             TextureMap map = evt.getMap();
             IResourceManager manager = Minecraft.getInstance().getResourceManager();
+            CuriosRegistry.processIcons();
 
-            for (ResourceLocation resource : CuriosRegistry.getResources()) {
+            for (ResourceLocation resource : CuriosAPI.getIcons().values()) {
                 map.registerSprite(manager, resource);
             }
             map.registerSprite(manager, new ResourceLocation("curios:item/empty_generic_slot"));

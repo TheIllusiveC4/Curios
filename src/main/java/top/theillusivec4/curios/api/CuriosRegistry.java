@@ -19,77 +19,72 @@
 
 package top.theillusivec4.curios.api;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import net.minecraft.item.Item;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
+import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.util.ResourceLocation;
-import top.theillusivec4.curios.Curios;
+import net.minecraftforge.fml.InterModComms;
+import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CuriosRegistry {
 
-    private static ConcurrentMap<String, CurioType> idToType = new ConcurrentHashMap<>();
-    private static Map<String, Tag<Item>> idToTag = new HashMap<>();
-    private static Map<Item, Set<String>> itemToTypes = new HashMap<>();
-
+    static Map<String, CurioType> idToType = new HashMap<>();
+    static ConcurrentMap<String, ConcurrentSet<ResourceLocation>> iconQueues = new ConcurrentHashMap<>();
     static Map<String, ResourceLocation> icons = new HashMap<>();
 
-    public static CurioType getOrRegisterType(@Nonnull String identifier) {
+    public static void processCurioTypes(Stream<InterModComms.IMCMessage> register, Stream<InterModComms.IMCMessage> modify) {
+        register
+                .filter(msg -> msg.getMessageSupplier().get() instanceof CurioIMCMessage)
+                .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
+                .forEach(msg -> processType(msg, true));
 
-        if (identifier.isEmpty()) {
-            throw new IllegalArgumentException("Identifier cannot be empty!");
-        }
-        return idToType.merge(identifier, new CurioType(identifier), (key, value) -> value);
+        modify
+                .filter(msg -> msg.getMessageSupplier().get() instanceof CurioIMCMessage)
+                .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
+                .forEach(msg -> processType(msg, false));
     }
 
-    @Nullable
-    public static CurioType getType(String identifier) {
-        return idToType.get(identifier);
-    }
+    public static void processIcons() {
 
-    public static ImmutableSet<String> getTypeIdentifiers() { return ImmutableSet.copyOf(idToType.keySet()); }
-
-    public static ImmutableSet<String> getCurioTags(Item item) {
-
-        if (idToTag.isEmpty()) {
-            refreshTags();
+        if (!icons.isEmpty()) {
+            icons = new HashMap<>();
         }
+        iconQueues.forEach((k, v) -> {
 
-        if (itemToTypes.containsKey(item)) {
-            return ImmutableSet.copyOf(itemToTypes.get(item));
-        } else {
-            Set<String> tags = Sets.newHashSet();
-
-            for (String identifier : idToTag.keySet()) {
-
-                if (idToTag.get(identifier).contains(item)) {
-                    tags.add(identifier);
-                }
+            if (!icons.containsKey(k)) {
+                List<ResourceLocation> sortedList = new ArrayList<>(v);
+                Collections.sort(sortedList);
+                icons.put(k, sortedList.get(sortedList.size() - 1));
             }
-            itemToTypes.put(item, tags);
-            return ImmutableSet.copyOf(tags);
+        });
+    }
+
+    private static void processType(CurioIMCMessage message, boolean create) {
+        String identifier = message.getIdentifier();
+
+        if (idToType.containsKey(identifier)) {
+            CurioType presentType = idToType.get(identifier);
+
+            if (message.getSize() > presentType.getSize()) {
+                presentType.defaultSize(message.getSize());
+            }
+
+            if (!message.isEnabled() && presentType.isEnabled()) {
+                presentType.enabled(false);
+            }
+
+            if (message.isHidden() && !presentType.isHidden()) {
+                presentType.hide(true);
+            }
+
+        } else if (create) {
+            idToType.put(identifier, new CurioType(identifier)
+                    .defaultSize(message.getSize())
+                    .enabled(message.isEnabled())
+                    .hide(message.isHidden()));
         }
-    }
-
-    public static ImmutableSet<ResourceLocation> getResources() {
-        return ImmutableSet.copyOf(icons.values());
-    }
-
-    private static void refreshTags() {
-        idToTag = ItemTags.getCollection().getTagMap().entrySet()
-                .stream()
-                .filter(map -> map.getKey().getNamespace().equals(Curios.MODID))
-                .collect(Collectors.toMap(entry -> entry.getKey().getPath(), Map.Entry::getValue));
-        itemToTypes.clear();
     }
 }

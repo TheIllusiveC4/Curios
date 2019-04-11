@@ -23,11 +23,12 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.SlotItemHandler;
+import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.CuriosRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,13 +38,11 @@ public class SlotCurio extends SlotItemHandler {
 
     private final String identifier;
     private final EntityPlayer player;
-    private final String slotOverlay;
 
     public SlotCurio(EntityPlayer player, CurioStackHandler handler, int index, String identifier, int xPosition, int yPosition) {
         super(handler, index, xPosition, yPosition);
         this.identifier = identifier;
         this.player = player;
-        this.slotOverlay = handler.getIcon().isEmpty() ? "curios:item/empty_generic_slot" : handler.getIcon();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -57,7 +56,7 @@ public class SlotCurio extends SlotItemHandler {
 
     @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
-        return hasValidTag(CuriosRegistry.getCurioTags(stack.getItem())) && CuriosAPI.getCurio(stack)
+        return hasValidTag(CuriosAPI.getCurioTags(stack.getItem())) && CuriosAPI.getCurio(stack)
                 .map(curio -> curio.canEquip(identifier, player)).orElse(true)
                 && super.isItemValid(stack);
     }
@@ -78,6 +77,6 @@ public class SlotCurio extends SlotItemHandler {
     @OnlyIn(Dist.CLIENT)
     @Override
     public String getSlotTexture() {
-        return slotOverlay;
+        return CuriosAPI.getIcons().getOrDefault(identifier, new ResourceLocation(Curios.MODID, "item/empty_generic_slot")).toString();
     }
 }

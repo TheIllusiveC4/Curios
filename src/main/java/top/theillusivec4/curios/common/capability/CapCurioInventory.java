@@ -43,7 +43,6 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
@@ -102,15 +101,11 @@ public class CapCurioInventory {
                     for (int i = 0; i < tagList.size(); i++) {
                         NBTTagCompound itemtag = tagList.getCompound(i);
                         String identifier = itemtag.getString("Identifier");
-                        CurioType type = CuriosRegistry.getType(identifier);
+                        CurioType type = CuriosAPI.getType(identifier);
                         CurioStackHandler stackHandler = new CurioStackHandler();
                         stackHandler.deserializeNBT(itemtag);
 
                         if (type != null) {
-
-                            if (type.getIcon() != null) {
-                                stackHandler.setIcon(type.getIcon().toString());
-                            }
                             curios.put(identifier, stackHandler);
                         } else {
 
@@ -160,15 +155,14 @@ public class CapCurioInventory {
         public SortedMap<String, CurioStackHandler> getDefaultSlots() {
             SortedMap<String, CurioStackHandler> slots = Maps.newTreeMap();
 
-            for (String id : CuriosRegistry.getTypeIdentifiers()) {
+            for (String id : CuriosAPI.getTypeIdentifiers()) {
 
                 if (disabled.isEmpty() || !disabled.contains(id)) {
-                    CurioType type = CuriosRegistry.getType(id);
+                    CurioType type = CuriosAPI.getType(id);
 
                     if (type != null && type.isEnabled()) {
                         CurioStackHandler handler = new CurioStackHandler(type.getSize());
                         handler.setHidden(type.isHidden());
-                        handler.setIcon(type.getIcon() == null ? "" : type.getIcon().toString());
                         slots.put(id, handler);
                     }
                 }
@@ -209,7 +203,7 @@ public class CapCurioInventory {
 
         @Override
         public void enableCurio(String identifier) {
-            CurioType type = CuriosRegistry.getType(identifier);
+            CurioType type = CuriosAPI.getType(identifier);
 
             if (type != null) {
                 this.curioSlots.putIfAbsent(identifier, new CurioStackHandler(type.getSize()));

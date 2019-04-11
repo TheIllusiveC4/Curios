@@ -19,11 +19,18 @@
 
 package top.theillusivec4.curios.api;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Tuple;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
+import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
@@ -31,8 +38,11 @@ import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class CuriosAPI {
 
@@ -53,6 +63,20 @@ public class CuriosAPI {
     }
 
     /**
+     * @param identifier    The unique identifier for the {@link CurioType}
+     * @return  The CurioType from the given identifier
+     */
+    @Nullable
+    public static CurioType getType(String identifier) {
+        return CuriosRegistry.idToType.get(identifier);
+    }
+
+    /**
+     * @return  An unmodifiable list of all unique registered identifiers
+     */
+    public static ImmutableSet<String> getTypeIdentifiers() { return ImmutableSet.copyOf(CuriosRegistry.idToType.keySet()); }
+
+    /**
      * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no matches were found.
      * @param item              The item to find
      * @param entityLivingBase  The wearer of the item to be found
@@ -62,7 +86,7 @@ public class CuriosAPI {
     @Nullable
     public static FinderData getCurioEquipped(Item item, @Nonnull final EntityLivingBase entityLivingBase) {
         FinderData found = getCuriosHandler(entityLivingBase).map(handler -> {
-            Set<String> tags = CuriosRegistry.getCurioTags(item);
+            Set<String> tags = getCurioTags(item);
 
             for (String id : tags) {
                 CurioStackHandler stackHandler = handler.getStackHandler(id);
@@ -121,54 +145,6 @@ public class CuriosAPI {
             return found;
         } else {
             return null;
-        }
-    }
-
-    /**
-     * Sets whether the {@link CurioType} with the associated identifier should be enabled or disabled
-     * Note that this affects only the registry and will not affect entities whose slots have already been initialized,
-     * so any calls to this in-game should be made with caution.
-     * This does not make any guarantees that entities can/cannot have this CurioType at all, only that they will/will not be
-     * given those slots upon initialization
-     * @param id        The identifier of the CurioType
-     * @param enabled   True to enable, false to disable
-     */
-    public static void setTypeEnabled(String id, boolean enabled) {
-        CurioType type = CuriosRegistry.getType(id);
-
-        if (type != null) {
-            type.enabled(enabled);
-        }
-    }
-
-    /**
-     * Sets the size for the {@link CurioType} with the associated identifier
-     * Note that this affects only the registry and will not affect entities whose slots have already been initialized,
-     * so any calls to this in-game should be made with caution
-     * This does not make any guarantees about how many slots entities can have for the given CurioType, only that they
-     * will be given this amount of slots upon initialization
-     * @param id    The identifier of the CurioType
-     * @param size  The number of default slots for the CurioType to give entities upon initialization
-     */
-    public static void setTypeSize(String id, int size) {
-        CurioType type = CuriosRegistry.getType(id);
-
-        if (type != null) {
-            type.defaultSize(size);
-        }
-    }
-
-    /**
-     * Sets whether the {@link CurioType} for the associated identifier will be hidden from the default GUI
-     * This will prevent the slot(s) from being handled by the default GUI but the slot(s) will still exist
-     * @param id    The identifier of the CurioType
-     * @param hide  True to hide from the GUI, otherwise false
-     */
-    public static void setTypeHidden(String id, boolean hide) {
-        CurioType type = CuriosRegistry.getType(id);
-
-        if (type != null) {
-            type.hide(hide);
         }
     }
 
@@ -234,6 +210,65 @@ public class CuriosAPI {
      */
     public static void disableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.disableCurio(id));
+    }
+
+    private static Map<Item, Set<String>> itemToTypes = new HashMap<>();
+    private static Map<String, Tag<Item>> idToTag = new HashMap<>();
+
+    /**
+     * Retrieves a set of string identifiers from the curio tags associated with the given item
+     * @param item  The item to retrieve curio tags for
+     * @return      Unmodifiable list of unique curio identifiers associated with the item
+     */
+    public static ImmutableSet<String> getCurioTags(Item item) {
+
+        if (idToTag.isEmpty()) {
+            idToTag = ItemTags.getCollection().getTagMap().entrySet()
+                    .stream()
+                    .filter(map -> map.getKey().getNamespace().equals(Curios.MODID))
+                    .collect(Collectors.toMap(entry -> entry.getKey().getPath(), Map.Entry::getValue));
+            itemToTypes.clear();
+        }
+
+        if (itemToTypes.containsKey(item)) {
+            return ImmutableSet.copyOf(itemToTypes.get(item));
+        } else {
+            Set<String> tags = Sets.newHashSet();
+
+            for (String identifier : idToTag.keySet()) {
+
+                if (idToTag.get(identifier).contains(item)) {
+                    tags.add(identifier);
+                }
+            }
+            itemToTypes.put(item, tags);
+            return ImmutableSet.copyOf(tags);
+        }
+    }
+
+    /**
+     * Registers a resource location to be used as the slot overlay icon in the GUI
+     * @param id                The identifier of the type of curio to be associated with the icon
+     * @param resourceLocation  The resource location of the icon
+     */
+    public static void registerIcon(String id, @Nonnull ResourceLocation resourceLocation) {
+        CuriosRegistry.iconQueues.computeIfAbsent(id, k -> new ConcurrentSet<>()).add(resourceLocation);
+    }
+
+    /**
+     * @return  A map of identifiers and their registered icons
+     */
+    public static Map<String, ResourceLocation> getIcons() {
+        return ImmutableMap.copyOf(CuriosRegistry.icons);
+    }
+
+    /**
+     * Holder class for IMC message identifiers
+     */
+    public final static class IMC {
+
+        public static final String REGISTER_TYPE = "register_type";
+        public static final String MODIFY_TYPE = "modify_type";
     }
 
     public final static class FinderData {

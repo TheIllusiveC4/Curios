@@ -17,23 +17,17 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.api;
+package top.theillusivec4.curios.api.imc;
 
-public class CurioType {
+public class CurioIMCMessage {
 
     private final String identifier;
-    /** The default number of slots*/
-    private int size;
-    /** Enabled slots will be given to holders by default*/
-    private boolean isEnabled;
-    /** Hidden slots will not show up in the default Curios GUI, but will still exist*/
-    private boolean isHidden;
+    private int size = 1;
+    private boolean isEnabled = true;
+    private boolean isHidden = false;
 
-    public CurioType(String identifier) {
-        this.identifier = identifier;
-        this.size = 1;
-        this.isEnabled = true;
-        this.isHidden = false;
+    public CurioIMCMessage(String id) {
+        this.identifier = id;
     }
 
     public String getIdentifier() {
@@ -41,27 +35,29 @@ public class CurioType {
     }
 
     public int getSize() {
-        return this.size;
+        return size;
+    }
+
+    public CurioIMCMessage setSize(int size) {
+        this.size = size;
+        return this;
     }
 
     public boolean isEnabled() {
         return isEnabled;
     }
 
-    public boolean isHidden() { return isHidden; }
-
-    public final CurioType defaultSize(int size) {
-        this.size = Math.max(size, this.size);
+    public CurioIMCMessage setEnabled(boolean enabled) {
+        isEnabled = enabled;
         return this;
     }
 
-    public final CurioType enabled(boolean enabled) {
-        this.isEnabled = enabled;
-        return this;
+    public boolean isHidden() {
+        return isHidden;
     }
 
-    public final CurioType hide(boolean hide) {
-        this.isHidden = hide;
+    public CurioIMCMessage setHidden(boolean hidden) {
+        isHidden = hidden;
         return this;
     }
 }

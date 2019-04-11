@@ -31,7 +31,6 @@ public final class CurioStackHandler extends ItemStackHandler {
 
     protected NonNullList<ItemStack> previousStacks;
     protected boolean isHidden = false;
-    protected String icon = "";
 
     public CurioStackHandler()
     {
@@ -46,12 +45,10 @@ public final class CurioStackHandler extends ItemStackHandler {
         this.stacks = stacks;
         this.previousStacks = NonNullList.create();
 
-        for (ItemStack stack : stacks) {
+        for (int i = 0; i < stacks.size(); i++) {
             previousStacks.add(ItemStack.EMPTY);
         }
     }
-
-
 
     @Override
     public void setSize(int size) {
@@ -108,14 +105,6 @@ public final class CurioStackHandler extends ItemStackHandler {
         }
     }
 
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
     public boolean isHidden() {
         return isHidden;
     }
@@ -128,14 +117,12 @@ public final class CurioStackHandler extends ItemStackHandler {
     public NBTTagCompound serializeNBT() {
         NBTTagCompound compound = super.serializeNBT();
         compound.setBoolean("Hidden", isHidden);
-        compound.setString("Icon", icon);
         return compound;
     }
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
         this.isHidden = nbt.contains("Hidden", Constants.NBT.TAG_BYTE) && nbt.getBoolean("Hidden");
-        this.icon = nbt.contains("Icon", Constants.NBT.TAG_STRING) ? nbt.getString("Icon") : "";
         super.deserializeNBT(nbt);
     }
 }
