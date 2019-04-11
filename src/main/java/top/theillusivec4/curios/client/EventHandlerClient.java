@@ -70,7 +70,7 @@ public class EventHandlerClient {
 
         if (!stack.isEmpty()) {
             List<ITextComponent> tooltip = evt.getToolTip();
-            Set<String> slots = CuriosRegistry.getCurioTags(stack.getItem());
+            Set<String> slots = CuriosAPI.getCurioTags(stack.getItem());
 
             if (!slots.isEmpty()) {
 

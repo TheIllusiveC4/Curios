@@ -197,7 +197,7 @@ public class EventHandlerCurios {
 
                     if (!player.world.isRemote) {
                         SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
-                        Set<String> tags = CuriosRegistry.getCurioTags(stack.getItem());
+                        Set<String> tags = CuriosAPI.getCurioTags(stack.getItem());
 
                         for (String id : tags) {
 
