@@ -125,7 +125,7 @@ public class Curios {
 
             if (DEBUG) {
                 CuriosAPI.registerIcon("ring", new ResourceLocation(MODID, "item/empty_ring_slot"));
-                CuriosAPI.registerIcon("necklace", new ResourceLocation(MODID, "item/empty_amulet_slot"));
+                CuriosAPI.registerIcon("necklace", new ResourceLocation(MODID, "item/empty_necklace_slot"));
             }
         }
 
