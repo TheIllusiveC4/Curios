@@ -1,33 +1,33 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url 'https://plugins.gradle.org/m2/' }
         jcenter()
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.2.0'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'maven-publish'
 
-version = "${version_minecraft}-${version_mod}"
+version = "${version_minecraft}-${mod_version}"
 group = "${mod_group}"
 archivesBaseName = "${mod_id}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    mappings channel: 'snapshot', version: '20180921-1.13'
+    mappings channel: 'snapshot', version: "${version_mcp}".toString()
 
     runs {
         client {
             workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
+            
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -39,11 +39,8 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
+            
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -56,7 +53,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.84'
+    minecraft "net.minecraftforge:forge:${version_forge}"
 }
 
 sourceSets {
@@ -68,14 +65,13 @@ sourceSets {
 }
 
 jar {
-    from sourceSets.main.output
     manifest {
-        attributes(["Specification-Title": "curios",
-                    "Specification-Vendor": "C4",
-                    "Specification-Version": "1.0",
-                    "Implementation-Title": project.name,
+        attributes(["Specification-Title": "${mod_name}",
+                    "Specification-Vendor": "${mod_author}",
+                    "Specification-Version": "${version}",
+                    "Implementation-Title": "${mod_name}",
                     "Implementation-Version": "${version}",
-                    "Implementation-Vendor" :"C4",
+                    "Implementation-Vendor" :"${mod_author}",
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
     }
 }
@@ -100,20 +96,41 @@ task sourcesJar(type: Jar) {
 
 tasks.build.dependsOn apiJar, sourcesJar
 
+processResources {
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'META-INF/mods.toml'
+        expand 'version': project.version, 'mod_id' : mod_id, 'mod_name': mod_name, 'mod_url': mod_url, 'mod_author': mod_author, 'mod_description': mod_description, 'mod_icon': mod_icon
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'META-INF/mods.toml'
+    }
+}
+
+curseforge {
+
+    project {
+        apiKey = findProperty('curseKey') ?: 0
+        id = "${curse_id}"
+        releaseType = "${curse_release}"
+        changelogType = 'markdown'
+        changelog = file('docs/CHANGELOG.md')
+        addArtifact(sourcesJar)
+        addArtifact(apiJar)
+    }
+}
+
 publishing {
     tasks.publish.dependsOn 'build'
     publications {
 
         mavenJava(MavenPublication) {
-            artifact (reobfArtifact) {
-                artifactId project.archivesBaseName
-            }
-            artifact (sourcesJar) {
-                artifactId project.archivesBaseName
-            }
-            artifact (apiJar) {
-                artifactId project.archivesBaseName
-            }
+            artifactId project.archivesBaseName
+
+            artifact reobfArtifact
+            artifact sourcesJar
+            artifact apiJar
         }
     }
 

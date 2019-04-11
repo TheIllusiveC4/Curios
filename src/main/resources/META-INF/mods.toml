@@ -1,15 +1,15 @@
 modLoader="javafml"
 loaderVersion="[25,)"
 issueTrackerURL="https://github.com/TheIllusiveC4/Curios/issues"
-logoFile="curios_icon.png"
+logoFile="${mod_icon}"
 [[mods]]
-modId="curios"
+modId="${mod_id}"
 version="${file.jarVersion}"
-displayName="Curios API"
-displayURL="https://minecraft.curseforge.com/projects/curios"
-authors="C4"
+displayName="${mod_name}"
+displayURL="${mod_url}"
+authors="${mod_author}"
 description='''
-A flexible and expandable accessory/equipment API for users and developers.
+${mod_description}
 '''
 [[dependencies.curios]]
     modId="forge"
