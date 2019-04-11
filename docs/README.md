@@ -25,12 +25,12 @@ Add the following to your build.gradle file:
 ```
 repositories {
     maven {
-        url = "https://maven.theillusivec4.top"
+        url = "https://maven.theillusivec4.top/"
     }
 }
 
 dependencies {
-    compile 'top.theillusivec4.curios:curios:${version}'
+    deobf 'top.theillusivec4.curios:curios:${version}'
 }
 ```
 
