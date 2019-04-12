@@ -116,7 +116,7 @@ public final class CurioStackHandler extends ItemStackHandler {
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound compound = super.serializeNBT();
-        compound.setBoolean("Hidden", isHidden);
+        compound.putBoolean("Hidden", isHidden);
         return compound;
     }
 

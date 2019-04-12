@@ -4,7 +4,7 @@ issueTrackerURL="https://github.com/TheIllusiveC4/Curios/issues"
 logoFile="${mod_icon}"
 [[mods]]
 modId="${mod_id}"
-version="${file.jarVersion}"
+version="${version}"
 displayName="${mod_name}"
 displayURL="${mod_url}"
 authors="${mod_author}"

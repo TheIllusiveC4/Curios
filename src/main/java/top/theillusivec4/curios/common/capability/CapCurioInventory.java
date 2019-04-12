@@ -70,17 +70,17 @@ public class CapCurioInventory {
                 for (String identifier : curioMap.keySet()) {
                     CurioStackHandler stackHandler = curioMap.get(identifier);
                     NBTTagCompound itemtag = stackHandler.serializeNBT();
-                    itemtag.setString("Identifier", identifier);
+                    itemtag.putString("Identifier", identifier);
                     taglist.add(itemtag);
                 }
-                compound.setTag("Curios", taglist);
+                compound.put("Curios", taglist);
 
                 NBTTagList taglist1 = new NBTTagList();
 
                 for (String identifier : instance.getDisabled()) {
                     taglist1.add(new NBTTagString(identifier));
                 }
-                compound.setTag("Disabled", taglist1);
+                compound.put("Disabled", taglist1);
                 return compound;
             }
 

@@ -52,41 +52,41 @@ public class CommandCurios {
         literalargumentbuilder.then(Commands.literal("add")
                 .then(Commands.argument("slot", StringArgumentType.string())
                         .suggests((ctx, builder) -> ISuggestionProvider.suggest(CuriosAPI.getTypeIdentifiers(), builder))
-                        .then(Commands.argument("player", EntityArgument.singlePlayer())
-                                .executes(context -> addSlotToPlayer(context.getSource(), EntityArgument.getOnePlayer(context, "player"), StringArgumentType.getString(context, "slot"), 1))
+                        .then(Commands.argument("player", EntityArgument.player())
+                                .executes(context -> addSlotToPlayer(context.getSource(), EntityArgument.getPlayer(context, "player"), StringArgumentType.getString(context, "slot"), 1))
                                 .then(Commands.argument("amount", IntegerArgumentType.integer())
-                                        .executes(context -> addSlotToPlayer(context.getSource(), EntityArgument.getOnePlayer(context, "player"), StringArgumentType.getString(context, "slot"), IntegerArgumentType.getInteger(context, "amount")))))));
+                                        .executes(context -> addSlotToPlayer(context.getSource(), EntityArgument.getPlayer(context, "player"), StringArgumentType.getString(context, "slot"), IntegerArgumentType.getInteger(context, "amount")))))));
 
         literalargumentbuilder.then(Commands.literal("remove")
                 .then(Commands.argument("slot", StringArgumentType.string())
                         .suggests((ctx, builder) -> ISuggestionProvider.suggest(CuriosAPI.getTypeIdentifiers(), builder))
-                        .then(Commands.argument("player", EntityArgument.singlePlayer())
-                                .executes(context -> removeSlotFromPlayer(context.getSource(), EntityArgument.getOnePlayer(context, "player"), StringArgumentType.getString(context, "slot"), 1))
+                        .then(Commands.argument("player", EntityArgument.player())
+                                .executes(context -> removeSlotFromPlayer(context.getSource(), EntityArgument.getPlayer(context, "player"), StringArgumentType.getString(context, "slot"), 1))
                                 .then(Commands.argument("amount", IntegerArgumentType.integer())
-                                        .executes(context -> removeSlotFromPlayer(context.getSource(), EntityArgument.getOnePlayer(context, "player"), StringArgumentType.getString(context, "slot"), IntegerArgumentType.getInteger(context, "amount")))))));
+                                        .executes(context -> removeSlotFromPlayer(context.getSource(), EntityArgument.getPlayer(context, "player"), StringArgumentType.getString(context, "slot"), IntegerArgumentType.getInteger(context, "amount")))))));
 
         literalargumentbuilder.then(Commands.literal("enable")
                 .then(Commands.argument("slot", StringArgumentType.string())
                         .suggests((ctx, builder) -> ISuggestionProvider.suggest(CuriosAPI.getTypeIdentifiers(), builder))
-                        .then(Commands.argument("player", EntityArgument.singlePlayer())
-                                .executes(context -> enableSlotForPlayer(context.getSource(), EntityArgument.getOnePlayer(context, "player"), StringArgumentType.getString(context, "slot"))))));
+                        .then(Commands.argument("player", EntityArgument.player())
+                                .executes(context -> enableSlotForPlayer(context.getSource(), EntityArgument.getPlayer(context, "player"), StringArgumentType.getString(context, "slot"))))));
 
         literalargumentbuilder.then(Commands.literal("disable")
                 .then(Commands.argument("slot", StringArgumentType.string())
                         .suggests((ctx, builder) -> ISuggestionProvider.suggest(CuriosAPI.getTypeIdentifiers(), builder))
-                        .then(Commands.argument("player", EntityArgument.singlePlayer())
-                                .executes(context -> disableSlotForPlayer(context.getSource(), EntityArgument.getOnePlayer(context, "player"), StringArgumentType.getString(context, "slot"))))));
+                        .then(Commands.argument("player", EntityArgument.player())
+                                .executes(context -> disableSlotForPlayer(context.getSource(), EntityArgument.getPlayer(context, "player"), StringArgumentType.getString(context, "slot"))))));
 
         literalargumentbuilder.then(Commands.literal("clear")
-                .then(Commands.argument("player", EntityArgument.singlePlayer())
-                        .executes(context -> clearSlotsForPlayer(context.getSource(), EntityArgument.getOnePlayer(context, "player"), ""))
+                .then(Commands.argument("player", EntityArgument.player())
+                        .executes(context -> clearSlotsForPlayer(context.getSource(), EntityArgument.getPlayer(context, "player"), ""))
                                 .then(Commands.argument("slot", StringArgumentType.string())
                                         .suggests((ctx, builder) -> ISuggestionProvider.suggest(CuriosAPI.getTypeIdentifiers(), builder))
-                                        .executes(context -> clearSlotsForPlayer(context.getSource(), EntityArgument.getOnePlayer(context, "player"), StringArgumentType.getString(context, "slot"))))));
+                                        .executes(context -> clearSlotsForPlayer(context.getSource(), EntityArgument.getPlayer(context, "player"), StringArgumentType.getString(context, "slot"))))));
 
         literalargumentbuilder.then(Commands.literal("reset")
-                .then(Commands.argument("player", EntityArgument.singlePlayer())
-                        .executes(context -> resetSlotsForPlayer(context.getSource(), EntityArgument.getOnePlayer(context, "player")))));
+                .then(Commands.argument("player", EntityArgument.player())
+                        .executes(context -> resetSlotsForPlayer(context.getSource(), EntityArgument.getPlayer(context, "player")))));
 
         dispatcher.register(literalargumentbuilder);
     }
