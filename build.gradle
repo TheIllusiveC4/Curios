@@ -94,7 +94,12 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
 }
 
-tasks.build.dependsOn apiJar, sourcesJar
+task deobfJar(type: Jar) {
+    classifier = 'deobf'
+    from sourceSets.main.output
+}
+
+tasks.build.dependsOn apiJar, sourcesJar, deobfJar
 
 processResources {
 
@@ -118,6 +123,7 @@ curseforge {
         changelog = file('docs/CHANGELOG.md')
         addArtifact(sourcesJar)
         addArtifact(apiJar)
+        addArtifact(deobfJar)
     }
 }
 
@@ -127,8 +133,9 @@ publishing {
 
         mavenJava(MavenPublication) {
             artifactId project.archivesBaseName
-
+            
             artifact reobfArtifact
+            artifact deobfJar
             artifact sourcesJar
             artifact apiJar
         }
