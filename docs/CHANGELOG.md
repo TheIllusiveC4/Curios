@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [0.11] - 2019.04.28
+### Added
+- Slot icons for commonly used terms for potential slots
+
 ## [0.10] - 2019.04.11
 ### Added
 - [API] Curio item tag dictionary is available as a holder class to provide commonly used terms for potential slots
