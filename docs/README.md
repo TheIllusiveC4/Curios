@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    deobf 'top.theillusivec4.curios:curios:${version}'
+    compile fg.deobf("top.theillusivec4.curios:curios:${version}")
 }
 ```
 
