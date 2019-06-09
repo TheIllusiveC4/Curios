@@ -10,18 +10,19 @@ buildscript {
         classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.2.0'
     }
 }
+apply plugin: 'eclipse'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'maven-publish'
 
-version = "${version_minecraft}-${mod_version}"
+version = "${mod_version}"
 group = "${mod_group}"
 archivesBaseName = "${mod_id}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    mappings channel: 'snapshot', version: "${version_mcp}".toString()
+    mappings channel: 'snapshot', version: "${version_mcp}"
 
     runs {
         client {
