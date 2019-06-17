@@ -220,30 +220,11 @@ public class CuriosAPI {
      * @param item  The item to retrieve curio tags for
      * @return      Unmodifiable list of unique curio identifiers associated with the item
      */
-    public static ImmutableSet<String> getCurioTags(Item item) {
-
-        if (idToTag.isEmpty()) {
-            idToTag = ItemTags.getCollection().getTagMap().entrySet()
-                    .stream()
-                    .filter(map -> map.getKey().getNamespace().equals(Curios.MODID))
-                    .collect(Collectors.toMap(entry -> entry.getKey().getPath(), Map.Entry::getValue));
-            itemToTypes.clear();
-        }
-
-        if (itemToTypes.containsKey(item)) {
-            return ImmutableSet.copyOf(itemToTypes.get(item));
-        } else {
-            Set<String> tags = Sets.newHashSet();
-
-            for (String identifier : idToTag.keySet()) {
-
-                if (idToTag.get(identifier).contains(item)) {
-                    tags.add(identifier);
-                }
-            }
-            itemToTypes.put(item, tags);
-            return ImmutableSet.copyOf(tags);
-        }
+    public static Set<String> getCurioTags(Item item) {
+        return item.getTags()
+                .stream()
+                .filter(tag -> tag.getNamespace().equals(Curios.MODID))
+                .map(ResourceLocation::getPath).collect(Collectors.toSet());
     }
 
     /**
