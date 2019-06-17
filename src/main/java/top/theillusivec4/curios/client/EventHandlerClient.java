@@ -26,17 +26,16 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
@@ -77,9 +76,9 @@ public class EventHandlerClient {
                 for (String s : slots) {
                     String key = "curios.identifier." + s;
                     if (I18n.hasKey(key)) {
-                        tooltip.add(new TextComponentTranslation("curios.identifier." + s).applyTextStyle(TextFormatting.GOLD));
+                        tooltip.add(new TranslationTextComponent("curios.identifier." + s).applyTextStyle(TextFormatting.GOLD));
                     } else {
-                        tooltip.add(new TextComponentString(s.substring(0, 1).toUpperCase() + s.substring(1)).applyTextStyle(TextFormatting.GOLD));
+                        tooltip.add(new StringTextComponent(s.substring(0, 1).toUpperCase() + s.substring(1)).applyTextStyle(TextFormatting.GOLD));
                     }
                 }
                 CuriosAPI.getCurio(stack).ifPresent(curio -> {
@@ -88,9 +87,9 @@ public class EventHandlerClient {
                         Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier);
 
                         if (!multimap.isEmpty()) {
-                            EntityPlayer player = evt.getEntityPlayer();
-                            tooltip.add(new TextComponentString(""));
-                            tooltip.add(new TextComponentTranslation("curios.modifiers", identifier).applyTextStyle(TextFormatting.GOLD));
+                            PlayerEntity player = evt.getEntityPlayer();
+                            tooltip.add(new StringTextComponent(""));
+                            tooltip.add(new TranslationTextComponent("curios.modifiers", identifier).applyTextStyle(TextFormatting.GOLD));
 
                             for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
                                 AttributeModifier attributemodifier = entry.getValue();
@@ -110,19 +109,19 @@ public class EventHandlerClient {
 
                                     double d1;
 
-                                    if (attributemodifier.getOperation() != 1 && attributemodifier.getOperation() != 2) {
+                                    if (attributemodifier.getOperation().getId() != 1 && attributemodifier.getOperation().getId() != 2) {
                                         d1 = amount;
                                     } else {
                                         d1 = amount * 100.0D;
                                     }
 
                                     if (flag) {
-                                        tooltip.add((new TextComponentString(" ")).appendSibling(new TextComponentTranslation("attribute.modifier.equals." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.DARK_GREEN));
+                                        tooltip.add((new StringTextComponent(" ")).appendSibling(new TranslationTextComponent("attribute.modifier.equals." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.DARK_GREEN));
                                     } else if (amount > 0.0D) {
-                                        tooltip.add((new TextComponentTranslation("attribute.modifier.plus." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.BLUE));
+                                        tooltip.add((new TranslationTextComponent("attribute.modifier.plus." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.BLUE));
                                     } else if (amount < 0.0D) {
                                         d1 = d1 * -1.0D;
-                                        tooltip.add((new TextComponentTranslation("attribute.modifier.take." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TextComponentTranslation("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.RED));
+                                        tooltip.add((new TranslationTextComponent("attribute.modifier.take." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.RED));
                                     }
                                 }
                             }

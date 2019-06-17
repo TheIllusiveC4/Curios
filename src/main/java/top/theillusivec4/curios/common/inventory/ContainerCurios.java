@@ -24,7 +24,15 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.*;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.CraftResultInventory;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.CraftingResultSlot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -47,23 +55,23 @@ public class ContainerCurios extends Container {
                                                                     "minecraft:item/empty_armor_slot_leggings",
                                                                     "minecraft:item/empty_armor_slot_chestplate",
                                                                     "minecraft:item/empty_armor_slot_helmet"};
-    private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[] {EntityEquipmentSlot.HEAD,
-            EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
+    private static final EquipmentSlotType[] VALID_EQUIPMENT_SLOTS = new EquipmentSlotType[] {EquipmentSlotType.HEAD,
+            EquipmentSlotType.CHEST, EquipmentSlotType.LEGS, EquipmentSlotType.FEET};
 
     public final LazyOptional<ICurioItemHandler> curios;
 
-    private final EntityPlayer player;
+    private final PlayerEntity player;
     private final boolean isLocalWorld;
 
-    private InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
-    private InventoryCraftResult craftResult = new InventoryCraftResult();
+    private CraftingInventory craftMatrix = new CraftingInventory(this, 2, 2);
+    private CraftResultInventory craftResult = new CraftResultInventory();
     private int lastScrollIndex;
 
-    public ContainerCurios(InventoryPlayer playerInventory, EntityPlayer playerIn) {
+    public ContainerCurios(PlayerInventory playerInventory, PlayerEntity playerIn) {
         this.player = playerIn;
         this.isLocalWorld = playerIn.world.isRemote;
         this.curios = CuriosAPI.getCuriosHandler(playerIn);
-        this.addSlot(new SlotCrafting(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154, 28));
+        this.addSlot(new CraftingResultSlot(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154, 28));
 
         for (int i = 0; i < 2; ++i) {
 
@@ -73,7 +81,7 @@ public class ContainerCurios extends Container {
         }
 
         for (int k = 0; k < 4; ++k) {
-            final EntityEquipmentSlot entityequipmentslot = VALID_EQUIPMENT_SLOTS[k];
+            final EquipmentSlotType entityequipmentslot = VALID_EQUIPMENT_SLOTS[k];
             this.addSlot(new Slot(playerInventory, 36 + (3 - k), 8, 8 + k * 18) {
 
                 @Override
@@ -88,7 +96,7 @@ public class ContainerCurios extends Container {
                 }
 
                 @Override
-                public boolean canTakeStack(EntityPlayer playerIn) {
+                public boolean canTakeStack(PlayerEntity playerIn) {
                     ItemStack itemstack = this.getStack();
                     return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse
                             (itemstack)) && super.canTakeStack(playerIn);
@@ -148,7 +156,7 @@ public class ContainerCurios extends Container {
             int yOffset = 12;
             int index = 0;
             this.inventorySlots.subList(46, this.inventorySlots.size()).clear();
-            this.inventoryItemStacks.subList(46, this.inventoryItemStacks.size()).clear();
+//            this.inventoryItemStacks.subList(46, this.inventoryItemStacks.size()).clear();
 
             for (String identifier : curioMap.keySet()) {
                 CurioStackHandler stackHandler = curioMap.get(identifier);

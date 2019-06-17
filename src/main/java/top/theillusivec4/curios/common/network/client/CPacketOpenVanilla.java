@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.common.network.client;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -36,7 +37,7 @@ public class CPacketOpenVanilla {
     public static void handle(CPacketOpenVanilla msg, Supplier<NetworkEvent.Context> ctx) {
 
         ctx.get().enqueueWork(() -> {
-            EntityPlayerMP sender = ctx.get().getSender();
+            ServerPlayerEntity sender = ctx.get().getSender();
 
             if (sender != null) {
                 sender.closeContainer();

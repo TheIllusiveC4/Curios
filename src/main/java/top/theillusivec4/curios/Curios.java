@@ -20,19 +20,13 @@
 package top.theillusivec4.curios;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.entity.RenderPlayer;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -40,13 +34,11 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.FMLPlayMessages;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 import top.theillusivec4.curios.client.EventHandlerClient;
 import top.theillusivec4.curios.client.KeyRegistry;
-import top.theillusivec4.curios.client.gui.GuiContainerCurios;
 import top.theillusivec4.curios.client.gui.GuiEventHandler;
 import top.theillusivec4.curios.client.render.LayerCurios;
 import top.theillusivec4.curios.common.CommandCurios;
@@ -54,8 +46,6 @@ import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 import top.theillusivec4.curios.common.event.EventHandlerCurios;
-import top.theillusivec4.curios.common.inventory.ContainerCurios;
-import top.theillusivec4.curios.common.inventory.CurioContainerHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 
 import java.util.Map;
@@ -120,7 +110,7 @@ public class Curios {
             MinecraftForge.EVENT_BUS.register(new EventHandlerClient());
             MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
             MinecraftForge.EVENT_BUS.addListener(ClientProxy::onTextureStitch);
-            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> Curios.ClientProxy::getGuiContainer);
+//            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> Curios.ClientProxy::getGuiContainer);
             KeyRegistry.registerKeys();
             CuriosAPI.registerIcon("ring", new ResourceLocation(MODID, "item/empty_ring_slot"));
             CuriosAPI.registerIcon("necklace", new ResourceLocation(MODID, "item/empty_necklace_slot"));
@@ -133,32 +123,32 @@ public class Curios {
 
         @SubscribeEvent
         public static void postSetupClient(FMLLoadCompleteEvent evt) {
-            Map<String, RenderPlayer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
+            Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
 
-            for (RenderPlayer render : skinMap.values()) {
-                render.addLayer(new LayerCurios());
+            for (PlayerRenderer render : skinMap.values()) {
+                render.addLayer(new LayerCurios(render));
             }
         }
 
         public static void onTextureStitch(TextureStitchEvent.Pre evt) {
-            TextureMap map = evt.getMap();
-            IResourceManager manager = Minecraft.getInstance().getResourceManager();
-            CuriosRegistry.processIcons();
-
-            for (ResourceLocation resource : CuriosAPI.getIcons().values()) {
-                map.registerSprite(manager, resource);
-            }
-            map.registerSprite(manager, new ResourceLocation("curios:item/empty_generic_slot"));
+//            AtlasTexture map = evt.getMap();
+//            IResourceManager manager = Minecraft.getInstance().getResourceManager();
+//            CuriosRegistry.processIcons();
+//
+//            for (ResourceLocation resource : CuriosAPI.getIcons().values()) {
+//                map.registerSprite(manager, resource);
+//            }
+//            map.registerSprite(manager, new ResourceLocation("curios:item/empty_generic_slot"));
         }
 
-        private static GuiScreen getGuiContainer(FMLPlayMessages.OpenContainer msg) {
-
-            if (msg.getId().equals(CurioContainerHandler.ID)) {
-                EntityPlayerSP sp = Minecraft.getInstance().player;
-                PacketBuffer buffer = msg.getAdditionalData();
-                return new GuiContainerCurios(new ContainerCurios(sp.inventory, sp), buffer.readFloat(), buffer.readFloat());
-            }
-            return null;
-        }
+//        private static GuiScreen getGuiContainer(FMLPlayMessages.OpenContainer msg) {
+//
+//            if (msg.getId().equals(CurioContainerHandler.ID)) {
+//                EntityPlayerSP sp = Minecraft.getInstance().player;
+//                PacketBuffer buffer = msg.getAdditionalData();
+//                return new GuiContainerCurios(new ContainerCurios(sp.inventory, sp), buffer.readFloat(), buffer.readFloat());
+//            }
+//            return null;
+//        }
     }
 }

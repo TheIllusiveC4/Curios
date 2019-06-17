@@ -22,15 +22,15 @@ package top.theillusivec4.curios.common.capability;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -61,33 +61,31 @@ public class CapCurioInventory {
     public static void register() {
         CapabilityManager.INSTANCE.register(ICurioItemHandler.class, new Capability.IStorage<ICurioItemHandler>() {
             @Override
-            public INBTBase writeNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance,
-                                     EnumFacing side) {
+            public INBT writeNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, Direction side) {
                 SortedMap<String, CurioStackHandler> curioMap = instance.getCurioMap();
-                NBTTagCompound compound = new NBTTagCompound();
-                NBTTagList taglist = new NBTTagList();
+                CompoundNBT compound = new CompoundNBT();
+                ListNBT taglist = new ListNBT();
 
                 for (String identifier : curioMap.keySet()) {
                     CurioStackHandler stackHandler = curioMap.get(identifier);
-                    NBTTagCompound itemtag = stackHandler.serializeNBT();
+                    CompoundNBT itemtag = stackHandler.serializeNBT();
                     itemtag.putString("Identifier", identifier);
                     taglist.add(itemtag);
                 }
                 compound.put("Curios", taglist);
-
-                NBTTagList taglist1 = new NBTTagList();
+                ListNBT taglist1 = new ListNBT();
 
                 for (String identifier : instance.getDisabled()) {
-                    taglist1.add(new NBTTagString(identifier));
+                    taglist1.add(new StringNBT(identifier));
                 }
                 compound.put("Disabled", taglist1);
                 return compound;
             }
 
             @Override
-            public void readNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, EnumFacing side, INBTBase nbt) {
-                NBTTagList tagList = ((NBTTagCompound)nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
-                NBTTagList tagList1 = ((NBTTagCompound)nbt).getList("Disabled", Constants.NBT.TAG_STRING);
+            public void readNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, Direction side, INBT nbt) {
+                ListNBT tagList = ((CompoundNBT)nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
+                ListNBT tagList1 = ((CompoundNBT)nbt).getList("Disabled", Constants.NBT.TAG_STRING);
                 Set<String> disabled = Sets.newHashSet();
 
                 for (int k = 0; k < tagList1.size(); k++) {
@@ -99,7 +97,7 @@ public class CapCurioInventory {
                     SortedMap<String, CurioStackHandler> curios = instance.getDefaultSlots();
 
                     for (int i = 0; i < tagList.size(); i++) {
-                        NBTTagCompound itemtag = tagList.getCompound(i);
+                        CompoundNBT itemtag = tagList.getCompound(i);
                         String identifier = itemtag.getString("Identifier");
                         CurioType type = CuriosAPI.getType(identifier);
                         CurioStackHandler stackHandler = new CurioStackHandler();
@@ -124,7 +122,7 @@ public class CapCurioInventory {
         }, CurioInventoryWrapper::new);
     }
 
-    public static ICapabilityProvider createProvider(final EntityLivingBase livingBase) {
+    public static ICapabilityProvider createProvider(final LivingEntity livingBase) {
         return new Provider(livingBase);
     }
 
@@ -133,13 +131,13 @@ public class CapCurioInventory {
         SortedMap<String, CurioStackHandler> curioSlots;
         NonNullList<ItemStack> invalidCache;
         Set<String> disabled;
-        EntityLivingBase wearer;
+        LivingEntity wearer;
 
         CurioInventoryWrapper() {
             this(null);
         }
 
-        CurioInventoryWrapper(final EntityLivingBase livingBase) {
+        CurioInventoryWrapper(final LivingEntity livingBase) {
             this.disabled = Sets.newHashSet();
             this.curioSlots = this.getDefaultSlots();
             this.invalidCache = NonNullList.create();
@@ -209,9 +207,9 @@ public class CapCurioInventory {
                 this.curioSlots.putIfAbsent(identifier, new CurioStackHandler(type.getSize()));
                 this.disabled.remove(identifier);
 
-                if (!wearer.world.isRemote && wearer instanceof EntityPlayerMP) {
+                if (!wearer.world.isRemote && wearer instanceof ServerPlayerEntity) {
                     NetworkHandler.INSTANCE.sendTo(new SPacketSyncActive(wearer.getEntityId(), identifier, false),
-                            ((EntityPlayerMP)wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                            ((ServerPlayerEntity)wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                 }
             }
         }
@@ -225,9 +223,9 @@ public class CapCurioInventory {
                 this.curioSlots.remove(identifier);
                 this.disabled.add(identifier);
 
-                if (wearer instanceof EntityPlayerMP) {
+                if (wearer instanceof ServerPlayerEntity) {
                     NetworkHandler.INSTANCE.sendTo(new SPacketSyncActive(wearer.getEntityId(), identifier, true),
-                            ((EntityPlayerMP) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                            ((ServerPlayerEntity) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                 }
             }
         }
@@ -241,9 +239,9 @@ public class CapCurioInventory {
                 if (stackHandler != null) {
                     stackHandler.addSize(amount);
 
-                    if (wearer instanceof EntityPlayerMP) {
+                    if (wearer instanceof ServerPlayerEntity) {
                         NetworkHandler.INSTANCE.sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount, false),
-                                ((EntityPlayerMP) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                ((ServerPlayerEntity) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                     }
                 }
             }
@@ -259,9 +257,9 @@ public class CapCurioInventory {
                     amount = Math.min(stackHandler.getSlots() - 1, amount);
                     dropOrGiveLast(stackHandler, identifier, amount);
 
-                    if (wearer instanceof EntityPlayerMP) {
+                    if (wearer instanceof ServerPlayerEntity) {
                         NetworkHandler.INSTANCE.sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount, true),
-                                ((EntityPlayerMP) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                                ((ServerPlayerEntity) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                     }
                     stackHandler.removeSize(amount);
                 }
@@ -270,7 +268,7 @@ public class CapCurioInventory {
 
         @Nullable
         @Override
-        public EntityLivingBase getWearer() {
+        public LivingEntity getWearer() {
             return this.wearer;
         }
 
@@ -308,7 +306,7 @@ public class CapCurioInventory {
                     drops.add(stackHandler.getStackInSlot(i));
                     CuriosAPI.getCurio(stack).ifPresent(curio -> {
                         if (!stack.isEmpty()) {
-                            wearer.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier));
+                            wearer.getAttributes().removeAttributeModifiers(curio.getAttributeModifiers(identifier));
                         }
                     });
                     stackHandler.setStackInSlot(i, ItemStack.EMPTY);
@@ -319,10 +317,10 @@ public class CapCurioInventory {
 
         private void dropOrGive(NonNullList<ItemStack> drops) {
 
-            if (wearer instanceof EntityPlayer) {
+            if (wearer instanceof PlayerEntity) {
 
                 for (ItemStack drop : drops) {
-                    ItemHandlerHelper.giveItemToPlayer((EntityPlayer) wearer, drop);
+                    ItemHandlerHelper.giveItemToPlayer((PlayerEntity) wearer, drop);
                 }
             } else {
 
@@ -333,12 +331,12 @@ public class CapCurioInventory {
         }
     }
 
-    public static class Provider implements ICapabilitySerializable<INBTBase> {
+    public static class Provider implements ICapabilitySerializable<INBT> {
 
         final LazyOptional<ICurioItemHandler> optional;
         final ICurioItemHandler handler;
 
-        Provider(final EntityLivingBase livingBase) {
+        Provider(final LivingEntity livingBase) {
             this.handler = new CurioInventoryWrapper(livingBase);
             this.optional = LazyOptional.of(() -> handler);
         }
@@ -346,19 +344,19 @@ public class CapCurioInventory {
         @SuppressWarnings("ConstantConditions")
         @Nonnull
         @Override
-        public <T> LazyOptional<T> getCapability(@Nullable Capability<T> capability, EnumFacing facing) {
+        public <T> LazyOptional<T> getCapability(@Nullable Capability<T> capability, Direction facing) {
             return CuriosCapability.INVENTORY.orEmpty(capability, optional);
         }
 
         @SuppressWarnings("ConstantConditions")
         @Override
-        public INBTBase serializeNBT() {
+        public INBT serializeNBT() {
             return CuriosCapability.INVENTORY.writeNBT(handler, null);
         }
 
         @SuppressWarnings("ConstantConditions")
         @Override
-        public void deserializeNBT(INBTBase nbt) {
+        public void deserializeNBT(INBT nbt) {
             CuriosCapability.INVENTORY.readNBT(handler, null, nbt);
         }
     }

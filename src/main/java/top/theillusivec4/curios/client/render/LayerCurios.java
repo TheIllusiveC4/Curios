@@ -19,9 +19,11 @@
 
 package top.theillusivec4.curios.client.render;
 
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
@@ -30,10 +32,14 @@ import top.theillusivec4.curios.common.CuriosConfig;
 import javax.annotation.Nonnull;
 import java.util.SortedMap;
 
-public class LayerCurios implements LayerRenderer<EntityLivingBase> {
+public class LayerCurios<T extends LivingEntity, M extends EntityModel<T>> extends LayerRenderer<T, M> {
+
+    public LayerCurios(IEntityRenderer<T, M> renderer) {
+        super(renderer);
+    }
 
     @Override
-    public void render(@Nonnull EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks,
+    public void render(@Nonnull LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks,
                        float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 
         if (!CuriosConfig.CLIENT.renderCurios.get()) {

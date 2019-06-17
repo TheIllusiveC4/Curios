@@ -21,7 +21,9 @@ package top.theillusivec4.curios.common.network.server;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.common.inventory.ContainerCurios;
@@ -50,7 +52,7 @@ public class SPacketScrollCurios {
     public static void handle(SPacketScrollCurios msg, Supplier<NetworkEvent.Context> ctx) {
 
         ctx.get().enqueueWork(() -> {
-            EntityPlayerSP sp = Minecraft.getInstance().player;
+            ClientPlayerEntity sp = Minecraft.getInstance().player;
             Container container = sp.openContainer;
 
             if (container instanceof ContainerCurios && container.windowId == msg.windowId) {

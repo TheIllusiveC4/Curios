@@ -20,33 +20,31 @@
 package top.theillusivec4.curios.common.event;
 
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityTracker;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Enchantments;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ExperienceOrbEntity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumActionResult;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
@@ -65,8 +63,8 @@ public class EventHandlerCurios {
 
     @SubscribeEvent
     public void onCapabilitiesEntity(AttachCapabilitiesEvent<Entity> evt) {
-        if (evt.getObject() instanceof EntityPlayer) {
-            evt.addCapability(CuriosCapability.ID_INVENTORY, CapCurioInventory.createProvider((EntityPlayer)evt.getObject()));
+        if (evt.getObject() instanceof PlayerEntity) {
+            evt.addCapability(CuriosCapability.ID_INVENTORY, CapCurioInventory.createProvider((PlayerEntity)evt.getObject()));
         }
     }
 
@@ -74,13 +72,13 @@ public class EventHandlerCurios {
     public void onEntityJoinWorld(EntityJoinWorldEvent evt) {
         Entity entity = evt.getEntity();
 
-        if (entity instanceof EntityLivingBase) {
-            EntityLivingBase livingBase = (EntityLivingBase)evt.getEntity();
+        if (entity instanceof LivingEntity) {
+            LivingEntity livingBase = (LivingEntity)evt.getEntity();
             CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> {
                 handler.dropInvalidCache();
 
-                if (entity instanceof EntityPlayerMP) {
-                    EntityPlayerMP mp = (EntityPlayerMP)entity;
+                if (entity instanceof ServerPlayerEntity) {
+                    ServerPlayerEntity mp = (ServerPlayerEntity)entity;
                     NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()),
                             mp.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
                 }
@@ -91,18 +89,18 @@ public class EventHandlerCurios {
     @SubscribeEvent
     public void onPlayerStartTracking(PlayerEvent.StartTracking evt) {
         Entity target = evt.getTarget();
-        EntityPlayer player = evt.getEntityPlayer();
+        PlayerEntity player = evt.getEntityPlayer();
 
-        if (player instanceof EntityPlayerMP && target instanceof EntityLivingBase) {
-            EntityLivingBase livingBase = (EntityLivingBase)target;
+        if (player instanceof ServerPlayerEntity && target instanceof LivingEntity) {
+            LivingEntity livingBase = (LivingEntity) target;
             CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(livingBase.getEntityId(), handler.getCurioMap()),
-                    ((EntityPlayerMP)player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT));
+                    ((ServerPlayerEntity)player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT));
         }
     }
 
     @SubscribeEvent
     public void onPlayerClone(PlayerEvent.Clone evt) {
-        EntityPlayer player = evt.getEntityPlayer();
+        PlayerEntity player = evt.getEntityPlayer();
         if (!evt.isWasDeath() || player.world.getGameRules().getBoolean("keepInventory")) {
 
             CuriosAPI.getCuriosHandler(evt.getOriginal()).ifPresent(originalHandler ->
@@ -112,12 +110,12 @@ public class EventHandlerCurios {
     }
 
     @SubscribeEvent
-    public void onPlayerDrops(PlayerDropsEvent evt) {
-        EntityPlayer player = evt.getEntityPlayer();
+    public void onPlayerDrops(LivingDropsEvent evt) {
+        LivingEntity livingEntity = evt.getEntityLiving();
 
-        if (!player.world.getGameRules().getBoolean("keepInventory") && !player.isSpectator()) {
-            CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
-                Collection<EntityItem> entityItems = evt.getDrops();
+        if (!livingEntity.world.getGameRules().getBoolean("keepInventory") && !livingEntity.isSpectator()) {
+            CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
+                Collection<ItemEntity> entityItems = evt.getDrops();
                 SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
 
                 for (String identifier : curioMap.keySet()) {
@@ -128,7 +126,7 @@ public class EventHandlerCurios {
 
                         if (!stack.isEmpty()) {
                             if (!EnchantmentHelper.hasVanishingCurse(stack)) {
-                                entityItems.add(this.getDroppedItem(stack, player));
+                                entityItems.add(this.getDroppedItem(stack, livingEntity));
                             }
                             stacks.setStackInSlot(i, ItemStack.EMPTY);
                         }
@@ -140,7 +138,7 @@ public class EventHandlerCurios {
 
     @SubscribeEvent
     public void onPlayerXPPickUp(PlayerPickupXpEvent evt) {
-        EntityPlayer player = evt.getEntityPlayer();
+        PlayerEntity player = evt.getEntityPlayer();
 
         if (!player.world.isRemote) {
             CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
@@ -155,7 +153,7 @@ public class EventHandlerCurios {
                         if (!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0
                                 && stack.isDamaged()) {
                             evt.setCanceled(true);
-                            EntityXPOrb orb = evt.getOrb();
+                            ExperienceOrbEntity orb = evt.getOrb();
                             player.xpCooldown = 2;
                             player.onItemPickup(orb, 1);
                             int toRepair = Math.min(orb.xpValue * 2, stack.getDamage());
@@ -174,21 +172,19 @@ public class EventHandlerCurios {
         }
     }
 
-    private EntityItem getDroppedItem(ItemStack droppedItem, EntityPlayer player) {
-        double d0 = player.posY - 0.30000001192092896D + (double)player.getEyeHeight();
-        EntityItem entityitem = new EntityItem(player.world, player.posX, d0, player.posZ, droppedItem);
+    private ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
+        double d0 = livingEntity.posY - 0.30000001192092896D + (double)livingEntity.getEyeHeight();
+        ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.posX, d0, livingEntity.posZ, droppedItem);
         entityitem.setPickupDelay(40);
-        float f = player.world.rand.nextFloat() * 0.5F;
-        float f1 = player.world.rand.nextFloat() * ((float)Math.PI * 2F);
-        entityitem.motionX = (double)(-MathHelper.sin(f1) * f);
-        entityitem.motionZ = (double)(MathHelper.cos(f1) * f);
-        entityitem.motionY = 0.20000000298023224D;
+        float f = livingEntity.world.rand.nextFloat() * 0.5F;
+        float f1 = livingEntity.world.rand.nextFloat() * ((float)Math.PI * 2F);
+        entityitem.setMotion((double)(-MathHelper.sin(f1) * f), 0.20000000298023224D, (double)(MathHelper.cos(f1) * f));
         return entityitem;
     }
 
     @SubscribeEvent
     public void onCurioRightClick(PlayerInteractEvent.RightClickItem evt) {
-        EntityPlayer player = evt.getEntityPlayer();
+        PlayerEntity player = evt.getEntityPlayer();
         ItemStack stack = evt.getItemStack();
         CuriosAPI.getCurio(stack).ifPresent(curio -> {
 
@@ -212,7 +208,7 @@ public class EventHandlerCurios {
                                             stackHandler.setStackInSlot(i, stack.copy());
                                             curio.playEquipSound(player);
                                             stack.shrink(1);
-                                            evt.setCancellationResult(EnumActionResult.SUCCESS);
+                                            evt.setCancellationResult(ActionResultType.SUCCESS);
                                             evt.setCanceled(true);
                                             return;
                                         }
@@ -221,7 +217,7 @@ public class EventHandlerCurios {
                             }
                         }
                     } else {
-                        evt.setCancellationResult(EnumActionResult.SUCCESS);
+                        evt.setCancellationResult(ActionResultType.SUCCESS);
                         evt.setCanceled(true);
                     }
                 });
@@ -231,7 +227,7 @@ public class EventHandlerCurios {
 
     @SubscribeEvent
     public void onCurioTick(LivingEvent.LivingUpdateEvent evt) {
-        EntityLivingBase entitylivingbase = evt.getEntityLiving();
+        LivingEntity entitylivingbase = evt.getEntityLiving();
         CuriosAPI.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
             SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
@@ -250,52 +246,34 @@ public class EventHandlerCurios {
                         if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
                             LazyOptional<ICurio> prevCurio = CuriosAPI.getCurio(prevStack);
                             boolean shouldSync = !stack.equals(prevStack, true);
-                            NBTTagCompound syncTag = new NBTTagCompound();
+                            CompoundNBT syncTag = new CompoundNBT();
 
                             if (currentCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
                                     .orElse(false) || prevCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
                                     .orElse(false) || shouldSync) {
-                                EntityTracker tracker = ((WorldServer) entitylivingbase.world).getEntityTracker();
 
                                 if (currentCurio.isPresent()) {
                                     syncTag = currentCurio.map(ICurio::getSyncTag).orElse(syncTag);
                                 }
 
-                                for (EntityPlayer player : tracker.getTrackingPlayers(entitylivingbase)) {
-
-                                    if (player instanceof EntityPlayerMP) {
-
-                                        if (!syncTag.isEmpty()) {
-                                            NetworkHandler.INSTANCE.sendTo(new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i, stack, syncTag),
-                                                    ((EntityPlayerMP) player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
-                                        } else {
-                                            NetworkHandler.INSTANCE.sendTo(new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack),
-                                                    ((EntityPlayerMP) player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
-                                        }
-                                    }
+                                if (!syncTag.isEmpty()) {
+                                    NetworkHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
+                                            new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i, stack, syncTag));
+                                } else {
+                                    NetworkHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
+                                            new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack));
                                 }
                             }
                             MinecraftForge.EVENT_BUS.post(new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
                             prevCurio.ifPresent(curio -> {
-                                entitylivingbase.getAttributeMap().removeAttributeModifiers(curio.getAttributeModifiers(identifier));
+                                entitylivingbase.getAttributes().removeAttributeModifiers(curio.getAttributeModifiers(identifier));
                                 curio.onUnequipped(identifier, entitylivingbase);
                             });
                             currentCurio.ifPresent(curio -> {
-                                entitylivingbase.getAttributeMap().applyAttributeModifiers(curio.getAttributeModifiers(identifier));
+                                entitylivingbase.getAttributes().applyAttributeModifiers(curio.getAttributeModifiers(identifier));
                                 curio.onEquipped(identifier, entitylivingbase);
                             });
                             stackHandler.setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
-
-                            if (entitylivingbase instanceof EntityPlayerMP) {
-
-                                if (!syncTag.isEmpty()) {
-                                    NetworkHandler.INSTANCE.sendTo(new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i, stack, syncTag),
-                                            ((EntityPlayerMP) entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
-                                } else {
-                                    NetworkHandler.INSTANCE.sendTo(new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack),
-                                            ((EntityPlayerMP) entitylivingbase).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
-                                }
-                            }
                         }
                     }
                 }

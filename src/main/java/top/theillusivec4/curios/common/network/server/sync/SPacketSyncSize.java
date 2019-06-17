@@ -21,7 +21,7 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
@@ -58,8 +58,8 @@ public class SPacketSyncSize {
         ctx.get().enqueueWork(() -> {
             Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
 
-            if (entity instanceof EntityLivingBase) {
-                CuriosAPI.getCuriosHandler((EntityLivingBase) entity).ifPresent(handler -> {
+            if (entity instanceof LivingEntity) {
+                CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
 
                     if (msg.remove) {
                         handler.removeCurioSlot(msg.curioId, msg.amount);

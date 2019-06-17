@@ -21,18 +21,18 @@ package top.theillusivec4.curios.api.capability;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderLivingBase;
-import net.minecraft.client.renderer.entity.model.ModelBase;
-import net.minecraft.client.renderer.entity.model.ModelBiped;
-import net.minecraft.client.renderer.entity.model.ModelRenderer;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import top.theillusivec4.curios.api.CurioType;
 
 import javax.annotation.Nonnull;
@@ -44,21 +44,21 @@ public interface ICurio {
      * @param identifier        The {@link CurioType} identifier of the ItemStack's slot
      * @param entityLivingBase  The wearer of the ItemStack
      */
-    default void onCurioTick(String identifier, EntityLivingBase entityLivingBase) {}
+    default void onCurioTick(String identifier, LivingEntity entityLivingBase) {}
 
     /**
      * Called when the ItemStack is equipped into a slot
      * @param identifier        The {@link CurioType} identifier of the slot being equipped into
      * @param entityLivingBase  The wearer of the ItemStack
      */
-    default void onEquipped(String identifier, EntityLivingBase entityLivingBase) {}
+    default void onEquipped(String identifier, LivingEntity entityLivingBase) {}
 
     /**
      * Called when the ItemStack is unequipped from a slot
      * @param identifier        The {@link CurioType} identifier of the slot being unequipped from
      * @param entityLivingBase  The wearer of the ItemStack
      */
-    default void onUnequipped(String identifier, EntityLivingBase entityLivingBase) {}
+    default void onUnequipped(String identifier, LivingEntity entityLivingBase) {}
 
     /**
      * Determines if the ItemStack can be equipped into a slot
@@ -66,7 +66,7 @@ public interface ICurio {
      * @param entityLivingBase  The wearer of the ItemStack
      * @return  True if the ItemStack can be equipped/put in, false if not
      */
-    default boolean canEquip(String identifier, EntityLivingBase entityLivingBase) {
+    default boolean canEquip(String identifier, LivingEntity entityLivingBase) {
         return true;
     }
 
@@ -76,7 +76,7 @@ public interface ICurio {
      * @param entityLivingBase  The wearer of the ItemStack
      * @return  True if the ItemStack can be unequipped/taken out, false if not
      */
-    default boolean canUnequip(String identifier, EntityLivingBase entityLivingBase) {
+    default boolean canUnequip(String identifier, LivingEntity entityLivingBase) {
         return true;
     }
 
@@ -94,7 +94,7 @@ public interface ICurio {
      * This can be overriden to play nothing, but it is advised to always play something as an auditory feedback for players
      * @param entityLivingBase  The wearer of the ItemStack
      */
-    default void playEquipSound(EntityLivingBase entityLivingBase) {
+    default void playEquipSound(LivingEntity entityLivingBase) {
         entityLivingBase.world.playSound(null, entityLivingBase.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
                 SoundCategory.NEUTRAL, 1.0f, 1.0f);
     }
@@ -113,23 +113,23 @@ public interface ICurio {
      * @param entityLivingBase  The EntityLivingBase that is wearing the ItemStack
      * @return  True to curios the ItemStack change to all tracking clients, false to do nothing
      */
-    default boolean shouldSyncToTracking(String identifier, EntityLivingBase entityLivingBase) {
+    default boolean shouldSyncToTracking(String identifier, LivingEntity entityLivingBase) {
         return false;
     }
 
     /**
      * Gets a tag that is used to sync extra curio data from the server to the client
-     * Only used when {@link ICurio#shouldSyncToTracking(String, EntityLivingBase)} returns true
+     * Only used when {@link ICurio#shouldSyncToTracking(String, LivingEntity)} returns true
      * @return  Data to be sent to the client
      */
     @Nonnull
-    default NBTTagCompound getSyncTag() { return new NBTTagCompound(); }
+    default CompoundNBT getSyncTag() { return new CompoundNBT(); }
 
     /**
      * Used client-side to read data tags created by {@link ICurio#getSyncTag()} received from the server
      * @param compound Data received from the server
      */
-    default void readSyncTag(NBTTagCompound compound) {}
+    default void readSyncTag(CompoundNBT compound) {}
 
     /**
      * Determines if the ItemStack has rendering
@@ -137,15 +137,15 @@ public interface ICurio {
      * @param entityLivingBase  The EntityLivingBase that is wearing the ItemStack
      * @return  True if the ItemStack has rendering, false if it does not
      */
-    default boolean hasRender(String identifier, EntityLivingBase entityLivingBase) { return false; }
+    default boolean hasRender(String identifier, LivingEntity entityLivingBase) { return false; }
 
     /**
-     * Performs rendering of the ItemStack if {@link ICurio#hasRender(String, EntityLivingBase)} returns true
+     * Performs rendering of the ItemStack if {@link ICurio#hasRender(String, LivingEntity)} returns true
      * Note that vertical sneaking translations are automatically applied before this rendering method is called
      * @param identifier            The identifier of the {@link CurioType} of the slot
      * @param entitylivingbaseIn    The EntityLivingBase that is wearing the ItemStack
      */
-    default void doRender(String identifier, EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount,
+    default void doRender(String identifier, LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount,
                           float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {}
 
     /**
@@ -159,7 +159,7 @@ public interface ICurio {
          * being rendered on the body
          * @param entitylivingbaseIn    The wearer of the curio
          */
-        public static void rotateIfSneaking(final EntityLivingBase entitylivingbaseIn) {
+        public static void rotateIfSneaking(final LivingEntity entitylivingbaseIn) {
 
             if (entitylivingbaseIn.isSneaking()) {
                 GlStateManager.rotatef(90.0F / (float) Math.PI, 1.0F, 0.0F, 0.0F);
@@ -169,21 +169,21 @@ public interface ICurio {
         /**
          * Rotates the rendering for the model renderers based on the entity's head movement
          * This will align the model renderers with the movements and rotations of the head
-         * This will do nothing if the entity render object does not implement {@link RenderLivingBase} or if the model
-         * does not have a head (aka does not implement {@link ModelBiped}).
+         * This will do nothing if the entity render object does not implement {@link LivingRenderer} or if the model
+         * does not have a head (aka does not implement {@link BipedModel}).
          * @param entitylivingbaseIn    The wearer of the curio
          * @param renderers             The list of model renderers to align to the head movement
          */
-        public static void followHeadRotations(final EntityLivingBase entitylivingbaseIn, ModelRenderer... renderers) {
-            Render render = Minecraft.getInstance().getRenderManager().getEntityRenderObject(entitylivingbaseIn);
+        public static void followHeadRotations(final LivingEntity entitylivingbaseIn, RendererModel... renderers) {
+            EntityRenderer render = Minecraft.getInstance().getRenderManager().getEntityRenderObject(entitylivingbaseIn);
 
-            if (render instanceof RenderLivingBase) {
-                ModelBase model = ((RenderLivingBase) render).getMainModel();
+            if (render instanceof LivingRenderer) {
+                EntityModel model = ((LivingRenderer) render).getEntityModel();
 
-                if (model instanceof ModelBiped) {
+                if (model instanceof BipedModel) {
 
-                    for (ModelRenderer renderer : renderers) {
-                        ModelBiped.copyModelAngles(((ModelBiped) model).bipedHead, renderer);
+                    for (RendererModel renderer : renderers) {
+                        (((BipedModel) model).bipedHeadwear).func_217177_a(renderer);
                     }
                 }
             }

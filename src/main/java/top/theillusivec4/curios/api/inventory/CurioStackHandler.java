@@ -20,7 +20,7 @@
 package top.theillusivec4.curios.api.inventory;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.ItemStackHandler;
@@ -114,14 +114,14 @@ public final class CurioStackHandler extends ItemStackHandler {
     }
 
     @Override
-    public NBTTagCompound serializeNBT() {
-        NBTTagCompound compound = super.serializeNBT();
+    public CompoundNBT serializeNBT() {
+        CompoundNBT compound = super.serializeNBT();
         compound.putBoolean("Hidden", isHidden);
         return compound;
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
+    public void deserializeNBT(CompoundNBT nbt) {
         this.isHidden = nbt.contains("Hidden", Constants.NBT.TAG_BYTE) && nbt.getBoolean("Hidden");
         super.deserializeNBT(nbt);
     }

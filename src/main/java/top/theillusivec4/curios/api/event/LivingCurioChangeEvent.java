@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.api.event;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -51,7 +51,7 @@ public class LivingCurioChangeEvent extends LivingEvent {
     private final ItemStack to;
     private final int index;
 
-    public LivingCurioChangeEvent(EntityLivingBase living, String type, int index, @Nonnull ItemStack from, @Nonnull ItemStack to) {
+    public LivingCurioChangeEvent(LivingEntity living, String type, int index, @Nonnull ItemStack from, @Nonnull ItemStack to) {
         super(living);
         this.type = type;
         this.from = from;

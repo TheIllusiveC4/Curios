@@ -22,8 +22,8 @@ package top.theillusivec4.curios.common.network.server.sync;
 import com.google.common.collect.Maps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
@@ -63,7 +63,7 @@ public class SPacketSyncMap {
         for (int i = 0; i < entrySize; i++) {
             String key = buf.readString(25);
             CurioStackHandler stackHandler = new CurioStackHandler();
-            NBTTagCompound compound = buf.readCompoundTag();
+            CompoundNBT compound = buf.readCompoundTag();
 
             if (compound != null) {
                 stackHandler.deserializeNBT(compound);
@@ -78,8 +78,8 @@ public class SPacketSyncMap {
         ctx.get().enqueueWork(() -> {
             Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
 
-            if (entity instanceof EntityLivingBase) {
-                CuriosAPI.getCuriosHandler((EntityLivingBase) entity).ifPresent(handler -> handler.setCurioMap(msg.map));
+            if (entity instanceof LivingEntity) {
+                CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> handler.setCurioMap(msg.map));
             }
         });
         ctx.get().setPacketHandled(true);

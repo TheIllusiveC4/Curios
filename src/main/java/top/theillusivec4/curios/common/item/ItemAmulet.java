@@ -20,13 +20,13 @@
 package top.theillusivec4.curios.common.item;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
@@ -42,7 +42,7 @@ public class ItemAmulet extends Item implements ICurio {
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound unused) {
+    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
         return CapCurioItem.createProvider(new ICurio() {
 
             private final ResourceLocation AMULET_TEXTURE = new ResourceLocation(Curios.MODID, "textures/entity/amulet.png");
@@ -50,20 +50,20 @@ public class ItemAmulet extends Item implements ICurio {
             private Object model;
 
             @Override
-            public void onCurioTick(String identifier, EntityLivingBase entityLivingBase) {
+            public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
 
                 if (!entityLivingBase.getEntityWorld().isRemote && entityLivingBase.ticksExisted % 40 == 0) {
-                    entityLivingBase.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 80, 0, true, true));
+                    entityLivingBase.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
                 }
             }
 
             @Override
-            public boolean hasRender(String identifier, EntityLivingBase entityLivingBase) {
+            public boolean hasRender(String identifier, LivingEntity entityLivingBase) {
                 return true;
             }
 
             @Override
-            public void doRender(String identifier, EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+            public void doRender(String identifier, LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
                 Minecraft.getInstance().getTextureManager().bindTexture(AMULET_TEXTURE);
                 ICurio.RenderHelper.rotateIfSneaking(entitylivingbaseIn);
 

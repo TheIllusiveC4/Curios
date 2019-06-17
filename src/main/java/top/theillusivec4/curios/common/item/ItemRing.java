@@ -21,17 +21,17 @@ package top.theillusivec4.curios.common.item;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.init.MobEffects;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
@@ -51,18 +51,18 @@ public class ItemRing extends Item implements ICurio {
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound unused) {
+    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
         return CapCurioItem.createProvider(new ICurio() {
 
             @Override
-            public void onCurioTick(String identifier, EntityLivingBase entityLivingBase) {
+            public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
                 if (!entityLivingBase.getEntityWorld().isRemote && entityLivingBase.ticksExisted % 19 == 0) {
-                    entityLivingBase.addPotionEffect(new PotionEffect(MobEffects.HASTE, 20, 0, true, true));
+                    entityLivingBase.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));
                 }
             }
 
             @Override
-            public void playEquipSound(EntityLivingBase entityLivingBase) {
+            public void playEquipSound(LivingEntity entityLivingBase) {
                 entityLivingBase.world.playSound(null, entityLivingBase.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GOLD,
                         SoundCategory.NEUTRAL, 1.0f, 1.0f);
             }
@@ -72,8 +72,8 @@ public class ItemRing extends Item implements ICurio {
                 Multimap<String, AttributeModifier> atts = HashMultimap.create();
 
                 if (CuriosAPI.getCurioTags(stack.getItem()).contains(identifier)) {
-                    atts.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1, 2));
-                    atts.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_UUID, "Armor bonus", 2, 0));
+                    atts.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1, AttributeModifier.Operation.MULTIPLY_TOTAL));
+                    atts.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_UUID, "Armor bonus", 2, AttributeModifier.Operation.ADDITION));
                 }
                 return atts;
             }

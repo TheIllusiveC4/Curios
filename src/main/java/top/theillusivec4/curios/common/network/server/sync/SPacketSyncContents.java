@@ -21,7 +21,7 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -59,8 +59,8 @@ public class SPacketSyncContents {
         ctx.get().enqueueWork(() -> {
             Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
 
-            if (entity instanceof EntityLivingBase) {
-                CuriosAPI.getCuriosHandler((EntityLivingBase)entity).ifPresent(handler -> handler.setStackInSlot(msg.curioId, msg.slotId, msg.stack));
+            if (entity instanceof LivingEntity) {
+                CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> handler.setStackInSlot(msg.curioId, msg.slotId, msg.stack));
             }
         });
         ctx.get().setPacketHandled(true);

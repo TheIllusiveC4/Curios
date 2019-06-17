@@ -2,9 +2,9 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
@@ -17,9 +17,9 @@ public class SPacketSyncContentsWithTag {
     private int slotId;
     private String curioId;
     private ItemStack stack;
-    private NBTTagCompound compound;
+    private CompoundNBT compound;
 
-    public SPacketSyncContentsWithTag(int entityId, String curioId, int slotId, ItemStack stack, NBTTagCompound compound) {
+    public SPacketSyncContentsWithTag(int entityId, String curioId, int slotId, ItemStack stack, CompoundNBT compound) {
         this.entityId = entityId;
         this.slotId = slotId;
         this.stack = stack.copy();
@@ -45,8 +45,8 @@ public class SPacketSyncContentsWithTag {
         ctx.get().enqueueWork(() -> {
             Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
 
-            if (entity instanceof EntityLivingBase) {
-                CuriosAPI.getCuriosHandler((EntityLivingBase)entity).ifPresent(handler -> {
+            if (entity instanceof LivingEntity) {
+                CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
                     ItemStack stack = msg.stack;
                     CuriosAPI.getCurio(stack).ifPresent(curio -> curio.readSyncTag(msg.compound));
                     handler.setStackInSlot(msg.curioId, msg.slotId, stack);

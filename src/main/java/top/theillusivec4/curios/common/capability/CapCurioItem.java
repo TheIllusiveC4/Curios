@@ -19,9 +19,9 @@
 
 package top.theillusivec4.curios.common.capability;
 
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -37,12 +37,12 @@ public class CapCurioItem {
     public static void register() {
         CapabilityManager.INSTANCE.register(ICurio.class, new Capability.IStorage<ICurio>() {
             @Override
-            public INBTBase writeNBT(Capability<ICurio> capability, ICurio instance, EnumFacing side) {
-                return new NBTTagCompound();
+            public INBT writeNBT(Capability<ICurio> capability, ICurio instance, Direction side) {
+                return new CompoundNBT();
             }
 
             @Override
-            public void readNBT(Capability<ICurio> capability, ICurio instance, EnumFacing side, INBTBase nbt) {
+            public void readNBT(Capability<ICurio> capability, ICurio instance, Direction side, INBT nbt) {
 
             }
         }, CurioWrapper::new);
@@ -65,7 +65,7 @@ public class CapCurioItem {
         @SuppressWarnings("ConstantConditions")
         @Nonnull
         @Override
-        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
+        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
             return CuriosCapability.ITEM.orEmpty(cap, capability);
         }
     }

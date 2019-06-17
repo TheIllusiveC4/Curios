@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.netty.util.internal.ConcurrentSet;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.ItemTags;
@@ -58,7 +58,7 @@ public class CuriosAPI {
      * @param entityLivingBase  The ItemStack to get the curio inventory capability from
      * @return  LazyOptional of the curio inventory capability attached to the entity
      */
-    public static LazyOptional<ICurioItemHandler> getCuriosHandler(@Nonnull final EntityLivingBase entityLivingBase) {
+    public static LazyOptional<ICurioItemHandler> getCuriosHandler(@Nonnull final LivingEntity entityLivingBase) {
         return entityLivingBase.getCapability(CuriosCapability.INVENTORY);
     }
 
@@ -84,7 +84,7 @@ public class CuriosAPI {
      * of the first found ItemStack matching the parameters. Null if no matches were found.
      */
     @Nullable
-    public static FinderData getCurioEquipped(Item item, @Nonnull final EntityLivingBase entityLivingBase) {
+    public static FinderData getCurioEquipped(Item item, @Nonnull final LivingEntity entityLivingBase) {
         FinderData found = getCuriosHandler(entityLivingBase).map(handler -> {
             Set<String> tags = getCurioTags(item);
 
@@ -121,7 +121,7 @@ public class CuriosAPI {
      * of the first found ItemStack matching the parameters. Null if no matches were found.
      */
     @Nullable
-    public static FinderData getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final EntityLivingBase entityLivingBase) {
+    public static FinderData getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final LivingEntity entityLivingBase) {
         FinderData found = getCuriosHandler(entityLivingBase).map(handler -> {
 
             for (String id : handler.getCurioMap().keySet()) {
@@ -151,45 +151,45 @@ public class CuriosAPI {
     /**
      * Adds a single slot to the {@link CurioType} with the associated identifier
      * If the slot to be added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
-     * for types that are not yet available, there must first be a call to {@link CuriosAPI#enableTypeForEntity(String, EntityLivingBase)}
+     * for types that are not yet available, there must first be a call to {@link CuriosAPI#enableTypeForEntity(String, LivingEntity)}
      * @param id                The identifier of the CurioType
      * @param entityLivingBase  The holder of the slot(s)
      */
-    public static void addTypeSlotToEntity(String id, final EntityLivingBase entityLivingBase) {
+    public static void addTypeSlotToEntity(String id, final LivingEntity entityLivingBase) {
         addTypeSlotsToEntity(id, 1, entityLivingBase);
     }
 
     /**
      * Adds multiple slots to the {@link CurioType} with the associated identifier
      * If the slot to be added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
-     * for types that are not yet available, there must first be a call to {@link CuriosAPI#enableTypeForEntity(String, EntityLivingBase)}
+     * for types that are not yet available, there must first be a call to {@link CuriosAPI#enableTypeForEntity(String, LivingEntity)}
      * @param id                The identifier of the CurioType
      * @param amount            The number of slots to add
      * @param entityLivingBase  The holder of the slots
      */
-    public static void addTypeSlotsToEntity(String id, int amount, final EntityLivingBase entityLivingBase) {
+    public static void addTypeSlotsToEntity(String id, int amount, final LivingEntity entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.addCurioSlot(id, amount));
     }
 
     /**
      * Removes a single slot to the {@link CurioType} with the associated identifier
      * If the slot to be removed is the last slot available, it will not be removed. For the removal of the last slot,
-     * please see {@link CuriosAPI#disableTypeForEntity(String, EntityLivingBase)}
+     * please see {@link CuriosAPI#disableTypeForEntity(String, LivingEntity)}
      * @param id                The identifier of the CurioType
      * @param entityLivingBase  The holder of the slot(s)
      */
-    public static void removeTypeSlotFromEntity(String id, final EntityLivingBase entityLivingBase) {
+    public static void removeTypeSlotFromEntity(String id, final LivingEntity entityLivingBase) {
         removeTypeSlotsFromEntity(id, 1, entityLivingBase);
     }
 
     /**
      * Removes multiple slots to the {@link CurioType} with the associated identifier
      * If the slot to be removed is the last slot available, it will not be removed. For the removal of the last slot,
-     * please see {@link CuriosAPI#disableTypeForEntity(String, EntityLivingBase)}
+     * please see {@link CuriosAPI#disableTypeForEntity(String, LivingEntity)}
      * @param id                The identifier of the CurioType
      * @param entityLivingBase  The holder of the slot(s)
      */
-    public static void removeTypeSlotsFromEntity(String id, int amount, final EntityLivingBase entityLivingBase) {
+    public static void removeTypeSlotsFromEntity(String id, int amount, final LivingEntity entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.removeCurioSlot(id, amount));
     }
 
@@ -199,7 +199,7 @@ public class CuriosAPI {
      * @param id                The identifier of the CurioType
      * @param entityLivingBase  The holder of the slot(s)
      */
-    public static void enableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
+    public static void enableTypeForEntity(String id, final LivingEntity entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.enableCurio(id));
     }
 
@@ -208,7 +208,7 @@ public class CuriosAPI {
      * @param id                The identifier of the CurioType
      * @param entityLivingBase  The holder of the slot(s)
      */
-    public static void disableTypeForEntity(String id, final EntityLivingBase entityLivingBase) {
+    public static void disableTypeForEntity(String id, final LivingEntity entityLivingBase) {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.disableCurio(id));
     }
 

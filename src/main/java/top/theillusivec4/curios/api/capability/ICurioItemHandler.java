@@ -20,7 +20,7 @@
 package top.theillusivec4.curios.api.capability;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
@@ -99,7 +99,7 @@ public interface ICurioItemHandler {
     /**
      * @return  The wearer/owner of this handler instance
      */
-    EntityLivingBase getWearer();
+    LivingEntity getWearer();
 
     /**
      * The default curio map built from the settings found in {@link top.theillusivec4.curios.api.CuriosRegistry},

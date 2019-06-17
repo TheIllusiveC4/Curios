@@ -1,13 +1,13 @@
 package top.theillusivec4.curios.common.item;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
@@ -23,7 +23,7 @@ public class ItemCrown extends Item implements ICurio {
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound unused) {
+    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
         return CapCurioItem.createProvider(new ICurio() {
 
             private final ResourceLocation CROWN_TEXTURE = new ResourceLocation(Curios.MODID, "textures/entity/crown.png");
@@ -31,29 +31,29 @@ public class ItemCrown extends Item implements ICurio {
             private Object model;
 
             @Override
-            public void onCurioTick(String identifier, EntityLivingBase entityLivingBase) {
+            public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
 
                 if (!entityLivingBase.getEntityWorld().isRemote && entityLivingBase.ticksExisted % 20 == 0) {
-                    entityLivingBase.addPotionEffect(new PotionEffect(MobEffects.NIGHT_VISION, 300, -44, true, true));
+                    entityLivingBase.addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, -44, true, true));
                 }
             }
 
             @Override
-            public void onUnequipped(String identifier, EntityLivingBase entityLivingBase) {
-                PotionEffect effect = entityLivingBase.getActivePotionEffect(MobEffects.NIGHT_VISION);
+            public void onUnequipped(String identifier, LivingEntity entityLivingBase) {
+                EffectInstance effect = entityLivingBase.getActivePotionEffect(Effects.NIGHT_VISION);
 
                 if (effect != null && effect.getAmplifier() == -44) {
-                    entityLivingBase.removePotionEffect(MobEffects.NIGHT_VISION);
+                    entityLivingBase.removePotionEffect(Effects.NIGHT_VISION);
                 }
             }
 
             @Override
-            public boolean hasRender(String identifier, EntityLivingBase entityLivingBase) {
+            public boolean hasRender(String identifier, LivingEntity entityLivingBase) {
                 return true;
             }
 
             @Override
-            public void doRender(String identifier, EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+            public void doRender(String identifier, LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
                 Minecraft.getInstance().getTextureManager().bindTexture(CROWN_TEXTURE);
 
                 if (!(this.model instanceof ModelCrown)) {

@@ -21,7 +21,7 @@ package top.theillusivec4.curios.api.inventory;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -37,9 +37,9 @@ import java.util.Set;
 public class SlotCurio extends SlotItemHandler {
 
     private final String identifier;
-    private final EntityPlayer player;
+    private final PlayerEntity player;
 
-    public SlotCurio(EntityPlayer player, CurioStackHandler handler, int index, String identifier, int xPosition, int yPosition) {
+    public SlotCurio(PlayerEntity player, CurioStackHandler handler, int index, String identifier, int xPosition, int yPosition) {
         super(handler, index, xPosition, yPosition);
         this.identifier = identifier;
         this.player = player;
@@ -66,7 +66,7 @@ public class SlotCurio extends SlotItemHandler {
     }
 
     @Override
-    public boolean canTakeStack(EntityPlayer playerIn) {
+    public boolean canTakeStack(PlayerEntity playerIn) {
         ItemStack stack = this.getStack();
         return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
                 && CuriosAPI.getCurio(stack).map(curio -> curio.canUnequip(identifier, playerIn)).orElse(true)
