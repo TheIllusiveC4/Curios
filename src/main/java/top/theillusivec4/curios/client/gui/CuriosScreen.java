@@ -19,25 +19,24 @@
 
 package top.theillusivec4.curios.client.gui;
 
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.InventoryEffectRenderer;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.InputMappings;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.text.TranslationTextComponent;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.SlotCurio;
 import top.theillusivec4.curios.client.KeyRegistry;
-import top.theillusivec4.curios.common.inventory.ContainerCurios;
+import top.theillusivec4.curios.common.inventory.CuriosContainer;
 
-@OnlyIn(Dist.CLIENT)
-public class GuiContainerCurios extends InventoryEffectRenderer {
+public class CuriosScreen extends ContainerScreen<CuriosContainer> {
 
     static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID, "textures/gui/inventory.png");
 
@@ -51,16 +50,16 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     private boolean isScrolling;
     private boolean buttonClicked;
 
-    public GuiContainerCurios(ContainerCurios containerCurios, float oldMouseX, float oldMouseY) {
-        super(containerCurios);
-        this.allowUserInput = true;
+    public CuriosScreen(CuriosContainer curiosContainer, PlayerInventory playerInventory, float oldMouseX, float oldMouseY) {
+        super(curiosContainer, playerInventory, new TranslationTextComponent("container.curios"));
+        this.passEvents = true;
         this.oldMouseX = oldMouseX;
         this.oldMouseY = oldMouseY;
     }
 
     @Override
-    public void initGui() {
-        super.initGui();
+    public void init() {
+        super.init();
         this.widthTooNarrow = this.width < 379;
         this.guiLeft = (this.width - this.xSize) / 2;
         this.addButton(new GuiButtonCurios(this,44, this.getGuiLeft() + 26, this.height / 2 - 75,
@@ -79,8 +78,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        this.drawDefaultBackground();
-        this.hasActivePotionEffects = false;
+        this.renderBackground();
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
         oldMouseX = (float)mouseX;
@@ -91,7 +89,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
 
         if (KeyRegistry.openCurios.isActiveAndMatches(InputMappings.getInputByCode(p_keyPressed_1_, p_keyPressed_2_))) {
-            this.mc.player.closeScreen();
+            this.getMinecraft().player.closeScreen();
             return true;
         } else {
             return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
@@ -100,17 +98,16 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        this.fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
+        this.getMinecraft().fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
 
-        if (this.mc.player.inventory.getItemStack().isEmpty() && this.getSlotUnderMouse() != null) {
+        if (this.getMinecraft().player.inventory.getItemStack().isEmpty() && this.getSlotUnderMouse() != null) {
             Slot slot = this.getSlotUnderMouse();
             if (slot instanceof SlotCurio && !slot.getHasStack()) {
                 SlotCurio slotCurio = (SlotCurio)slot;
-                this.drawHoveringText(slotCurio.getSlotName(), mouseX - this.guiLeft, mouseY - this.guiTop);
+                this.renderTooltip(slotCurio.getSlotName(), mouseX - this.guiLeft, mouseY - this.guiTop);
             }
         }
     }
-
 
     /**
      * Draws the background layer of this container (behind the item).
@@ -118,24 +115,24 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(GuiInventory.INVENTORY_BACKGROUND);
+        this.getMinecraft().getTextureManager().bindTexture(INVENTORY_BACKGROUND);
         int i = this.guiLeft;
         int j = this.guiTop;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
-        GuiInventory.drawEntityOnScreen(i + 51, j + 75, 30, (float)(i + 51) - oldMouseX,
-                (float)(j + 75 - 50) - oldMouseY, this.mc.player);
-        CuriosAPI.getCuriosHandler(this.mc.player).ifPresent(handler -> {
+        this.blit(i, j, 0, 0, this.xSize, this.ySize);
+        InventoryScreen.drawEntityOnScreen(i + 51, j + 75, 30, (float)(i + 51) - oldMouseX,
+                (float)(j + 75 - 50) - oldMouseY, this.getMinecraft().player);
+        CuriosAPI.getCuriosHandler(this.getMinecraft().player).ifPresent(handler -> {
             int slotCount = handler.getSlots();
             int upperHeight = 7 + slotCount * 18;
-            this.mc.getTextureManager().bindTexture(CURIO_INVENTORY);
-            this.drawTexturedModalRect(i - 26, j + 4, 0, 0, 27, upperHeight);
+            this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
+            this.blit(i - 26, j + 4, 0, 0, 27, upperHeight);
 
             if (slotCount <= 8) {
-                this.drawTexturedModalRect(i - 26, j + 4 + upperHeight, 0, 151, 27, 7);
+                this.blit(i - 26, j + 4 + upperHeight, 0, 151, 27, 7);
             } else {
-                this.drawTexturedModalRect(i - 42, j + 4, 27, 0, 23, 158);
-                this.mc.getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
-                this.drawTexturedModalRect(i - 34, j + 12 + (int)(127f * this.currentScroll), 232, 0, 12, 15);
+                this.blit(i - 42, j + 4, 27, 0, 23, 158);
+                this.getMinecraft().getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
+                this.blit(i - 34, j + 12 + (int)(127f * this.currentScroll), 232, 0, 12, 15);
             }
         });
     }
@@ -184,7 +181,7 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
             int j = i + 112;
             this.currentScroll = ((float)pMouseDragged3 - (float)i - 7.5F) / ((float)(j - i) - 15.0F);
             this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
-            ((ContainerCurios)this.inventorySlots).scrollTo(this.currentScroll);
+            this.container.scrollTo(this.currentScroll);
             return true;
         } else {
             return super.mouseDragged(pMouseDragged1, pMouseDragged3, pMouseDragged5, pMouseDragged6, pMouseDragged8);
@@ -192,19 +189,19 @@ public class GuiContainerCurios extends InventoryEffectRenderer {
     }
 
     @Override
-    public boolean mouseScrolled(double pMouseScrolled1) {
+    public boolean mouseScrolled(double pMouseScrolled1, double pMouseScrolled3, double pMouseScrolled5) {
         if (!this.needsScrollBars()) {
             return false;
         } else {
-            int i = ((ContainerCurios)this.inventorySlots).curios.map(ICurioItemHandler::getSlots).orElse(1);
+            int i = (this.container).curios.map(ICurioItemHandler::getSlots).orElse(1);
             this.currentScroll = (float)((double)this.currentScroll - pMouseScrolled1 / (double)i);
             this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
-            ((ContainerCurios)this.inventorySlots).scrollTo(this.currentScroll);
+            this.container.scrollTo(this.currentScroll);
             return true;
         }
     }
 
     private boolean needsScrollBars() {
-        return ((ContainerCurios)this.inventorySlots).canScroll();
+        return this.container.canScroll();
     }
 }

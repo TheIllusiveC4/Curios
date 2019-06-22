@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.client.gui;
 
-import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -28,10 +28,10 @@ public class GuiEventHandler {
     @SubscribeEvent
     public void onInventoryGui(GuiScreenEvent.InitGuiEvent.Post evt) {
 
-        if (evt.getGui() instanceof GuiInventory) {
-            GuiInventory gui = (GuiInventory)evt.getGui();
-            evt.addButton(new GuiButtonCurios(gui,44, gui.getGuiLeft() + 26, gui.height / 2 - 75,
-                    14, 14, 50, 0, 14, GuiContainerCurios.CURIO_INVENTORY));
+        if (evt.getGui() instanceof InventoryScreen) {
+            InventoryScreen gui = (InventoryScreen) evt.getGui();
+            evt.addWidget(new GuiButtonCurios(gui,44, gui.getGuiLeft() + 26, gui.height / 2 - 75,
+                    14, 14, 50, 0, 14, CuriosScreen.CURIO_INVENTORY));
         }
     }
 }

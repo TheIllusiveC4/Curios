@@ -146,7 +146,7 @@ public class Curios {
 //            if (msg.getId().equals(CurioContainerHandler.ID)) {
 //                EntityPlayerSP sp = Minecraft.getInstance().player;
 //                PacketBuffer buffer = msg.getAdditionalData();
-//                return new GuiContainerCurios(new ContainerCurios(sp.inventory, sp), buffer.readFloat(), buffer.readFloat());
+//                return new CuriosScreen(new CuriosContainer(sp.inventory, sp), buffer.readFloat(), buffer.readFloat());
 //            }
 //            return null;
 //        }

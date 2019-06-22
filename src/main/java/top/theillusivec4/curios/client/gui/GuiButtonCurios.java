@@ -20,23 +20,15 @@
 package top.theillusivec4.curios.client.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.gui.recipebook.GuiRecipeBook;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
-
-import javax.annotation.Nonnull;
 
 public class GuiButtonCurios extends ImageButton {
 
@@ -45,23 +37,19 @@ public class GuiButtonCurios extends ImageButton {
 
     GuiButtonCurios(ContainerScreen parentGui, int buttonId, int xIn, int yIn, int widthIn, int heightIn, int textureOffestX,
                           int textureOffestY, int yDiffText, ResourceLocation resource) {
-        super(buttonId, xIn, yIn, widthIn, heightIn, textureOffestX, textureOffestY, yDiffText, resource, new IPressable() {
+        super(xIn, yIn, widthIn, heightIn, textureOffestX, textureOffestY, yDiffText, resource, (button) -> {
+            Minecraft mc = Minecraft.getInstance();
 
-            @Override
-            public void onPress(@Nonnull Button button) {
-                Minecraft mc = Minecraft.getInstance();
-
-                if (parentGui instanceof GuiContainerCurios) {
-                    InventoryScreen inventory = new InventoryScreen(mc.player);
-                    ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, inventory, (float)mouseX, "field_147048_u");
-                    ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, inventory, (float)mouseY, "field_147047_v");
-                    mc.displayGuiScreen(inventory);
-                    NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
-                } else {
-                    float oldMouseX = ObfuscationReflectionHelper.getPrivateValue(InventoryScreen.class, (InventoryScreen)parentGui, "field_147048_u");
-                    float oldMouseY = ObfuscationReflectionHelper.getPrivateValue(InventoryScreen.class, (InventoryScreen)parentGui, "field_147047_v");
-                    NetworkHandler.INSTANCE.sendToServer(new CPacketOpenCurios(oldMouseX, oldMouseY));
-                }
+            if (parentGui instanceof CuriosScreen) {
+                InventoryScreen inventory = new InventoryScreen(mc.player);
+//                ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, inventory, (float)mouseX, "field_147048_u");
+//                ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, inventory, (float)mouseY, "field_147047_v");
+                mc.displayGuiScreen(inventory);
+                NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
+            } else {
+//                float oldMouseX = ObfuscationReflectionHelper.getPrivateValue(InventoryScreen.class, (InventoryScreen)parentGui, "field_147048_u");
+//                float oldMouseY = ObfuscationReflectionHelper.getPrivateValue(InventoryScreen.class, (InventoryScreen)parentGui, "field_147047_v");
+                NetworkHandler.INSTANCE.sendToServer(new CPacketOpenCurios(0, 0));
             }
         });
         this.parentGui = parentGui;

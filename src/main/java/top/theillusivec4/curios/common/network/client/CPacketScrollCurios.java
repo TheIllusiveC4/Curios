@@ -19,14 +19,11 @@
 
 package top.theillusivec4.curios.common.network.client;
 
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.common.inventory.ContainerCurios;
+import top.theillusivec4.curios.common.inventory.CuriosContainer;
 
 import java.util.function.Supplier;
 
@@ -57,8 +54,8 @@ public class CPacketScrollCurios {
             if (sender != null) {
                 Container container = sender.openContainer;
 
-                if (container instanceof ContainerCurios && container.windowId == msg.windowId) {
-                    ((ContainerCurios)container).scrollToIndex(msg.index);
+                if (container instanceof CuriosContainer && container.windowId == msg.windowId) {
+                    ((CuriosContainer)container).scrollToIndex(msg.index);
                 }
             }
         });

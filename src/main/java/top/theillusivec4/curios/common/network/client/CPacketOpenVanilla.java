@@ -19,7 +19,6 @@
 
 package top.theillusivec4.curios.common.network.client;
 
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;

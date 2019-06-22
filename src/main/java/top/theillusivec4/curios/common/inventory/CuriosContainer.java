@@ -20,12 +20,10 @@
 package top.theillusivec4.curios.common.inventory;
 
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.CraftResultInventory;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -34,10 +32,15 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.CraftingResultSlot;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.ICraftingRecipe;
+import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.network.play.server.SSetSlotPacket;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
@@ -47,9 +50,10 @@ import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 import java.util.SortedMap;
 
-public class ContainerCurios extends Container {
+public class CuriosContainer extends Container {
 
     private static final String[] EMPTY_SLOT_NAMES = new String[]{  "minecraft:item/empty_armor_slot_boots",
                                                                     "minecraft:item/empty_armor_slot_leggings",
@@ -67,7 +71,8 @@ public class ContainerCurios extends Container {
     private CraftResultInventory craftResult = new CraftResultInventory();
     private int lastScrollIndex;
 
-    public ContainerCurios(PlayerInventory playerInventory, PlayerEntity playerIn) {
+    public CuriosContainer(PlayerInventory playerInventory, PlayerEntity playerIn) {
+        super(null, 0);
         this.player = playerIn;
         this.isLocalWorld = playerIn.world.isRemote;
         this.curios = CuriosAPI.getCuriosHandler(playerIn);
@@ -156,7 +161,8 @@ public class ContainerCurios extends Container {
             int yOffset = 12;
             int index = 0;
             this.inventorySlots.subList(46, this.inventorySlots.size()).clear();
-//            this.inventoryItemStacks.subList(46, this.inventoryItemStacks.size()).clear();
+            NonNullList<ItemStack> inventoryItemStacks = ObfuscationReflectionHelper.getPrivateValue(Container.class, this, "field_75153_a");
+            inventoryItemStacks.subList(46, inventoryItemStacks.size()).clear();
 
             for (String identifier : curioMap.keySet()) {
                 CurioStackHandler stackHandler = curioMap.get(identifier);
@@ -176,8 +182,8 @@ public class ContainerCurios extends Container {
             }
 
             if (!this.isLocalWorld) {
-                NetworkHandler.INSTANCE.sendTo(new SPacketScrollCurios(this.windowId, indexIn),
-                        ((EntityPlayerMP)this.player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player),
+                        new SPacketScrollCurios(this.windowId, indexIn));
             }
             lastScrollIndex = indexIn;
         });
@@ -204,11 +210,25 @@ public class ContainerCurios extends Container {
 
     @Override
     public void onCraftMatrixChanged(IInventory inventoryIn) {
-        this.slotChangedCraftingGrid(this.player.world, this.player, this.craftMatrix, this.craftResult);
+
+        if (!this.player.world.isRemote) {
+            ServerPlayerEntity playerMP = (ServerPlayerEntity)this.player;
+            ItemStack stack = ItemStack.EMPTY;
+            Optional<ICraftingRecipe> recipe = this.player.world.getServer().getRecipeManager().getRecipe(IRecipeType.CRAFTING, this.craftMatrix, this.player.world);
+
+            if (recipe.isPresent()) {
+                ICraftingRecipe craftingRecipe = recipe.get();
+                if (this.craftResult.canUseRecipe(this.player.world, playerMP, craftingRecipe)) {
+                    stack = craftingRecipe.getCraftingResult(this.craftMatrix);
+                }
+            }
+            craftResult.setInventorySlotContents(0, stack);
+            playerMP.connection.sendPacket(new SSetSlotPacket(this.windowId, 0, stack));
+        }
     }
 
     @Override
-    public void onContainerClosed(EntityPlayer playerIn) {
+    public void onContainerClosed(PlayerEntity playerIn) {
         super.onContainerClosed(playerIn);
         this.craftResult.clear();
 
@@ -228,21 +248,21 @@ public class ContainerCurios extends Container {
     }
 
     @Override
-    public boolean canInteractWith(@Nonnull EntityPlayer playerIn)
+    public boolean canInteractWith(@Nonnull PlayerEntity playerIn)
     {
         return true;
     }
 
     @Nonnull
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack()) {
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
-            EntityEquipmentSlot entityequipmentslot = EntityLiving.getSlotForItemStack(itemstack);
+            EquipmentSlotType entityequipmentslot = MobEntity.getSlotForItemStack(itemstack);
             if (index == 0) {
 
                 if (!this.mergeItemStack(itemstack1, 9, 45, true)) {
@@ -259,7 +279,7 @@ public class ContainerCurios extends Container {
                 if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR && !(this.inventorySlots.get(8 - entityequipmentslot.getIndex())).getHasStack()) {
+            } else if (entityequipmentslot.getSlotType() == EquipmentSlotType.Group.ARMOR && !(this.inventorySlots.get(8 - entityequipmentslot.getIndex())).getHasStack()) {
                 int i = 8 - entityequipmentslot.getIndex();
 
                 if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
@@ -270,7 +290,7 @@ public class ContainerCurios extends Container {
                 if (this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (entityequipmentslot == EntityEquipmentSlot.OFFHAND && !(this.inventorySlots.get(45)).getHasStack()) {
+            } else if (entityequipmentslot == EquipmentSlotType.OFFHAND && !(this.inventorySlots.get(45)).getHasStack()) {
 
                 if (!this.mergeItemStack(itemstack1, 45, 46, false)) {
                     return ItemStack.EMPTY;
