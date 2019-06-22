@@ -19,18 +19,21 @@
 
 package top.theillusivec4.curios.common;
 
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
+import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.common.inventory.CuriosContainer;
 import top.theillusivec4.curios.common.item.ItemAmulet;
 import top.theillusivec4.curios.common.item.ItemCrown;
 import top.theillusivec4.curios.common.item.ItemRing;
 
 @Mod.EventBusSubscriber(modid = Curios.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class ItemRegistry {
+public class CuriosInternalRegistry {
 
     @ObjectHolder("curios:ring")
     public static final Item RING = null;
@@ -41,8 +44,16 @@ public class ItemRegistry {
     @ObjectHolder("curios:crown")
     public static final Item CROWN = null;
 
+    @ObjectHolder("curios:curios_container")
+    public static final ContainerType<CuriosContainer> CONTAINER_TYPE = null;
+
     @SubscribeEvent
-    public static void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().registerAll(new ItemRing(), new ItemAmulet(), new ItemCrown());
+    public static void registerItems(RegistryEvent.Register<Item> evt) {
+        evt.getRegistry().registerAll(new ItemRing(), new ItemAmulet(), new ItemCrown());
+    }
+
+    @SubscribeEvent
+    public static void registerContainer(RegistryEvent.Register<ContainerType<?>> evt) {
+        evt.getRegistry().register(IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
     }
 }

@@ -20,6 +20,7 @@
 package top.theillusivec4.curios;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -39,10 +40,12 @@ import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 import top.theillusivec4.curios.client.EventHandlerClient;
 import top.theillusivec4.curios.client.KeyRegistry;
+import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.client.gui.GuiEventHandler;
 import top.theillusivec4.curios.client.render.LayerCurios;
 import top.theillusivec4.curios.common.CommandCurios;
 import top.theillusivec4.curios.common.CuriosConfig;
+import top.theillusivec4.curios.common.CuriosInternalRegistry;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 import top.theillusivec4.curios.common.event.EventHandlerCurios;
@@ -110,7 +113,7 @@ public class Curios {
             MinecraftForge.EVENT_BUS.register(new EventHandlerClient());
             MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
             MinecraftForge.EVENT_BUS.addListener(ClientProxy::onTextureStitch);
-//            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> Curios.ClientProxy::getGuiContainer);
+            ScreenManager.registerFactory(CuriosInternalRegistry.CONTAINER_TYPE, CuriosScreen::new);
             KeyRegistry.registerKeys();
             CuriosAPI.registerIcon("ring", new ResourceLocation(MODID, "item/empty_ring_slot"));
             CuriosAPI.registerIcon("necklace", new ResourceLocation(MODID, "item/empty_necklace_slot"));
@@ -133,22 +136,12 @@ public class Curios {
         public static void onTextureStitch(TextureStitchEvent.Pre evt) {
 //            AtlasTexture map = evt.getMap();
 //            IResourceManager manager = Minecraft.getInstance().getResourceManager();
-//            CuriosRegistry.processIcons();
+//            CuriosInternalRegistry.processIcons();
 //
 //            for (ResourceLocation resource : CuriosAPI.getIcons().values()) {
 //                map.registerSprite(manager, resource);
 //            }
 //            map.registerSprite(manager, new ResourceLocation("curios:item/empty_generic_slot"));
         }
-
-//        private static GuiScreen getGuiContainer(FMLPlayMessages.OpenContainer msg) {
-//
-//            if (msg.getId().equals(CurioContainerHandler.ID)) {
-//                EntityPlayerSP sp = Minecraft.getInstance().player;
-//                PacketBuffer buffer = msg.getAdditionalData();
-//                return new CuriosScreen(new CuriosContainer(sp.inventory, sp), buffer.readFloat(), buffer.readFloat());
-//            }
-//            return null;
-//        }
     }
 }

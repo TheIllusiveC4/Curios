@@ -28,6 +28,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
@@ -50,11 +51,11 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
     private boolean isScrolling;
     private boolean buttonClicked;
 
-    public CuriosScreen(CuriosContainer curiosContainer, PlayerInventory playerInventory, float oldMouseX, float oldMouseY) {
-        super(curiosContainer, playerInventory, new TranslationTextComponent("container.curios"));
+    public CuriosScreen(CuriosContainer curiosContainer, PlayerInventory playerInventory, ITextComponent title) {
+        super(curiosContainer, playerInventory, title);
         this.passEvents = true;
-        this.oldMouseX = oldMouseX;
-        this.oldMouseY = oldMouseY;
+        this.oldMouseX = 0;
+        this.oldMouseY = 0;
     }
 
     @Override

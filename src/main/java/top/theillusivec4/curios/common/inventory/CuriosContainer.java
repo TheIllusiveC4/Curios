@@ -34,6 +34,7 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ICraftingRecipe;
 import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SSetSlotPacket;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.api.distmarker.Dist;
@@ -71,11 +72,15 @@ public class CuriosContainer extends Container {
     private CraftResultInventory craftResult = new CraftResultInventory();
     private int lastScrollIndex;
 
-    public CuriosContainer(PlayerInventory playerInventory, PlayerEntity playerIn) {
-        super(null, 0);
-        this.player = playerIn;
-        this.isLocalWorld = playerIn.world.isRemote;
-        this.curios = CuriosAPI.getCuriosHandler(playerIn);
+    public CuriosContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packetBuffer) {
+        this(windowId, playerInventory);
+    }
+
+    public CuriosContainer(int windowId, PlayerInventory playerInventory) {
+        super(null, windowId);
+        this.player = playerInventory.player;
+        this.isLocalWorld = player.world.isRemote;
+        this.curios = CuriosAPI.getCuriosHandler(player);
         this.addSlot(new CraftingResultSlot(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154, 28));
 
         for (int i = 0; i < 2; ++i) {
