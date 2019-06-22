@@ -129,7 +129,7 @@ public class Curios {
             Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
 
             for (PlayerRenderer render : skinMap.values()) {
-                render.addLayer(new LayerCurios(render));
+                render.addLayer(new LayerCurios<>(render));
             }
         }
 
