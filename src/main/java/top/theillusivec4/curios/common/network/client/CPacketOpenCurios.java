@@ -23,6 +23,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkHooks;
+import top.theillusivec4.curios.common.inventory.CuriosContainerProvider;
 
 import java.util.function.Supplier;
 
@@ -51,10 +52,7 @@ public class CPacketOpenCurios {
             ServerPlayerEntity sender = ctx.get().getSender();
 
             if (sender != null) {
-//                NetworkHooks.openGui(sender, new CurioContainerHandler(), buf -> {
-//                    buf.writeFloat(msg.oldMouseX);
-//                    buf.writeFloat(msg.oldMouseY);
-//                });
+                NetworkHooks.openGui(sender, new CuriosContainerProvider());
             }
         });
     }

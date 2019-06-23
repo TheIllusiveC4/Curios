@@ -35,6 +35,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
@@ -59,7 +60,7 @@ public class EventHandlerClient {
         Minecraft mc = Minecraft.getInstance();
 
         if (KeyRegistry.openCurios.isPressed() && mc.isGameFocused()) {
-            NetworkHandler.INSTANCE.sendToServer(new CPacketOpenCurios((float)mc.mouseHelper.getMouseX(), (float)mc.mouseHelper.getMouseY()));
+            NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios((float)mc.mouseHelper.getMouseX(), (float)mc.mouseHelper.getMouseY()));
         }
     }
 

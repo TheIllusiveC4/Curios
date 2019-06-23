@@ -39,6 +39,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CurioType;
@@ -208,8 +209,8 @@ public class CapCurioInventory {
                 this.disabled.remove(identifier);
 
                 if (!wearer.world.isRemote && wearer instanceof ServerPlayerEntity) {
-                    NetworkHandler.INSTANCE.sendTo(new SPacketSyncActive(wearer.getEntityId(), identifier, false),
-                            ((ServerPlayerEntity)wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                    NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)wearer),
+                            new SPacketSyncActive(wearer.getEntityId(), identifier, false));
                 }
             }
         }
@@ -224,8 +225,8 @@ public class CapCurioInventory {
                 this.disabled.add(identifier);
 
                 if (wearer instanceof ServerPlayerEntity) {
-                    NetworkHandler.INSTANCE.sendTo(new SPacketSyncActive(wearer.getEntityId(), identifier, true),
-                            ((ServerPlayerEntity) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                    NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)wearer),
+                            new SPacketSyncActive(wearer.getEntityId(), identifier, true));
                 }
             }
         }

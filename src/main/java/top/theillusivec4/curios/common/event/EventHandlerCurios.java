@@ -79,8 +79,8 @@ public class EventHandlerCurios {
 
                 if (entity instanceof ServerPlayerEntity) {
                     ServerPlayerEntity mp = (ServerPlayerEntity)entity;
-                    NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()),
-                            mp.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+                    NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
+                            new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()));
                 }
             });
         }
@@ -93,8 +93,8 @@ public class EventHandlerCurios {
 
         if (player instanceof ServerPlayerEntity && target instanceof LivingEntity) {
             LivingEntity livingBase = (LivingEntity) target;
-            CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(livingBase.getEntityId(), handler.getCurioMap()),
-                    ((ServerPlayerEntity)player).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT));
+            CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player),
+                    new SPacketSyncMap(player.getEntityId(), handler.getCurioMap())));
         }
     }
 

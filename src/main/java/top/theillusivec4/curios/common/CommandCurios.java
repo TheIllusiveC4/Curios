@@ -33,6 +33,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
@@ -149,8 +150,8 @@ public class CommandCurios {
                 }
             }
             handler.setCurioMap(slots);
-            NetworkHandler.INSTANCE.sendTo(new SPacketSyncMap(playerMP.getEntityId(), handler.getCurioMap()),
-                    playerMP.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+            NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> playerMP),
+                    new SPacketSyncMap(playerMP.getEntityId(), handler.getCurioMap()));
         });
         source.sendFeedback(new TranslationTextComponent("commands.curios.reset.success", playerMP.getDisplayName()), true);
         return Command.SINGLE_SUCCESS;

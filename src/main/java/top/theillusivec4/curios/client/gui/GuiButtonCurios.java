@@ -26,6 +26,8 @@ import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.PacketDispatcher;
+import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
@@ -35,7 +37,7 @@ public class GuiButtonCurios extends ImageButton {
     private final ContainerScreen parentGui;
     private boolean isRecipeBookVisible = false;
 
-    GuiButtonCurios(ContainerScreen parentGui, int buttonId, int xIn, int yIn, int widthIn, int heightIn, int textureOffestX,
+    GuiButtonCurios(ContainerScreen parentGui, int xIn, int yIn, int widthIn, int heightIn, int textureOffestX,
                           int textureOffestY, int yDiffText, ResourceLocation resource) {
         super(xIn, yIn, widthIn, heightIn, textureOffestX, textureOffestY, yDiffText, resource, (button) -> {
             Minecraft mc = Minecraft.getInstance();
@@ -45,11 +47,11 @@ public class GuiButtonCurios extends ImageButton {
 //                ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, inventory, (float)mouseX, "field_147048_u");
 //                ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, inventory, (float)mouseY, "field_147047_v");
                 mc.displayGuiScreen(inventory);
-                NetworkHandler.INSTANCE.sendToServer(new CPacketOpenVanilla());
+                NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla());
             } else {
 //                float oldMouseX = ObfuscationReflectionHelper.getPrivateValue(InventoryScreen.class, (InventoryScreen)parentGui, "field_147048_u");
 //                float oldMouseY = ObfuscationReflectionHelper.getPrivateValue(InventoryScreen.class, (InventoryScreen)parentGui, "field_147047_v");
-                NetworkHandler.INSTANCE.sendToServer(new CPacketOpenCurios(0, 0));
+                NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios(0, 0));
             }
         });
         this.parentGui = parentGui;
@@ -60,11 +62,7 @@ public class GuiButtonCurios extends ImageButton {
 
         if (parentGui instanceof InventoryScreen) {
             boolean lastVisible = isRecipeBookVisible;
-            IGuiEventListener eventListener = parentGui.getFocused();
-
-            if (eventListener != null) {
-                isRecipeBookVisible = ((RecipeBookGui)eventListener).isVisible();
-            }
+            isRecipeBookVisible = ((InventoryScreen)parentGui).func_194310_f().isVisible();
 
             if (lastVisible != isRecipeBookVisible) {
                 this.setPosition(parentGui.getGuiLeft() + 125, parentGui.height / 2 - 22);

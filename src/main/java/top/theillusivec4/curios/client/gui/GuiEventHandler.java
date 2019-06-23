@@ -30,7 +30,7 @@ public class GuiEventHandler {
 
         if (evt.getGui() instanceof InventoryScreen) {
             InventoryScreen gui = (InventoryScreen) evt.getGui();
-            evt.addWidget(new GuiButtonCurios(gui,44, gui.getGuiLeft() + 26, gui.height / 2 - 75,
+            evt.addWidget(new GuiButtonCurios(gui,gui.getGuiLeft() + 26, gui.height / 2 - 75,
                     14, 14, 50, 0, 14, CuriosScreen.CURIO_INVENTORY));
         }
     }

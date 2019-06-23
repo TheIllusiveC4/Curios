@@ -63,7 +63,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
         super.init();
         this.widthTooNarrow = this.width < 379;
         this.guiLeft = (this.width - this.xSize) / 2;
-        this.addButton(new GuiButtonCurios(this,44, this.getGuiLeft() + 26, this.height / 2 - 75,
+        this.addButton(new GuiButtonCurios(this,this.getGuiLeft() + 26, this.height / 2 - 75,
                 14, 14, 50, 0, 14, CURIO_INVENTORY));
     }
 
