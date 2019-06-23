@@ -183,7 +183,7 @@ public interface ICurio {
                 if (model instanceof BipedModel) {
 
                     for (RendererModel renderer : renderers) {
-                        (((BipedModel) model).bipedHeadwear).func_217177_a(renderer);
+                        renderer.func_217177_a(((BipedModel) model).field_78116_c);
                     }
                 }
             }

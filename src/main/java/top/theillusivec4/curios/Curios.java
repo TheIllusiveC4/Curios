@@ -129,13 +129,6 @@ public class Curios {
             MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
             ScreenManager.registerFactory(CuriosInternalRegistry.CONTAINER_TYPE, CuriosScreen::new);
             KeyRegistry.registerKeys();
-//            CuriosAPI.registerIcon("ring", new ResourceLocation(MODID, "item/empty_ring_slot"));
-//            CuriosAPI.registerIcon("necklace", new ResourceLocation(MODID, "item/empty_necklace_slot"));
-//            CuriosAPI.registerIcon("body", new ResourceLocation(MODID, "item/empty_body_slot"));
-//            CuriosAPI.registerIcon("back", new ResourceLocation(MODID, "item/empty_back_slot"));
-//            CuriosAPI.registerIcon("head", new ResourceLocation(MODID, "item/empty_head_slot"));
-//            CuriosAPI.registerIcon("belt", new ResourceLocation(MODID, "item/empty_belt_slot"));
-//            CuriosAPI.registerIcon("charm", new ResourceLocation(MODID, "item/empty_charm_slot"));
         }
 
         @SubscribeEvent
