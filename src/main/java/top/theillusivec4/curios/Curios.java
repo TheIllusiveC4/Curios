@@ -23,8 +23,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -58,7 +58,7 @@ public class Curios {
 
     public static final String MODID = "curios";
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     public Curios() {
         final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -89,12 +89,17 @@ public class Curios {
 
         if (DEBUG) {
             send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("ring").setSize(10));
+            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("ring", new ResourceLocation(MODID, "item/empty_ring_slot")));
             send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("necklace"));
+            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("necklace", new ResourceLocation(MODID, "item/empty_necklace_slot")));
         }
     }
 
     private void process(InterModProcessEvent evt) {
-        CuriosRegistry.processCurioTypes(evt.getIMCStream(CuriosAPI.IMC.REGISTER_TYPE::equals), evt.getIMCStream(CuriosAPI.IMC.MODIFY_TYPE::equals));
+        CuriosRegistry.processCurioTypes(
+                evt.getIMCStream(CuriosAPI.IMC.REGISTER_TYPE::equals),
+                evt.getIMCStream(CuriosAPI.IMC.MODIFY_TYPE::equals),
+                evt.getIMCStream(CuriosAPI.IMC.REGISTER_ICON::equals));
     }
 
     private static void send(String id, Object msg) {
@@ -112,16 +117,15 @@ public class Curios {
         public static void setupClient(FMLClientSetupEvent evt) {
             MinecraftForge.EVENT_BUS.register(new EventHandlerClient());
             MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
-            MinecraftForge.EVENT_BUS.addListener(ClientProxy::onTextureStitch);
             ScreenManager.registerFactory(CuriosInternalRegistry.CONTAINER_TYPE, CuriosScreen::new);
             KeyRegistry.registerKeys();
-            CuriosAPI.registerIcon("ring", new ResourceLocation(MODID, "item/empty_ring_slot"));
-            CuriosAPI.registerIcon("necklace", new ResourceLocation(MODID, "item/empty_necklace_slot"));
-            CuriosAPI.registerIcon("body", new ResourceLocation(MODID, "item/empty_body_slot"));
-            CuriosAPI.registerIcon("back", new ResourceLocation(MODID, "item/empty_back_slot"));
-            CuriosAPI.registerIcon("head", new ResourceLocation(MODID, "item/empty_head_slot"));
-            CuriosAPI.registerIcon("belt", new ResourceLocation(MODID, "item/empty_belt_slot"));
-            CuriosAPI.registerIcon("charm", new ResourceLocation(MODID, "item/empty_charm_slot"));
+//            CuriosAPI.registerIcon("ring", new ResourceLocation(MODID, "item/empty_ring_slot"));
+//            CuriosAPI.registerIcon("necklace", new ResourceLocation(MODID, "item/empty_necklace_slot"));
+//            CuriosAPI.registerIcon("body", new ResourceLocation(MODID, "item/empty_body_slot"));
+//            CuriosAPI.registerIcon("back", new ResourceLocation(MODID, "item/empty_back_slot"));
+//            CuriosAPI.registerIcon("head", new ResourceLocation(MODID, "item/empty_head_slot"));
+//            CuriosAPI.registerIcon("belt", new ResourceLocation(MODID, "item/empty_belt_slot"));
+//            CuriosAPI.registerIcon("charm", new ResourceLocation(MODID, "item/empty_charm_slot"));
         }
 
         @SubscribeEvent
@@ -131,17 +135,6 @@ public class Curios {
             for (PlayerRenderer render : skinMap.values()) {
                 render.addLayer(new LayerCurios<>(render));
             }
-        }
-
-        public static void onTextureStitch(TextureStitchEvent.Pre evt) {
-//            AtlasTexture map = evt.getMap();
-//            IResourceManager manager = Minecraft.getInstance().getResourceManager();
-//            CuriosInternalRegistry.processIcons();
-//
-//            for (ResourceLocation resource : CuriosAPI.getIcons().values()) {
-//                map.registerSprite(manager, resource);
-//            }
-//            map.registerSprite(manager, new ResourceLocation("curios:item/empty_generic_slot"));
         }
     }
 }

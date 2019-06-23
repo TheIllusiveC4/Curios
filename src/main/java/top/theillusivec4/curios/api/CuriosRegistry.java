@@ -20,8 +20,11 @@
 package top.theillusivec4.curios.api;
 
 import io.netty.util.internal.ConcurrentSet;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.InterModComms;
+import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 
 import java.util.*;
@@ -29,13 +32,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
-public class CuriosRegistry {
+public final class CuriosRegistry {
 
     static Map<String, CurioType> idToType = new HashMap<>();
-    static ConcurrentMap<String, ConcurrentSet<ResourceLocation>> iconQueues = new ConcurrentHashMap<>();
-    static Map<String, ResourceLocation> icons = new HashMap<>();
+    static Map<String, ResourceLocation> idToIcon = new HashMap<>();
 
-    public static void processCurioTypes(Stream<InterModComms.IMCMessage> register, Stream<InterModComms.IMCMessage> modify) {
+    public static void processCurioTypes(Stream<InterModComms.IMCMessage> register, Stream<InterModComms.IMCMessage> modify,
+                                         Stream<InterModComms.IMCMessage> icons) {
         register
                 .filter(msg -> msg.getMessageSupplier().get() instanceof CurioIMCMessage)
                 .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
@@ -45,21 +48,19 @@ public class CuriosRegistry {
                 .filter(msg -> msg.getMessageSupplier().get() instanceof CurioIMCMessage)
                 .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
                 .forEach(msg -> processType(msg, false));
-    }
 
-    public static void processIcons() {
+        icons
+                .filter(msg -> {
+                    Object obj = msg.getMessageSupplier().get();
 
-        if (!icons.isEmpty()) {
-            icons = new HashMap<>();
-        }
-        iconQueues.forEach((k, v) -> {
-
-            if (!icons.containsKey(k)) {
-                List<ResourceLocation> sortedList = new ArrayList<>(v);
-                Collections.sort(sortedList);
-                icons.put(k, sortedList.get(sortedList.size() - 1));
-            }
-        });
+                    if (obj instanceof Tuple) {
+                        Tuple tup = (Tuple)obj;
+                        return tup.getA() instanceof String && tup.getB() instanceof ResourceLocation;
+                    }
+                    return false;
+                })
+                .map(msg -> (Tuple<String, ResourceLocation>) msg.getMessageSupplier().get())
+                .forEach(msg -> idToIcon.put(msg.getA(), msg.getB()));
     }
 
     private static void processType(CurioIMCMessage message, boolean create) {

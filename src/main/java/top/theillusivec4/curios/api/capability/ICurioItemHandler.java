@@ -24,6 +24,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.CuriosRegistry;
 
 import java.util.Set;
 import java.util.SortedMap;
@@ -102,7 +103,7 @@ public interface ICurioItemHandler {
     LivingEntity getWearer();
 
     /**
-     * The default curio map built from the settings found in {@link top.theillusivec4.curios.api.CuriosRegistry},
+     * The default curio map built from the settings found in {@link CuriosRegistry},
      * sorted by {@link CurioType} identifier
      * Used primarily for initializing and resetting the current curio map
      * @return  A default curio map from the registry

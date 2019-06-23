@@ -21,12 +21,9 @@ package top.theillusivec4.curios.api;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
@@ -228,19 +225,10 @@ public class CuriosAPI {
     }
 
     /**
-     * Registers a resource location to be used as the slot overlay icon in the GUI
-     * @param id                The identifier of the type of curio to be associated with the icon
-     * @param resourceLocation  The resource location of the icon
-     */
-    public static void registerIcon(String id, @Nonnull ResourceLocation resourceLocation) {
-        CuriosRegistry.iconQueues.computeIfAbsent(id, k -> new ConcurrentSet<>()).add(resourceLocation);
-    }
-
-    /**
      * @return  A map of identifiers and their registered icons
      */
     public static Map<String, ResourceLocation> getIcons() {
-        return ImmutableMap.copyOf(CuriosRegistry.icons);
+        return ImmutableMap.copyOf(CuriosRegistry.idToIcon);
     }
 
     /**
@@ -250,6 +238,7 @@ public class CuriosAPI {
 
         public static final String REGISTER_TYPE = "register_type";
         public static final String MODIFY_TYPE = "modify_type";
+        public static final String REGISTER_ICON = "register_icon";
     }
 
     public final static class FinderData {
