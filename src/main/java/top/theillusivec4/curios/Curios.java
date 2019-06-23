@@ -58,7 +58,7 @@ public class Curios {
 
     public static final String MODID = "curios";
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public Curios() {
         final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -88,10 +88,20 @@ public class Curios {
         }
 
         if (DEBUG) {
-            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("ring").setSize(10));
-            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("ring", new ResourceLocation(MODID, "item/empty_ring_slot")));
+            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("ring").setSize(2));
+            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("ring", new ResourceLocation(MODID, "textures/item/empty_ring_slot.png")));
+            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("body"));
+            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("body", new ResourceLocation(MODID, "textures/item/empty_body_slot.png")));
+            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("back"));
+            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("back", new ResourceLocation(MODID, "textures/item/empty_back_slot.png")));
+            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("head"));
+            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("head", new ResourceLocation(MODID, "textures/item/empty_head_slot.png")));
+            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("belt"));
+            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("belt", new ResourceLocation(MODID, "textures/item/empty_belt_slot.png")));
+            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("charm"));
+            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("charm", new ResourceLocation(MODID, "textures/item/empty_charm_slot.png")));
             send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("necklace"));
-            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("necklace", new ResourceLocation(MODID, "item/empty_necklace_slot")));
+            send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("necklace", new ResourceLocation(MODID, "textures/item/empty_necklace_slot.png")));
         }
     }
 

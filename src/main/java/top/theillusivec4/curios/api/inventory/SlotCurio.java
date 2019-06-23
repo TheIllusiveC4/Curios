@@ -48,7 +48,7 @@ public class SlotCurio extends SlotItemHandler {
         super(handler, index, xPosition, yPosition);
         this.identifier = identifier;
         this.player = player;
-        this.backgroundLocation = new ResourceLocation(Curios.MODID, "textures/item/empty_generic_slot.png");
+        this.backgroundLocation = CuriosAPI.getIcons().getOrDefault(identifier, GENERIC_SLOT);
 
         if (this.player.world.isRemote && sprites == null) {
             sprites = new AtlasSpriteHolder();
@@ -89,25 +89,15 @@ public class SlotCurio extends SlotItemHandler {
         return sprites != null ? sprites.getSpriteForString(this.identifier) : null;
     }
 
-    @Nullable
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public String getSlotTexture() {
-        return CuriosAPI.getIcons().getOrDefault(identifier, GENERIC_SLOT).toString();
-    }
-
     final class AtlasSpriteHolder {
 
         private final Map<String, TextureAtlasSprite> spriteMap = new HashMap<>();
 
         TextureAtlasSprite getSpriteForString(String id) {
-            return spriteMap.computeIfAbsent(id, key -> {
-                ResourceLocation rl = CuriosAPI.getIcons().getOrDefault(id, GENERIC_SLOT);
-                return new TextureAtlasSprite(rl, 16, 16) {
-                    {
-                        func_217789_a(16, 16, 0, 0);
-                    }
-                };
+            return spriteMap.computeIfAbsent(id, key -> new TextureAtlasSprite(backgroundLocation, 16, 16) {
+                {
+                    func_217789_a(16, 16, 0, 0);
+                }
             });
         }
     }
