@@ -110,19 +110,19 @@ public class EventHandlerClient {
 
                                     double d1;
 
-                                    if (attributemodifier.getOperation().getId() != 1 && attributemodifier.getOperation().getId() != 2) {
+                                    if (attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_BASE && attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_TOTAL) {
                                         d1 = amount;
                                     } else {
                                         d1 = amount * 100.0D;
                                     }
 
                                     if (flag) {
-                                        tooltip.add((new StringTextComponent(" ")).appendSibling(new TranslationTextComponent("attribute.modifier.equals." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.DARK_GREEN));
+                                        tooltip.add((new StringTextComponent(" ")).appendSibling(new TranslationTextComponent("attribute.modifier.equals." + attributemodifier.getOperation().getId(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.DARK_GREEN));
                                     } else if (amount > 0.0D) {
-                                        tooltip.add((new TranslationTextComponent("attribute.modifier.plus." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.BLUE));
+                                        tooltip.add((new TranslationTextComponent("attribute.modifier.plus." + attributemodifier.getOperation().getId(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.BLUE));
                                     } else if (amount < 0.0D) {
                                         d1 = d1 * -1.0D;
-                                        tooltip.add((new TranslationTextComponent("attribute.modifier.take." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.RED));
+                                        tooltip.add((new TranslationTextComponent("attribute.modifier.take." + attributemodifier.getOperation().getId(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.RED));
                                     }
                                 }
                             }
