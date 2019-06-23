@@ -19,17 +19,13 @@
 
 package top.theillusivec4.curios.api;
 
-import io.netty.util.internal.ConcurrentSet;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.InterModComms;
-import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public final class CuriosRegistry {
