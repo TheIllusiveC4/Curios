@@ -24,9 +24,9 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
@@ -35,7 +35,6 @@ import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -77,12 +76,12 @@ public class CuriosAPI {
      * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no matches were found.
      * @param item              The item to find
      * @param entityLivingBase  The wearer of the item to be found
-     * @return  An instance of {@link FinderData} indicating the identifier of the curio slot, slot index, and the ItemStack
+     * @return  An instance of {@link ImmutableTriple} indicating the identifier of the curio slot, slot index, and the ItemStack
      * of the first found ItemStack matching the parameters. Null if no matches were found.
      */
     @Nullable
-    public static FinderData getCurioEquipped(Item item, @Nonnull final LivingEntity entityLivingBase) {
-        FinderData found = getCuriosHandler(entityLivingBase).map(handler -> {
+    public static ImmutableTriple<String, Integer, ItemStack> getCurioEquipped(Item item, @Nonnull final LivingEntity entityLivingBase) {
+        ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(entityLivingBase).map(handler -> {
             Set<String> tags = getCurioTags(item);
 
             for (String id : tags) {
@@ -94,19 +93,14 @@ public class CuriosAPI {
                         ItemStack stack = stackHandler.getStackInSlot(i);
 
                         if (!stack.isEmpty() && item == stack.getItem()) {
-                            return new FinderData(id, i, stack);
+                            return new ImmutableTriple<>(id, i, stack);
                         }
                     }
                 }
             }
-            return new FinderData("", 0, ItemStack.EMPTY);
-        }).orElse(new FinderData("", 0, ItemStack.EMPTY));
-
-        if (!found.getIdentifier().isEmpty()) {
-            return found;
-        } else {
-            return null;
-        }
+            return new ImmutableTriple<>("", 0, ItemStack.EMPTY);
+        }).orElse(new ImmutableTriple<>("", 0, ItemStack.EMPTY));
+        return result.getLeft().isEmpty() ? null : result;
     }
 
     /**
@@ -114,12 +108,12 @@ public class CuriosAPI {
      * matches were found.
      * @param filter            The filter to test the ItemStack against
      * @param entityLivingBase  The wearer of the item to be found
-     * @return  An instance of {@link FinderData} indicating the identifier of the curio slot, slot index, and the ItemStack
+     * @return  An instance of {@link ImmutableTriple} indicating the identifier of the curio slot, slot index, and the ItemStack
      * of the first found ItemStack matching the parameters. Null if no matches were found.
      */
     @Nullable
-    public static FinderData getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final LivingEntity entityLivingBase) {
-        FinderData found = getCuriosHandler(entityLivingBase).map(handler -> {
+    public static ImmutableTriple<String, Integer, ItemStack> getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final LivingEntity entityLivingBase) {
+        ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(entityLivingBase).map(handler -> {
 
             for (String id : handler.getCurioMap().keySet()) {
                 CurioStackHandler stackHandler = handler.getStackHandler(id);
@@ -130,19 +124,15 @@ public class CuriosAPI {
                         ItemStack stack = stackHandler.getStackInSlot(i);
 
                         if (!stack.isEmpty() && filter.test(stack)) {
-                            return new FinderData(id, i, stack);
+                            return new ImmutableTriple<>(id, i, stack);
                         }
                     }
+
                 }
             }
-            return new FinderData("", 0, ItemStack.EMPTY);
-        }).orElse(new FinderData("", 0, ItemStack.EMPTY));
-
-        if (!found.getIdentifier().isEmpty()) {
-            return found;
-        } else {
-            return null;
-        }
+            return new ImmutableTriple<>("", 0, ItemStack.EMPTY);
+        }).orElse(new ImmutableTriple<>("", 0, ItemStack.EMPTY));
+        return result.getLeft().isEmpty() ? null : result;
     }
 
     /**
@@ -209,9 +199,6 @@ public class CuriosAPI {
         getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.disableCurio(id));
     }
 
-    private static Map<Item, Set<String>> itemToTypes = new HashMap<>();
-    private static Map<String, Tag<Item>> idToTag = new HashMap<>();
-
     /**
      * Retrieves a set of string identifiers from the curio tags associated with the given item
      * @param item  The item to retrieve curio tags for
@@ -239,30 +226,5 @@ public class CuriosAPI {
         public static final String REGISTER_TYPE = "register_type";
         public static final String MODIFY_TYPE = "modify_type";
         public static final String REGISTER_ICON = "register_icon";
-    }
-
-    public final static class FinderData {
-
-        String identifier;
-        int index;
-        ItemStack stack;
-
-        public FinderData(String identifier, int index, ItemStack stack) {
-            this.identifier = identifier;
-            this.index = index;
-            this.stack = stack;
-        }
-
-        public String getIdentifier() {
-            return identifier;
-        }
-
-        public int getIndex() {
-            return index;
-        }
-
-        public ItemStack getStack() {
-            return stack;
-        }
     }
 }
