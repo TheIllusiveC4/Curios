@@ -79,9 +79,9 @@ public class CuriosAPI {
      * @return  An instance of {@link ImmutableTriple} indicating the identifier of the curio slot, slot index, and the ItemStack
      * of the first found ItemStack matching the parameters. Null if no matches were found.
      */
-    @Nullable
+    @Nonnull
     public static ImmutableTriple<String, Integer, ItemStack> getCurioEquipped(Item item, @Nonnull final LivingEntity entityLivingBase) {
-        ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(entityLivingBase).map(handler -> {
+        return getCuriosHandler(entityLivingBase).map(handler -> {
             Set<String> tags = getCurioTags(item);
 
             for (String id : tags) {
@@ -100,7 +100,6 @@ public class CuriosAPI {
             }
             return new ImmutableTriple<>("", 0, ItemStack.EMPTY);
         }).orElse(new ImmutableTriple<>("", 0, ItemStack.EMPTY));
-        return result.getLeft().isEmpty() ? null : result;
     }
 
     /**
@@ -111,9 +110,9 @@ public class CuriosAPI {
      * @return  An instance of {@link ImmutableTriple} indicating the identifier of the curio slot, slot index, and the ItemStack
      * of the first found ItemStack matching the parameters. Null if no matches were found.
      */
-    @Nullable
+    @Nonnull
     public static ImmutableTriple<String, Integer, ItemStack> getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final LivingEntity entityLivingBase) {
-        ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(entityLivingBase).map(handler -> {
+        return getCuriosHandler(entityLivingBase).map(handler -> {
 
             for (String id : handler.getCurioMap().keySet()) {
                 CurioStackHandler stackHandler = handler.getStackHandler(id);
@@ -132,7 +131,6 @@ public class CuriosAPI {
             }
             return new ImmutableTriple<>("", 0, ItemStack.EMPTY);
         }).orElse(new ImmutableTriple<>("", 0, ItemStack.EMPTY));
-        return result.getLeft().isEmpty() ? null : result;
     }
 
     /**
