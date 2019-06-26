@@ -77,7 +77,7 @@ public class CuriosAPI {
      * @param item              The item to find
      * @param entityLivingBase  The wearer of the item to be found
      * @return  An instance of {@link ImmutableTriple} indicating the identifier of the curio slot, slot index, and the ItemStack
-     * of the first found ItemStack matching the parameters. Null if no matches were found.
+     * of the first found ItemStack matching the parameters. All values will be empty if no matches were found.
      */
     @Nonnull
     public static ImmutableTriple<String, Integer, ItemStack> getCurioEquipped(Item item, @Nonnull final LivingEntity entityLivingBase) {
@@ -108,7 +108,7 @@ public class CuriosAPI {
      * @param filter            The filter to test the ItemStack against
      * @param entityLivingBase  The wearer of the item to be found
      * @return  An instance of {@link ImmutableTriple} indicating the identifier of the curio slot, slot index, and the ItemStack
-     * of the first found ItemStack matching the parameters. Null if no matches were found.
+     * of the first found ItemStack matching the parameters. All values will be empty if no matches were found.
      */
     @Nonnull
     public static ImmutableTriple<String, Integer, ItemStack> getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final LivingEntity entityLivingBase) {
