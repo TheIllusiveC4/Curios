@@ -61,7 +61,7 @@ public class ItemCrown extends Item implements ICurio {
                 }
                 ModelCrown crown = (ModelCrown) this.model;
                 ICurio.RenderHelper.followHeadRotations(entitylivingbaseIn, crown.crown);
-                crown.render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+                crown.func_78088_a(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             }
         });
     }

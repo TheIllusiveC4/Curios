@@ -31,6 +31,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.GameRules;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -100,7 +101,7 @@ public class EventHandlerCurios {
     @SubscribeEvent
     public void onPlayerClone(PlayerEvent.Clone evt) {
         PlayerEntity player = evt.getEntityPlayer();
-        if (!evt.isWasDeath() || player.world.getGameRules().getBoolean("keepInventory")) {
+        if (!evt.isWasDeath() || player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
 
             CuriosAPI.getCuriosHandler(evt.getOriginal()).ifPresent(originalHandler ->
                     CuriosAPI.getCuriosHandler(player).ifPresent(newHandler ->
@@ -112,7 +113,7 @@ public class EventHandlerCurios {
     public void onPlayerDrops(LivingDropsEvent evt) {
         LivingEntity livingEntity = evt.getEntityLiving();
 
-        if (!livingEntity.world.getGameRules().getBoolean("keepInventory") && !livingEntity.isSpectator()) {
+        if (!livingEntity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) && !livingEntity.isSpectator()) {
             CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
                 Collection<ItemEntity> entityItems = evt.getDrops();
                 SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();

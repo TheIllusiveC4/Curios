@@ -175,7 +175,7 @@ public interface ICurio {
          * @param renderers             The list of model renderers to align to the head movement
          */
         public static void followHeadRotations(final LivingEntity entitylivingbaseIn, RendererModel... renderers) {
-            EntityRenderer render = Minecraft.getInstance().getRenderManager().getEntityRenderObject(entitylivingbaseIn);
+            EntityRenderer render = Minecraft.getInstance().getRenderManager().getRenderer(entitylivingbaseIn);
 
             if (render instanceof LivingRenderer) {
                 EntityModel model = ((LivingRenderer) render).getEntityModel();
@@ -183,7 +183,7 @@ public interface ICurio {
                 if (model instanceof BipedModel) {
 
                     for (RendererModel renderer : renderers) {
-                        renderer.func_217177_a(((BipedModel) model).field_78116_c);
+                        renderer.func_217177_a(((BipedModel) model).bipedHead);
                     }
                 }
             }

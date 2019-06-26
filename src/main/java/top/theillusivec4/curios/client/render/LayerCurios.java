@@ -39,7 +39,7 @@ public class LayerCurios<T extends LivingEntity, M extends EntityModel<T>> exten
     }
 
     @Override
-    public void render(@Nonnull LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks,
+    public void func_212842_a_(@Nonnull LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks,
                        float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 
         if (!CuriosConfig.CLIENT.renderCurios.get()) {
