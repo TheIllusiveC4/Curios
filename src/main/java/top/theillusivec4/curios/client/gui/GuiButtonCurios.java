@@ -41,13 +41,9 @@ public class GuiButtonCurios extends ImageButton {
 
             if (parentGui instanceof CuriosScreen) {
                 InventoryScreen inventory = new InventoryScreen(mc.player);
-//                ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, inventory, (float)mouseX, "field_147048_u");
-//                ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, inventory, (float)mouseY, "field_147047_v");
                 mc.displayGuiScreen(inventory);
                 NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla());
             } else {
-//                float oldMouseX = ObfuscationReflectionHelper.getPrivateValue(InventoryScreen.class, (InventoryScreen)parentGui, "field_147048_u");
-//                float oldMouseY = ObfuscationReflectionHelper.getPrivateValue(InventoryScreen.class, (InventoryScreen)parentGui, "field_147047_v");
                 NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios(0, 0));
             }
         });
@@ -62,7 +58,7 @@ public class GuiButtonCurios extends ImageButton {
             isRecipeBookVisible = ((InventoryScreen)parentGui).func_194310_f().isVisible();
 
             if (lastVisible != isRecipeBookVisible) {
-                this.setPosition(parentGui.getGuiLeft() + 125, parentGui.height / 2 - 22);
+                this.setPosition(parentGui.getGuiLeft() + 26, parentGui.height / 2 - 75);
             }
         }
         super.render(mouseX, mouseY, partialTicks);
