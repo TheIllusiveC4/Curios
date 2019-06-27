@@ -42,7 +42,6 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
-import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
@@ -100,11 +99,10 @@ public class CapCurioInventory {
                     for (int i = 0; i < tagList.size(); i++) {
                         CompoundNBT itemtag = tagList.getCompound(i);
                         String identifier = itemtag.getString("Identifier");
-                        CurioType type = CuriosAPI.getType(identifier);
                         CurioStackHandler stackHandler = new CurioStackHandler();
                         stackHandler.deserializeNBT(itemtag);
 
-                        if (type != null) {
+                        if (CuriosAPI.getType(identifier).isPresent()) {
                             curios.put(identifier, stackHandler);
                         } else {
 
@@ -157,13 +155,14 @@ public class CapCurioInventory {
             for (String id : CuriosAPI.getTypeIdentifiers()) {
 
                 if (disabled.isEmpty() || !disabled.contains(id)) {
-                    CurioType type = CuriosAPI.getType(id);
+                    CuriosAPI.getType(id).ifPresent(type ->  {
 
-                    if (type != null && type.isEnabled()) {
-                        CurioStackHandler handler = new CurioStackHandler(type.getSize());
-                        handler.setHidden(type.isHidden());
-                        slots.put(id, handler);
-                    }
+                        if (type.isEnabled()) {
+                            CurioStackHandler handler = new CurioStackHandler(type.getSize());
+                            handler.setHidden(type.isHidden());
+                            slots.put(id, handler);
+                        }
+                    });
                 }
             }
             return slots;
@@ -202,9 +201,8 @@ public class CapCurioInventory {
 
         @Override
         public void enableCurio(String identifier) {
-            CurioType type = CuriosAPI.getType(identifier);
 
-            if (type != null) {
+            CuriosAPI.getType(identifier).ifPresent(type -> {
                 this.curioSlots.putIfAbsent(identifier, new CurioStackHandler(type.getSize()));
                 this.disabled.remove(identifier);
 
@@ -212,7 +210,7 @@ public class CapCurioInventory {
                     NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)wearer),
                             new SPacketSyncActive(wearer.getEntityId(), identifier, false));
                 }
-            }
+            });
         }
 
         @Override

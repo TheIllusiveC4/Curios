@@ -19,8 +19,6 @@
 
 package top.theillusivec4.curios.api;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -34,13 +32,14 @@ import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class CuriosAPI {
+public final class CuriosAPI {
 
     /**
      * @param stack The ItemStack to get the curio capability from
@@ -60,17 +59,16 @@ public class CuriosAPI {
 
     /**
      * @param identifier    The unique identifier for the {@link CurioType}
-     * @return  The CurioType from the given identifier
+     * @return  Optional wrapper of the CurioType from the given identifier, or Optional.empty() if not present.
      */
-    @Nullable
-    public static CurioType getType(String identifier) {
-        return CuriosRegistry.idToType.get(identifier);
+    public static Optional<CurioType> getType(String identifier) {
+        return Optional.ofNullable(CuriosRegistry.idToType.get(identifier));
     }
 
     /**
      * @return  An unmodifiable list of all unique registered identifiers
      */
-    public static ImmutableSet<String> getTypeIdentifiers() { return ImmutableSet.copyOf(CuriosRegistry.idToType.keySet()); }
+    public static Set<String> getTypeIdentifiers() { return Collections.unmodifiableSet(CuriosRegistry.idToType.keySet()); }
 
     /**
      * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no matches were found.
@@ -79,9 +77,8 @@ public class CuriosAPI {
      * @return  An instance of {@link ImmutableTriple} indicating the identifier of the curio slot, slot index, and the ItemStack
      * of the first found ItemStack matching the parameters. All values will be empty if no matches were found.
      */
-    @Nonnull
-    public static ImmutableTriple<String, Integer, ItemStack> getCurioEquipped(Item item, @Nonnull final LivingEntity entityLivingBase) {
-        return getCuriosHandler(entityLivingBase).map(handler -> {
+    public static Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(Item item, @Nonnull final LivingEntity entityLivingBase) {
+        ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(entityLivingBase).map(handler -> {
             Set<String> tags = getCurioTags(item);
 
             for (String id : tags) {
@@ -100,6 +97,7 @@ public class CuriosAPI {
             }
             return new ImmutableTriple<>("", 0, ItemStack.EMPTY);
         }).orElse(new ImmutableTriple<>("", 0, ItemStack.EMPTY));
+        return result.getLeft().isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
     /**
@@ -111,8 +109,8 @@ public class CuriosAPI {
      * of the first found ItemStack matching the parameters. All values will be empty if no matches were found.
      */
     @Nonnull
-    public static ImmutableTriple<String, Integer, ItemStack> getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final LivingEntity entityLivingBase) {
-        return getCuriosHandler(entityLivingBase).map(handler -> {
+    public static Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(Predicate<ItemStack> filter, @Nonnull final LivingEntity entityLivingBase) {
+        ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(entityLivingBase).map(handler -> {
 
             for (String id : handler.getCurioMap().keySet()) {
                 CurioStackHandler stackHandler = handler.getStackHandler(id);
@@ -131,6 +129,7 @@ public class CuriosAPI {
             }
             return new ImmutableTriple<>("", 0, ItemStack.EMPTY);
         }).orElse(new ImmutableTriple<>("", 0, ItemStack.EMPTY));
+        return result.getLeft().isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
     /**
@@ -210,10 +209,10 @@ public class CuriosAPI {
     }
 
     /**
-     * @return  A map of identifiers and their registered icons
+     * @return  An unmodifiable map of identifiers and their registered icons
      */
     public static Map<String, ResourceLocation> getIcons() {
-        return ImmutableMap.copyOf(CuriosRegistry.idToIcon);
+        return Collections.unmodifiableMap(CuriosRegistry.idToIcon);
     }
 
     /**
