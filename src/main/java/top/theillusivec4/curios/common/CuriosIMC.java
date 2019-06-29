@@ -17,21 +17,18 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.api;
+package top.theillusivec4.curios.common;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.InterModComms;
+import top.theillusivec4.curios.api.CurioType;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
-public final class CuriosRegistry {
-
-    static Map<String, CurioType> idToType = new HashMap<>();
-    static Map<String, ResourceLocation> idToIcon = new HashMap<>();
+public class CuriosIMC {
 
     public static void processCurioTypes(Stream<InterModComms.IMCMessage> register, Stream<InterModComms.IMCMessage> modify,
                                          Stream<InterModComms.IMCMessage> icons) {
@@ -56,14 +53,14 @@ public final class CuriosRegistry {
                     return false;
                 })
                 .map(msg -> (Tuple<String, ResourceLocation>) msg.getMessageSupplier().get())
-                .forEach(msg -> idToIcon.put(msg.getA(), msg.getB()));
+                .forEach(msg -> CuriosAPI.idToIcon.put(msg.getA(), msg.getB()));
     }
 
     private static void processType(CurioIMCMessage message, boolean create) {
         String identifier = message.getIdentifier();
 
-        if (idToType.containsKey(identifier)) {
-            CurioType presentType = idToType.get(identifier);
+        if (CuriosAPI.idToType.containsKey(identifier)) {
+            CurioType presentType = CuriosAPI.idToType.get(identifier);
 
             if (message.getSize() > presentType.getSize()) {
                 presentType.defaultSize(message.getSize());
@@ -78,7 +75,7 @@ public final class CuriosRegistry {
             }
 
         } else if (create) {
-            idToType.put(identifier, new CurioType(identifier)
+            CuriosAPI.idToType.put(identifier, new CurioType(identifier)
                     .defaultSize(message.getSize())
                     .enabled(message.isEnabled())
                     .hide(message.isHidden()));

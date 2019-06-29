@@ -27,7 +27,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 
-public final class CurioStackHandler extends ItemStackHandler {
+public class CurioStackHandler extends ItemStackHandler {
 
     protected NonNullList<ItemStack> previousStacks;
     protected boolean isHidden = false;

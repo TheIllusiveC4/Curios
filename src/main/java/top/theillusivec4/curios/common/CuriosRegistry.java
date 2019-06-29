@@ -33,7 +33,7 @@ import top.theillusivec4.curios.common.item.ItemCrown;
 import top.theillusivec4.curios.common.item.ItemRing;
 
 @Mod.EventBusSubscriber(modid = Curios.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class CuriosInternalRegistry {
+public class CuriosRegistry {
 
     @ObjectHolder("curios:ring")
     public static final Item RING = null;

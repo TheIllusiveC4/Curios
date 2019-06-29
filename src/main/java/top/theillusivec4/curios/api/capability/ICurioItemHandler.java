@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.CurioType;
-import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
 import java.util.Set;

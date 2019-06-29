@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.api.imc;
 
-public class CurioIMCMessage {
+public final class CurioIMCMessage {
 
     private final String identifier;
     private int size = 1;

@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.api;
 
-public class CurioType {
+public final class CurioType {
 
     private final String identifier;
     /** The default number of slots*/

@@ -36,7 +36,6 @@ import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 import top.theillusivec4.curios.client.EventHandlerClient;
 import top.theillusivec4.curios.client.KeyRegistry;
@@ -45,7 +44,8 @@ import top.theillusivec4.curios.client.gui.GuiEventHandler;
 import top.theillusivec4.curios.client.render.LayerCurios;
 import top.theillusivec4.curios.common.CommandCurios;
 import top.theillusivec4.curios.common.CuriosConfig;
-import top.theillusivec4.curios.common.CuriosInternalRegistry;
+import top.theillusivec4.curios.common.CuriosIMC;
+import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 import top.theillusivec4.curios.common.event.EventHandlerCurios;
@@ -106,7 +106,7 @@ public class Curios {
     }
 
     private void process(InterModProcessEvent evt) {
-        CuriosRegistry.processCurioTypes(
+        CuriosIMC.processCurioTypes(
                 evt.getIMCStream(CuriosAPI.IMC.REGISTER_TYPE::equals),
                 evt.getIMCStream(CuriosAPI.IMC.MODIFY_TYPE::equals),
                 evt.getIMCStream(CuriosAPI.IMC.REGISTER_ICON::equals));
@@ -127,7 +127,7 @@ public class Curios {
         public static void setupClient(FMLClientSetupEvent evt) {
             MinecraftForge.EVENT_BUS.register(new EventHandlerClient());
             MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
-            ScreenManager.registerFactory(CuriosInternalRegistry.CONTAINER_TYPE, CuriosScreen::new);
+            ScreenManager.registerFactory(CuriosRegistry.CONTAINER_TYPE, CuriosScreen::new);
             KeyRegistry.registerKeys();
         }
 

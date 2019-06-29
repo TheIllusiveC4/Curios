@@ -34,7 +34,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
-import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -140,14 +139,7 @@ public class CommandCurios {
     private static int resetSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP) {
         CuriosAPI.getCuriosHandler(playerMP).ifPresent(handler -> {
             SortedMap<String, CurioStackHandler> slots = Maps.newTreeMap();
-
-            for (String id : CuriosAPI.getTypeIdentifiers()) {
-                CurioType type = CuriosAPI.getType(id);
-
-                if (type != null && type.isEnabled()) {
-                    slots.put(id, new CurioStackHandler(type.getSize()));
-                }
-            }
+            CuriosAPI.getTypeIdentifiers().forEach(id -> CuriosAPI.getType(id).ifPresent(type -> slots.put(id, new CurioStackHandler(type.getSize()))));
             handler.setCurioMap(slots);
             NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> playerMP),
                     new SPacketSyncMap(playerMP.getEntityId(), handler.getCurioMap()));

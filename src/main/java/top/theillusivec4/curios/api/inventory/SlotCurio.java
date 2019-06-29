@@ -24,11 +24,9 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.SlotItemHandler;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 
 import javax.annotation.Nonnull;
@@ -40,7 +38,6 @@ import java.util.Set;
 public class SlotCurio extends SlotItemHandler {
 
     private static AtlasSpriteHolder sprites;
-    private static final ResourceLocation GENERIC_SLOT = new ResourceLocation(Curios.MODID, "textures/item/empty_generic_slot.png");
     private final String identifier;
     private final PlayerEntity player;
 
@@ -48,7 +45,7 @@ public class SlotCurio extends SlotItemHandler {
         super(handler, index, xPosition, yPosition);
         this.identifier = identifier;
         this.player = player;
-        this.backgroundLocation = CuriosAPI.getIcons().getOrDefault(identifier, GENERIC_SLOT);
+        this.backgroundLocation = CuriosAPI.getIcon(identifier);
 
         if (this.player.world.isRemote && sprites == null) {
             sprites = new AtlasSpriteHolder();

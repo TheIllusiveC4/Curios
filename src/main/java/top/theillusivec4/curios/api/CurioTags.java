@@ -29,7 +29,7 @@ import top.theillusivec4.curios.Curios;
  * A reference class for storing a list of commonly used tags to avoid modders implementing duplicate slots
  * If there is a tag that is commonly used that isn't already in this list, please submit a PR or issue ticket on GitHub
  */
-public class CurioTags {
+public final class CurioTags {
 
     /**
      * Used for capes, backpacks, or anything worn on the back.

@@ -46,7 +46,7 @@ import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.api.inventory.SlotCurio;
-import top.theillusivec4.curios.common.CuriosInternalRegistry;
+import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
@@ -78,7 +78,7 @@ public class CuriosContainer extends Container {
     }
 
     public CuriosContainer(int windowId, PlayerInventory playerInventory) {
-        super(CuriosInternalRegistry.CONTAINER_TYPE, windowId);
+        super(CuriosRegistry.CONTAINER_TYPE, windowId);
         this.player = playerInventory.player;
         this.isLocalWorld = player.world.isRemote;
         this.curios = CuriosAPI.getCuriosHandler(player);

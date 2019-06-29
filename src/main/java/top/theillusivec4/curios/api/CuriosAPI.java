@@ -32,10 +32,7 @@ import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -62,13 +59,13 @@ public final class CuriosAPI {
      * @return  Optional wrapper of the CurioType from the given identifier, or Optional.empty() if not present.
      */
     public static Optional<CurioType> getType(String identifier) {
-        return Optional.ofNullable(CuriosRegistry.idToType.get(identifier));
+        return Optional.ofNullable(idToType.get(identifier));
     }
 
     /**
      * @return  An unmodifiable list of all unique registered identifiers
      */
-    public static Set<String> getTypeIdentifiers() { return Collections.unmodifiableSet(CuriosRegistry.idToType.keySet()); }
+    public static Set<String> getTypeIdentifiers() { return Collections.unmodifiableSet(idToType.keySet()); }
 
     /**
      * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no matches were found.
@@ -208,12 +205,23 @@ public final class CuriosAPI {
                 .map(ResourceLocation::getPath).collect(Collectors.toSet());
     }
 
+    private static final ResourceLocation GENERIC_SLOT = new ResourceLocation(Curios.MODID, "textures/item/empty_generic_slot.png");
+
     /**
      * @return  An unmodifiable map of identifiers and their registered icons
      */
-    public static Map<String, ResourceLocation> getIcons() {
-        return Collections.unmodifiableMap(CuriosRegistry.idToIcon);
+    @Nonnull
+    public static ResourceLocation getIcon(String identifier) {
+        return idToIcon.getOrDefault(identifier, GENERIC_SLOT);
     }
+
+    /**
+     * The maps containing the CurioType and icons with identifiers as keys
+     * Try not to access these directly and instead use {@link CuriosAPI#getType(String)} and {@link CuriosAPI#getIcon(String)}
+     * DO NOT REGISTER DIRECTLY - Use IMC to send the appropriate {@link top.theillusivec4.curios.api.imc.CurioIMCMessage}
+     */
+    public static Map<String, CurioType> idToType = new HashMap<>();
+    public static Map<String, ResourceLocation> idToIcon = new HashMap<>();
 
     /**
      * Holder class for IMC message identifiers
