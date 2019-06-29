@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [0.13] - 2019.06.28
+### Changed
+- Ported to 1.14.3 Forge
+- [API] CuriosAPI#getType now returns an Optional value
+- [API] CuriosAPI#getCurioEquipped methods each now return an Optional ImmutableTriple
+- [API] Moved IMC processing out of the API
+### Removed
+- [API] CuriosAPI#registerIcon has been removed and replaced with IMC processing
+- [API] CuriosAPI#getIcons has been removed and replaced with CuriosAPI#getIcon(String)
+- [API] CuriosAPI.FinderData class and usages have been removed and replaced with ImmutableTriple
+
+## [0.12] - 2019.06.08
+### Changed
+- Updated to last 1.13.2 Forge and mappings
+
 ## [0.11] - 2019.04.28
 ### Added
 - Slot icons for commonly used terms for potential slots
