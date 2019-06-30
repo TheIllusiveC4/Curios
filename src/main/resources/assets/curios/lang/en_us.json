@@ -14,6 +14,10 @@
   "curios.identifier.necklace": "Necklace",
   "curios.identifier.ring": "Ring",
   "curios.identifier.head": "Head",
+  "curios.identifier.back": "Back",
+  "curios.identifier.belt": "Belt",
+  "curios.identifier.body": "Body",
+  "curios.identifier.charm": "Charm",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Open/Close Curios Inventory"
 }
