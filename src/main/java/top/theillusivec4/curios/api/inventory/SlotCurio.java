@@ -54,11 +54,7 @@ public class SlotCurio extends SlotItemHandler {
 
     @OnlyIn(Dist.CLIENT)
     public String getSlotName() {
-        String key = "curios.identifier." + identifier;
-        if (!I18n.hasKey(key)) {
-            return identifier.substring(0, 1).toUpperCase() + identifier.substring(1);
-        }
-        return I18n.format(key);
+        return I18n.format("curios.identifier." + identifier);
     }
 
     @Override
@@ -82,6 +78,7 @@ public class SlotCurio extends SlotItemHandler {
 
     @Nullable
     @OnlyIn(Dist.CLIENT)
+    @Override
     public net.minecraft.client.renderer.texture.TextureAtlasSprite getBackgroundSprite() {
         return sprites != null ? sprites.getSpriteForString(this.identifier) : null;
     }
