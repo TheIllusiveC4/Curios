@@ -225,7 +225,7 @@ public class CuriosContainer extends Container {
             if (recipe.isPresent()) {
                 ICraftingRecipe craftingRecipe = recipe.get();
                 if (this.craftResult.canUseRecipe(this.player.world, playerMP, craftingRecipe)) {
-                    stack = craftingRecipe.func_77572_b(this.craftMatrix);
+                    stack = craftingRecipe.getCraftingResult(this.craftMatrix);
                 }
             }
             craftResult.setInventorySlotContents(0, stack);

@@ -183,7 +183,7 @@ public interface ICurio {
                 if (model instanceof BipedModel) {
 
                     for (RendererModel renderer : renderers) {
-                        renderer.func_217177_a(((BipedModel) model).bipedHead);
+                        renderer.copyModelAngles(((BipedModel) model).bipedHead);
                     }
                 }
             }

@@ -70,7 +70,7 @@ public class ItemAmulet extends Item implements ICurio {
                 if (!(this.model instanceof ModelAmulet)) {
                     this.model = new ModelAmulet();
                 }
-                ((ModelAmulet) model).func_78088_a(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+                ((ModelAmulet) model).render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             }
         });
     }
