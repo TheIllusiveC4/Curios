@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [0.15] - 2019.07.08
+### Fixed
+- Fixed Curios GUI sometimes being colored purple due to an enchanted item being rendered
+
 ## [0.14] - 2019.06.30
 ### Changed
 - [API] Removed fallback for missing identifier lang entries, so modders and users need to define these explicitly if they're not provided internally by Curios
