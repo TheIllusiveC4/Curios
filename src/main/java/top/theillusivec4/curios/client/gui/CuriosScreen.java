@@ -124,6 +124,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
         CuriosAPI.getCuriosHandler(this.getMinecraft().player).ifPresent(handler -> {
             int slotCount = handler.getSlots();
             int upperHeight = 7 + slotCount * 18;
+            GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
             this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
             this.blit(i - 26, j + 4, 0, 0, 27, upperHeight);
 

@@ -58,8 +58,6 @@ public class Curios {
 
     public static final String MODID = "curios";
 
-    private static final boolean DEBUG = true;
-
     public Curios() {
         final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::setup);
@@ -93,16 +91,6 @@ public class Curios {
         send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("back", new ResourceLocation(MODID, "textures/item/empty_back_slot.png")));
         send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("body", new ResourceLocation(MODID, "textures/item/empty_body_slot.png")));
         send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("ring", new ResourceLocation(MODID, "textures/item/empty_ring_slot.png")));
-
-        if (DEBUG) {
-            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("ring").setSize(2));
-            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("body"));
-            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("back"));
-            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("head"));
-            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("belt"));
-            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("charm"));
-            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage("necklace"));
-        }
     }
 
     private void process(InterModProcessEvent evt) {
