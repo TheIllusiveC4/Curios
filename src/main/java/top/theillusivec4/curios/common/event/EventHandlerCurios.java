@@ -101,9 +101,11 @@ public class EventHandlerCurios {
     @SubscribeEvent
     public void onPlayerClone(PlayerEvent.Clone evt) {
         PlayerEntity player = evt.getEntityPlayer();
-        if (!evt.isWasDeath() || player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+        PlayerEntity oldPlayer = evt.getOriginal();
 
-            CuriosAPI.getCuriosHandler(evt.getOriginal()).ifPresent(originalHandler ->
+        if (!evt.isWasDeath() || player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+            oldPlayer.revive();
+            CuriosAPI.getCuriosHandler(oldPlayer).ifPresent(originalHandler ->
                     CuriosAPI.getCuriosHandler(player).ifPresent(newHandler ->
                             newHandler.setCurioMap(originalHandler.getCurioMap())));
         }
