@@ -34,7 +34,7 @@ public class ItemCrown extends Item implements ICurio {
             public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
 
                 if (!entityLivingBase.getEntityWorld().isRemote && entityLivingBase.ticksExisted % 20 == 0) {
-                    entityLivingBase.addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, -44, true, true));
+                    entityLivingBase.addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, 44, true, true));
                 }
             }
 
@@ -42,7 +42,7 @@ public class ItemCrown extends Item implements ICurio {
             public void onUnequipped(String identifier, LivingEntity entityLivingBase) {
                 EffectInstance effect = entityLivingBase.getActivePotionEffect(Effects.NIGHT_VISION);
 
-                if (effect != null && effect.getAmplifier() == -44) {
+                if (effect != null && effect.getAmplifier() == 44) {
                     entityLivingBase.removePotionEffect(Effects.NIGHT_VISION);
                 }
             }
