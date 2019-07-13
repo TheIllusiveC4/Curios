@@ -285,7 +285,7 @@ public class CuriosContainer extends Container {
                 if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (entityequipmentslot.getSlotType() == EquipmentSlotType.Group.ARMOR && !(this.inventorySlots.get(8 - entityequipmentslot.getIndex())).getHasStack()) {
+            } else if (entityequipmentslot.getSlotType() == EquipmentSlotType.Group.ARMOR && !this.inventorySlots.get(8 - entityequipmentslot.getIndex()).getHasStack()) {
                 int i = 8 - entityequipmentslot.getIndex();
 
                 if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
@@ -293,12 +293,20 @@ public class CuriosContainer extends Container {
                 }
             } else if (index < 46 && CuriosAPI.getCurio(itemstack).isPresent()) {
 
-                if (this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
+                if (!this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
                     return ItemStack.EMPTY;
                 }
             } else if (entityequipmentslot == EquipmentSlotType.OFFHAND && !(this.inventorySlots.get(45)).getHasStack()) {
 
                 if (!this.mergeItemStack(itemstack1, 45, 46, false)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (index < 36) {
+                if (!this.mergeItemStack(itemstack1, 36, 45, false)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (index < 45) {
+                if (!this.mergeItemStack(itemstack1, 9, 36, false)) {
                     return ItemStack.EMPTY;
                 }
             } else if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
