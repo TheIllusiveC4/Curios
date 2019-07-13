@@ -291,7 +291,7 @@ public class CuriosContainer extends Container {
                 if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (index < 46 && CuriosAPI.getCurio(itemstack).isPresent()) {
+            } else if (index < 46 && !CuriosAPI.getCurioTags(itemstack.getItem()).isEmpty()) {
 
                 if (!this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
                     return ItemStack.EMPTY;
