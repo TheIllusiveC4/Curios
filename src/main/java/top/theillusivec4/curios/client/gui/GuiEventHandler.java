@@ -19,19 +19,41 @@
 
 package top.theillusivec4.curios.client.gui;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHelper;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class GuiEventHandler {
 
     @SubscribeEvent
-    public void onInventoryGui(GuiScreenEvent.InitGuiEvent.Post evt) {
+    public void onInventoryGuiInit(GuiScreenEvent.InitGuiEvent.Post evt) {
 
-        if (evt.getGui() instanceof InventoryScreen) {
-            InventoryScreen gui = (InventoryScreen) evt.getGui();
-            evt.addWidget(new GuiButtonCurios(gui,gui.getGuiLeft() + 26, gui.height / 2 - 75,
-                    14, 14, 50, 0, 14, CuriosScreen.CURIO_INVENTORY));
+        if (!(evt.getGui() instanceof InventoryScreen)) {
+            return;
         }
+
+        InventoryScreen gui = (InventoryScreen) evt.getGui();
+        evt.addWidget(new GuiButtonCurios(gui,gui.getGuiLeft() + 26, gui.height / 2 - 75,
+                    14, 14, 50, 0, 14, CuriosScreen.CURIO_INVENTORY));
+    }
+
+    @SubscribeEvent
+    public void onInventoryGuiDrawBackground(GuiScreenEvent.DrawScreenEvent.Pre evt) {
+
+        if (!(evt.getGui() instanceof InventoryScreen)) {
+            return;
+        }
+
+        InventoryScreen gui = (InventoryScreen) evt.getGui();
+        ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class,
+                                                    gui, evt.getMouseX(),
+                                                    "field_147048_u");
+        ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class,
+                                                    gui, evt.getMouseY(),
+                                                    "field_147047_v");
     }
 }

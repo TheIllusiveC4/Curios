@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.client.gui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.resources.I18n;
@@ -42,9 +43,6 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
 
     private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 
-    public float oldMouseX;
-    public float oldMouseY;
-
     private boolean widthTooNarrow;
     private float currentScroll;
     private boolean isScrolling;
@@ -53,8 +51,6 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
     public CuriosScreen(CuriosContainer curiosContainer, PlayerInventory playerInventory, ITextComponent title) {
         super(curiosContainer, playerInventory, title);
         this.passEvents = true;
-        this.oldMouseX = 0;
-        this.oldMouseY = 0;
     }
 
     @Override
@@ -81,8 +77,6 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
         this.renderBackground();
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
-        oldMouseX = (float)mouseX;
-        oldMouseY = (float)mouseY;
     }
 
     @Override
@@ -119,8 +113,9 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
         int i = this.guiLeft;
         int j = this.guiTop;
         this.blit(i, j, 0, 0, this.xSize, this.ySize);
-        InventoryScreen.drawEntityOnScreen(i + 51, j + 75, 30, (float)(i + 51) - oldMouseX,
-                (float)(j + 75 - 50) - oldMouseY, this.getMinecraft().player);
+        InventoryScreen.drawEntityOnScreen(i + 51, j + 75, 30,
+                                           (float)(i + 51) - mouseX,
+                (float)(j + 75 - 50) - mouseY, this.getMinecraft().player);
         CuriosAPI.getCuriosHandler(this.getMinecraft().player).ifPresent(handler -> {
             int slotCount = handler.getSlots();
             int upperHeight = 7 + slotCount * 18;
