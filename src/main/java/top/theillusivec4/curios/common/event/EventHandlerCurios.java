@@ -111,7 +111,6 @@ public class EventHandlerCurios {
     PlayerEntity oldPlayer = evt.getOriginal();
 
     if (!evt.isWasDeath() || player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
-      oldPlayer.revive();
       CuriosAPI.getCuriosHandler(oldPlayer)
                .ifPresent(originalHandler -> CuriosAPI.getCuriosHandler(player)
                                                       .ifPresent(
