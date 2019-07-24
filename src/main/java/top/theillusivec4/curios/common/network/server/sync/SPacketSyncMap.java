@@ -35,53 +35,57 @@ import java.util.function.Supplier;
 
 public class SPacketSyncMap {
 
-    private int entityId;
-    private int entrySize;
-    private SortedMap<String, CurioStackHandler> map;
+  private int                                  entityId;
+  private int                                  entrySize;
+  private SortedMap<String, CurioStackHandler> map;
 
-    public SPacketSyncMap(int entityId, SortedMap<String, CurioStackHandler> map) {
-        this.entityId = entityId;
-        this.entrySize = map.size();
-        this.map = map;
+  public SPacketSyncMap(int entityId, SortedMap<String, CurioStackHandler> map) {
+
+    this.entityId = entityId;
+    this.entrySize = map.size();
+    this.map = map;
+  }
+
+  public static void encode(SPacketSyncMap msg, PacketBuffer buf) {
+
+    buf.writeInt(msg.entityId);
+    buf.writeInt(msg.entrySize);
+
+    for (Map.Entry<String, CurioStackHandler> entry : msg.map.entrySet()) {
+      buf.writeString(entry.getKey());
+      buf.writeCompoundTag(entry.getValue().serializeNBT());
     }
+  }
 
-    public static void encode(SPacketSyncMap msg, PacketBuffer buf) {
-        buf.writeInt(msg.entityId);
-        buf.writeInt(msg.entrySize);
+  public static SPacketSyncMap decode(PacketBuffer buf) {
 
-        for (Map.Entry<String, CurioStackHandler> entry : msg.map.entrySet()) {
-            buf.writeString(entry.getKey());
-            buf.writeCompoundTag(entry.getValue().serializeNBT());
-        }
+    int entityId = buf.readInt();
+    int entrySize = buf.readInt();
+    SortedMap<String, CurioStackHandler> map = Maps.newTreeMap();
+
+    for (int i = 0; i < entrySize; i++) {
+      String key = buf.readString(25);
+      CurioStackHandler stackHandler = new CurioStackHandler();
+      CompoundNBT compound = buf.readCompoundTag();
+
+      if (compound != null) {
+        stackHandler.deserializeNBT(compound);
+      }
+      map.put(key, stackHandler);
     }
+    return new SPacketSyncMap(entityId, map);
+  }
 
-    public static SPacketSyncMap decode(PacketBuffer buf) {
-        int entityId = buf.readInt();
-        int entrySize = buf.readInt();
-        SortedMap<String, CurioStackHandler> map = Maps.newTreeMap();
+  public static void handle(SPacketSyncMap msg, Supplier<NetworkEvent.Context> ctx) {
 
-        for (int i = 0; i < entrySize; i++) {
-            String key = buf.readString(25);
-            CurioStackHandler stackHandler = new CurioStackHandler();
-            CompoundNBT compound = buf.readCompoundTag();
+    ctx.get().enqueueWork(() -> {
+      Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
 
-            if (compound != null) {
-                stackHandler.deserializeNBT(compound);
-            }
-            map.put(key, stackHandler);
-        }
-        return new SPacketSyncMap(entityId, map);
-    }
-
-    public static void handle(SPacketSyncMap msg, Supplier<NetworkEvent.Context> ctx) {
-
-        ctx.get().enqueueWork(() -> {
-            Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
-
-            if (entity instanceof LivingEntity) {
-                CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> handler.setCurioMap(msg.map));
-            }
-        });
-        ctx.get().setPacketHandled(true);
-    }
+      if (entity instanceof LivingEntity) {
+        CuriosAPI.getCuriosHandler((LivingEntity) entity)
+                 .ifPresent(handler -> handler.setCurioMap(msg.map));
+      }
+    });
+    ctx.get().setPacketHandled(true);
+  }
 }

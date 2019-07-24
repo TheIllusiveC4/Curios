@@ -30,55 +30,54 @@ import java.util.stream.Stream;
 
 public class CuriosIMC {
 
-    public static void processCurioTypes(Stream<InterModComms.IMCMessage> register, Stream<InterModComms.IMCMessage> modify,
-                                         Stream<InterModComms.IMCMessage> icons) {
-        register
-                .filter(msg -> msg.getMessageSupplier().get() instanceof CurioIMCMessage)
-                .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
-                .forEach(msg -> processType(msg, true));
+  public static void processCurioTypes(Stream<InterModComms.IMCMessage> register,
+                                       Stream<InterModComms.IMCMessage> modify,
+                                       Stream<InterModComms.IMCMessage> icons) {
 
-        modify
-                .filter(msg -> msg.getMessageSupplier().get() instanceof CurioIMCMessage)
-                .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
-                .forEach(msg -> processType(msg, false));
+    register.filter(msg -> msg.getMessageSupplier().get() instanceof CurioIMCMessage)
+            .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
+            .forEach(msg -> processType(msg, true));
 
-        icons
-                .filter(msg -> {
-                    Object obj = msg.getMessageSupplier().get();
+    modify.filter(msg -> msg.getMessageSupplier().get() instanceof CurioIMCMessage)
+          .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
+          .forEach(msg -> processType(msg, false));
 
-                    if (obj instanceof Tuple) {
-                        Tuple tup = (Tuple)obj;
-                        return tup.getA() instanceof String && tup.getB() instanceof ResourceLocation;
-                    }
-                    return false;
-                })
-                .map(msg -> (Tuple<String, ResourceLocation>) msg.getMessageSupplier().get())
-                .forEach(msg -> CuriosAPI.idToIcon.put(msg.getA(), msg.getB()));
+    icons.filter(msg -> {
+      Object obj = msg.getMessageSupplier().get();
+
+      if (obj instanceof Tuple) {
+        Tuple tup = (Tuple) obj;
+        return tup.getA() instanceof String && tup.getB() instanceof ResourceLocation;
+      }
+      return false;
+    })
+         .map(msg -> (Tuple<String, ResourceLocation>) msg.getMessageSupplier().get())
+         .forEach(msg -> CuriosAPI.idToIcon.put(msg.getA(), msg.getB()));
+  }
+
+  private static void processType(CurioIMCMessage message, boolean create) {
+
+    String identifier = message.getIdentifier();
+
+    if (CuriosAPI.idToType.containsKey(identifier)) {
+      CurioType presentType = CuriosAPI.idToType.get(identifier);
+
+      if (message.getSize() > presentType.getSize()) {
+        presentType.defaultSize(message.getSize());
+      }
+
+      if (!message.isEnabled() && presentType.isEnabled()) {
+        presentType.enabled(false);
+      }
+
+      if (message.isHidden() && !presentType.isHidden()) {
+        presentType.hide(true);
+      }
+
+    } else if (create) {
+      CuriosAPI.idToType.put(identifier, new CurioType(identifier).defaultSize(message.getSize())
+                                                                  .enabled(message.isEnabled())
+                                                                  .hide(message.isHidden()));
     }
-
-    private static void processType(CurioIMCMessage message, boolean create) {
-        String identifier = message.getIdentifier();
-
-        if (CuriosAPI.idToType.containsKey(identifier)) {
-            CurioType presentType = CuriosAPI.idToType.get(identifier);
-
-            if (message.getSize() > presentType.getSize()) {
-                presentType.defaultSize(message.getSize());
-            }
-
-            if (!message.isEnabled() && presentType.isEnabled()) {
-                presentType.enabled(false);
-            }
-
-            if (message.isHidden() && !presentType.isHidden()) {
-                presentType.hide(true);
-            }
-
-        } else if (create) {
-            CuriosAPI.idToType.put(identifier, new CurioType(identifier)
-                    .defaultSize(message.getSize())
-                    .enabled(message.isEnabled())
-                    .hide(message.isHidden()));
-        }
-    }
+  }
 }

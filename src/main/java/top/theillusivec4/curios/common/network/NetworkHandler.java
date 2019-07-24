@@ -37,31 +37,43 @@ import java.util.function.Supplier;
 
 public class NetworkHandler {
 
-    private static final String PTC_VERSION = "1";
-    public static final SimpleChannel INSTANCE = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation(Curios.MODID, "main"))
-            .networkProtocolVersion(() -> PTC_VERSION)
-            .clientAcceptedVersions(PTC_VERSION::equals)
-            .serverAcceptedVersions(PTC_VERSION::equals)
-            .simpleChannel();
+  private static final String        PTC_VERSION = "1";
+  public static final  SimpleChannel INSTANCE    =
+      NetworkRegistry.ChannelBuilder.named(new ResourceLocation(Curios.MODID, "main"))
+                                    .networkProtocolVersion(() -> PTC_VERSION)
+                                    .clientAcceptedVersions(PTC_VERSION::equals)
+                                    .serverAcceptedVersions(PTC_VERSION::equals)
+                                    .simpleChannel();
 
-    private static int id = 0;
+  private static int id = 0;
 
-    public static void register() {
-        registerMessage(CPacketOpenCurios.class, CPacketOpenCurios::encode, CPacketOpenCurios::decode, CPacketOpenCurios::handle);
-        registerMessage(CPacketOpenVanilla.class, CPacketOpenVanilla::encode, CPacketOpenVanilla::decode, CPacketOpenVanilla::handle);
-        registerMessage(CPacketScrollCurios.class, CPacketScrollCurios::encode, CPacketScrollCurios::decode, CPacketScrollCurios::handle);
-        registerMessage(SPacketSyncContents.class, SPacketSyncContents::encode, SPacketSyncContents::decode, SPacketSyncContents::handle);
-        registerMessage(SPacketScrollCurios.class, SPacketScrollCurios::encode, SPacketScrollCurios::decode, SPacketScrollCurios::handle);
-        registerMessage(SPacketSyncActive.class, SPacketSyncActive::encode, SPacketSyncActive::decode, SPacketSyncActive::handle);
-        registerMessage(SPacketSyncSize.class, SPacketSyncSize::encode, SPacketSyncSize::decode, SPacketSyncSize::handle);
-        registerMessage(SPacketSyncMap.class, SPacketSyncMap::encode, SPacketSyncMap::decode, SPacketSyncMap::handle);
-        registerMessage(SPacketSyncContentsWithTag.class, SPacketSyncContentsWithTag::encode, SPacketSyncContentsWithTag::decode, SPacketSyncContentsWithTag::handle);
-    }
+  public static void register() {
 
-    private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder,
-                                              Function<PacketBuffer, MSG> decoder,
-                                              BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer) {
-        INSTANCE.registerMessage(id++, messageType, encoder, decoder, messageConsumer);
-    }
+    registerMessage(CPacketOpenCurios.class, CPacketOpenCurios::encode, CPacketOpenCurios::decode,
+                    CPacketOpenCurios::handle);
+    registerMessage(CPacketOpenVanilla.class, CPacketOpenVanilla::encode,
+                    CPacketOpenVanilla::decode, CPacketOpenVanilla::handle);
+    registerMessage(CPacketScrollCurios.class, CPacketScrollCurios::encode,
+                    CPacketScrollCurios::decode, CPacketScrollCurios::handle);
+    registerMessage(SPacketSyncContents.class, SPacketSyncContents::encode,
+                    SPacketSyncContents::decode, SPacketSyncContents::handle);
+    registerMessage(SPacketScrollCurios.class, SPacketScrollCurios::encode,
+                    SPacketScrollCurios::decode, SPacketScrollCurios::handle);
+    registerMessage(SPacketSyncActive.class, SPacketSyncActive::encode, SPacketSyncActive::decode,
+                    SPacketSyncActive::handle);
+    registerMessage(SPacketSyncSize.class, SPacketSyncSize::encode, SPacketSyncSize::decode,
+                    SPacketSyncSize::handle);
+    registerMessage(SPacketSyncMap.class, SPacketSyncMap::encode, SPacketSyncMap::decode,
+                    SPacketSyncMap::handle);
+    registerMessage(SPacketSyncContentsWithTag.class, SPacketSyncContentsWithTag::encode,
+                    SPacketSyncContentsWithTag::decode, SPacketSyncContentsWithTag::handle);
+  }
+
+  private static <MSG> void registerMessage(Class<MSG> messageType,
+                                            BiConsumer<MSG, PacketBuffer> encoder,
+                                            Function<PacketBuffer, MSG> decoder,
+                                            BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer) {
+
+    INSTANCE.registerMessage(id++, messageType, encoder, decoder, messageConsumer);
+  }
 }

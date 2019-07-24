@@ -42,51 +42,64 @@ import java.util.UUID;
 
 public class ItemRing extends Item implements ICurio {
 
-    private static final UUID SPEED_UUID = UUID.fromString("8b7c8fcd-89bc-4794-8bb9-eddeb32753a5");
-    private static final UUID ARMOR_UUID = UUID.fromString("38faf191-bf78-4654-b349-cc1f4f1143bf");
+  private static final UUID SPEED_UUID = UUID.fromString("8b7c8fcd-89bc-4794-8bb9-eddeb32753a5");
+  private static final UUID ARMOR_UUID = UUID.fromString("38faf191-bf78-4654-b349-cc1f4f1143bf");
 
-    public ItemRing() {
-        super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
-        this.setRegistryName(Curios.MODID, "ring");
-    }
+  public ItemRing() {
 
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-        return CapCurioItem.createProvider(new ICurio() {
+    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
+    this.setRegistryName(Curios.MODID, "ring");
+  }
 
-            @Override
-            public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
-                if (!entityLivingBase.getEntityWorld().isRemote && entityLivingBase.ticksExisted % 19 == 0) {
-                    entityLivingBase.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));
-                }
-            }
+  @Override
+  public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
 
-            @Override
-            public void playEquipSound(LivingEntity entityLivingBase) {
-                entityLivingBase.world.playSound(null, entityLivingBase.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GOLD,
-                        SoundCategory.NEUTRAL, 1.0f, 1.0f);
-            }
+    return CapCurioItem.createProvider(new ICurio() {
 
-            @Override
-            public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
-                Multimap<String, AttributeModifier> atts = HashMultimap.create();
+      @Override
+      public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
 
-                if (CuriosAPI.getCurioTags(stack.getItem()).contains(identifier)) {
-                    atts.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(), new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1, AttributeModifier.Operation.MULTIPLY_TOTAL));
-                    atts.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_UUID, "Armor bonus", 2, AttributeModifier.Operation.ADDITION));
-                }
-                return atts;
-            }
+        if (!entityLivingBase.getEntityWorld().isRemote &&
+            entityLivingBase.ticksExisted % 19 == 0) {
+          entityLivingBase.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));
+        }
+      }
 
-            @Override
-            public boolean canRightClickEquip() {
-                return true;
-            }
-        });
-    }
+      @Override
+      public void playEquipSound(LivingEntity entityLivingBase) {
 
-    @Override
-    public boolean hasEffect(ItemStack stack) {
+        entityLivingBase.world.playSound(null, entityLivingBase.getPosition(),
+                                         SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL,
+                                         1.0f, 1.0f);
+      }
+
+      @Override
+      public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
+
+        Multimap<String, AttributeModifier> atts = HashMultimap.create();
+
+        if (CuriosAPI.getCurioTags(stack.getItem()).contains(identifier)) {
+          atts.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(),
+                   new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
+                                         AttributeModifier.Operation.MULTIPLY_TOTAL));
+          atts.put(SharedMonsterAttributes.ARMOR.getName(),
+                   new AttributeModifier(ARMOR_UUID, "Armor bonus", 2,
+                                         AttributeModifier.Operation.ADDITION));
+        }
+        return atts;
+      }
+
+      @Override
+      public boolean canRightClickEquip() {
+
         return true;
-    }
+      }
+    });
+  }
+
+  @Override
+  public boolean hasEffect(ItemStack stack) {
+
+    return true;
+  }
 }

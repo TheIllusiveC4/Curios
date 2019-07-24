@@ -21,43 +21,51 @@ package top.theillusivec4.curios.api.imc;
 
 public final class CurioIMCMessage {
 
-    private final String identifier;
-    private int size = 1;
-    private boolean isEnabled = true;
-    private boolean isHidden = false;
+  private final String  identifier;
+  private       int     size      = 1;
+  private       boolean isEnabled = true;
+  private       boolean isHidden  = false;
 
-    public CurioIMCMessage(String id) {
-        this.identifier = id;
-    }
+  public CurioIMCMessage(String id) {
 
-    public String getIdentifier() {
-        return identifier;
-    }
+    this.identifier = id;
+  }
 
-    public int getSize() {
-        return size;
-    }
+  public String getIdentifier() {
 
-    public CurioIMCMessage setSize(int size) {
-        this.size = size;
-        return this;
-    }
+    return identifier;
+  }
 
-    public boolean isEnabled() {
-        return isEnabled;
-    }
+  public int getSize() {
 
-    public CurioIMCMessage setEnabled(boolean enabled) {
-        isEnabled = enabled;
-        return this;
-    }
+    return size;
+  }
 
-    public boolean isHidden() {
-        return isHidden;
-    }
+  public CurioIMCMessage setSize(int size) {
 
-    public CurioIMCMessage setHidden(boolean hidden) {
-        isHidden = hidden;
-        return this;
-    }
+    this.size = size;
+    return this;
+  }
+
+  public boolean isEnabled() {
+
+    return isEnabled;
+  }
+
+  public CurioIMCMessage setEnabled(boolean enabled) {
+
+    isEnabled = enabled;
+    return this;
+  }
+
+  public boolean isHidden() {
+
+    return isHidden;
+  }
+
+  public CurioIMCMessage setHidden(boolean hidden) {
+
+    isHidden = hidden;
+    return this;
+  }
 }

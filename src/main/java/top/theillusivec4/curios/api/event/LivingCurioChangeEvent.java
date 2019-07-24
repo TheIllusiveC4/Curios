@@ -28,13 +28,17 @@ import net.minecraftforge.eventbus.api.Cancelable;
 import javax.annotation.Nonnull;
 
 /**
- * {@link LivingCurioChangeEvent} is fired when the Curio of an EntityLivingBase changes. <br>
- * This event is fired whenever changes in curios are detected in {@link net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent}. <br>
+ * {@link LivingCurioChangeEvent} is fired when the Curio of a LivingEntity
+ * changes. <br>
+ * This event is fired whenever changes in curios are detected in
+ * {@link net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent}. <br>
  * This also includes entities joining the World, as well as being cloned. <br>
  * This event is fired on server-side only. <br>
  * <br>
- * {@link #type} contains the affected {@link top.theillusivec4.curios.api.CurioType}. <br>
- * {@link #from} contains the {@link ItemStack} that was equipped previously. <br>
+ * {@link #type} contains the affected
+ * {@link top.theillusivec4.curios.api.CurioType}. <br>
+ * {@link #from} contains the {@link ItemStack} that was equipped previously.
+ * <br>
  * {@link #to} contains the {@link ItemStack} that is equipped now. <br>
  * {@link #index} contains the index of the curio slot
  * <br>
@@ -46,26 +50,40 @@ import javax.annotation.Nonnull;
  **/
 public class LivingCurioChangeEvent extends LivingEvent {
 
-    private final String type;
-    private final ItemStack from;
-    private final ItemStack to;
-    private final int index;
+  private final String    type;
+  private final ItemStack from;
+  private final ItemStack to;
+  private final int       index;
 
-    public LivingCurioChangeEvent(LivingEntity living, String type, int index, @Nonnull ItemStack from, @Nonnull ItemStack to) {
-        super(living);
-        this.type = type;
-        this.from = from;
-        this.to = to;
-        this.index = index;
-    }
+  public LivingCurioChangeEvent(LivingEntity living, String type, int index,
+                                @Nonnull ItemStack from, @Nonnull ItemStack to) {
 
-    public String getTypeIdentifier() { return this.type; }
+    super(living);
+    this.type = type;
+    this.from = from;
+    this.to = to;
+    this.index = index;
+  }
 
-    public int getSlotIndex() { return this.index; }
+  public String getTypeIdentifier() {
 
-    @Nonnull
-    public ItemStack getFrom() { return this.from; }
+    return this.type;
+  }
 
-    @Nonnull
-    public ItemStack getTo() { return this.to; }
+  public int getSlotIndex() {
+
+    return this.index;
+  }
+
+  @Nonnull
+  public ItemStack getFrom() {
+
+    return this.from;
+  }
+
+  @Nonnull
+  public ItemStack getTo() {
+
+    return this.to;
+  }
 }

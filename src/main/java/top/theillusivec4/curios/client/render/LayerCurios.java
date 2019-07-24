@@ -32,52 +32,56 @@ import top.theillusivec4.curios.common.CuriosConfig;
 import javax.annotation.Nonnull;
 import java.util.SortedMap;
 
-public class LayerCurios<T extends LivingEntity, M extends EntityModel<T>> extends LayerRenderer<T, M> {
+public class LayerCurios<T extends LivingEntity, M extends EntityModel<T>>
+    extends LayerRenderer<T, M> {
 
-    public LayerCurios(IEntityRenderer<T, M> renderer) {
-        super(renderer);
+  public LayerCurios(IEntityRenderer<T, M> renderer) {
+
+    super(renderer);
+  }
+
+  @Override
+  public void render(@Nonnull LivingEntity entitylivingbaseIn, float limbSwing,
+                     float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+                     float headPitch, float scale) {
+
+    if (!CuriosConfig.CLIENT.renderCurios.get()) {
+      return;
     }
+    GlStateManager.pushMatrix();
+    CuriosAPI.getCuriosHandler(entitylivingbaseIn).ifPresent(handler -> {
+      SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
-    @Override
-    public void render(@Nonnull LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks,
-                       float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+      if (entitylivingbaseIn.isSneaking()) {
+        GlStateManager.translatef(0.0f, 0.2f, 0.0f);
+      }
 
-        if (!CuriosConfig.CLIENT.renderCurios.get()) {
-            return;
+      for (String id : curios.keySet()) {
+        CurioStackHandler stackHandler = curios.get(id);
+
+        for (int i = 0; i < stackHandler.getSlots(); i++) {
+          ItemStack stack = stackHandler.getStackInSlot(i);
+
+          if (!stack.isEmpty()) {
+            CuriosAPI.getCurio(stack).ifPresent(curio -> {
+              if (curio.hasRender(id, entitylivingbaseIn)) {
+                GlStateManager.pushMatrix();
+                GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+                curio.doRender(id, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks,
+                               ageInTicks, netHeadYaw, headPitch, scale);
+                GlStateManager.popMatrix();
+              }
+            });
+          }
         }
-        GlStateManager.pushMatrix();
-        CuriosAPI.getCuriosHandler(entitylivingbaseIn).ifPresent(handler -> {
-            SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
+      }
+    });
+    GlStateManager.popMatrix();
+  }
 
-            if (entitylivingbaseIn.isSneaking()) {
-                GlStateManager.translatef(0.0f, 0.2f, 0.0f);
-            }
+  @Override
+  public boolean shouldCombineTextures() {
 
-            for (String id : curios.keySet()) {
-                CurioStackHandler stackHandler = curios.get(id);
-
-                for (int i = 0; i < stackHandler.getSlots(); i++) {
-                    ItemStack stack = stackHandler.getStackInSlot(i);
-
-                    if (!stack.isEmpty()) {
-                        CuriosAPI.getCurio(stack).ifPresent(curio -> {
-                            if (curio.hasRender(id, entitylivingbaseIn)) {
-                                GlStateManager.pushMatrix();
-                                GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-                                curio.doRender(id, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks,
-                                        ageInTicks, netHeadYaw, headPitch, scale);
-                                GlStateManager.popMatrix();
-                            }
-                        });
-                    }
-                }
-            }
-        });
-        GlStateManager.popMatrix();
-    }
-
-    @Override
-    public boolean shouldCombineTextures() {
-        return false;
-    }
+    return false;
+  }
 }

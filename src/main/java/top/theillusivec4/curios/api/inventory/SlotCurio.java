@@ -37,62 +37,77 @@ import java.util.Set;
 
 public class SlotCurio extends SlotItemHandler {
 
-    private static AtlasSpriteHolder sprites;
-    private final String identifier;
-    private final PlayerEntity player;
+  private static AtlasSpriteHolder sprites;
+  private final  String            identifier;
+  private final  PlayerEntity      player;
 
-    public SlotCurio(PlayerEntity player, CurioStackHandler handler, int index, String identifier, int xPosition, int yPosition) {
-        super(handler, index, xPosition, yPosition);
-        this.identifier = identifier;
-        this.player = player;
-        this.backgroundLocation = CuriosAPI.getIcon(identifier);
+  public SlotCurio(PlayerEntity player, CurioStackHandler handler, int index, String identifier,
+                   int xPosition, int yPosition) {
 
-        if (this.player.world.isRemote && sprites == null) {
-            sprites = new AtlasSpriteHolder();
-        }
+    super(handler, index, xPosition, yPosition);
+    this.identifier = identifier;
+    this.player = player;
+    this.backgroundLocation = CuriosAPI.getIcon(identifier);
+
+    if (this.player.world.isRemote && sprites == null) {
+      sprites = new AtlasSpriteHolder();
     }
+  }
 
-    @OnlyIn(Dist.CLIENT)
-    public String getSlotName() {
-        return I18n.format("curios.identifier." + identifier);
+  @OnlyIn(Dist.CLIENT)
+  public String getSlotName() {
+
+    return I18n.format("curios.identifier." + identifier);
+  }
+
+  @Override
+  public boolean isItemValid(@Nonnull ItemStack stack) {
+
+    return hasValidTag(CuriosAPI.getCurioTags(stack.getItem())) && CuriosAPI.getCurio(stack)
+                                                                            .map(
+                                                                                curio -> curio.canEquip(
+                                                                                    identifier,
+                                                                                    player))
+                                                                            .orElse(true) &&
+           super.isItemValid(stack);
+  }
+
+  protected boolean hasValidTag(Set<String> tags) {
+
+    return tags.contains(identifier);
+  }
+
+  @Override
+  public boolean canTakeStack(PlayerEntity playerIn) {
+
+    ItemStack stack = this.getStack();
+    return
+        (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) &&
+        CuriosAPI.getCurio(stack)
+                 .map(curio -> curio.canUnequip(identifier, playerIn))
+                 .orElse(true) && super.canTakeStack(playerIn);
+  }
+
+  @Nullable
+  @OnlyIn(Dist.CLIENT)
+  @Override
+  public net.minecraft.client.renderer.texture.TextureAtlasSprite getBackgroundSprite() {
+
+    return sprites != null ? sprites.getSpriteForString(this.identifier) : null;
+  }
+
+  final class AtlasSpriteHolder {
+
+    private final Map<String, TextureAtlasSprite> spriteMap = new HashMap<>();
+
+    TextureAtlasSprite getSpriteForString(String id) {
+
+      return spriteMap.computeIfAbsent(id,
+                                       key -> new TextureAtlasSprite(backgroundLocation, 16, 16) {
+                                         {
+                                           func_217789_a(16, 16, 0, 0);
+                                         }
+                                       });
     }
-
-    @Override
-    public boolean isItemValid(@Nonnull ItemStack stack) {
-        return hasValidTag(CuriosAPI.getCurioTags(stack.getItem())) && CuriosAPI.getCurio(stack)
-                .map(curio -> curio.canEquip(identifier, player)).orElse(true)
-                && super.isItemValid(stack);
-    }
-
-    protected boolean hasValidTag(Set<String> tags) {
-        return tags.contains(identifier);
-    }
-
-    @Override
-    public boolean canTakeStack(PlayerEntity playerIn) {
-        ItemStack stack = this.getStack();
-        return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
-                && CuriosAPI.getCurio(stack).map(curio -> curio.canUnequip(identifier, playerIn)).orElse(true)
-                && super.canTakeStack(playerIn);
-    }
-
-    @Nullable
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public net.minecraft.client.renderer.texture.TextureAtlasSprite getBackgroundSprite() {
-        return sprites != null ? sprites.getSpriteForString(this.identifier) : null;
-    }
-
-    final class AtlasSpriteHolder {
-
-        private final Map<String, TextureAtlasSprite> spriteMap = new HashMap<>();
-
-        TextureAtlasSprite getSpriteForString(String id) {
-            return spriteMap.computeIfAbsent(id, key -> new TextureAtlasSprite(backgroundLocation, 16, 16) {
-                {
-                    func_217789_a(16, 16, 0, 0);
-                }
-            });
-        }
-    }
+  }
 }

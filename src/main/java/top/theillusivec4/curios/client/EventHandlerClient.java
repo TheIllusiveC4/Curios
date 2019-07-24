@@ -49,87 +49,117 @@ import static net.minecraft.item.ItemStack.DECIMALFORMAT;
 
 public class EventHandlerClient {
 
-    private static final UUID ATTACK_DAMAGE_MODIFIER = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
-    private static final UUID ATTACK_SPEED_MODIFIER = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
+  private static final UUID ATTACK_DAMAGE_MODIFIER =
+      UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
+  private static final UUID ATTACK_SPEED_MODIFIER  =
+      UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
 
-    @SubscribeEvent
-    public void onKeyInput(TickEvent.ClientTickEvent evt) {
+  @SubscribeEvent
+  public void onKeyInput(TickEvent.ClientTickEvent evt) {
 
-        if (evt.phase != TickEvent.Phase.END) return;
-
-        Minecraft mc = Minecraft.getInstance();
-
-        if (KeyRegistry.openCurios.isPressed() && mc.isGameFocused()) {
-            NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios((float)mc.mouseHelper.getMouseX(), (float)mc.mouseHelper.getMouseY()));
-        }
+    if (evt.phase != TickEvent.Phase.END) {
+      return;
     }
 
-    @SubscribeEvent
-    public void onTooltip(ItemTooltipEvent evt) {
-        ItemStack stack = evt.getItemStack();
+    Minecraft mc = Minecraft.getInstance();
 
-        if (!stack.isEmpty()) {
-            List<ITextComponent> tooltip = evt.getToolTip();
-            Set<String> slots = CuriosAPI.getCurioTags(stack.getItem());
+    if (KeyRegistry.openCurios.isPressed() && mc.isGameFocused()) {
+      NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
+                                   new CPacketOpenCurios((float) mc.mouseHelper.getMouseX(),
+                                                         (float) mc.mouseHelper.getMouseY()));
+    }
+  }
 
-            if (!slots.isEmpty()) {
+  @SubscribeEvent
+  public void onTooltip(ItemTooltipEvent evt) {
 
-                for (String s : slots) {
-                    String key = "curios.identifier." + s;
-                    if (I18n.hasKey(key)) {
-                        tooltip.add(new TranslationTextComponent("curios.identifier." + s).applyTextStyle(TextFormatting.GOLD));
-                    } else {
-                        tooltip.add(new StringTextComponent(s.substring(0, 1).toUpperCase() + s.substring(1)).applyTextStyle(TextFormatting.GOLD));
-                    }
+    ItemStack stack = evt.getItemStack();
+
+    if (!stack.isEmpty()) {
+      List<ITextComponent> tooltip = evt.getToolTip();
+      Set<String> slots = CuriosAPI.getCurioTags(stack.getItem());
+
+      if (!slots.isEmpty()) {
+
+        for (String s : slots) {
+          String key = "curios.identifier." + s;
+          if (I18n.hasKey(key)) {
+            tooltip.add(new TranslationTextComponent("curios.identifier." + s).applyTextStyle(
+                TextFormatting.GOLD));
+          } else {
+            tooltip.add(new StringTextComponent(
+                s.substring(0, 1).toUpperCase() + s.substring(1)).applyTextStyle(
+                TextFormatting.GOLD));
+          }
+        }
+        CuriosAPI.getCurio(stack).ifPresent(curio -> {
+
+          for (String identifier : slots) {
+            Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier);
+
+            if (!multimap.isEmpty()) {
+              PlayerEntity player = evt.getEntityPlayer();
+              tooltip.add(new StringTextComponent(""));
+              tooltip.add(
+                  new TranslationTextComponent("curios.modifiers", identifier).applyTextStyle(
+                      TextFormatting.GOLD));
+
+              for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
+                AttributeModifier attributemodifier = entry.getValue();
+                double amount = attributemodifier.getAmount();
+                boolean flag = false;
+
+                if (player != null) {
+
+                  if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
+                    amount = amount + player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
+                                            .getBaseValue();
+                    amount = amount + (double) EnchantmentHelper.getModifierForCreature(stack,
+                                                                                        CreatureAttribute.UNDEFINED);
+                    flag = true;
+                  } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
+                    amount +=
+                        player.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
+                    flag = true;
+                  }
+
+                  double d1;
+
+                  if (attributemodifier.getOperation() !=
+                      AttributeModifier.Operation.MULTIPLY_BASE &&
+                      attributemodifier.getOperation() !=
+                      AttributeModifier.Operation.MULTIPLY_TOTAL) {
+                    d1 = amount;
+                  } else {
+                    d1 = amount * 100.0D;
+                  }
+
+                  if (flag) {
+                    tooltip.add((new StringTextComponent(" ")).appendSibling(
+                        new TranslationTextComponent(
+                            "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
+                            DECIMALFORMAT.format(d1),
+                            new TranslationTextComponent("attribute.name." + entry.getKey())))
+                                                              .applyTextStyle(
+                                                                  TextFormatting.DARK_GREEN));
+                  } else if (amount > 0.0D) {
+                    tooltip.add((new TranslationTextComponent(
+                        "attribute.modifier.plus." + attributemodifier.getOperation().getId(),
+                        DECIMALFORMAT.format(d1), new TranslationTextComponent(
+                        "attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.BLUE));
+                  } else if (amount < 0.0D) {
+                    d1 = d1 * -1.0D;
+                    tooltip.add((new TranslationTextComponent(
+                        "attribute.modifier.take." + attributemodifier.getOperation().getId(),
+                        DECIMALFORMAT.format(d1), new TranslationTextComponent(
+                        "attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.RED));
+                  }
                 }
-                CuriosAPI.getCurio(stack).ifPresent(curio -> {
-
-                    for (String identifier : slots) {
-                        Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier);
-
-                        if (!multimap.isEmpty()) {
-                            PlayerEntity player = evt.getEntityPlayer();
-                            tooltip.add(new StringTextComponent(""));
-                            tooltip.add(new TranslationTextComponent("curios.modifiers", identifier).applyTextStyle(TextFormatting.GOLD));
-
-                            for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
-                                AttributeModifier attributemodifier = entry.getValue();
-                                double amount = attributemodifier.getAmount();
-                                boolean flag = false;
-
-                                if (player != null) {
-
-                                    if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
-                                        amount = amount + player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
-                                        amount = amount + (double) EnchantmentHelper.getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
-                                        flag = true;
-                                    } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
-                                        amount += player.getAttribute(SharedMonsterAttributes.ATTACK_SPEED).getBaseValue();
-                                        flag = true;
-                                    }
-
-                                    double d1;
-
-                                    if (attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_BASE && attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_TOTAL) {
-                                        d1 = amount;
-                                    } else {
-                                        d1 = amount * 100.0D;
-                                    }
-
-                                    if (flag) {
-                                        tooltip.add((new StringTextComponent(" ")).appendSibling(new TranslationTextComponent("attribute.modifier.equals." + attributemodifier.getOperation().getId(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.DARK_GREEN));
-                                    } else if (amount > 0.0D) {
-                                        tooltip.add((new TranslationTextComponent("attribute.modifier.plus." + attributemodifier.getOperation().getId(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.BLUE));
-                                    } else if (amount < 0.0D) {
-                                        d1 = d1 * -1.0D;
-                                        tooltip.add((new TranslationTextComponent("attribute.modifier.take." + attributemodifier.getOperation().getId(), DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey()))).applyTextStyle(TextFormatting.RED));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+              }
             }
-        }
+          }
+        });
+      }
     }
+  }
 }

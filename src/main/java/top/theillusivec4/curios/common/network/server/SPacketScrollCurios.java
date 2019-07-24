@@ -30,33 +30,36 @@ import java.util.function.Supplier;
 
 public class SPacketScrollCurios {
 
-    private int windowId;
-    private int index;
+  private int windowId;
+  private int index;
 
-    public SPacketScrollCurios(int windowId, int index) {
-        this.windowId = windowId;
-        this.index = index;
-    }
+  public SPacketScrollCurios(int windowId, int index) {
 
-    public static void encode(SPacketScrollCurios msg, PacketBuffer buf) {
-        buf.writeInt(msg.windowId);
-        buf.writeInt(msg.index);
-    }
+    this.windowId = windowId;
+    this.index = index;
+  }
 
-    public static SPacketScrollCurios decode(PacketBuffer buf) {
-        return new SPacketScrollCurios(buf.readInt(), buf.readInt());
-    }
+  public static void encode(SPacketScrollCurios msg, PacketBuffer buf) {
 
-    public static void handle(SPacketScrollCurios msg, Supplier<NetworkEvent.Context> ctx) {
+    buf.writeInt(msg.windowId);
+    buf.writeInt(msg.index);
+  }
 
-        ctx.get().enqueueWork(() -> {
-            ClientPlayerEntity sp = Minecraft.getInstance().player;
-            Container container = sp.openContainer;
+  public static SPacketScrollCurios decode(PacketBuffer buf) {
 
-            if (container instanceof CuriosContainer && container.windowId == msg.windowId) {
-                ((CuriosContainer)container).scrollToIndex(msg.index);
-            }
-        });
-        ctx.get().setPacketHandled(true);
-    }
+    return new SPacketScrollCurios(buf.readInt(), buf.readInt());
+  }
+
+  public static void handle(SPacketScrollCurios msg, Supplier<NetworkEvent.Context> ctx) {
+
+    ctx.get().enqueueWork(() -> {
+      ClientPlayerEntity sp = Minecraft.getInstance().player;
+      Container container = sp.openContainer;
+
+      if (container instanceof CuriosContainer && container.windowId == msg.windowId) {
+        ((CuriosContainer) container).scrollToIndex(msg.index);
+      }
+    });
+    ctx.get().setPacketHandled(true);
+  }
 }

@@ -35,25 +35,29 @@ import top.theillusivec4.curios.common.item.ItemRing;
 @Mod.EventBusSubscriber(modid = Curios.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CuriosRegistry {
 
-    @ObjectHolder("curios:ring")
-    public static final Item RING = null;
+  @ObjectHolder("curios:ring")
+  public static final Item RING = null;
 
-    @ObjectHolder("curios:amulet")
-    public static final Item AMULET = null;
+  @ObjectHolder("curios:amulet")
+  public static final Item AMULET = null;
 
-    @ObjectHolder("curios:crown")
-    public static final Item CROWN = null;
+  @ObjectHolder("curios:crown")
+  public static final Item CROWN = null;
 
-    @ObjectHolder("curios:curios_container")
-    public static final ContainerType<CuriosContainer> CONTAINER_TYPE = null;
+  @ObjectHolder("curios:curios_container")
+  public static final ContainerType<CuriosContainer> CONTAINER_TYPE = null;
 
-    @SubscribeEvent
-    public static void registerItems(RegistryEvent.Register<Item> evt) {
-        evt.getRegistry().registerAll(new ItemRing(), new ItemAmulet(), new ItemCrown());
-    }
+  @SubscribeEvent
+  public static void registerItems(RegistryEvent.Register<Item> evt) {
 
-    @SubscribeEvent
-    public static void registerContainer(RegistryEvent.Register<ContainerType<?>> evt) {
-        evt.getRegistry().register(IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
-    }
+    evt.getRegistry().registerAll(new ItemRing(), new ItemAmulet(), new ItemCrown());
+  }
+
+  @SubscribeEvent
+  public static void registerContainer(RegistryEvent.Register<ContainerType<?>> evt) {
+
+    evt.getRegistry()
+       .register(
+           IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
+  }
 }

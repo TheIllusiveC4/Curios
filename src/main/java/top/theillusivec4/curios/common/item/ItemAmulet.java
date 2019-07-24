@@ -36,47 +36,58 @@ import top.theillusivec4.curios.common.capability.CapCurioItem;
 
 public class ItemAmulet extends Item implements ICurio {
 
-    public ItemAmulet() {
-        super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
-        this.setRegistryName(Curios.MODID, "amulet");
-    }
+  public ItemAmulet() {
 
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-        return CapCurioItem.createProvider(new ICurio() {
+    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
+    this.setRegistryName(Curios.MODID, "amulet");
+  }
 
-            private final ResourceLocation AMULET_TEXTURE = new ResourceLocation(Curios.MODID, "textures/entity/amulet.png");
+  @Override
+  public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
 
-            private Object model;
+    return CapCurioItem.createProvider(new ICurio() {
 
-            @Override
-            public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
+      private final ResourceLocation AMULET_TEXTURE =
+          new ResourceLocation(Curios.MODID, "textures/entity/amulet.png");
 
-                if (!entityLivingBase.getEntityWorld().isRemote && entityLivingBase.ticksExisted % 40 == 0) {
-                    entityLivingBase.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
-                }
-            }
+      private Object model;
 
-            @Override
-            public boolean hasRender(String identifier, LivingEntity entityLivingBase) {
-                return true;
-            }
+      @Override
+      public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
 
-            @Override
-            public void doRender(String identifier, LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-                Minecraft.getInstance().getTextureManager().bindTexture(AMULET_TEXTURE);
-                ICurio.RenderHelper.rotateIfSneaking(entitylivingbaseIn);
+        if (!entityLivingBase.getEntityWorld().isRemote &&
+            entityLivingBase.ticksExisted % 40 == 0) {
+          entityLivingBase.addPotionEffect(
+              new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
+        }
+      }
 
-                if (!(this.model instanceof ModelAmulet)) {
-                    this.model = new ModelAmulet();
-                }
-                ((ModelAmulet) model).render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-            }
-        });
-    }
+      @Override
+      public boolean hasRender(String identifier, LivingEntity entityLivingBase) {
 
-    @Override
-    public boolean hasEffect(ItemStack stack) {
         return true;
-    }
+      }
+
+      @Override
+      public void doRender(String identifier, LivingEntity entitylivingbaseIn, float limbSwing,
+                           float limbSwingAmount, float partialTicks, float ageInTicks,
+                           float netHeadYaw, float headPitch, float scale) {
+
+        Minecraft.getInstance().getTextureManager().bindTexture(AMULET_TEXTURE);
+        ICurio.RenderHelper.rotateIfSneaking(entitylivingbaseIn);
+
+        if (!(this.model instanceof ModelAmulet)) {
+          this.model = new ModelAmulet();
+        }
+        ((ModelAmulet) model).render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks,
+                                     netHeadYaw, headPitch, scale);
+      }
+    });
+  }
+
+  @Override
+  public boolean hasEffect(ItemStack stack) {
+
+    return true;
+  }
 }

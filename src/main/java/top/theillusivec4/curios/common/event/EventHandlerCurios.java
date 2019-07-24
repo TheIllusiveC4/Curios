@@ -61,225 +61,253 @@ import java.util.SortedMap;
 
 public class EventHandlerCurios {
 
-    @SubscribeEvent
-    public void onCapabilitiesEntity(AttachCapabilitiesEvent<Entity> evt) {
-        if (evt.getObject() instanceof PlayerEntity) {
-            evt.addCapability(CuriosCapability.ID_INVENTORY, CapCurioInventory.createProvider((PlayerEntity)evt.getObject()));
+  @SubscribeEvent
+  public void onCapabilitiesEntity(AttachCapabilitiesEvent<Entity> evt) {
+
+    if (evt.getObject() instanceof PlayerEntity) {
+      evt.addCapability(CuriosCapability.ID_INVENTORY,
+                        CapCurioInventory.createProvider((PlayerEntity) evt.getObject()));
+    }
+  }
+
+  @SubscribeEvent
+  public void onEntityJoinWorld(EntityJoinWorldEvent evt) {
+
+    Entity entity = evt.getEntity();
+
+    if (entity instanceof LivingEntity) {
+      LivingEntity livingBase = (LivingEntity) evt.getEntity();
+      CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> {
+        handler.dropInvalidCache();
+
+        if (entity instanceof ServerPlayerEntity) {
+          ServerPlayerEntity mp = (ServerPlayerEntity) entity;
+          NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
+                                       new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()));
         }
+      });
     }
+  }
 
-    @SubscribeEvent
-    public void onEntityJoinWorld(EntityJoinWorldEvent evt) {
-        Entity entity = evt.getEntity();
+  @SubscribeEvent
+  public void onPlayerStartTracking(PlayerEvent.StartTracking evt) {
 
-        if (entity instanceof LivingEntity) {
-            LivingEntity livingBase = (LivingEntity)evt.getEntity();
-            CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> {
-                handler.dropInvalidCache();
+    Entity target = evt.getTarget();
+    PlayerEntity player = evt.getEntityPlayer();
 
-                if (entity instanceof ServerPlayerEntity) {
-                    ServerPlayerEntity mp = (ServerPlayerEntity)entity;
-                    NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
-                            new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()));
-                }
-            });
-        }
+    if (player instanceof ServerPlayerEntity && target instanceof LivingEntity) {
+      LivingEntity livingBase = (LivingEntity) target;
+      CuriosAPI.getCuriosHandler(livingBase)
+               .ifPresent(handler -> NetworkHandler.INSTANCE.send(
+                   PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
+                   new SPacketSyncMap(player.getEntityId(), handler.getCurioMap())));
     }
+  }
 
-    @SubscribeEvent
-    public void onPlayerStartTracking(PlayerEvent.StartTracking evt) {
-        Entity target = evt.getTarget();
-        PlayerEntity player = evt.getEntityPlayer();
+  @SubscribeEvent
+  public void onPlayerClone(PlayerEvent.Clone evt) {
 
-        if (player instanceof ServerPlayerEntity && target instanceof LivingEntity) {
-            LivingEntity livingBase = (LivingEntity) target;
-            CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player),
-                    new SPacketSyncMap(player.getEntityId(), handler.getCurioMap())));
-        }
+    PlayerEntity player = evt.getEntityPlayer();
+    PlayerEntity oldPlayer = evt.getOriginal();
+
+    if (!evt.isWasDeath() || player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+      oldPlayer.revive();
+      CuriosAPI.getCuriosHandler(oldPlayer)
+               .ifPresent(originalHandler -> CuriosAPI.getCuriosHandler(player)
+                                                      .ifPresent(
+                                                          newHandler -> newHandler.setCurioMap(
+                                                              originalHandler.getCurioMap())));
     }
+  }
 
-    @SubscribeEvent
-    public void onPlayerClone(PlayerEvent.Clone evt) {
-        PlayerEntity player = evt.getEntityPlayer();
-        PlayerEntity oldPlayer = evt.getOriginal();
+  @SubscribeEvent
+  public void onPlayerDrops(LivingDropsEvent evt) {
 
-        if (!evt.isWasDeath() || player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
-            oldPlayer.revive();
-            CuriosAPI.getCuriosHandler(oldPlayer).ifPresent(originalHandler ->
-                    CuriosAPI.getCuriosHandler(player).ifPresent(newHandler ->
-                            newHandler.setCurioMap(originalHandler.getCurioMap())));
-        }
-    }
+    LivingEntity livingEntity = evt.getEntityLiving();
 
-    @SubscribeEvent
-    public void onPlayerDrops(LivingDropsEvent evt) {
-        LivingEntity livingEntity = evt.getEntityLiving();
+    if (!livingEntity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) &&
+        !livingEntity.isSpectator()) {
+      CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
+        Collection<ItemEntity> entityItems = evt.getDrops();
+        SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
 
-        if (!livingEntity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) && !livingEntity.isSpectator()) {
-            CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
-                Collection<ItemEntity> entityItems = evt.getDrops();
-                SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
+        for (String identifier : curioMap.keySet()) {
+          ItemStackHandler stacks = curioMap.get(identifier);
 
-                for (String identifier : curioMap.keySet()) {
-                    ItemStackHandler stacks = curioMap.get(identifier);
+          for (int i = 0; i < stacks.getSlots(); i++) {
+            ItemStack stack = stacks.getStackInSlot(i);
 
-                    for (int i = 0; i < stacks.getSlots(); i++) {
-                        ItemStack stack = stacks.getStackInSlot(i);
-
-                        if (!stack.isEmpty()) {
-                            if (!EnchantmentHelper.hasVanishingCurse(stack)) {
-                                entityItems.add(this.getDroppedItem(stack, livingEntity));
-                            }
-                            stacks.setStackInSlot(i, ItemStack.EMPTY);
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-    @SubscribeEvent
-    public void onPlayerXPPickUp(PlayerPickupXpEvent evt) {
-        PlayerEntity player = evt.getEntityPlayer();
-
-        if (!player.world.isRemote) {
-            CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
-                SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
-
-                for (String identifier : curioMap.keySet()) {
-                    ItemStackHandler stacks = curioMap.get(identifier);
-
-                    for (int i = 0; i < stacks.getSlots(); i++) {
-                        ItemStack stack = stacks.getStackInSlot(i);
-
-                        if (!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0
-                                && stack.isDamaged()) {
-                            evt.setCanceled(true);
-                            ExperienceOrbEntity orb = evt.getOrb();
-                            player.xpCooldown = 2;
-                            player.onItemPickup(orb, 1);
-                            int toRepair = Math.min(orb.xpValue * 2, stack.getDamage());
-                            orb.xpValue -= toRepair / 2;
-                            stack.setDamage(stack.getDamage() - toRepair);
-
-                            if (orb.xpValue > 0) {
-                                player.giveExperiencePoints(orb.xpValue);
-                            }
-                            orb.remove();
-                            return;
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-    private ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
-        double d0 = livingEntity.posY - 0.30000001192092896D + (double)livingEntity.getEyeHeight();
-        ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.posX, d0, livingEntity.posZ, droppedItem);
-        entityitem.setPickupDelay(40);
-        float f = livingEntity.world.rand.nextFloat() * 0.5F;
-        float f1 = livingEntity.world.rand.nextFloat() * ((float)Math.PI * 2F);
-        entityitem.setMotion((double)(-MathHelper.sin(f1) * f), 0.20000000298023224D, (double)(MathHelper.cos(f1) * f));
-        return entityitem;
-    }
-
-    @SubscribeEvent
-    public void onCurioRightClick(PlayerInteractEvent.RightClickItem evt) {
-        PlayerEntity player = evt.getEntityPlayer();
-        ItemStack stack = evt.getItemStack();
-        CuriosAPI.getCurio(stack).ifPresent(curio -> {
-
-            if (curio.canRightClickEquip()) {
-                CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
-
-                    if (!player.world.isRemote) {
-                        SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
-                        Set<String> tags = CuriosAPI.getCurioTags(stack.getItem());
-
-                        for (String id : tags) {
-
-                            if (curio.canEquip(id, player)) {
-                                ItemStackHandler stackHandler = curios.get(id);
-
-                                if (stackHandler != null) {
-
-                                    for (int i = 0; i < stackHandler.getSlots(); i++) {
-
-                                        if (stackHandler.getStackInSlot(i).isEmpty()) {
-                                            stackHandler.setStackInSlot(i, stack.copy());
-                                            curio.playEquipSound(player);
-                                            stack.shrink(1);
-                                            evt.setCancellationResult(ActionResultType.SUCCESS);
-                                            evt.setCanceled(true);
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        evt.setCancellationResult(ActionResultType.SUCCESS);
-                        evt.setCanceled(true);
-                    }
-                });
+            if (!stack.isEmpty()) {
+              if (!EnchantmentHelper.hasVanishingCurse(stack)) {
+                entityItems.add(this.getDroppedItem(stack, livingEntity));
+              }
+              stacks.setStackInSlot(i, ItemStack.EMPTY);
             }
-        });
+          }
+        }
+      });
     }
+  }
 
-    @SubscribeEvent
-    public void onCurioTick(LivingEvent.LivingUpdateEvent evt) {
-        LivingEntity entitylivingbase = evt.getEntityLiving();
-        CuriosAPI.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
+  @SubscribeEvent
+  public void onPlayerXPPickUp(PlayerPickupXpEvent evt) {
+
+    PlayerEntity player = evt.getEntityPlayer();
+
+    if (!player.world.isRemote) {
+      CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
+        SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
+
+        for (String identifier : curioMap.keySet()) {
+          ItemStackHandler stacks = curioMap.get(identifier);
+
+          for (int i = 0; i < stacks.getSlots(); i++) {
+            ItemStack stack = stacks.getStackInSlot(i);
+
+            if (!stack.isEmpty() &&
+                EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0 &&
+                stack.isDamaged()) {
+              evt.setCanceled(true);
+              ExperienceOrbEntity orb = evt.getOrb();
+              player.xpCooldown = 2;
+              player.onItemPickup(orb, 1);
+              int toRepair = Math.min(orb.xpValue * 2, stack.getDamage());
+              orb.xpValue -= toRepair / 2;
+              stack.setDamage(stack.getDamage() - toRepair);
+
+              if (orb.xpValue > 0) {
+                player.giveExperiencePoints(orb.xpValue);
+              }
+              orb.remove();
+              return;
+            }
+          }
+        }
+      });
+    }
+  }
+
+  private ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
+
+    double d0 = livingEntity.posY - 0.30000001192092896D + (double) livingEntity.getEyeHeight();
+    ItemEntity entityitem =
+        new ItemEntity(livingEntity.world, livingEntity.posX, d0, livingEntity.posZ, droppedItem);
+    entityitem.setPickupDelay(40);
+    float f = livingEntity.world.rand.nextFloat() * 0.5F;
+    float f1 = livingEntity.world.rand.nextFloat() * ((float) Math.PI * 2F);
+    entityitem.setMotion((double) (-MathHelper.sin(f1) * f), 0.20000000298023224D,
+                         (double) (MathHelper.cos(f1) * f));
+    return entityitem;
+  }
+
+  @SubscribeEvent
+  public void onCurioRightClick(PlayerInteractEvent.RightClickItem evt) {
+
+    PlayerEntity player = evt.getEntityPlayer();
+    ItemStack stack = evt.getItemStack();
+    CuriosAPI.getCurio(stack).ifPresent(curio -> {
+
+      if (curio.canRightClickEquip()) {
+        CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
+
+          if (!player.world.isRemote) {
             SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
+            Set<String> tags = CuriosAPI.getCurioTags(stack.getItem());
 
-            for (String identifier : curios.keySet()) {
-                CurioStackHandler stackHandler = curios.get(identifier);
+            for (String id : tags) {
 
-                for (int i = 0; i < stackHandler.getSlots(); i++) {
-                    ItemStack stack = stackHandler.getStackInSlot(i);
-                    stack.inventoryTick(entitylivingbase.world, entitylivingbase, -1, false);
-                    LazyOptional<ICurio> currentCurio = CuriosAPI.getCurio(stack);
-                    currentCurio.ifPresent(curio -> curio.onCurioTick(identifier, entitylivingbase));
+              if (curio.canEquip(id, player)) {
+                ItemStackHandler stackHandler = curios.get(id);
 
-                    if (!entitylivingbase.world.isRemote) {
-                        ItemStack prevStack = stackHandler.getPreviousStackInSlot(i);
+                if (stackHandler != null) {
 
-                        if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
-                            LazyOptional<ICurio> prevCurio = CuriosAPI.getCurio(prevStack);
-                            boolean shouldSync = !stack.equals(prevStack, true);
-                            CompoundNBT syncTag = new CompoundNBT();
+                  for (int i = 0; i < stackHandler.getSlots(); i++) {
 
-                            if (currentCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
-                                    .orElse(false) || prevCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
-                                    .orElse(false) || shouldSync) {
-
-                                if (currentCurio.isPresent()) {
-                                    syncTag = currentCurio.map(ICurio::getSyncTag).orElse(syncTag);
-                                }
-
-                                if (!syncTag.isEmpty()) {
-                                    NetworkHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
-                                            new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i, stack, syncTag));
-                                } else {
-                                    NetworkHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
-                                            new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i, stack));
-                                }
-                            }
-                            MinecraftForge.EVENT_BUS.post(new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
-                            prevCurio.ifPresent(curio -> {
-                                entitylivingbase.getAttributes().removeAttributeModifiers(curio.getAttributeModifiers(identifier));
-                                curio.onUnequipped(identifier, entitylivingbase);
-                            });
-                            currentCurio.ifPresent(curio -> {
-                                entitylivingbase.getAttributes().applyAttributeModifiers(curio.getAttributeModifiers(identifier));
-                                curio.onEquipped(identifier, entitylivingbase);
-                            });
-                            stackHandler.setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
-                        }
+                    if (stackHandler.getStackInSlot(i).isEmpty()) {
+                      stackHandler.setStackInSlot(i, stack.copy());
+                      curio.playEquipSound(player);
+                      stack.shrink(1);
+                      evt.setCancellationResult(ActionResultType.SUCCESS);
+                      evt.setCanceled(true);
+                      return;
                     }
+                  }
                 }
+              }
             }
+          } else {
+            evt.setCancellationResult(ActionResultType.SUCCESS);
+            evt.setCanceled(true);
+          }
         });
-    }
+      }
+    });
+  }
+
+  @SubscribeEvent
+  public void onCurioTick(LivingEvent.LivingUpdateEvent evt) {
+
+    LivingEntity entitylivingbase = evt.getEntityLiving();
+    CuriosAPI.getCuriosHandler(entitylivingbase).ifPresent(handler -> {
+      SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
+
+      for (String identifier : curios.keySet()) {
+        CurioStackHandler stackHandler = curios.get(identifier);
+
+        for (int i = 0; i < stackHandler.getSlots(); i++) {
+          ItemStack stack = stackHandler.getStackInSlot(i);
+          stack.inventoryTick(entitylivingbase.world, entitylivingbase, -1, false);
+          LazyOptional<ICurio> currentCurio = CuriosAPI.getCurio(stack);
+          currentCurio.ifPresent(curio -> curio.onCurioTick(identifier, entitylivingbase));
+
+          if (!entitylivingbase.world.isRemote) {
+            ItemStack prevStack = stackHandler.getPreviousStackInSlot(i);
+
+            if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
+              LazyOptional<ICurio> prevCurio = CuriosAPI.getCurio(prevStack);
+              boolean shouldSync = !stack.equals(prevStack, true);
+              CompoundNBT syncTag = new CompoundNBT();
+
+              if (currentCurio.map(
+                  curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
+                              .orElse(false) ||
+                  prevCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
+                           .orElse(false) || shouldSync) {
+
+                if (currentCurio.isPresent()) {
+                  syncTag = currentCurio.map(ICurio::getSyncTag).orElse(syncTag);
+                }
+
+                if (!syncTag.isEmpty()) {
+                  NetworkHandler.INSTANCE.send(
+                      PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
+                      new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i,
+                                                     stack, syncTag));
+                } else {
+                  NetworkHandler.INSTANCE.send(
+                      PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
+                      new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i,
+                                              stack));
+                }
+              }
+              MinecraftForge.EVENT_BUS.post(
+                  new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
+              prevCurio.ifPresent(curio -> {
+                entitylivingbase.getAttributes()
+                                .removeAttributeModifiers(curio.getAttributeModifiers(identifier));
+                curio.onUnequipped(identifier, entitylivingbase);
+              });
+              currentCurio.ifPresent(curio -> {
+                entitylivingbase.getAttributes()
+                                .applyAttributeModifiers(curio.getAttributeModifiers(identifier));
+                curio.onEquipped(identifier, entitylivingbase);
+              });
+              stackHandler.setPreviousStackInSlot(i,
+                                                  stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
+            }
+          }
+        }
+      }
+    });
+  }
 }

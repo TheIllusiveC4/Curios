@@ -27,21 +27,24 @@ import java.util.function.Supplier;
 
 public class CPacketOpenVanilla {
 
-    public static void encode(CPacketOpenVanilla msg, PacketBuffer buf) {}
+  public static void encode(CPacketOpenVanilla msg, PacketBuffer buf) {
 
-    public static CPacketOpenVanilla decode(PacketBuffer buf) {
-        return new CPacketOpenVanilla();
-    }
+  }
 
-    public static void handle(CPacketOpenVanilla msg, Supplier<NetworkEvent.Context> ctx) {
+  public static CPacketOpenVanilla decode(PacketBuffer buf) {
 
-        ctx.get().enqueueWork(() -> {
-            ServerPlayerEntity sender = ctx.get().getSender();
+    return new CPacketOpenVanilla();
+  }
 
-            if (sender != null) {
-                sender.closeContainer();
-            }
-        });
-        ctx.get().setPacketHandled(true);
-    }
+  public static void handle(CPacketOpenVanilla msg, Supplier<NetworkEvent.Context> ctx) {
+
+    ctx.get().enqueueWork(() -> {
+      ServerPlayerEntity sender = ctx.get().getSender();
+
+      if (sender != null) {
+        sender.closeContainer();
+      }
+    });
+    ctx.get().setPacketHandled(true);
+  }
 }

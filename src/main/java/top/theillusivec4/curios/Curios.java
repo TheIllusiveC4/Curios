@@ -56,76 +56,90 @@ import java.util.Map;
 @Mod(Curios.MODID)
 public class Curios {
 
-    public static final String MODID = "curios";
+  public static final String MODID = "curios";
 
-    public Curios() {
-        final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        eventBus.addListener(this::setup);
-        eventBus.addListener(this::enqueue);
-        eventBus.addListener(this::process);
-        MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CuriosConfig.commonSpec);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CuriosConfig.clientSpec);
+  public Curios() {
+
+    final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    eventBus.addListener(this::setup);
+    eventBus.addListener(this::enqueue);
+    eventBus.addListener(this::process);
+    MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
+    ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CuriosConfig.commonSpec);
+    ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CuriosConfig.clientSpec);
+  }
+
+  private void setup(FMLCommonSetupEvent evt) {
+
+    CapCurioInventory.register();
+    CapCurioItem.register();
+    NetworkHandler.register();
+    MinecraftForge.EVENT_BUS.register(new EventHandlerCurios());
+  }
+
+  private void enqueue(InterModEnqueueEvent evt) {
+
+    for (String id : CuriosConfig.COMMON.createCurios.get()) {
+      send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage(id));
     }
 
-    private void setup(FMLCommonSetupEvent evt) {
-        CapCurioInventory.register();
-        CapCurioItem.register();
-        NetworkHandler.register();
-        MinecraftForge.EVENT_BUS.register(new EventHandlerCurios());
+    for (String id : CuriosConfig.COMMON.disabledCurios.get()) {
+      send(CuriosAPI.IMC.MODIFY_TYPE, new CurioIMCMessage(id).setEnabled(false));
+    }
+    send(CuriosAPI.IMC.REGISTER_ICON,
+         new Tuple<>("charm", new ResourceLocation(MODID, "textures/item/empty_charm_slot.png")));
+    send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("necklace", new ResourceLocation(MODID,
+                                                                                   "textures/item" +
+                                                                                   "/empty_necklace_slot.png")));
+    send(CuriosAPI.IMC.REGISTER_ICON,
+         new Tuple<>("belt", new ResourceLocation(MODID, "textures/item/empty_belt_slot.png")));
+    send(CuriosAPI.IMC.REGISTER_ICON,
+         new Tuple<>("head", new ResourceLocation(MODID, "textures/item/empty_head_slot.png")));
+    send(CuriosAPI.IMC.REGISTER_ICON,
+         new Tuple<>("back", new ResourceLocation(MODID, "textures/item/empty_back_slot.png")));
+    send(CuriosAPI.IMC.REGISTER_ICON,
+         new Tuple<>("body", new ResourceLocation(MODID, "textures/item/empty_body_slot.png")));
+    send(CuriosAPI.IMC.REGISTER_ICON,
+         new Tuple<>("ring", new ResourceLocation(MODID, "textures/item/empty_ring_slot.png")));
+  }
+
+  private void process(InterModProcessEvent evt) {
+
+    CuriosIMC.processCurioTypes(evt.getIMCStream(CuriosAPI.IMC.REGISTER_TYPE::equals),
+                                evt.getIMCStream(CuriosAPI.IMC.MODIFY_TYPE::equals),
+                                evt.getIMCStream(CuriosAPI.IMC.REGISTER_ICON::equals));
+  }
+
+  private static void send(String id, Object msg) {
+
+    InterModComms.sendTo(MODID, id, () -> msg);
+  }
+
+  private void onServerStarting(FMLServerStartingEvent evt) {
+
+    CommandCurios.register(evt.getCommandDispatcher());
+  }
+
+  @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+  public static class ClientProxy {
+
+    @SubscribeEvent
+    public static void setupClient(FMLClientSetupEvent evt) {
+
+      MinecraftForge.EVENT_BUS.register(new EventHandlerClient());
+      MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
+      ScreenManager.registerFactory(CuriosRegistry.CONTAINER_TYPE, CuriosScreen::new);
+      KeyRegistry.registerKeys();
     }
 
-    private void enqueue(InterModEnqueueEvent evt) {
+    @SubscribeEvent
+    public static void postSetupClient(FMLLoadCompleteEvent evt) {
 
-        for (String id : CuriosConfig.COMMON.createCurios.get()) {
-            send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage(id));
-        }
+      Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
 
-        for (String id : CuriosConfig.COMMON.disabledCurios.get()) {
-            send(CuriosAPI.IMC.MODIFY_TYPE, new CurioIMCMessage(id).setEnabled(false));
-        }
-        send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("charm", new ResourceLocation(MODID, "textures/item/empty_charm_slot.png")));
-        send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("necklace", new ResourceLocation(MODID, "textures/item/empty_necklace_slot.png")));
-        send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("belt", new ResourceLocation(MODID, "textures/item/empty_belt_slot.png")));
-        send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("head", new ResourceLocation(MODID, "textures/item/empty_head_slot.png")));
-        send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("back", new ResourceLocation(MODID, "textures/item/empty_back_slot.png")));
-        send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("body", new ResourceLocation(MODID, "textures/item/empty_body_slot.png")));
-        send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("ring", new ResourceLocation(MODID, "textures/item/empty_ring_slot.png")));
+      for (PlayerRenderer render : skinMap.values()) {
+        render.addLayer(new LayerCurios<>(render));
+      }
     }
-
-    private void process(InterModProcessEvent evt) {
-        CuriosIMC.processCurioTypes(
-                evt.getIMCStream(CuriosAPI.IMC.REGISTER_TYPE::equals),
-                evt.getIMCStream(CuriosAPI.IMC.MODIFY_TYPE::equals),
-                evt.getIMCStream(CuriosAPI.IMC.REGISTER_ICON::equals));
-    }
-
-    private static void send(String id, Object msg) {
-        InterModComms.sendTo(MODID, id, () -> msg);
-    }
-
-    private void onServerStarting(FMLServerStartingEvent evt) {
-        CommandCurios.register(evt.getCommandDispatcher());
-    }
-
-    @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class ClientProxy {
-
-        @SubscribeEvent
-        public static void setupClient(FMLClientSetupEvent evt) {
-            MinecraftForge.EVENT_BUS.register(new EventHandlerClient());
-            MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
-            ScreenManager.registerFactory(CuriosRegistry.CONTAINER_TYPE, CuriosScreen::new);
-            KeyRegistry.registerKeys();
-        }
-
-        @SubscribeEvent
-        public static void postSetupClient(FMLLoadCompleteEvent evt) {
-            Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
-
-            for (PlayerRenderer render : skinMap.values()) {
-                render.addLayer(new LayerCurios<>(render));
-            }
-        }
-    }
+  }
 }

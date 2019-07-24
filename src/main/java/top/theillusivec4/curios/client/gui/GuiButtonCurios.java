@@ -31,36 +31,41 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 
 public class GuiButtonCurios extends ImageButton {
 
-    private final ContainerScreen parentGui;
-    private boolean isRecipeBookVisible = false;
+  private final ContainerScreen parentGui;
+  private       boolean         isRecipeBookVisible = false;
 
-    GuiButtonCurios(ContainerScreen parentGui, int xIn, int yIn, int widthIn, int heightIn, int textureOffestX,
-                          int textureOffestY, int yDiffText, ResourceLocation resource) {
-        super(xIn, yIn, widthIn, heightIn, textureOffestX, textureOffestY, yDiffText, resource, (button) -> {
+  GuiButtonCurios(ContainerScreen parentGui, int xIn, int yIn, int widthIn, int heightIn,
+                  int textureOffestX, int textureOffestY, int yDiffText,
+                  ResourceLocation resource) {
+
+    super(xIn, yIn, widthIn, heightIn, textureOffestX, textureOffestY, yDiffText, resource,
+          (button) -> {
             Minecraft mc = Minecraft.getInstance();
 
             if (parentGui instanceof CuriosScreen) {
-                InventoryScreen inventory = new InventoryScreen(mc.player);
-                mc.displayGuiScreen(inventory);
-                NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla());
+              InventoryScreen inventory = new InventoryScreen(mc.player);
+              mc.displayGuiScreen(inventory);
+              NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
+                                           new CPacketOpenVanilla());
             } else {
-                NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios(0, 0));
+              NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
+                                           new CPacketOpenCurios(0, 0));
             }
-        });
-        this.parentGui = parentGui;
+          });
+    this.parentGui = parentGui;
+  }
+
+  @Override
+  public void render(int mouseX, int mouseY, float partialTicks) {
+
+    if (parentGui instanceof InventoryScreen) {
+      boolean lastVisible = isRecipeBookVisible;
+      isRecipeBookVisible = ((InventoryScreen) parentGui).func_194310_f().isVisible();
+
+      if (lastVisible != isRecipeBookVisible) {
+        this.setPosition(parentGui.getGuiLeft() + 26, parentGui.height / 2 - 75);
+      }
     }
-
-    @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-
-        if (parentGui instanceof InventoryScreen) {
-            boolean lastVisible = isRecipeBookVisible;
-            isRecipeBookVisible = ((InventoryScreen)parentGui).func_194310_f().isVisible();
-
-            if (lastVisible != isRecipeBookVisible) {
-                this.setPosition(parentGui.getGuiLeft() + 26, parentGui.height / 2 - 75);
-            }
-        }
-        super.render(mouseX, mouseY, partialTicks);
-    }
+    super.render(mouseX, mouseY, partialTicks);
+  }
 }

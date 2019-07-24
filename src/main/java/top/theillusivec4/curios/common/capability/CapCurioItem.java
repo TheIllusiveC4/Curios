@@ -34,39 +34,47 @@ import javax.annotation.Nullable;
 
 public class CapCurioItem {
 
-    public static void register() {
-        CapabilityManager.INSTANCE.register(ICurio.class, new Capability.IStorage<ICurio>() {
-            @Override
-            public INBT writeNBT(Capability<ICurio> capability, ICurio instance, Direction side) {
-                return new CompoundNBT();
-            }
+  public static void register() {
 
-            @Override
-            public void readNBT(Capability<ICurio> capability, ICurio instance, Direction side, INBT nbt) {
+    CapabilityManager.INSTANCE.register(ICurio.class, new Capability.IStorage<ICurio>() {
+      @Override
+      public INBT writeNBT(Capability<ICurio> capability, ICurio instance, Direction side) {
 
-            }
-        }, CurioWrapper::new);
+        return new CompoundNBT();
+      }
+
+      @Override
+      public void readNBT(Capability<ICurio> capability, ICurio instance, Direction side,
+                          INBT nbt) {
+
+      }
+    }, CurioWrapper::new);
+  }
+
+  public static ICapabilityProvider createProvider(final ICurio curio) {
+
+    return new Provider(curio);
+  }
+
+  private static class CurioWrapper implements ICurio {
+
+  }
+
+  public static class Provider implements ICapabilityProvider {
+
+    final LazyOptional<ICurio> capability;
+
+    Provider(ICurio curio) {
+
+      this.capability = LazyOptional.of(() -> curio);
     }
 
-    public static ICapabilityProvider createProvider(final ICurio curio) {
-        return new Provider(curio);
+    @SuppressWarnings("ConstantConditions")
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+
+      return CuriosCapability.ITEM.orEmpty(cap, capability);
     }
-
-    private static class CurioWrapper implements ICurio {}
-
-    public static class Provider implements ICapabilityProvider {
-
-        final LazyOptional<ICurio> capability;
-
-        Provider(ICurio curio) {
-            this.capability = LazyOptional.of(() -> curio);
-        }
-
-        @SuppressWarnings("ConstantConditions")
-        @Nonnull
-        @Override
-        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-            return CuriosCapability.ITEM.orEmpty(cap, capability);
-        }
-    }
+  }
 }

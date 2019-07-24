@@ -21,47 +21,63 @@ package top.theillusivec4.curios.api;
 
 public final class CurioType {
 
-    private final String identifier;
-    /** The default number of slots*/
-    private int size;
-    /** Enabled slots will be given to holders by default*/
-    private boolean isEnabled;
-    /** Hidden slots will not show up in the default Curios GUI, but will still exist*/
-    private boolean isHidden;
+  private final String  identifier;
+  /**
+   * The default number of slots
+   */
+  private       int     size;
+  /**
+   * Enabled slots will be given to holders by default
+   */
+  private       boolean isEnabled;
+  /**
+   * Hidden slots will not be in the default Curios GUI, but will still exist
+   */
+  private       boolean isHidden;
 
-    public CurioType(String identifier) {
-        this.identifier = identifier;
-        this.size = 1;
-        this.isEnabled = true;
-        this.isHidden = false;
-    }
+  public CurioType(String identifier) {
 
-    public String getIdentifier() {
-        return identifier;
-    }
+    this.identifier = identifier;
+    this.size = 1;
+    this.isEnabled = true;
+    this.isHidden = false;
+  }
 
-    public int getSize() {
-        return this.size;
-    }
+  public String getIdentifier() {
 
-    public boolean isEnabled() {
-        return isEnabled;
-    }
+    return identifier;
+  }
 
-    public boolean isHidden() { return isHidden; }
+  public int getSize() {
 
-    public final CurioType defaultSize(int size) {
-        this.size = Math.max(size, this.size);
-        return this;
-    }
+    return this.size;
+  }
 
-    public final CurioType enabled(boolean enabled) {
-        this.isEnabled = enabled;
-        return this;
-    }
+  public boolean isEnabled() {
 
-    public final CurioType hide(boolean hide) {
-        this.isHidden = hide;
-        return this;
-    }
+    return isEnabled;
+  }
+
+  public boolean isHidden() {
+
+    return isHidden;
+  }
+
+  public final CurioType defaultSize(int size) {
+
+    this.size = Math.max(size, this.size);
+    return this;
+  }
+
+  public final CurioType enabled(boolean enabled) {
+
+    this.isEnabled = enabled;
+    return this;
+  }
+
+  public final CurioType hide(boolean hide) {
+
+    this.isHidden = hide;
+    return this;
+  }
 }

@@ -30,42 +30,45 @@ import java.util.function.Supplier;
 
 public class SPacketSyncActive {
 
-    private int entityId;
-    private String curioId;
-    private boolean remove;
+  private int     entityId;
+  private String  curioId;
+  private boolean remove;
 
-    public SPacketSyncActive(int entityId, String curioId, boolean remove) {
-        this.entityId = entityId;
-        this.curioId = curioId;
-        this.remove = remove;
-    }
+  public SPacketSyncActive(int entityId, String curioId, boolean remove) {
 
-    public static void encode(SPacketSyncActive msg, PacketBuffer buf) {
-        buf.writeInt(msg.entityId);
-        buf.writeString(msg.curioId);
-        buf.writeBoolean(msg.remove);
-    }
+    this.entityId = entityId;
+    this.curioId = curioId;
+    this.remove = remove;
+  }
 
-    public static SPacketSyncActive decode(PacketBuffer buf) {
-        return new SPacketSyncActive(buf.readInt(), buf.readString(25), buf.readBoolean());
-    }
+  public static void encode(SPacketSyncActive msg, PacketBuffer buf) {
 
-    public static void handle(SPacketSyncActive msg, Supplier<NetworkEvent.Context> ctx) {
+    buf.writeInt(msg.entityId);
+    buf.writeString(msg.curioId);
+    buf.writeBoolean(msg.remove);
+  }
 
-        ctx.get().enqueueWork(() -> {
-            Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+  public static SPacketSyncActive decode(PacketBuffer buf) {
 
-            if (entity instanceof LivingEntity) {
-                CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
+    return new SPacketSyncActive(buf.readInt(), buf.readString(25), buf.readBoolean());
+  }
 
-                    if (msg.remove) {
-                        handler.disableCurio(msg.curioId);
-                    } else {
-                        handler.enableCurio(msg.curioId);
-                    }
-                });
-            }
+  public static void handle(SPacketSyncActive msg, Supplier<NetworkEvent.Context> ctx) {
+
+    ctx.get().enqueueWork(() -> {
+      Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+
+      if (entity instanceof LivingEntity) {
+        CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
+
+          if (msg.remove) {
+            handler.disableCurio(msg.curioId);
+          } else {
+            handler.enableCurio(msg.curioId);
+          }
         });
-        ctx.get().setPacketHandled(true);
-    }
+      }
+    });
+    ctx.get().setPacketHandled(true);
+  }
 }

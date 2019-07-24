@@ -58,305 +58,350 @@ import java.util.SortedMap;
 
 public class CapCurioInventory {
 
-    public static void register() {
-        CapabilityManager.INSTANCE.register(ICurioItemHandler.class, new Capability.IStorage<ICurioItemHandler>() {
-            @Override
-            public INBT writeNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, Direction side) {
-                SortedMap<String, CurioStackHandler> curioMap = instance.getCurioMap();
-                CompoundNBT compound = new CompoundNBT();
-                ListNBT taglist = new ListNBT();
+  public static void register() {
 
-                for (String identifier : curioMap.keySet()) {
-                    CurioStackHandler stackHandler = curioMap.get(identifier);
-                    CompoundNBT itemtag = stackHandler.serializeNBT();
-                    itemtag.putString("Identifier", identifier);
-                    taglist.add(itemtag);
-                }
-                compound.put("Curios", taglist);
-                ListNBT taglist1 = new ListNBT();
+    CapabilityManager.INSTANCE.register(ICurioItemHandler.class,
+                                        new Capability.IStorage<ICurioItemHandler>() {
+                                          @Override
+                                          public INBT writeNBT(
+                                              Capability<ICurioItemHandler> capability,
+                                              ICurioItemHandler instance, Direction side) {
 
-                for (String identifier : instance.getDisabled()) {
-                    taglist1.add(new StringNBT(identifier));
-                }
-                compound.put("Disabled", taglist1);
-                return compound;
-            }
+                                            SortedMap<String, CurioStackHandler> curioMap =
+                                                instance.getCurioMap();
+                                            CompoundNBT compound = new CompoundNBT();
+                                            ListNBT taglist = new ListNBT();
 
-            @Override
-            public void readNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance, Direction side, INBT nbt) {
-                ListNBT tagList = ((CompoundNBT)nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
-                ListNBT tagList1 = ((CompoundNBT)nbt).getList("Disabled", Constants.NBT.TAG_STRING);
-                Set<String> disabled = Sets.newHashSet();
+                                            for (String identifier : curioMap.keySet()) {
+                                              CurioStackHandler stackHandler =
+                                                  curioMap.get(identifier);
+                                              CompoundNBT itemtag = stackHandler.serializeNBT();
+                                              itemtag.putString("Identifier", identifier);
+                                              taglist.add(itemtag);
+                                            }
+                                            compound.put("Curios", taglist);
+                                            ListNBT taglist1 = new ListNBT();
 
-                for (int k = 0; k < tagList1.size(); k++) {
-                    disabled.add(tagList1.getString(k));
-                }
-                instance.setDisabled(disabled);
+                                            for (String identifier : instance.getDisabled()) {
+                                              taglist1.add(new StringNBT(identifier));
+                                            }
+                                            compound.put("Disabled", taglist1);
+                                            return compound;
+                                          }
 
-                if (!tagList.isEmpty()) {
-                    SortedMap<String, CurioStackHandler> curios = instance.getDefaultSlots();
+                                          @Override
+                                          public void readNBT(
+                                              Capability<ICurioItemHandler> capability,
+                                              ICurioItemHandler instance, Direction side,
+                                              INBT nbt) {
 
-                    for (int i = 0; i < tagList.size(); i++) {
-                        CompoundNBT itemtag = tagList.getCompound(i);
-                        String identifier = itemtag.getString("Identifier");
-                        CurioStackHandler stackHandler = new CurioStackHandler();
-                        stackHandler.deserializeNBT(itemtag);
+                                            ListNBT tagList = ((CompoundNBT) nbt).getList("Curios",
+                                                                                          Constants.NBT.TAG_COMPOUND);
+                                            ListNBT tagList1 =
+                                                ((CompoundNBT) nbt).getList("Disabled",
+                                                                            Constants.NBT.TAG_STRING);
+                                            Set<String> disabled = Sets.newHashSet();
 
-                        if (CuriosAPI.getType(identifier).isPresent()) {
-                            curios.put(identifier, stackHandler);
-                        } else {
+                                            for (int k = 0; k < tagList1.size(); k++) {
+                                              disabled.add(tagList1.getString(k));
+                                            }
+                                            instance.setDisabled(disabled);
 
-                            for (int j = 0; j < stackHandler.getSlots(); j++) {
-                                ItemStack stack = stackHandler.getStackInSlot(j);
+                                            if (!tagList.isEmpty()) {
+                                              SortedMap<String, CurioStackHandler> curios =
+                                                  instance.getDefaultSlots();
 
-                                if (!stack.isEmpty()) {
-                                    instance.addInvalid(stackHandler.getStackInSlot(j));
-                                }
-                            }
-                        }
-                    }
-                    instance.setCurioMap(curios);
-                }
-            }
-        }, CurioInventoryWrapper::new);
+                                              for (int i = 0; i < tagList.size(); i++) {
+                                                CompoundNBT itemtag = tagList.getCompound(i);
+                                                String identifier = itemtag.getString("Identifier");
+                                                CurioStackHandler stackHandler =
+                                                    new CurioStackHandler();
+                                                stackHandler.deserializeNBT(itemtag);
+
+                                                if (CuriosAPI.getType(identifier).isPresent()) {
+                                                  curios.put(identifier, stackHandler);
+                                                } else {
+
+                                                  for (int j = 0; j < stackHandler.getSlots();
+                                                       j++) {
+                                                    ItemStack stack =
+                                                        stackHandler.getStackInSlot(j);
+
+                                                    if (!stack.isEmpty()) {
+                                                      instance.addInvalid(
+                                                          stackHandler.getStackInSlot(j));
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                              instance.setCurioMap(curios);
+                                            }
+                                          }
+                                        }, CurioInventoryWrapper::new);
+  }
+
+  public static ICapabilityProvider createProvider(final LivingEntity livingBase) {
+
+    return new Provider(livingBase);
+  }
+
+  public static class CurioInventoryWrapper implements ICurioItemHandler {
+
+    SortedMap<String, CurioStackHandler> curioSlots;
+    NonNullList<ItemStack>               invalidCache;
+    Set<String>                          disabled;
+    LivingEntity                         wearer;
+
+    CurioInventoryWrapper() {
+
+      this(null);
     }
 
-    public static ICapabilityProvider createProvider(final LivingEntity livingBase) {
-        return new Provider(livingBase);
+    CurioInventoryWrapper(final LivingEntity livingBase) {
+
+      this.disabled = Sets.newHashSet();
+      this.curioSlots = this.getDefaultSlots();
+      this.invalidCache = NonNullList.create();
+      this.wearer = livingBase;
     }
 
-    public static class CurioInventoryWrapper implements ICurioItemHandler {
+    @Override
+    public void setStackInSlot(String identifier, int slot, @Nonnull ItemStack stack) {
 
-        SortedMap<String, CurioStackHandler> curioSlots;
-        NonNullList<ItemStack> invalidCache;
-        Set<String> disabled;
-        LivingEntity wearer;
-
-        CurioInventoryWrapper() {
-            this(null);
-        }
-
-        CurioInventoryWrapper(final LivingEntity livingBase) {
-            this.disabled = Sets.newHashSet();
-            this.curioSlots = this.getDefaultSlots();
-            this.invalidCache = NonNullList.create();
-            this.wearer = livingBase;
-        }
-
-        @Override
-        public void setStackInSlot(String identifier, int slot, @Nonnull ItemStack stack) {
-            this.curioSlots.get(identifier).setStackInSlot(slot, stack);
-        }
-
-        @Override
-        public SortedMap<String, CurioStackHandler> getDefaultSlots() {
-            SortedMap<String, CurioStackHandler> slots = Maps.newTreeMap();
-
-            for (String id : CuriosAPI.getTypeIdentifiers()) {
-
-                if (disabled.isEmpty() || !disabled.contains(id)) {
-                    CuriosAPI.getType(id).ifPresent(type ->  {
-
-                        if (type.isEnabled()) {
-                            CurioStackHandler handler = new CurioStackHandler(type.getSize());
-                            handler.setHidden(type.isHidden());
-                            slots.put(id, handler);
-                        }
-                    });
-                }
-            }
-            return slots;
-        }
-
-        @Override
-        public int getSlots() {
-            int totalSlots = 0;
-
-            for (ItemStackHandler stacks : curioSlots.values()) {
-                totalSlots += stacks.getSlots();
-            }
-            return totalSlots;
-        }
-
-        @Nonnull
-        public ItemStack getStackInSlot(String identifier, int slot) {
-            return this.curioSlots.get(identifier).getStackInSlot(slot);
-        }
-
-        @Nullable
-        @Override
-        public CurioStackHandler getStackHandler(String identifier) {
-            return this.curioSlots.get(identifier);
-        }
-
-        @Override
-        public SortedMap<String, CurioStackHandler> getCurioMap() {
-            return Collections.unmodifiableSortedMap(this.curioSlots);
-        }
-
-        @Override
-        public void setCurioMap(SortedMap<String, CurioStackHandler> map) {
-            this.curioSlots = map;
-        }
-
-        @Override
-        public void enableCurio(String identifier) {
-
-            CuriosAPI.getType(identifier).ifPresent(type -> {
-                this.curioSlots.putIfAbsent(identifier, new CurioStackHandler(type.getSize()));
-                this.disabled.remove(identifier);
-
-                if (!wearer.world.isRemote && wearer instanceof ServerPlayerEntity) {
-                    NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)wearer),
-                            new SPacketSyncActive(wearer.getEntityId(), identifier, false));
-                }
-            });
-        }
-
-        @Override
-        public void disableCurio(String identifier) {
-            CurioStackHandler stackHandler = this.curioSlots.get(identifier);
-
-            if (stackHandler != null) {
-                dropOrGiveLast(stackHandler, identifier, stackHandler.getSlots());
-                this.curioSlots.remove(identifier);
-                this.disabled.add(identifier);
-
-                if (wearer instanceof ServerPlayerEntity) {
-                    NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)wearer),
-                            new SPacketSyncActive(wearer.getEntityId(), identifier, true));
-                }
-            }
-        }
-
-        @Override
-        public void addCurioSlot(String identifier, int amount) {
-
-            if (amount > 0) {
-                CurioStackHandler stackHandler = this.curioSlots.get(identifier);
-
-                if (stackHandler != null) {
-                    stackHandler.addSize(amount);
-
-                    if (wearer instanceof ServerPlayerEntity) {
-                        NetworkHandler.INSTANCE.sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount, false),
-                                ((ServerPlayerEntity) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void removeCurioSlot(String identifier, int amount) {
-
-            if (amount > 0) {
-                CurioStackHandler stackHandler = this.curioSlots.get(identifier);
-
-                if (stackHandler != null) {
-                    amount = Math.min(stackHandler.getSlots() - 1, amount);
-                    dropOrGiveLast(stackHandler, identifier, amount);
-
-                    if (wearer instanceof ServerPlayerEntity) {
-                        NetworkHandler.INSTANCE.sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount, true),
-                                ((ServerPlayerEntity) wearer).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
-                    }
-                    stackHandler.removeSize(amount);
-                }
-            }
-        }
-
-        @Nullable
-        @Override
-        public LivingEntity getWearer() {
-            return this.wearer;
-        }
-
-        @Override
-        public ImmutableSet<String> getDisabled() {
-            return ImmutableSet.copyOf(disabled);
-        }
-
-        @Override
-        public void setDisabled(Set<String> disabled) {
-            this.disabled = disabled;
-        }
-
-        @Override
-        public void addInvalid(ItemStack stack) {
-            this.invalidCache.add(stack);
-        }
-
-        @Override
-        public void dropInvalidCache() {
-
-            if (!this.invalidCache.isEmpty()) {
-                dropOrGive(this.invalidCache);
-                this.invalidCache = NonNullList.create();
-            }
-        }
-
-        private void dropOrGiveLast(ItemStackHandler stackHandler, String identifier, int amount) {
-
-            if (!wearer.world.isRemote) {
-                NonNullList<ItemStack> drops = NonNullList.create();
-
-                for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
-                    ItemStack stack = stackHandler.getStackInSlot(i);
-                    drops.add(stackHandler.getStackInSlot(i));
-                    CuriosAPI.getCurio(stack).ifPresent(curio -> {
-                        if (!stack.isEmpty()) {
-                            wearer.getAttributes().removeAttributeModifiers(curio.getAttributeModifiers(identifier));
-                        }
-                    });
-                    stackHandler.setStackInSlot(i, ItemStack.EMPTY);
-                }
-                dropOrGive(drops);
-            }
-        }
-
-        private void dropOrGive(NonNullList<ItemStack> drops) {
-
-            if (wearer instanceof PlayerEntity) {
-
-                for (ItemStack drop : drops) {
-                    ItemHandlerHelper.giveItemToPlayer((PlayerEntity) wearer, drop);
-                }
-            } else {
-
-                for (ItemStack drop : drops) {
-                    wearer.entityDropItem(drop, 0.0f);
-                }
-            }
-        }
+      this.curioSlots.get(identifier).setStackInSlot(slot, stack);
     }
 
-    public static class Provider implements ICapabilitySerializable<INBT> {
+    @Override
+    public SortedMap<String, CurioStackHandler> getDefaultSlots() {
 
-        final LazyOptional<ICurioItemHandler> optional;
-        final ICurioItemHandler handler;
+      SortedMap<String, CurioStackHandler> slots = Maps.newTreeMap();
 
-        Provider(final LivingEntity livingBase) {
-            this.handler = new CurioInventoryWrapper(livingBase);
-            this.optional = LazyOptional.of(() -> handler);
+      for (String id : CuriosAPI.getTypeIdentifiers()) {
+
+        if (disabled.isEmpty() || !disabled.contains(id)) {
+          CuriosAPI.getType(id).ifPresent(type -> {
+
+            if (type.isEnabled()) {
+              CurioStackHandler handler = new CurioStackHandler(type.getSize());
+              handler.setHidden(type.isHidden());
+              slots.put(id, handler);
+            }
+          });
         }
-
-        @SuppressWarnings("ConstantConditions")
-        @Nonnull
-        @Override
-        public <T> LazyOptional<T> getCapability(@Nullable Capability<T> capability, Direction facing) {
-            return CuriosCapability.INVENTORY.orEmpty(capability, optional);
-        }
-
-        @SuppressWarnings("ConstantConditions")
-        @Override
-        public INBT serializeNBT() {
-            return CuriosCapability.INVENTORY.writeNBT(handler, null);
-        }
-
-        @SuppressWarnings("ConstantConditions")
-        @Override
-        public void deserializeNBT(INBT nbt) {
-            CuriosCapability.INVENTORY.readNBT(handler, null, nbt);
-        }
+      }
+      return slots;
     }
+
+    @Override
+    public int getSlots() {
+
+      int totalSlots = 0;
+
+      for (ItemStackHandler stacks : curioSlots.values()) {
+        totalSlots += stacks.getSlots();
+      }
+      return totalSlots;
+    }
+
+    @Nonnull
+    public ItemStack getStackInSlot(String identifier, int slot) {
+
+      return this.curioSlots.get(identifier).getStackInSlot(slot);
+    }
+
+    @Nullable
+    @Override
+    public CurioStackHandler getStackHandler(String identifier) {
+
+      return this.curioSlots.get(identifier);
+    }
+
+    @Override
+    public SortedMap<String, CurioStackHandler> getCurioMap() {
+
+      return Collections.unmodifiableSortedMap(this.curioSlots);
+    }
+
+    @Override
+    public void setCurioMap(SortedMap<String, CurioStackHandler> map) {
+
+      this.curioSlots = map;
+    }
+
+    @Override
+    public void enableCurio(String identifier) {
+
+      CuriosAPI.getType(identifier).ifPresent(type -> {
+        this.curioSlots.putIfAbsent(identifier, new CurioStackHandler(type.getSize()));
+        this.disabled.remove(identifier);
+
+        if (!wearer.world.isRemote && wearer instanceof ServerPlayerEntity) {
+          NetworkHandler.INSTANCE.send(
+              PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
+              new SPacketSyncActive(wearer.getEntityId(), identifier, false));
+        }
+      });
+    }
+
+    @Override
+    public void disableCurio(String identifier) {
+
+      CurioStackHandler stackHandler = this.curioSlots.get(identifier);
+
+      if (stackHandler != null) {
+        dropOrGiveLast(stackHandler, identifier, stackHandler.getSlots());
+        this.curioSlots.remove(identifier);
+        this.disabled.add(identifier);
+
+        if (wearer instanceof ServerPlayerEntity) {
+          NetworkHandler.INSTANCE.send(
+              PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
+              new SPacketSyncActive(wearer.getEntityId(), identifier, true));
+        }
+      }
+    }
+
+    @Override
+    public void addCurioSlot(String identifier, int amount) {
+
+      if (amount > 0) {
+        CurioStackHandler stackHandler = this.curioSlots.get(identifier);
+
+        if (stackHandler != null) {
+          stackHandler.addSize(amount);
+
+          if (wearer instanceof ServerPlayerEntity) {
+            NetworkHandler.INSTANCE.sendTo(
+                new SPacketSyncSize(wearer.getEntityId(), identifier, amount, false),
+                ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
+                NetworkDirection.PLAY_TO_CLIENT);
+          }
+        }
+      }
+    }
+
+    @Override
+    public void removeCurioSlot(String identifier, int amount) {
+
+      if (amount > 0) {
+        CurioStackHandler stackHandler = this.curioSlots.get(identifier);
+
+        if (stackHandler != null) {
+          amount = Math.min(stackHandler.getSlots() - 1, amount);
+          dropOrGiveLast(stackHandler, identifier, amount);
+
+          if (wearer instanceof ServerPlayerEntity) {
+            NetworkHandler.INSTANCE.sendTo(
+                new SPacketSyncSize(wearer.getEntityId(), identifier, amount, true),
+                ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
+                NetworkDirection.PLAY_TO_CLIENT);
+          }
+          stackHandler.removeSize(amount);
+        }
+      }
+    }
+
+    @Nullable
+    @Override
+    public LivingEntity getWearer() {
+
+      return this.wearer;
+    }
+
+    @Override
+    public ImmutableSet<String> getDisabled() {
+
+      return ImmutableSet.copyOf(disabled);
+    }
+
+    @Override
+    public void setDisabled(Set<String> disabled) {
+
+      this.disabled = disabled;
+    }
+
+    @Override
+    public void addInvalid(ItemStack stack) {
+
+      this.invalidCache.add(stack);
+    }
+
+    @Override
+    public void dropInvalidCache() {
+
+      if (!this.invalidCache.isEmpty()) {
+        dropOrGive(this.invalidCache);
+        this.invalidCache = NonNullList.create();
+      }
+    }
+
+    private void dropOrGiveLast(ItemStackHandler stackHandler, String identifier, int amount) {
+
+      if (!wearer.world.isRemote) {
+        NonNullList<ItemStack> drops = NonNullList.create();
+
+        for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
+          ItemStack stack = stackHandler.getStackInSlot(i);
+          drops.add(stackHandler.getStackInSlot(i));
+          CuriosAPI.getCurio(stack).ifPresent(curio -> {
+            if (!stack.isEmpty()) {
+              wearer.getAttributes()
+                    .removeAttributeModifiers(curio.getAttributeModifiers(identifier));
+            }
+          });
+          stackHandler.setStackInSlot(i, ItemStack.EMPTY);
+        }
+        dropOrGive(drops);
+      }
+    }
+
+    private void dropOrGive(NonNullList<ItemStack> drops) {
+
+      if (wearer instanceof PlayerEntity) {
+
+        for (ItemStack drop : drops) {
+          ItemHandlerHelper.giveItemToPlayer((PlayerEntity) wearer, drop);
+        }
+      } else {
+
+        for (ItemStack drop : drops) {
+          wearer.entityDropItem(drop, 0.0f);
+        }
+      }
+    }
+  }
+
+  public static class Provider implements ICapabilitySerializable<INBT> {
+
+    final LazyOptional<ICurioItemHandler> optional;
+    final ICurioItemHandler               handler;
+
+    Provider(final LivingEntity livingBase) {
+
+      this.handler = new CurioInventoryWrapper(livingBase);
+      this.optional = LazyOptional.of(() -> handler);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nullable Capability<T> capability, Direction facing) {
+
+      return CuriosCapability.INVENTORY.orEmpty(capability, optional);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public INBT serializeNBT() {
+
+      return CuriosCapability.INVENTORY.writeNBT(handler, null);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void deserializeNBT(INBT nbt) {
+
+      CuriosCapability.INVENTORY.readNBT(handler, null, nbt);
+    }
+  }
 }

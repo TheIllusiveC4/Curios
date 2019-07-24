@@ -29,100 +29,110 @@ import javax.annotation.Nonnull;
 
 public class CurioStackHandler extends ItemStackHandler {
 
-    protected NonNullList<ItemStack> previousStacks;
-    protected boolean isHidden = false;
+  protected NonNullList<ItemStack> previousStacks;
+  protected boolean                isHidden = false;
 
-    public CurioStackHandler()
-    {
-        this(1);
+  public CurioStackHandler() {
+
+    this(1);
+  }
+
+  public CurioStackHandler(int size) {
+
+    this.setSize(size);
+  }
+
+  public CurioStackHandler(NonNullList<ItemStack> stacks) {
+
+    this.stacks = stacks;
+    this.previousStacks = NonNullList.create();
+
+    for (int i = 0; i < stacks.size(); i++) {
+      previousStacks.add(ItemStack.EMPTY);
+    }
+  }
+
+  @Override
+  public void setSize(int size) {
+
+    this.stacks = NonNullList.create();
+    this.previousStacks = NonNullList.create();
+
+    for (int i = 0; i < size; i++) {
+      this.stacks.add(ItemStack.EMPTY);
+      this.previousStacks.add(ItemStack.EMPTY);
+    }
+  }
+
+  public void setPreviousStackInSlot(int slot, @Nonnull ItemStack stack) {
+
+    validateSlotIndex(slot);
+    this.previousStacks.set(slot, stack);
+    onContentsChanged(slot);
+  }
+
+  public int getPreviousSlots() {
+
+    return previousStacks.size();
+  }
+
+  @Nonnull
+  public ItemStack getPreviousStackInSlot(int slot) {
+
+    validateSlotIndex(slot);
+    return this.previousStacks.get(slot);
+  }
+
+  public void addSize(int amount) {
+
+    if (amount < 0) {
+      throw new IllegalArgumentException("Amount cannot be negative!");
     }
 
-    public CurioStackHandler(int size) {
-        this.setSize(size);
+    for (int i = 0; i < amount; i++) {
+      this.stacks.add(ItemStack.EMPTY);
+      this.previousStacks.add(ItemStack.EMPTY);
+    }
+  }
+
+  public void removeSize(int amount) {
+
+    if (amount < 0) {
+      throw new IllegalArgumentException("Amount cannot be negative!");
+    }
+    int targetSize = this.stacks.size() - amount;
+
+    while (this.stacks.size() > targetSize) {
+      this.stacks.remove(this.stacks.size() - 1);
     }
 
-    public CurioStackHandler(NonNullList<ItemStack> stacks) {
-        this.stacks = stacks;
-        this.previousStacks = NonNullList.create();
-
-        for (int i = 0; i < stacks.size(); i++) {
-            previousStacks.add(ItemStack.EMPTY);
-        }
+    while (this.previousStacks.size() > targetSize) {
+      this.previousStacks.remove(this.previousStacks.size() - 1);
     }
+  }
 
-    @Override
-    public void setSize(int size) {
-        this.stacks = NonNullList.create();
-        this.previousStacks = NonNullList.create();
+  public boolean isHidden() {
 
-        for (int i = 0; i < size; i++) {
-            this.stacks.add(ItemStack.EMPTY);
-            this.previousStacks.add(ItemStack.EMPTY);
-        }
-    }
+    return isHidden;
+  }
 
-    public void setPreviousStackInSlot(int slot, @Nonnull ItemStack stack) {
-        validateSlotIndex(slot);
-        this.previousStacks.set(slot, stack);
-        onContentsChanged(slot);
-    }
+  public void setHidden(boolean hidden) {
 
-    public int getPreviousSlots() {
-        return previousStacks.size();
-    }
+    isHidden = hidden;
+  }
 
-    @Nonnull
-    public ItemStack getPreviousStackInSlot(int slot) {
-        validateSlotIndex(slot);
-        return this.previousStacks.get(slot);
-    }
+  @Override
+  public CompoundNBT serializeNBT() {
 
-    public void addSize(int amount) {
+    CompoundNBT compound = super.serializeNBT();
+    compound.putBoolean("Hidden", isHidden);
+    return compound;
+  }
 
-        if (amount < 0) {
-            throw new IllegalArgumentException("Amount cannot be negative!");
-        }
+  @Override
+  public void deserializeNBT(CompoundNBT nbt) {
 
-        for (int i = 0; i < amount; i++) {
-            this.stacks.add(ItemStack.EMPTY);
-            this.previousStacks.add(ItemStack.EMPTY);
-        }
-    }
-
-    public void removeSize(int amount) {
-
-        if (amount < 0) {
-            throw new IllegalArgumentException("Amount cannot be negative!");
-        }
-        int targetSize = this.stacks.size() - amount;
-
-        while (this.stacks.size() > targetSize) {
-            this.stacks.remove(this.stacks.size() - 1);
-        }
-
-        while (this.previousStacks.size() > targetSize) {
-            this.previousStacks.remove(this.previousStacks.size() - 1);
-        }
-    }
-
-    public boolean isHidden() {
-        return isHidden;
-    }
-
-    public void setHidden(boolean hidden) {
-        isHidden = hidden;
-    }
-
-    @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT compound = super.serializeNBT();
-        compound.putBoolean("Hidden", isHidden);
-        return compound;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundNBT nbt) {
-        this.isHidden = nbt.contains("Hidden", Constants.NBT.TAG_BYTE) && nbt.getBoolean("Hidden");
-        super.deserializeNBT(nbt);
-    }
+    this.isHidden = nbt.contains("Hidden", Constants.NBT.TAG_BYTE) && nbt.getBoolean("Hidden");
+    super.deserializeNBT(nbt);
+  }
 }

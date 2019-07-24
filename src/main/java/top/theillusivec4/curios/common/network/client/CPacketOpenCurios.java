@@ -29,31 +29,34 @@ import java.util.function.Supplier;
 
 public class CPacketOpenCurios {
 
-    private float oldMouseX;
-    private float oldMouseY;
+  private float oldMouseX;
+  private float oldMouseY;
 
-    public CPacketOpenCurios(float oldMouseX, float oldMouseY) {
-        this.oldMouseX = oldMouseX;
-        this.oldMouseY = oldMouseY;
-    }
+  public CPacketOpenCurios(float oldMouseX, float oldMouseY) {
 
-    public static void encode(CPacketOpenCurios msg, PacketBuffer buf) {
-        buf.writeFloat(msg.oldMouseX);
-        buf.writeFloat(msg.oldMouseY);
-    }
+    this.oldMouseX = oldMouseX;
+    this.oldMouseY = oldMouseY;
+  }
 
-    public static CPacketOpenCurios decode(PacketBuffer buf) {
-        return new CPacketOpenCurios(buf.readFloat(), buf.readFloat());
-    }
+  public static void encode(CPacketOpenCurios msg, PacketBuffer buf) {
 
-    public static void handle(CPacketOpenCurios msg, Supplier<NetworkEvent.Context> ctx) {
+    buf.writeFloat(msg.oldMouseX);
+    buf.writeFloat(msg.oldMouseY);
+  }
 
-        ctx.get().enqueueWork(() -> {
-            ServerPlayerEntity sender = ctx.get().getSender();
+  public static CPacketOpenCurios decode(PacketBuffer buf) {
 
-            if (sender != null) {
-                NetworkHooks.openGui(sender, new CuriosContainerProvider());
-            }
-        });
-    }
+    return new CPacketOpenCurios(buf.readFloat(), buf.readFloat());
+  }
+
+  public static void handle(CPacketOpenCurios msg, Supplier<NetworkEvent.Context> ctx) {
+
+    ctx.get().enqueueWork(() -> {
+      ServerPlayerEntity sender = ctx.get().getSender();
+
+      if (sender != null) {
+        NetworkHooks.openGui(sender, new CuriosContainerProvider());
+      }
+    });
+  }
 }

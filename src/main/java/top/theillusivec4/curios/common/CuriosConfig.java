@@ -28,63 +28,65 @@ import java.util.List;
 
 public class CuriosConfig {
 
-    private static final String CONFIG_PREFIX = "gui." + Curios.MODID + ".config.";
+  private static final String CONFIG_PREFIX = "gui." + Curios.MODID + ".config.";
 
-    public static class Common {
+  public static class Common {
 
-        public final ForgeConfigSpec.ConfigValue<List<String>> disabledCurios;
-        public final ForgeConfigSpec.ConfigValue<List<String>> createCurios;
+    public final ForgeConfigSpec.ConfigValue<List<String>> disabledCurios;
+    public final ForgeConfigSpec.ConfigValue<List<String>> createCurios;
 
-        Common(ForgeConfigSpec.Builder builder) {
-            builder.push("common");
+    Common(ForgeConfigSpec.Builder builder) {
 
-            disabledCurios = builder
-                    .comment("List of curio types to disable by default")
-                    .translation(CONFIG_PREFIX + "disabledCurios")
-                    .worldRestart()
-                    .define("disabledCurios", Lists.newArrayList());
+      builder.push("common");
 
-            createCurios = builder
-                    .comment("List of curio types to create")
-                    .translation(CONFIG_PREFIX + "createCurios")
-                    .worldRestart()
-                    .define("createCurios", Lists.newArrayList());
+      disabledCurios = builder.comment("List of curio types to disable by default")
+                              .translation(CONFIG_PREFIX + "disabledCurios")
+                              .worldRestart()
+                              .define("disabledCurios", Lists.newArrayList());
 
-            builder.pop();
-        }
+      createCurios = builder.comment("List of curio types to create")
+                            .translation(CONFIG_PREFIX + "createCurios")
+                            .worldRestart()
+                            .define("createCurios", Lists.newArrayList());
+
+      builder.pop();
     }
+  }
 
-    public static class Client {
+  public static class Client {
 
-        public final ForgeConfigSpec.BooleanValue renderCurios;
+    public final ForgeConfigSpec.BooleanValue renderCurios;
 
-        Client(ForgeConfigSpec.Builder builder) {
-            builder.comment("Client only settings, mostly things related to rendering")
-                    .push("client");
+    Client(ForgeConfigSpec.Builder builder) {
 
-            renderCurios = builder
-                    .comment("Set to true to enable rendering curios")
-                    .translation(CONFIG_PREFIX + "renderCurios")
-                    .define("renderCurios", true);
+      builder.comment("Client only settings, mostly things related to rendering").push("client");
 
-            builder.pop();
-        }
+      renderCurios = builder.comment("Set to true to enable rendering curios")
+                            .translation(CONFIG_PREFIX + "renderCurios")
+                            .define("renderCurios", true);
+
+      builder.pop();
     }
+  }
 
-    public static final ForgeConfigSpec clientSpec;
-    public static final Client CLIENT;
-    static {
-        final Pair<Client, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(Client::new);
-        clientSpec = specPair.getRight();
-        CLIENT = specPair.getLeft();
-    }
+  public static final ForgeConfigSpec clientSpec;
+  public static final Client          CLIENT;
+
+  static {
+    final Pair<Client, ForgeConfigSpec> specPair =
+        new ForgeConfigSpec.Builder().configure(Client::new);
+    clientSpec = specPair.getRight();
+    CLIENT = specPair.getLeft();
+  }
 
 
-    public static final ForgeConfigSpec commonSpec;
-    public static final Common COMMON;
-    static {
-        final Pair<Common, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(Common::new);
-        commonSpec = specPair.getRight();
-        COMMON = specPair.getLeft();
-    }
+  public static final ForgeConfigSpec commonSpec;
+  public static final Common          COMMON;
+
+  static {
+    final Pair<Common, ForgeConfigSpec> specPair =
+        new ForgeConfigSpec.Builder().configure(Common::new);
+    commonSpec = specPair.getRight();
+    COMMON = specPair.getLeft();
+  }
 }
