@@ -24,7 +24,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.logging.log4j.util.TriConsumer;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
@@ -33,10 +35,26 @@ import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class CuriosAPI {
+
+  /**
+   * Contains a three-input consumer that should be used when passing in a single-input consumer
+   * into {@link ItemStack#damageItem(int, LivingEntity, Consumer)}
+   * <p>
+   * The first input is the {@link CurioType} String identifier
+   * The second input is the slot index of the identifier
+   * The third input is the entity that is breaking the item
+   * <p>
+   * Example:
+   * {
+   * stack.damageItem(amount, entity, damager -> CuriosAPI.onBrokenCurio.accept(id, index, damager)
+   * }
+   */
+  public static TriConsumer<String, Integer, LivingEntity> onBrokenCurio;
 
   /**
    * @param stack The ItemStack to get the curio capability from
@@ -146,10 +164,6 @@ public final class CuriosAPI {
           return new ImmutableTriple<>("", 0, ItemStack.EMPTY);
         }).orElse(new ImmutableTriple<>("", 0, ItemStack.EMPTY));
     return result.getLeft().isEmpty() ? Optional.empty() : Optional.of(result);
-  }
-
-  public static void sendCurioBreakAnimation(int entityId, String identifier, int index) {
-
   }
 
   /**
@@ -271,6 +285,12 @@ public final class CuriosAPI {
    */
   public static Map<String, CurioType>        idToType = new HashMap<>();
   public static Map<String, ResourceLocation> idToIcon = new HashMap<>();
+
+  /**
+   * An instance of a network channel to be used within the API
+   * This is populated from the Curios mod itself, do not attempt to override it
+   */
+  public static SimpleChannel network;
 
   /**
    * Holder class for IMC message identifiers

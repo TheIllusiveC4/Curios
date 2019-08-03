@@ -25,9 +25,11 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
+import top.theillusivec4.curios.common.network.server.SPacketBreakCurio;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
 import top.theillusivec4.curios.common.network.server.sync.*;
 
@@ -49,6 +51,7 @@ public class NetworkHandler {
 
   public static void register() {
 
+    CuriosAPI.network = INSTANCE;
     registerMessage(CPacketOpenCurios.class, CPacketOpenCurios::encode, CPacketOpenCurios::decode,
                     CPacketOpenCurios::handle);
     registerMessage(CPacketOpenVanilla.class, CPacketOpenVanilla::encode,
@@ -67,6 +70,8 @@ public class NetworkHandler {
                     SPacketSyncMap::handle);
     registerMessage(SPacketSyncContentsWithTag.class, SPacketSyncContentsWithTag::encode,
                     SPacketSyncContentsWithTag::decode, SPacketSyncContentsWithTag::handle);
+    registerMessage(SPacketBreakCurio.class, SPacketBreakCurio::encode, SPacketBreakCurio::decode,
+                    SPacketBreakCurio::handle);
   }
 
   private static <MSG> void registerMessage(Class<MSG> messageType,

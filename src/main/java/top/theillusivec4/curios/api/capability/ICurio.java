@@ -37,7 +37,6 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.server.ServerWorld;
 import top.theillusivec4.curios.api.CurioType;
 
 import javax.annotation.Nonnull;
@@ -161,7 +160,7 @@ public interface ICurio {
    * @param stack        The ItemStack that was broken
    * @param livingEntity The entity that broke the curio
    */
-  default void renderBrokenCurio(ItemStack stack, LivingEntity livingEntity) {
+  default void onCurioBreak(ItemStack stack, LivingEntity livingEntity) {
 
     if (!stack.isEmpty()) {
 
@@ -186,14 +185,8 @@ public interface ICurio {
             vec3d1.add(livingEntity.posX, livingEntity.posY + (double) livingEntity.getEyeHeight(),
                        livingEntity.posZ);
 
-        if (livingEntity.world instanceof ServerWorld) {
-          ((ServerWorld) livingEntity.world).spawnParticle(
-              new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y, vec3d1.z, 1,
-              vec3d.x, vec3d.y + 0.05D, vec3d.z, 0.0D);
-        } else {
-          livingEntity.world.addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x,
-                                         vec3d1.y, vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
-        }
+        livingEntity.world.addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x,
+                                       vec3d1.y, vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
       }
     }
   }

@@ -11,6 +11,7 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.client.render.ModelCrown;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
@@ -19,7 +20,7 @@ public class ItemCrown extends Item implements ICurio {
 
   public ItemCrown() {
 
-    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
+    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(2000));
     this.setRegistryName(Curios.MODID, "crown");
   }
 
@@ -34,12 +35,14 @@ public class ItemCrown extends Item implements ICurio {
       private Object model;
 
       @Override
-      public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
+      public void onCurioTick(String identifier, int index, LivingEntity entityLivingBase) {
 
         if (!entityLivingBase.getEntityWorld().isRemote &&
             entityLivingBase.ticksExisted % 20 == 0) {
           entityLivingBase.addPotionEffect(
               new EffectInstance(Effects.NIGHT_VISION, 300, 44, true, true));
+          stack.damageItem(20, entityLivingBase,
+                           damager -> CuriosAPI.onBrokenCurio.accept(identifier, index, damager));
         }
       }
 
