@@ -51,6 +51,7 @@ public interface ICurio {
    */
   default void onCurioTick(String identifier, int index, LivingEntity entityLivingBase) {
 
+    onCurioTick(identifier, entityLivingBase);
   }
 
   /**
