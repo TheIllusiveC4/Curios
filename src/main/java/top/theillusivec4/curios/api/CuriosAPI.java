@@ -148,6 +148,10 @@ public final class CuriosAPI {
     return result.getLeft().isEmpty() ? Optional.empty() : Optional.of(result);
   }
 
+  public static void sendCurioBreakAnimation(int entityId, String identifier, int index) {
+
+  }
+
   /**
    * Adds a single slot to the {@link CurioType} with the associated identifier.
    * If the slot to be added is for a type that is not enabled on the entity, it will not be added.

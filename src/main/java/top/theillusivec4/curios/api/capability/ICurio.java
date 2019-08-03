@@ -30,9 +30,14 @@ import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ItemParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.server.ServerWorld;
 import top.theillusivec4.curios.api.CurioType;
 
 import javax.annotation.Nonnull;
@@ -40,12 +45,24 @@ import javax.annotation.Nonnull;
 public interface ICurio {
 
   /**
+   * @param identifier       The {@link CurioType} identifier of the
+   *                         *                         ItemStack's slot
+   * @param index            The index of the ItemStack's slot
+   * @param entityLivingBase The wearer of the ItemStack
+   */
+  default void onCurioTick(String identifier, int index, LivingEntity entityLivingBase) {
+
+  }
+
+  /**
    * Called every tick while the ItemStack is equipped
+   * Deprecated - use index-sensitive version {@link ICurio#onCurioTick(String, int, LivingEntity)}
    *
    * @param identifier       The {@link CurioType} identifier of the
    *                         ItemStack's slot
    * @param entityLivingBase The wearer of the ItemStack
    */
+  @Deprecated
   default void onCurioTick(String identifier, LivingEntity entityLivingBase) {
 
   }
@@ -134,6 +151,51 @@ public interface ICurio {
   default boolean canRightClickEquip() {
 
     return false;
+  }
+
+
+  /**
+   * Called when rendering break animations and sounds client-side when a worn
+   * curio item is broken
+   *
+   * @param stack        The ItemStack that was broken
+   * @param livingEntity The entity that broke the curio
+   */
+  default void renderBrokenCurio(ItemStack stack, LivingEntity livingEntity) {
+
+    if (!stack.isEmpty()) {
+
+      if (!livingEntity.isSilent()) {
+        livingEntity.world.playSound(livingEntity.posX, livingEntity.posY, livingEntity.posZ,
+                                     SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(),
+                                     0.8F, 0.8F + livingEntity.world.rand.nextFloat() * 0.4F,
+                                     false);
+      }
+
+      for (int i = 0; i < 5; ++i) {
+        Vec3d vec3d = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
+                                Math.random() * 0.1D + 0.1D, 0.0D);
+        vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
+        vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
+        double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
+        Vec3d vec3d1 =
+            new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D, d0, 0.6D);
+        vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
+        vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
+        vec3d1 =
+            vec3d1.add(livingEntity.posX, livingEntity.posY + (double) livingEntity.getEyeHeight(),
+                       livingEntity.posZ);
+
+        if (livingEntity.world instanceof ServerWorld) {
+          ((ServerWorld) livingEntity.world).spawnParticle(
+              new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y, vec3d1.z, 1,
+              vec3d.x, vec3d.y + 0.05D, vec3d.z, 0.0D);
+        } else {
+          livingEntity.world.addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x,
+                                         vec3d1.y, vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
+        }
+      }
+    }
   }
 
   /**
