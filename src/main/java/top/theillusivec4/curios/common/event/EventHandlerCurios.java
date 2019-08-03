@@ -291,15 +291,23 @@ public class EventHandlerCurios {
               }
               MinecraftForge.EVENT_BUS.post(
                   new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
+
+              boolean changeEquipped = !ItemStack.areItemsEqualIgnoreDurability(prevStack, stack);
               prevCurio.ifPresent(curio -> {
                 entitylivingbase.getAttributes()
                                 .removeAttributeModifiers(curio.getAttributeModifiers(identifier));
-                curio.onUnequipped(identifier, entitylivingbase);
+
+                if (changeEquipped) {
+                  curio.onUnequipped(identifier, entitylivingbase);
+                }
               });
               currentCurio.ifPresent(curio -> {
                 entitylivingbase.getAttributes()
                                 .applyAttributeModifiers(curio.getAttributeModifiers(identifier));
-                curio.onEquipped(identifier, entitylivingbase);
+
+                if (changeEquipped) {
+                  curio.onEquipped(identifier, entitylivingbase);
+                }
               });
               stackHandler.setPreviousStackInSlot(i,
                                                   stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
