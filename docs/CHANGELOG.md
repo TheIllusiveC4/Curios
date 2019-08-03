@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [0.19] - 2019.08.03
+### Added
+- [API] ICurio#onCurioBreak and CuriosAPI#onBrokenCurio for implementing 
+break animations for curios in curio slots, defaulting to vanilla behavior 
+but allowing for overrides as well
+### Changed
+- [API] onUnequipped and onEquipped methods now fire only when items are 
+different and ignore durability
+### Fixed
+- Fixed bug with Curios stacks not being cleaned up in the slots
+
 ## [0.18] - 2019.07.24
 ### Changed
 - Updated to 1.14.4 Forge
