@@ -81,7 +81,7 @@ public class Curios {
     NetworkHandler.register();
     MinecraftForge.EVENT_BUS.register(new EventHandlerCurios());
 
-    CuriosAPI.onBrokenCurio = (id, index, livingEntity) -> NetworkHandler.INSTANCE.send(
+    CuriosAPI.brokenCurioConsumer = (id, index, livingEntity) -> NetworkHandler.INSTANCE.send(
         PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
         new SPacketBreakCurio(livingEntity.getEntityId(), id, index));
   }
