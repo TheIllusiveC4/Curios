@@ -41,7 +41,7 @@ public class ItemCrown extends Item implements ICurio {
             entityLivingBase.ticksExisted % 20 == 0) {
           entityLivingBase.addPotionEffect(
               new EffectInstance(Effects.NIGHT_VISION, 300, 44, true, true));
-          stack.damageItem(20, entityLivingBase,
+          stack.damageItem(1, entityLivingBase,
                            damager -> CuriosAPI.onBrokenCurio.accept(identifier, index, damager));
         }
       }

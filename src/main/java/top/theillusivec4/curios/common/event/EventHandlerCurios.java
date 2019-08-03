@@ -310,6 +310,7 @@ public class EventHandlerCurios {
                   curio.onEquipped(identifier, entitylivingbase);
                 }
               });
+              stackHandler.setStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
               stackHandler.setPreviousStackInSlot(i,
                                                   stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
             }
