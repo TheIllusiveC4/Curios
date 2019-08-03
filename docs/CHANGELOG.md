@@ -4,14 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [0.20] - 2019.08.03
+### Changed
+- [API] Added call to ICurio#onCurioTick(String, LivingEntity) from 
+ICurio#onCurioTick(String, int, LivingEntity) for backwards compatibility
+
 ## [0.19] - 2019.08.03
 ### Added
 - [API] ICurio#onCurioBreak and CuriosAPI#onBrokenCurio for implementing 
 break animations for curios in curio slots, defaulting to vanilla behavior 
 but allowing for overrides as well
+- [API] Added ICurio#onCurioTick(String, int, LivingEntity) for 
+index-sensitive tick calls
 ### Changed
 - [API] onUnequipped and onEquipped methods now fire only when items are 
 different and ignore durability
+- [API] ICurio#onCurioTick(String, LivingEntity) has been deprecated in favor
+ of the index-sensitive version
 ### Fixed
 - Fixed bug with Curios stacks not being cleaned up in the slots
 
