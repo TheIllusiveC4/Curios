@@ -25,7 +25,6 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
@@ -51,7 +50,6 @@ public class NetworkHandler {
 
   public static void register() {
 
-    CuriosAPI.network = INSTANCE;
     registerMessage(CPacketOpenCurios.class, CPacketOpenCurios::encode, CPacketOpenCurios::decode,
                     CPacketOpenCurios::handle);
     registerMessage(CPacketOpenVanilla.class, CPacketOpenVanilla::encode,

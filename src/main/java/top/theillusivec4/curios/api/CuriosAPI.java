@@ -24,7 +24,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
 import top.theillusivec4.curios.Curios;
@@ -40,21 +39,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class CuriosAPI {
-
-  /**
-   * Contains a three-input consumer that should be used when passing in a single-input consumer
-   * into {@link ItemStack#damageItem(int, LivingEntity, Consumer)}
-   * <p>
-   * The first input is the {@link CurioType} String identifier
-   * The second input is the slot index of the identifier
-   * The third input is the entity that is breaking the item
-   * <p>
-   * Example:
-   * {
-   * stack.damageItem(amount, entity, damager -> CuriosAPI.onBrokenCurio.accept(id, index, damager)
-   * }
-   */
-  public static TriConsumer<String, Integer, LivingEntity> onBrokenCurio;
 
   /**
    * @param stack The ItemStack to get the curio capability from
@@ -73,6 +57,26 @@ public final class CuriosAPI {
       @Nonnull final LivingEntity entityLivingBase) {
 
     return entityLivingBase.getCapability(CuriosCapability.INVENTORY);
+  }
+
+  /**
+   * Passes three inputs into an internal triple-input consumer that should be used from the
+   * single-input consumer in {@link ItemStack#damageItem(int, LivingEntity, Consumer)}
+   * <p>
+   * This will be necessary in order to trigger break animations in curio slots
+   * <p>
+   * Example:
+   * {
+   * stack.damageItem(amount, entity, damager -> CuriosAPI.onBrokenCurio(id, index, damager));
+   * }
+   *
+   * @param id      The {@link CurioType} String identifier
+   * @param index   The slot index of the identifier
+   * @param damager The entity that is breaking the item
+   */
+  public static void onBrokenCurio(String id, int index, LivingEntity damager) {
+
+    brokenCurioConsumer.accept(id, index, damager);
   }
 
   /**
@@ -286,11 +290,7 @@ public final class CuriosAPI {
   public static Map<String, CurioType>        idToType = new HashMap<>();
   public static Map<String, ResourceLocation> idToIcon = new HashMap<>();
 
-  /**
-   * An instance of a network channel to be used within the API
-   * This is populated from the Curios mod itself, do not attempt to override it
-   */
-  public static SimpleChannel network;
+  public static TriConsumer<String, Integer, LivingEntity> brokenCurioConsumer;
 
   /**
    * Holder class for IMC message identifiers
