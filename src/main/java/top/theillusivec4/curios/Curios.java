@@ -35,6 +35,8 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 import top.theillusivec4.curios.client.EventHandlerClient;
@@ -56,7 +58,8 @@ import java.util.Map;
 @Mod(Curios.MODID)
 public class Curios {
 
-  public static final String MODID = "curios";
+  public static final String MODID  = "curios";
+  public static final Logger LOGGER = LogManager.getLogger();
 
   public Curios() {
 
