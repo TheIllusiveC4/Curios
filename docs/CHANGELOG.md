@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [0.21] - 2019.08.05
+### Changed
+- Updated Forge version to 28.0.45 to accommodate for a breaking change
+
 ## [0.20] - 2019.08.03
 ### Changed
 - [API] Added call to ICurio#onCurioTick(String, LivingEntity) from 

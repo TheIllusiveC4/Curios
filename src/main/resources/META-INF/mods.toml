@@ -14,7 +14,7 @@ ${mod_description}
 [[dependencies.curios]]
     modId="forge"
     mandatory=true
-    versionRange="[28,)"
+    versionRange="[28.0.45,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curios]]
