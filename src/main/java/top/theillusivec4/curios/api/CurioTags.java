@@ -23,7 +23,6 @@ import net.minecraft.item.Item;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
-import top.theillusivec4.curios.Curios;
 
 /**
  * A reference class for storing a list of commonly used tags to avoid modders implementing
@@ -69,6 +68,6 @@ public final class CurioTags {
 
   private static Tag<Item> tag(String name) {
 
-    return new ItemTags.Wrapper(new ResourceLocation(Curios.MODID, name));
+    return new ItemTags.Wrapper(new ResourceLocation(CuriosAPI.MODID, name));
   }
 }

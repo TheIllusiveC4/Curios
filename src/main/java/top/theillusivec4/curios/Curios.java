@@ -60,7 +60,7 @@ import java.util.Map;
 @Mod(Curios.MODID)
 public class Curios {
 
-  public static final String MODID  = "curios";
+  public static final String MODID  = CuriosAPI.MODID;
   public static final Logger LOGGER = LogManager.getLogger();
 
   public Curios() {

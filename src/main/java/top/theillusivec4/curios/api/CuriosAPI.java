@@ -26,7 +26,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
@@ -39,6 +38,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class CuriosAPI {
+
+  /**
+   * Holds a reference to the Curios modid
+   */
+  public static final String MODID = "curios";
 
   /**
    * @param stack The ItemStack to get the curio capability from
@@ -262,14 +266,13 @@ public final class CuriosAPI {
   public static Set<String> getCurioTags(Item item) {
 
     return item.getTags()
-               .stream()
-               .filter(tag -> tag.getNamespace().equals(Curios.MODID))
+               .stream().filter(tag -> tag.getNamespace().equals(MODID))
                .map(ResourceLocation::getPath)
                .collect(Collectors.toSet());
   }
 
   private static final ResourceLocation GENERIC_SLOT =
-      new ResourceLocation(Curios.MODID, "textures/item" + "/empty_generic_slot.png");
+      new ResourceLocation(MODID, "textures/item" + "/empty_generic_slot.png");
 
   /**
    * @return An unmodifiable map of identifiers and their registered icons
