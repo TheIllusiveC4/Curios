@@ -47,6 +47,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
@@ -107,16 +108,19 @@ public class EventHandlerCurios {
   @SubscribeEvent
   public void onPlayerClone(PlayerEvent.Clone evt) {
 
-    PlayerEntity player = evt.getEntityPlayer();
-    PlayerEntity oldPlayer = evt.getOriginal();
+    PlayerEntity player = evt.getPlayer();
 
-    if (!evt.isWasDeath() || player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
-      CuriosAPI.getCuriosHandler(oldPlayer)
-               .ifPresent(originalHandler -> CuriosAPI.getCuriosHandler(player)
-                                                      .ifPresent(
-                                                          newHandler -> newHandler.setCurioMap(
-                                                              originalHandler.getCurioMap())));
+    if (evt.isWasDeath() && !player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+      return;
     }
+
+    PlayerEntity oldPlayer = evt.getOriginal();
+    oldPlayer.revive();
+    LazyOptional<ICurioItemHandler> oldHandler = CuriosAPI.getCuriosHandler(oldPlayer);
+    LazyOptional<ICurioItemHandler> newHandler = CuriosAPI.getCuriosHandler(player);
+
+    oldHandler.ifPresent(oldCurios -> newHandler.ifPresent(
+        newCurios -> newCurios.setCurioMap(oldCurios.getCurioMap())));
   }
 
   @SubscribeEvent
