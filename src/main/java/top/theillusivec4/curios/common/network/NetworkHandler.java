@@ -25,6 +25,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.common.network.client.CPacketDestroyCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
@@ -38,8 +39,9 @@ import java.util.function.Supplier;
 
 public class NetworkHandler {
 
-  private static final String        PTC_VERSION = "1";
-  public static final  SimpleChannel INSTANCE    =
+  private static final String PTC_VERSION = "1";
+
+  public static final SimpleChannel INSTANCE =
       NetworkRegistry.ChannelBuilder.named(new ResourceLocation(Curios.MODID, "main"))
                                     .networkProtocolVersion(() -> PTC_VERSION)
                                     .clientAcceptedVersions(PTC_VERSION::equals)
@@ -50,12 +52,17 @@ public class NetworkHandler {
 
   public static void register() {
 
+    //Client Packets
     registerMessage(CPacketOpenCurios.class, CPacketOpenCurios::encode, CPacketOpenCurios::decode,
                     CPacketOpenCurios::handle);
     registerMessage(CPacketOpenVanilla.class, CPacketOpenVanilla::encode,
                     CPacketOpenVanilla::decode, CPacketOpenVanilla::handle);
     registerMessage(CPacketScrollCurios.class, CPacketScrollCurios::encode,
                     CPacketScrollCurios::decode, CPacketScrollCurios::handle);
+    registerMessage(CPacketDestroyCurios.class, CPacketDestroyCurios::encode,
+                    CPacketDestroyCurios::decode, CPacketDestroyCurios::handle);
+
+    // Server Packets
     registerMessage(SPacketSyncContents.class, SPacketSyncContents::encode,
                     SPacketSyncContents::decode, SPacketSyncContents::handle);
     registerMessage(SPacketScrollCurios.class, SPacketScrollCurios::encode,
