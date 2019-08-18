@@ -28,6 +28,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -78,12 +79,14 @@ public class Curios {
 
     CapCurioInventory.register();
     CapCurioItem.register();
-    NetworkHandler.register();
     MinecraftForge.EVENT_BUS.register(new EventHandlerCurios());
+    NetworkHandler.register();
 
-    CuriosAPI.brokenCurioConsumer = (id, index, livingEntity) -> NetworkHandler.INSTANCE.send(
-        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-        new SPacketBreakCurio(livingEntity.getEntityId(), id, index));
+    DeferredWorkQueue.runLater(() -> {
+      CuriosAPI.brokenCurioConsumer = (id, index, livingEntity) -> NetworkHandler.INSTANCE.send(
+          PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
+          new SPacketBreakCurio(livingEntity.getEntityId(), id, index));
+    });
   }
 
   private void enqueue(InterModEnqueueEvent evt) {
