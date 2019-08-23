@@ -89,6 +89,7 @@ public class Curios {
     for (String id : CuriosConfig.COMMON.disabledCurios.get()) {
       send(CuriosAPI.IMC.MODIFY_TYPE, new CurioIMCMessage(id).setEnabled(false));
     }
+
     send(CuriosAPI.IMC.REGISTER_ICON,
          new Tuple<>("charm", new ResourceLocation(MODID, "textures/item/empty_charm_slot.png")));
     send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("necklace", new ResourceLocation(MODID,
