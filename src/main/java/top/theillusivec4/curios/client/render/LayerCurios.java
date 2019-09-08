@@ -52,7 +52,7 @@ public class LayerCurios<T extends LivingEntity, M extends EntityModel<T>>
     CuriosAPI.getCuriosHandler(entitylivingbaseIn).ifPresent(handler -> {
       SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
-      if (entitylivingbaseIn.isSneaking()) {
+      if (entitylivingbaseIn.shouldRenderSneaking()) {
         GlStateManager.translatef(0.0f, 0.2f, 0.0f);
       }
 
