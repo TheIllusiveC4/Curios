@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.2.0'
+        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
     }
 }
 apply plugin: 'eclipse'
