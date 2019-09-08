@@ -34,7 +34,7 @@ import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.client.render.ModelAmulet;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 
-public class ItemAmulet extends Item implements ICurio {
+public class ItemAmulet extends Item {
 
   public ItemAmulet() {
 

@@ -40,7 +40,7 @@ import top.theillusivec4.curios.common.capability.CapCurioItem;
 
 import java.util.UUID;
 
-public class ItemRing extends Item implements ICurio {
+public class ItemRing extends Item {
 
   private static final UUID SPEED_UUID = UUID.fromString("8b7c8fcd-89bc-4794-8bb9-eddeb32753a5");
   private static final UUID ARMOR_UUID = UUID.fromString("38faf191-bf78-4654-b349-cc1f4f1143bf");

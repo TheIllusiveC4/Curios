@@ -16,7 +16,7 @@ import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.client.render.ModelCrown;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 
-public class ItemCrown extends Item implements ICurio {
+public class ItemCrown extends Item {
 
   public ItemCrown() {
 
