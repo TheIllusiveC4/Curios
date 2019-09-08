@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [0.25] - 2019.09.08
+### Fixed
+- Fixed sneak transformations on curio renders when in creative flight [#14](https://github.com/TheIllusiveC4/Curios/issues/14)
+
 ## [0.24] - 2019.08.22
 ### Fixed
 - Attempt #2 to fix startup crashes [#12](https://github.com/TheIllusiveC4/Curios/issues/12)
