@@ -60,7 +60,7 @@ public class GuiButtonCurios extends ImageButton {
 
     if (parentGui instanceof InventoryScreen) {
       boolean lastVisible = isRecipeBookVisible;
-      isRecipeBookVisible = ((InventoryScreen) parentGui).func_194310_f().isVisible();
+      isRecipeBookVisible = ((InventoryScreen) parentGui).getRecipeGui().isVisible();
 
       if (lastVisible != isRecipeBookVisible) {
         this.setPosition(parentGui.getGuiLeft() + 26, parentGui.height / 2 - 75);
