@@ -21,6 +21,7 @@ package top.theillusivec4.curios.client.gui;
 
 import java.lang.reflect.Method;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
@@ -44,14 +45,19 @@ public class GuiEventHandler {
   @SubscribeEvent
   public void onInventoryGuiInit(GuiScreenEvent.InitGuiEvent.Post evt) {
 
-    if (!(evt.getGui() instanceof InventoryScreen)) {
-      return;
-    }
+    Screen screen = evt.getGui();
 
-    InventoryScreen gui = (InventoryScreen) evt.getGui();
-    evt.addWidget(
-        new GuiButtonCurios(gui, gui.getGuiLeft() + 26, gui.height / 2 - 75, 14, 14, 50, 0, 14,
-            CuriosScreen.CURIO_INVENTORY));
+    if (screen instanceof InventoryScreen) {
+      InventoryScreen gui = (InventoryScreen) screen;
+      evt.addWidget(
+          new GuiButtonCurios(gui, gui.getGuiLeft() + 26, gui.height / 2 - 75, 14, 14, 50, 0, 14,
+              CuriosScreen.CURIO_INVENTORY));
+    } else if (screen instanceof CreativeScreen) {
+      CreativeScreen gui = (CreativeScreen) screen;
+      evt.addWidget(
+          new GuiButtonCurios(gui, gui.getGuiLeft() + 36, gui.height / 2 - 64, 14, 14, 50, 0, 14,
+              CuriosScreen.CURIO_INVENTORY));
+    }
   }
 
   @SubscribeEvent

@@ -21,8 +21,10 @@ package top.theillusivec4.curios.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.ImageButton;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -65,6 +67,11 @@ public class GuiButtonCurios extends ImageButton {
       if (lastVisible != isRecipeBookVisible) {
         this.setPosition(parentGui.getGuiLeft() + 26, parentGui.height / 2 - 75);
       }
+    } else if (parentGui instanceof CreativeScreen) {
+      CreativeScreen gui = (CreativeScreen) parentGui;
+      boolean isInventoryTab = gui.getSelectedTabIndex() == ItemGroup.INVENTORY.getIndex();
+      this.active = isInventoryTab;
+      this.visible = isInventoryTab;
     }
     super.render(mouseX, mouseY, partialTicks);
   }
