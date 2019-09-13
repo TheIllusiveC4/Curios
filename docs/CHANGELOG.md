@@ -9,6 +9,7 @@ This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 - Added Curios button to the Creative inventory screen
 ### Changed
 - [API] Re-formatted and updated some javadocs
+- Updated to Forge RB 1.14.4-28.1.0
 ### Fixed
 - Fixed client desyncing with items in curio slots [#15](https://github.com/TheIllusiveC4/Curios/issues/14)
 
