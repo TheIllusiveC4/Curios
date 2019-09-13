@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.common.network.server;
 
+import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -31,12 +32,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
 
-import java.util.function.Supplier;
-
 public class SPacketBreakCurio {
 
-  private int    entityId;
-  private int    slotId;
+  private int entityId;
+  private int slotId;
   private String curioId;
 
   public SPacketBreakCurio(int entityId, String curioId, int slotId) {
@@ -75,15 +74,15 @@ public class SPacketBreakCurio {
 
               if (!livingEntity.isSilent()) {
                 livingEntity.world.playSound(livingEntity.posX, livingEntity.posY,
-                                             livingEntity.posZ, SoundEvents.ENTITY_ITEM_BREAK,
-                                             livingEntity.getSoundCategory(), 0.8F,
-                                             0.8F + livingEntity.world.rand.nextFloat() * 0.4F,
-                                             false);
+                    livingEntity.posZ, SoundEvents.ENTITY_ITEM_BREAK,
+                    livingEntity.getSoundCategory(), 0.8F,
+                    0.8F + livingEntity.world.rand.nextFloat() * 0.4F,
+                    false);
               }
 
               for (int i = 0; i < 5; ++i) {
                 Vec3d vec3d = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
-                                        Math.random() * 0.1D + 0.1D, 0.0D);
+                    Math.random() * 0.1D + 0.1D, 0.0D);
                 vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
                 vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
                 double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
@@ -92,12 +91,12 @@ public class SPacketBreakCurio {
                 vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
                 vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
                 vec3d1 = vec3d1.add(livingEntity.posX,
-                                    livingEntity.posY + (double) livingEntity.getEyeHeight(),
-                                    livingEntity.posZ);
+                    livingEntity.posY + (double) livingEntity.getEyeHeight(),
+                    livingEntity.posZ);
 
                 livingEntity.world.addParticle(new ItemParticleData(ParticleTypes.ITEM, stack),
-                                               vec3d1.x, vec3d1.y, vec3d1.z, vec3d.x,
-                                               vec3d.y + 0.05D, vec3d.z);
+                    vec3d1.x, vec3d1.y, vec3d1.z, vec3d.x,
+                    vec3d.y + 0.05D, vec3d.z);
               }
             }
           }

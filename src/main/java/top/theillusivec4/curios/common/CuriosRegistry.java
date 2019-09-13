@@ -57,7 +57,7 @@ public class CuriosRegistry {
   public static void registerContainer(RegistryEvent.Register<ContainerType<?>> evt) {
 
     evt.getRegistry()
-       .register(
-           IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
+        .register(
+            IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
   }
 }

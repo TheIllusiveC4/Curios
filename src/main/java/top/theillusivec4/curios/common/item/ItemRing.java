@@ -21,6 +21,7 @@ package top.theillusivec4.curios.common.item;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import java.util.UUID;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -37,8 +38,6 @@ import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
-
-import java.util.UUID;
 
 public class ItemRing extends Item {
 
@@ -57,20 +56,19 @@ public class ItemRing extends Item {
     return CapCurioItem.createProvider(new ICurio() {
 
       @Override
-      public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
+      public void onCurioTick(String identifier, LivingEntity livingEntity) {
 
-        if (!entityLivingBase.getEntityWorld().isRemote &&
-            entityLivingBase.ticksExisted % 19 == 0) {
-          entityLivingBase.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));
+        if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 19 == 0) {
+          livingEntity.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));
         }
       }
 
       @Override
-      public void playEquipSound(LivingEntity entityLivingBase) {
+      public void playEquipSound(LivingEntity livingEntity) {
 
-        entityLivingBase.world.playSound(null, entityLivingBase.getPosition(),
-                                         SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL,
-                                         1.0f, 1.0f);
+        livingEntity.world
+            .playSound(null, livingEntity.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GOLD,
+                SoundCategory.NEUTRAL, 1.0f, 1.0f);
       }
 
       @Override
@@ -80,11 +78,11 @@ public class ItemRing extends Item {
 
         if (CuriosAPI.getCurioTags(stack.getItem()).contains(identifier)) {
           atts.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(),
-                   new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
-                                         AttributeModifier.Operation.MULTIPLY_TOTAL));
+              new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
+                  AttributeModifier.Operation.MULTIPLY_TOTAL));
           atts.put(SharedMonsterAttributes.ARMOR.getName(),
-                   new AttributeModifier(ARMOR_UUID, "Armor bonus", 2,
-                                         AttributeModifier.Operation.ADDITION));
+              new AttributeModifier(ARMOR_UUID, "Armor bonus", 2,
+                  AttributeModifier.Operation.ADDITION));
         }
         return atts;
       }

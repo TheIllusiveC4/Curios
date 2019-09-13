@@ -34,5 +34,5 @@ public class CuriosCapability {
 
   public static final ResourceLocation ID_INVENTORY =
       new ResourceLocation(CuriosAPI.MODID, "inventory");
-  public static final ResourceLocation ID_ITEM      = new ResourceLocation(CuriosAPI.MODID, "item");
+  public static final ResourceLocation ID_ITEM = new ResourceLocation(CuriosAPI.MODID, "item");
 }

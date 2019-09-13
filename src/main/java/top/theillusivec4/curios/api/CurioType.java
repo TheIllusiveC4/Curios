@@ -21,19 +21,19 @@ package top.theillusivec4.curios.api;
 
 public final class CurioType {
 
-  private final String  identifier;
+  private final String identifier;
   /**
-   * The default number of slots
+   * The default number of slots.
    */
-  private       int     size;
+  private int size;
   /**
-   * Enabled slots will be given to holders by default
+   * Enabled slots will be given to holders by default.
    */
-  private       boolean isEnabled;
+  private boolean isEnabled;
   /**
-   * Hidden slots will not be in the default Curios GUI, but will still exist
+   * Hidden slots will not be in the default Curios GUI, but will still exist.
    */
-  private       boolean isHidden;
+  private boolean isHidden;
 
   public CurioType(String identifier) {
 

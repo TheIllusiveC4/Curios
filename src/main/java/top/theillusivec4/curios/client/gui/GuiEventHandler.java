@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.client.gui;
 
+import java.lang.reflect.Method;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
@@ -34,13 +35,11 @@ import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketDestroyCurios;
 
-import java.lang.reflect.Method;
-
 public class GuiEventHandler {
 
   private static final Method GET_SELECTED_SLOT =
       ObfuscationReflectionHelper.findMethod(ContainerScreen.class, "func_195360_a", double.class,
-                                             double.class);
+          double.class);
 
   @SubscribeEvent
   public void onInventoryGuiInit(GuiScreenEvent.InitGuiEvent.Post evt) {
@@ -52,7 +51,7 @@ public class GuiEventHandler {
     InventoryScreen gui = (InventoryScreen) evt.getGui();
     evt.addWidget(
         new GuiButtonCurios(gui, gui.getGuiLeft() + 26, gui.height / 2 - 75, 14, 14, 50, 0, 14,
-                            CuriosScreen.CURIO_INVENTORY));
+            CuriosScreen.CURIO_INVENTORY));
   }
 
   @SubscribeEvent
@@ -64,9 +63,9 @@ public class GuiEventHandler {
 
     InventoryScreen gui = (InventoryScreen) evt.getGui();
     ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, gui, evt.getMouseX(),
-                                                "field_147048_u");
+        "field_147048_u");
     ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, gui, evt.getMouseY(),
-                                                "field_147047_v");
+        "field_147047_v");
   }
 
   @SubscribeEvent

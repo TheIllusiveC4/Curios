@@ -32,26 +32,26 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 public class GuiButtonCurios extends ImageButton {
 
   private final ContainerScreen parentGui;
-  private       boolean         isRecipeBookVisible = false;
+  private boolean isRecipeBookVisible = false;
 
   GuiButtonCurios(ContainerScreen parentGui, int xIn, int yIn, int widthIn, int heightIn,
-                  int textureOffestX, int textureOffestY, int yDiffText,
-                  ResourceLocation resource) {
+      int textureOffestX, int textureOffestY, int yDiffText,
+      ResourceLocation resource) {
 
     super(xIn, yIn, widthIn, heightIn, textureOffestX, textureOffestY, yDiffText, resource,
-          (button) -> {
-            Minecraft mc = Minecraft.getInstance();
+        (button) -> {
+          Minecraft mc = Minecraft.getInstance();
 
-            if (parentGui instanceof CuriosScreen) {
-              InventoryScreen inventory = new InventoryScreen(mc.player);
-              mc.displayGuiScreen(inventory);
-              NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-                                           new CPacketOpenVanilla());
-            } else {
-              NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-                                           new CPacketOpenCurios(0, 0));
-            }
-          });
+          if (parentGui instanceof CuriosScreen) {
+            InventoryScreen inventory = new InventoryScreen(mc.player);
+            mc.displayGuiScreen(inventory);
+            NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
+                new CPacketOpenVanilla());
+          } else {
+            NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
+                new CPacketOpenCurios(0, 0));
+          }
+        });
     this.parentGui = parentGui;
   }
 

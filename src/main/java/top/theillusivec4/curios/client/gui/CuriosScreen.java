@@ -45,12 +45,12 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
       new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
 
   private boolean widthTooNarrow;
-  private float   currentScroll;
+  private float currentScroll;
   private boolean isScrolling;
   private boolean buttonClicked;
 
   public CuriosScreen(CuriosContainer curiosContainer, PlayerInventory playerInventory,
-                      ITextComponent title) {
+      ITextComponent title) {
 
     super(curiosContainer, playerInventory, title);
     this.passEvents = true;
@@ -64,7 +64,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
     this.guiLeft = (this.width - this.xSize) / 2;
     this.addButton(
         new GuiButtonCurios(this, this.getGuiLeft() + 26, this.height / 2 - 75, 14, 14, 50, 0, 14,
-                            CURIO_INVENTORY));
+            CURIO_INVENTORY));
   }
 
   private boolean inScrollBar(double mouseX, double mouseY) {
@@ -76,7 +76,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
     int i1 = k + 14;
     int j1 = l + 139;
     return mouseX >= (double) k && mouseY >= (double) l && mouseX < (double) i1 &&
-           mouseY < (double) j1;
+        mouseY < (double) j1;
   }
 
   @Override
@@ -126,7 +126,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
     int j = this.guiTop;
     this.blit(i, j, 0, 0, this.xSize, this.ySize);
     InventoryScreen.drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - mouseX,
-                                       (float) (j + 75 - 50) - mouseY, this.getMinecraft().player);
+        (float) (j + 75 - 50) - mouseY, this.getMinecraft().player);
     CuriosAPI.getCuriosHandler(this.getMinecraft().player).ifPresent(handler -> {
       int slotCount = handler.getSlots();
       int upperHeight = 7 + slotCount * 18;
@@ -145,16 +145,15 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
   }
 
   /**
-   * Test if the 2D point is in a rectangle (relative to the GUI). Args :
-   * rectX, rectY, rectWidth, rectHeight, pointX,
-   * pointY
+   * Test if the 2D point is in a rectangle (relative to the GUI). Args : rectX, rectY, rectWidth,
+   * rectHeight, pointX, pointY
    */
   @Override
   protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight,
-                                    double pointX, double pointY) {
+      double pointX, double pointY) {
 
     return !this.widthTooNarrow &&
-           super.isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
+        super.isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
   }
 
   /**
@@ -187,7 +186,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
 
   @Override
   public boolean mouseDragged(double pMouseDragged1, double pMouseDragged3, int pMouseDragged5,
-                              double pMouseDragged6, double pMouseDragged8) {
+      double pMouseDragged6, double pMouseDragged8) {
 
     if (this.isScrolling) {
       int i = this.guiTop + 18;
@@ -198,13 +197,13 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
       return true;
     } else {
       return super.mouseDragged(pMouseDragged1, pMouseDragged3, pMouseDragged5, pMouseDragged6,
-                                pMouseDragged8);
+          pMouseDragged8);
     }
   }
 
   @Override
   public boolean mouseScrolled(double pMouseScrolled1, double pMouseScrolled3,
-                               double pMouseScrolled5) {
+      double pMouseScrolled5) {
 
     if (!this.needsScrollBars()) {
       return false;

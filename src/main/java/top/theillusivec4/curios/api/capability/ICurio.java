@@ -22,6 +22,7 @@ package top.theillusivec4.curios.api.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.platform.GlStateManager;
+import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingRenderer;
@@ -39,85 +40,78 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 import top.theillusivec4.curios.api.CurioType;
 
-import javax.annotation.Nonnull;
-
 public interface ICurio {
 
   /**
-   * @param identifier       The {@link CurioType} identifier of the
-   *                         *                         ItemStack's slot
-   * @param index            The index of the ItemStack's slot
-   * @param entityLivingBase The wearer of the ItemStack
+   * Called every tick while the ItemStack is equipped.
+   *
+   * @param identifier   The {@link CurioType} identifier of the ItemStack's slot
+   * @param index        The index of the ItemStack's slot
+   * @param livingEntity The wearer of the ItemStack
    */
-  default void onCurioTick(String identifier, int index, LivingEntity entityLivingBase) {
+  default void onCurioTick(String identifier, int index, LivingEntity livingEntity) {
 
-    onCurioTick(identifier, entityLivingBase);
+    onCurioTick(identifier, livingEntity);
   }
 
   /**
-   * Called every tick while the ItemStack is equipped
-   * Deprecated - use index-sensitive version {@link ICurio#onCurioTick(String, int, LivingEntity)}
+   * Deprecated - use index-sensitive version. {@link ICurio#onCurioTick(String, int,
+   * LivingEntity)}
    *
-   * @param identifier       The {@link CurioType} identifier of the
-   *                         ItemStack's slot
-   * @param entityLivingBase The wearer of the ItemStack
+   * @param identifier   The {@link CurioType} identifier of the ItemStack's slot
+   * @param livingEntity The wearer of the ItemStack
    */
   @Deprecated
-  default void onCurioTick(String identifier, LivingEntity entityLivingBase) {
+  default void onCurioTick(String identifier, LivingEntity livingEntity) {
 
   }
 
   /**
-   * Called when the ItemStack is equipped into a slot
+   * Called when the ItemStack is equipped into a slot.
    *
-   * @param identifier       The {@link CurioType} identifier of the slot
-   *                         being equipped into
-   * @param entityLivingBase The wearer of the ItemStack
+   * @param identifier   The {@link CurioType} identifier of the slot being equipped into
+   * @param livingEntity The wearer of the ItemStack
    */
-  default void onEquipped(String identifier, LivingEntity entityLivingBase) {
+  default void onEquipped(String identifier, LivingEntity livingEntity) {
 
   }
 
   /**
-   * Called when the ItemStack is unequipped from a slot
+   * Called when the ItemStack is unequipped from a slot.
    *
-   * @param identifier       The {@link CurioType} identifier of the slot
-   *                         being unequipped from
-   * @param entityLivingBase The wearer of the ItemStack
+   * @param identifier   The {@link CurioType} identifier of the slot being unequipped from
+   * @param livingEntity The wearer of the ItemStack
    */
-  default void onUnequipped(String identifier, LivingEntity entityLivingBase) {
+  default void onUnequipped(String identifier, LivingEntity livingEntity) {
 
   }
 
   /**
-   * Determines if the ItemStack can be equipped into a slot
+   * Determines if the ItemStack can be equipped into a slot.
    *
-   * @param identifier       The {@link CurioType} identifier of the slot
-   *                         being equipped into
-   * @param entityLivingBase The wearer of the ItemStack
+   * @param identifier   The {@link CurioType} identifier of the slot being equipped into
+   * @param livingEntity The wearer of the ItemStack
    * @return True if the ItemStack can be equipped/put in, false if not
    */
-  default boolean canEquip(String identifier, LivingEntity entityLivingBase) {
+  default boolean canEquip(String identifier, LivingEntity livingEntity) {
 
     return true;
   }
 
   /**
-   * Determines if the ItemStack can be unequipped from a slot
+   * Determines if the ItemStack can be unequipped from a slot.
    *
-   * @param identifier       The {@link CurioType} identifier of the slot
-   *                         being unequipped from
-   * @param entityLivingBase The wearer of the ItemStack
+   * @param identifier   The {@link CurioType} identifier of the slot being unequipped from
+   * @param livingEntity The wearer of the ItemStack
    * @return True if the ItemStack can be unequipped/taken out, false if not
    */
-  default boolean canUnequip(String identifier, LivingEntity entityLivingBase) {
+  default boolean canUnequip(String identifier, LivingEntity livingEntity) {
 
     return true;
   }
 
   /**
-   * A map of AttributeModifier associated with the ItemStack and the
-   * {@link CurioType} identifier
+   * A map of AttributeModifier associated with the ItemStack and the {@link CurioType} identifier.
    *
    * @param identifier The CurioType identifier for the context
    * @return A map of attribute modifiers to apply
@@ -128,23 +122,22 @@ public interface ICurio {
   }
 
   /**
-   * Plays a sound server-side when a curio is equipped from right-clicking the
-   * ItemStack in hand.
-   * This can be overridden to play nothing, but it is advised to always play
-   * something as an auditory feedback for players.
+   * Plays a sound server-side when a curio is equipped from right-clicking the ItemStack in hand.
+   * This can be overridden to play nothing, but it is advised to always play something as an
+   * auditory feedback for players.
    *
-   * @param entityLivingBase The wearer of the ItemStack
+   * @param livingEntity The wearer of the ItemStack
    */
-  default void playEquipSound(LivingEntity entityLivingBase) {
+  default void playEquipSound(LivingEntity livingEntity) {
 
-    entityLivingBase.world.playSound(null, entityLivingBase.getPosition(),
-                                     SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.NEUTRAL,
-                                     1.0f, 1.0f);
+    livingEntity.world.playSound(null, livingEntity.getPosition(),
+        SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.NEUTRAL,
+        1.0f, 1.0f);
   }
 
   /**
-   * Determines if the ItemStack can be automatically equipped into the first
-   * available slot when right-clicked.
+   * Determines if the ItemStack can be automatically equipped into the first available slot when
+   * right-clicked.
    *
    * @return True to enable right-clicking auto-equip, false to disable
    */
@@ -155,8 +148,8 @@ public interface ICurio {
 
 
   /**
-   * Called when rendering break animations and sounds client-side when a worn
-   * curio item is broken
+   * Called when rendering break animations and sounds client-side when a worn curio item is
+   * broken.
    *
    * @param stack        The ItemStack that was broken
    * @param livingEntity The entity that broke the curio
@@ -167,14 +160,14 @@ public interface ICurio {
 
       if (!livingEntity.isSilent()) {
         livingEntity.world.playSound(livingEntity.posX, livingEntity.posY, livingEntity.posZ,
-                                     SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(),
-                                     0.8F, 0.8F + livingEntity.world.rand.nextFloat() * 0.4F,
-                                     false);
+            SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(),
+            0.8F, 0.8F + livingEntity.world.rand.nextFloat() * 0.4F,
+            false);
       }
 
       for (int i = 0; i < 5; ++i) {
         Vec3d vec3d = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
-                                Math.random() * 0.1D + 0.1D, 0.0D);
+            Math.random() * 0.1D + 0.1D, 0.0D);
         vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
         double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
@@ -184,36 +177,31 @@ public interface ICurio {
         vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
         vec3d1 =
             vec3d1.add(livingEntity.posX, livingEntity.posY + (double) livingEntity.getEyeHeight(),
-                       livingEntity.posZ);
+                livingEntity.posZ);
 
         livingEntity.world.addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x,
-                                       vec3d1.y, vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
+            vec3d1.y, vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
       }
     }
   }
 
   /**
-   * Compares the current ItemStack and the previous ItemStack in the slot to
-   * detect any changes and returns true if the change should be synced to all
-   * tracking clients.
-   * Note that this check occurs every tick so implementations need to code
-   * their own timers for other intervals.
+   * Compares the current ItemStack and the previous ItemStack in the slot to detect any changes and
+   * returns true if the change should be synced to all tracking clients. Note that this check
+   * occurs every tick so implementations need to code their own timers for other intervals.
    *
-   * @param identifier       The identifier of the {@link CurioType} of the slot
-   * @param entityLivingBase The EntityLivingBase that is wearing the ItemStack
-   * @return True to curios the ItemStack change to all tracking clients, false
-   * to do nothing
+   * @param identifier   The identifier of the {@link CurioType} of the slot
+   * @param livingEntity The EntityLivingBase that is wearing the ItemStack
+   * @return True to curios the ItemStack change to all tracking clients, false to do nothing
    */
-  default boolean shouldSyncToTracking(String identifier, LivingEntity entityLivingBase) {
+  default boolean shouldSyncToTracking(String identifier, LivingEntity livingEntity) {
 
     return false;
   }
 
   /**
-   * Gets a tag that is used to sync extra curio data from the server to the
-   * client.
-   * Only used when {@link ICurio#shouldSyncToTracking(String, LivingEntity)}
-   * returns true.
+   * Gets a tag that is used to sync extra curio data from the server to the client. Only used when
+   * {@link ICurio#shouldSyncToTracking(String, LivingEntity)} returns true.
    *
    * @return Data to be sent to the client
    */
@@ -224,8 +212,8 @@ public interface ICurio {
   }
 
   /**
-   * Used client-side to read data tags created by {@link ICurio#getSyncTag()}
-   * received from the server.
+   * Used client-side to read data tags created by {@link ICurio#getSyncTag()} received from the
+   * server.
    *
    * @param compound Data received from the server
    */
@@ -234,69 +222,64 @@ public interface ICurio {
   }
 
   /**
-   * Determines if the ItemStack has rendering
+   * Determines if the ItemStack has rendering.
    *
    * @param identifier       The identifier of the {@link CurioType} of the slot
-   * @param entityLivingBase The EntityLivingBase that is wearing the ItemStack
+   * @param livingEntity The EntityLivingBase that is wearing the ItemStack
    * @return True if the ItemStack has rendering, false if it does not
    */
-  default boolean hasRender(String identifier, LivingEntity entityLivingBase) {
+  default boolean hasRender(String identifier, LivingEntity livingEntity) {
 
     return false;
   }
 
   /**
-   * Performs rendering of the ItemStack if {@link ICurio#hasRender(String, LivingEntity)}
-   * returns true.
-   * Note that vertical sneaking translations are automatically applied before
-   * this rendering method is called.
+   * Performs rendering of the ItemStack if {@link ICurio#hasRender(String, LivingEntity)} returns
+   * true. Note that vertical sneaking translations are automatically applied before this rendering
+   * method is called.
    *
-   * @param identifier         The identifier of the {@link CurioType} of the slot
-   * @param entitylivingbaseIn The EntityLivingBase that is wearing the ItemStack
+   * @param identifier   The identifier of the {@link CurioType} of the slot
+   * @param livingEntity The EntityLivingBase that is wearing the ItemStack
    */
-  default void doRender(String identifier, LivingEntity entitylivingbaseIn, float limbSwing,
-                        float limbSwingAmount, float partialTicks, float ageInTicks,
-                        float netHeadYaw, float headPitch, float scale) {
+  default void doRender(String identifier, LivingEntity livingEntity, float limbSwing,
+      float limbSwingAmount, float partialTicks, float ageInTicks,
+      float netHeadYaw, float headPitch, float scale) {
 
   }
 
   /**
-   * Some helper methods for rendering curios
+   * Some helper methods for rendering curios.
    */
   final class RenderHelper {
 
     /**
-     * Rotates the rendering for the curio if the entity is sneaking.
-     * The rotation angle is based on the body of a player model when sneaking,
-     * so this is typically used for items being rendered on the body.
+     * Rotates the rendering for the curio if the entity is sneaking. The rotation angle is based on
+     * the body of a player model when sneaking, so this is typically used for items being rendered
+     * on the body.
      *
-     * @param entitylivingbaseIn The wearer of the curio
+     * @param livingEntity The wearer of the curio
      */
-    public static void rotateIfSneaking(final LivingEntity entitylivingbaseIn) {
+    public static void rotateIfSneaking(final LivingEntity livingEntity) {
 
-      if (entitylivingbaseIn.isSneaking()) {
+      if (livingEntity.isSneaking()) {
         GlStateManager.rotatef(90.0F / (float) Math.PI, 1.0F, 0.0F, 0.0F);
       }
     }
 
     /**
-     * Rotates the rendering for the model renderers based on the entity's head
-     * movement.
-     * This will align the model renderers with the movements and rotations of
-     * the head.
-     * This will do nothing if the entity render object does not implement
-     * {@link LivingRenderer} or if the model does not have a head (does not
-     * implement {@link BipedModel}).
+     * Rotates the rendering for the model renderers based on the entity's head movement. This will
+     * align the model renderers with the movements and rotations of the head. This will do nothing
+     * if the entity render object does not implement {@link LivingRenderer} or if the model does
+     * not have a head (does not implement {@link BipedModel}).
      *
-     * @param entitylivingbaseIn The wearer of the curio
-     * @param renderers          The list of model renderers to align to the
-     *                           head movement
+     * @param livingEntity The wearer of the curio
+     * @param renderers    The list of model renderers to align to the head movement
      */
-    public static void followHeadRotations(final LivingEntity entitylivingbaseIn,
-                                           RendererModel... renderers) {
+    public static void followHeadRotations(final LivingEntity livingEntity,
+        RendererModel... renderers) {
 
       EntityRenderer render =
-          Minecraft.getInstance().getRenderManager().getRenderer(entitylivingbaseIn);
+          Minecraft.getInstance().getRenderManager().getRenderer(livingEntity);
 
       if (render instanceof LivingRenderer) {
         EntityModel model = ((LivingRenderer) render).getEntityModel();

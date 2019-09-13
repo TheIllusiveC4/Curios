@@ -20,15 +20,32 @@
 package top.theillusivec4.curios.common;
 
 import com.google.common.collect.Lists;
+import java.util.List;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 import top.theillusivec4.curios.Curios;
 
-import java.util.List;
-
 public class CuriosConfig {
 
+  public static final ForgeConfigSpec clientSpec;
+  public static final Client CLIENT;
+  public static final ForgeConfigSpec commonSpec;
+  public static final Common COMMON;
   private static final String CONFIG_PREFIX = "gui." + Curios.MODID + ".config.";
+
+  static {
+    final Pair<Client, ForgeConfigSpec> specPair =
+        new ForgeConfigSpec.Builder().configure(Client::new);
+    clientSpec = specPair.getRight();
+    CLIENT = specPair.getLeft();
+  }
+
+  static {
+    final Pair<Common, ForgeConfigSpec> specPair =
+        new ForgeConfigSpec.Builder().configure(Common::new);
+    commonSpec = specPair.getRight();
+    COMMON = specPair.getLeft();
+  }
 
   public static class Common {
 
@@ -40,14 +57,14 @@ public class CuriosConfig {
       builder.push("common");
 
       disabledCurios = builder.comment("List of curio types to disable by default")
-                              .translation(CONFIG_PREFIX + "disabledCurios")
-                              .worldRestart()
-                              .define("disabledCurios", Lists.newArrayList());
+          .translation(CONFIG_PREFIX + "disabledCurios")
+          .worldRestart()
+          .define("disabledCurios", Lists.newArrayList());
 
       createCurios = builder.comment("List of curio types to create")
-                            .translation(CONFIG_PREFIX + "createCurios")
-                            .worldRestart()
-                            .define("createCurios", Lists.newArrayList());
+          .translation(CONFIG_PREFIX + "createCurios")
+          .worldRestart()
+          .define("createCurios", Lists.newArrayList());
 
       builder.pop();
     }
@@ -62,31 +79,10 @@ public class CuriosConfig {
       builder.comment("Client only settings, mostly things related to rendering").push("client");
 
       renderCurios = builder.comment("Set to true to enable rendering curios")
-                            .translation(CONFIG_PREFIX + "renderCurios")
-                            .define("renderCurios", true);
+          .translation(CONFIG_PREFIX + "renderCurios")
+          .define("renderCurios", true);
 
       builder.pop();
     }
-  }
-
-  public static final ForgeConfigSpec clientSpec;
-  public static final Client          CLIENT;
-
-  static {
-    final Pair<Client, ForgeConfigSpec> specPair =
-        new ForgeConfigSpec.Builder().configure(Client::new);
-    clientSpec = specPair.getRight();
-    CLIENT = specPair.getLeft();
-  }
-
-
-  public static final ForgeConfigSpec commonSpec;
-  public static final Common          COMMON;
-
-  static {
-    final Pair<Common, ForgeConfigSpec> specPair =
-        new ForgeConfigSpec.Builder().configure(Common::new);
-    commonSpec = specPair.getRight();
-    COMMON = specPair.getLeft();
   }
 }

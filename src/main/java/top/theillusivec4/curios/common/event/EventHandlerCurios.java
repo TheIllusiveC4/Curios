@@ -19,6 +19,9 @@
 
 package top.theillusivec4.curios.common.event;
 
+import java.util.Collection;
+import java.util.Set;
+import java.util.SortedMap;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -56,10 +59,6 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContents;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContentsWithTag;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncMap;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.SortedMap;
-
 public class EventHandlerCurios {
 
   @SubscribeEvent
@@ -67,7 +66,7 @@ public class EventHandlerCurios {
 
     if (evt.getObject() instanceof PlayerEntity) {
       evt.addCapability(CuriosCapability.ID_INVENTORY,
-                        CapCurioInventory.createProvider((PlayerEntity) evt.getObject()));
+          CapCurioInventory.createProvider((PlayerEntity) evt.getObject()));
     }
   }
 
@@ -84,7 +83,7 @@ public class EventHandlerCurios {
         if (entity instanceof ServerPlayerEntity) {
           ServerPlayerEntity mp = (ServerPlayerEntity) entity;
           NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
-                                       new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()));
+              new SPacketSyncMap(mp.getEntityId(), handler.getCurioMap()));
         }
       });
     }
@@ -99,9 +98,9 @@ public class EventHandlerCurios {
     if (player instanceof ServerPlayerEntity && target instanceof LivingEntity) {
       LivingEntity livingBase = (LivingEntity) target;
       CuriosAPI.getCuriosHandler(livingBase)
-               .ifPresent(handler -> NetworkHandler.INSTANCE.send(
-                   PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
-                   new SPacketSyncMap(target.getEntityId(), handler.getCurioMap())));
+          .ifPresent(handler -> NetworkHandler.INSTANCE.send(
+              PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
+              new SPacketSyncMap(target.getEntityId(), handler.getCurioMap())));
     }
   }
 
@@ -128,8 +127,8 @@ public class EventHandlerCurios {
 
     LivingEntity livingEntity = evt.getEntityLiving();
 
-    if (!livingEntity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) &&
-        !livingEntity.isSpectator()) {
+    if (!livingEntity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)
+        && !livingEntity.isSpectator()) {
       CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
         Collection<ItemEntity> entityItems = evt.getDrops();
         SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
@@ -155,7 +154,7 @@ public class EventHandlerCurios {
   @SubscribeEvent
   public void onPlayerXPPickUp(PlayerPickupXpEvent evt) {
 
-    PlayerEntity player = evt.getEntityPlayer();
+    PlayerEntity player = evt.getPlayer();
 
     if (!player.world.isRemote) {
       CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
@@ -167,9 +166,9 @@ public class EventHandlerCurios {
           for (int i = 0; i < stacks.getSlots(); i++) {
             ItemStack stack = stacks.getStackInSlot(i);
 
-            if (!stack.isEmpty() &&
-                EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0 &&
-                stack.isDamaged()) {
+            if (!stack.isEmpty()
+                && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0
+                && stack.isDamaged()) {
               evt.setCanceled(true);
               ExperienceOrbEntity orb = evt.getOrb();
               player.xpCooldown = 2;
@@ -198,15 +197,14 @@ public class EventHandlerCurios {
     entityitem.setPickupDelay(40);
     float f = livingEntity.world.rand.nextFloat() * 0.5F;
     float f1 = livingEntity.world.rand.nextFloat() * ((float) Math.PI * 2F);
-    entityitem.setMotion((double) (-MathHelper.sin(f1) * f), 0.20000000298023224D,
-                         (double) (MathHelper.cos(f1) * f));
+    entityitem.setMotion((-MathHelper.sin(f1) * f), 0.20000000298023224D, (MathHelper.cos(f1) * f));
     return entityitem;
   }
 
   @SubscribeEvent
   public void onCurioRightClick(PlayerInteractEvent.RightClickItem evt) {
 
-    PlayerEntity player = evt.getEntityPlayer();
+    PlayerEntity player = evt.getPlayer();
     ItemStack stack = evt.getItemStack();
     CuriosAPI.getCurio(stack).ifPresent(curio -> {
 
@@ -271,12 +269,14 @@ public class EventHandlerCurios {
               LazyOptional<ICurio> prevCurio = CuriosAPI.getCurio(prevStack);
               boolean shouldSync = !stack.equals(prevStack, true);
               CompoundNBT syncTag = new CompoundNBT();
+              boolean currentSyncFlag = currentCurio
+                  .map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
+                  .orElse(false);
+              boolean prevSyncFlag = prevCurio
+                  .map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
+                  .orElse(false);
 
-              if (currentCurio.map(
-                  curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
-                              .orElse(false) ||
-                  prevCurio.map(curio -> curio.shouldSyncToTracking(identifier, entitylivingbase))
-                           .orElse(false) || shouldSync) {
+              if (currentSyncFlag || prevSyncFlag || shouldSync) {
 
                 if (currentCurio.isPresent()) {
                   syncTag = currentCurio.map(ICurio::getSyncTag).orElse(syncTag);
@@ -286,12 +286,12 @@ public class EventHandlerCurios {
                   NetworkHandler.INSTANCE.send(
                       PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
                       new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i,
-                                                     stack, syncTag));
+                          stack, syncTag));
                 } else {
                   NetworkHandler.INSTANCE.send(
                       PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
                       new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i,
-                                              stack));
+                          stack));
                 }
               }
               MinecraftForge.EVENT_BUS.post(
@@ -300,7 +300,7 @@ public class EventHandlerCurios {
               boolean changeEquipped = !ItemStack.areItemsEqualIgnoreDurability(prevStack, stack);
               prevCurio.ifPresent(curio -> {
                 entitylivingbase.getAttributes()
-                                .removeAttributeModifiers(curio.getAttributeModifiers(identifier));
+                    .removeAttributeModifiers(curio.getAttributeModifiers(identifier));
 
                 if (changeEquipped) {
                   curio.onUnequipped(identifier, entitylivingbase);
@@ -308,7 +308,7 @@ public class EventHandlerCurios {
               });
               currentCurio.ifPresent(curio -> {
                 entitylivingbase.getAttributes()
-                                .applyAttributeModifiers(curio.getAttributeModifiers(identifier));
+                    .applyAttributeModifiers(curio.getAttributeModifiers(identifier));
 
                 if (changeEquipped) {
                   curio.onEquipped(identifier, entitylivingbase);
@@ -316,7 +316,7 @@ public class EventHandlerCurios {
               });
               stackHandler.setStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
               stackHandler.setPreviousStackInSlot(i,
-                                                  stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
+                  stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
             }
           }
         }

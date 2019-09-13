@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios;
 
+import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
@@ -32,7 +33,11 @@ import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -53,12 +58,10 @@ import top.theillusivec4.curios.common.capability.CapCurioItem;
 import top.theillusivec4.curios.common.event.EventHandlerCurios;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 
-import java.util.Map;
-
 @Mod(Curios.MODID)
 public class Curios {
 
-  public static final String MODID  = CuriosAPI.MODID;
+  public static final String MODID = CuriosAPI.MODID;
   public static final Logger LOGGER = LogManager.getLogger();
 
   public Curios() {
@@ -70,6 +73,11 @@ public class Curios {
     MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
     ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CuriosConfig.commonSpec);
     ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CuriosConfig.clientSpec);
+  }
+
+  private static void send(String id, Object msg) {
+
+    InterModComms.sendTo(MODID, id, () -> msg);
   }
 
   private void setup(FMLCommonSetupEvent evt) {
@@ -91,32 +99,26 @@ public class Curios {
     }
 
     send(CuriosAPI.IMC.REGISTER_ICON,
-         new Tuple<>("charm", new ResourceLocation(MODID, "textures/item/empty_charm_slot.png")));
-    send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("necklace", new ResourceLocation(MODID,
-                                                                                   "textures/item" +
-                                                                                   "/empty_necklace_slot.png")));
+        new Tuple<>("charm", new ResourceLocation(MODID, "textures/item/empty_charm_slot.png")));
+    send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("necklace",
+        new ResourceLocation(MODID, "textures/item/empty_necklace_slot.png")));
     send(CuriosAPI.IMC.REGISTER_ICON,
-         new Tuple<>("belt", new ResourceLocation(MODID, "textures/item/empty_belt_slot.png")));
+        new Tuple<>("belt", new ResourceLocation(MODID, "textures/item/empty_belt_slot.png")));
     send(CuriosAPI.IMC.REGISTER_ICON,
-         new Tuple<>("head", new ResourceLocation(MODID, "textures/item/empty_head_slot.png")));
+        new Tuple<>("head", new ResourceLocation(MODID, "textures/item/empty_head_slot.png")));
     send(CuriosAPI.IMC.REGISTER_ICON,
-         new Tuple<>("back", new ResourceLocation(MODID, "textures/item/empty_back_slot.png")));
+        new Tuple<>("back", new ResourceLocation(MODID, "textures/item/empty_back_slot.png")));
     send(CuriosAPI.IMC.REGISTER_ICON,
-         new Tuple<>("body", new ResourceLocation(MODID, "textures/item/empty_body_slot.png")));
+        new Tuple<>("body", new ResourceLocation(MODID, "textures/item/empty_body_slot.png")));
     send(CuriosAPI.IMC.REGISTER_ICON,
-         new Tuple<>("ring", new ResourceLocation(MODID, "textures/item/empty_ring_slot.png")));
+        new Tuple<>("ring", new ResourceLocation(MODID, "textures/item/empty_ring_slot.png")));
   }
 
   private void process(InterModProcessEvent evt) {
 
     CuriosIMC.processCurioTypes(evt.getIMCStream(CuriosAPI.IMC.REGISTER_TYPE::equals),
-                                evt.getIMCStream(CuriosAPI.IMC.MODIFY_TYPE::equals),
-                                evt.getIMCStream(CuriosAPI.IMC.REGISTER_ICON::equals));
-  }
-
-  private static void send(String id, Object msg) {
-
-    InterModComms.sendTo(MODID, id, () -> msg);
+        evt.getIMCStream(CuriosAPI.IMC.MODIFY_TYPE::equals),
+        evt.getIMCStream(CuriosAPI.IMC.REGISTER_ICON::equals));
   }
 
   private void onServerStarting(FMLServerStartingEvent evt) {

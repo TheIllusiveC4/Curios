@@ -19,18 +19,17 @@
 
 package top.theillusivec4.curios.api.inventory;
 
+import javax.annotation.Nonnull;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.ItemStackHandler;
 
-import javax.annotation.Nonnull;
-
 public class CurioStackHandler extends ItemStackHandler {
 
   protected NonNullList<ItemStack> previousStacks;
-  protected boolean                isHidden = false;
+  protected boolean isHidden = false;
 
   public CurioStackHandler() {
 

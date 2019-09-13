@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.common;
 
+import java.util.stream.Stream;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.InterModComms;
@@ -26,21 +27,18 @@ import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 
-import java.util.stream.Stream;
-
 public class CuriosIMC {
 
   public static void processCurioTypes(Stream<InterModComms.IMCMessage> register,
-                                       Stream<InterModComms.IMCMessage> modify,
-                                       Stream<InterModComms.IMCMessage> icons) {
+      Stream<InterModComms.IMCMessage> modify, Stream<InterModComms.IMCMessage> icons) {
 
     register.filter(msg -> msg.getMessageSupplier().get() instanceof CurioIMCMessage)
-            .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
-            .forEach(msg -> processType(msg, true));
+        .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
+        .forEach(msg -> processType(msg, true));
 
     modify.filter(msg -> msg.getMessageSupplier().get() instanceof CurioIMCMessage)
-          .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
-          .forEach(msg -> processType(msg, false));
+        .map(msg -> (CurioIMCMessage) msg.getMessageSupplier().get())
+        .forEach(msg -> processType(msg, false));
 
     icons.filter(msg -> {
       Object obj = msg.getMessageSupplier().get();
@@ -51,8 +49,8 @@ public class CuriosIMC {
       }
       return false;
     })
-         .map(msg -> (Tuple<String, ResourceLocation>) msg.getMessageSupplier().get())
-         .forEach(msg -> CuriosAPI.idToIcon.put(msg.getA(), msg.getB()));
+        .map(msg -> (Tuple<String, ResourceLocation>) msg.getMessageSupplier().get())
+        .forEach(msg -> CuriosAPI.idToIcon.put(msg.getA(), msg.getB()));
   }
 
   private static void processType(CurioIMCMessage message, boolean create) {
@@ -76,8 +74,8 @@ public class CuriosIMC {
 
     } else if (create) {
       CuriosAPI.idToType.put(identifier, new CurioType(identifier).defaultSize(message.getSize())
-                                                                  .enabled(message.isEnabled())
-                                                                  .hide(message.isHidden()));
+          .enabled(message.isEnabled())
+          .hide(message.isHidden()));
     }
   }
 }

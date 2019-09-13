@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
+import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -27,13 +28,11 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
 
-import java.util.function.Supplier;
-
 public class SPacketSyncContents {
 
-  private int       entityId;
-  private int       slotId;
-  private String    curioId;
+  private int entityId;
+  private int slotId;
+  private String curioId;
   private ItemStack stack;
 
   public SPacketSyncContents(int entityId, String curioId, int slotId, ItemStack stack) {
@@ -55,7 +54,7 @@ public class SPacketSyncContents {
   public static SPacketSyncContents decode(PacketBuffer buf) {
 
     return new SPacketSyncContents(buf.readInt(), buf.readString(25), buf.readInt(),
-                                   buf.readItemStack());
+        buf.readItemStack());
   }
 
   public static void handle(SPacketSyncContents msg, Supplier<NetworkEvent.Context> ctx) {
@@ -65,7 +64,7 @@ public class SPacketSyncContents {
 
       if (entity instanceof LivingEntity) {
         CuriosAPI.getCuriosHandler((LivingEntity) entity)
-                 .ifPresent(handler -> handler.setStackInSlot(msg.curioId, msg.slotId, msg.stack));
+            .ifPresent(handler -> handler.setStackInSlot(msg.curioId, msg.slotId, msg.stack));
       }
     });
     ctx.get().setPacketHandled(true);

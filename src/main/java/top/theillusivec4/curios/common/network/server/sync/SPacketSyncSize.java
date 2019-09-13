@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
+import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -26,13 +27,11 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
 
-import java.util.function.Supplier;
-
 public class SPacketSyncSize {
 
-  private int     entityId;
-  private String  curioId;
-  private int     amount;
+  private int entityId;
+  private String curioId;
+  private int amount;
   private boolean remove;
 
   public SPacketSyncSize(int entityId, String curioId, int amount, boolean remove) {

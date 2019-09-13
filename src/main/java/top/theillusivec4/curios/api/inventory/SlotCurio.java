@@ -19,6 +19,11 @@
 
 package top.theillusivec4.curios.api.inventory;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -29,20 +34,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.SlotItemHandler;
 import top.theillusivec4.curios.api.CuriosAPI;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 public class SlotCurio extends SlotItemHandler {
 
   private static AtlasSpriteHolder sprites;
-  private final  String            identifier;
-  private final  PlayerEntity      player;
+  private final String identifier;
+  private final PlayerEntity player;
 
   public SlotCurio(PlayerEntity player, CurioStackHandler handler, int index, String identifier,
-                   int xPosition, int yPosition) {
+      int xPosition, int yPosition) {
 
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;
@@ -64,12 +63,12 @@ public class SlotCurio extends SlotItemHandler {
   public boolean isItemValid(@Nonnull ItemStack stack) {
 
     return hasValidTag(CuriosAPI.getCurioTags(stack.getItem())) && CuriosAPI.getCurio(stack)
-                                                                            .map(
-                                                                                curio -> curio.canEquip(
-                                                                                    identifier,
-                                                                                    player))
-                                                                            .orElse(true) &&
-           super.isItemValid(stack);
+        .map(
+            curio -> curio.canEquip(
+                identifier,
+                player))
+        .orElse(true) &&
+        super.isItemValid(stack);
   }
 
   protected boolean hasValidTag(Set<String> tags) {
@@ -83,9 +82,9 @@ public class SlotCurio extends SlotItemHandler {
     ItemStack stack = this.getStack();
     return
         (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) &&
-        CuriosAPI.getCurio(stack)
-                 .map(curio -> curio.canUnequip(identifier, playerIn))
-                 .orElse(true) && super.canTakeStack(playerIn);
+            CuriosAPI.getCurio(stack)
+                .map(curio -> curio.canUnequip(identifier, playerIn))
+                .orElse(true) && super.canTakeStack(playerIn);
   }
 
   @Nullable
@@ -103,11 +102,11 @@ public class SlotCurio extends SlotItemHandler {
     TextureAtlasSprite getSpriteForString(String id) {
 
       return spriteMap.computeIfAbsent(id,
-                                       key -> new TextureAtlasSprite(backgroundLocation, 16, 16) {
-                                         {
-                                           func_217789_a(16, 16, 0, 0);
-                                         }
-                                       });
+          key -> new TextureAtlasSprite(backgroundLocation, 16, 16) {
+            {
+              func_217789_a(16, 16, 0, 0);
+            }
+          });
     }
   }
 }

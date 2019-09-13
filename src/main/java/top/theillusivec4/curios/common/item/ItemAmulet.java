@@ -36,6 +36,9 @@ import top.theillusivec4.curios.common.capability.CapCurioItem;
 
 public class ItemAmulet extends Item {
 
+  private static final ResourceLocation AMULET_TEXTURE = new ResourceLocation(Curios.MODID,
+      "textures/entity/amulet.png");
+
   public ItemAmulet() {
 
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
@@ -47,40 +50,35 @@ public class ItemAmulet extends Item {
 
     return CapCurioItem.createProvider(new ICurio() {
 
-      private final ResourceLocation AMULET_TEXTURE =
-          new ResourceLocation(Curios.MODID, "textures/entity/amulet.png");
-
       private Object model;
 
       @Override
-      public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
+      public void onCurioTick(String identifier, LivingEntity livingEntity) {
 
-        if (!entityLivingBase.getEntityWorld().isRemote &&
-            entityLivingBase.ticksExisted % 40 == 0) {
-          entityLivingBase.addPotionEffect(
-              new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
+        if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 40 == 0) {
+          livingEntity.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
         }
       }
 
       @Override
-      public boolean hasRender(String identifier, LivingEntity entityLivingBase) {
+      public boolean hasRender(String identifier, LivingEntity livingEntity) {
 
         return true;
       }
 
       @Override
-      public void doRender(String identifier, LivingEntity entitylivingbaseIn, float limbSwing,
-                           float limbSwingAmount, float partialTicks, float ageInTicks,
-                           float netHeadYaw, float headPitch, float scale) {
+      public void doRender(String identifier, LivingEntity livingEntity, float limbSwing,
+          float limbSwingAmount, float partialTicks, float ageInTicks,
+          float netHeadYaw, float headPitch, float scale) {
 
         Minecraft.getInstance().getTextureManager().bindTexture(AMULET_TEXTURE);
-        ICurio.RenderHelper.rotateIfSneaking(entitylivingbaseIn);
+        ICurio.RenderHelper.rotateIfSneaking(livingEntity);
 
         if (!(this.model instanceof ModelAmulet)) {
           this.model = new ModelAmulet();
         }
-        ((ModelAmulet) model).render(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks,
-                                     netHeadYaw, headPitch, scale);
+        ((ModelAmulet) model).render(livingEntity, limbSwing, limbSwingAmount, ageInTicks,
+            netHeadYaw, headPitch, scale);
       }
     });
   }

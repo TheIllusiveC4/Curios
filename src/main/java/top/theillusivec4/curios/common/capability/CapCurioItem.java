@@ -19,6 +19,8 @@
 
 package top.theillusivec4.curios.common.capability;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
@@ -28,9 +30,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class CapCurioItem {
 
@@ -45,7 +44,7 @@ public class CapCurioItem {
 
       @Override
       public void readNBT(Capability<ICurio> capability, ICurio instance, Direction side,
-                          INBT nbt) {
+          INBT nbt) {
 
       }
     }, CurioWrapper::new);

@@ -19,14 +19,13 @@
 
 package top.theillusivec4.curios.common.network.server;
 
+import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.common.inventory.CuriosContainer;
-
-import java.util.function.Supplier;
 
 public class SPacketScrollCurios {
 

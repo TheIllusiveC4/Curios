@@ -20,6 +20,8 @@
 package top.theillusivec4.curios.client.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import java.util.SortedMap;
+import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
@@ -28,9 +30,6 @@ import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.CuriosConfig;
-
-import javax.annotation.Nonnull;
-import java.util.SortedMap;
 
 public class LayerCurios<T extends LivingEntity, M extends EntityModel<T>>
     extends LayerRenderer<T, M> {
@@ -41,18 +40,17 @@ public class LayerCurios<T extends LivingEntity, M extends EntityModel<T>>
   }
 
   @Override
-  public void render(@Nonnull LivingEntity entitylivingbaseIn, float limbSwing,
-                     float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-                     float headPitch, float scale) {
+  public void render(@Nonnull LivingEntity livingEntity, float limbSwing, float limbSwingAmount,
+      float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 
     if (!CuriosConfig.CLIENT.renderCurios.get()) {
       return;
     }
     GlStateManager.pushMatrix();
-    CuriosAPI.getCuriosHandler(entitylivingbaseIn).ifPresent(handler -> {
+    CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
       SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
-      if (entitylivingbaseIn.shouldRenderSneaking()) {
+      if (livingEntity.shouldRenderSneaking()) {
         GlStateManager.translatef(0.0f, 0.2f, 0.0f);
       }
 
@@ -64,11 +62,11 @@ public class LayerCurios<T extends LivingEntity, M extends EntityModel<T>>
 
           if (!stack.isEmpty()) {
             CuriosAPI.getCurio(stack).ifPresent(curio -> {
-              if (curio.hasRender(id, entitylivingbaseIn)) {
+              if (curio.hasRender(id, livingEntity)) {
                 GlStateManager.pushMatrix();
                 GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-                curio.doRender(id, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks,
-                               ageInTicks, netHeadYaw, headPitch, scale);
+                curio.doRender(id, livingEntity, limbSwing, limbSwingAmount, partialTicks,
+                    ageInTicks, netHeadYaw, headPitch, scale);
                 GlStateManager.popMatrix();
               }
             });

@@ -22,6 +22,11 @@ package top.theillusivec4.curios.common.capability;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.util.Collections;
+import java.util.Set;
+import java.util.SortedMap;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -50,94 +55,76 @@ import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActive;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncSize;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.Set;
-import java.util.SortedMap;
-
 public class CapCurioInventory {
 
   public static void register() {
 
     CapabilityManager.INSTANCE.register(ICurioItemHandler.class,
-                                        new Capability.IStorage<ICurioItemHandler>() {
-                                          @Override
-                                          public INBT writeNBT(
-                                              Capability<ICurioItemHandler> capability,
-                                              ICurioItemHandler instance, Direction side) {
+        new Capability.IStorage<ICurioItemHandler>() {
+          @Override
+          public INBT writeNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance,
+              Direction side) {
 
-                                            SortedMap<String, CurioStackHandler> curioMap =
-                                                instance.getCurioMap();
-                                            CompoundNBT compound = new CompoundNBT();
-                                            ListNBT taglist = new ListNBT();
+            SortedMap<String, CurioStackHandler> curioMap = instance.getCurioMap();
+            CompoundNBT compound = new CompoundNBT();
+            ListNBT taglist = new ListNBT();
 
-                                            for (String identifier : curioMap.keySet()) {
-                                              CurioStackHandler stackHandler =
-                                                  curioMap.get(identifier);
-                                              CompoundNBT itemtag = stackHandler.serializeNBT();
-                                              itemtag.putString("Identifier", identifier);
-                                              taglist.add(itemtag);
-                                            }
-                                            compound.put("Curios", taglist);
-                                            ListNBT taglist1 = new ListNBT();
+            for (String identifier : curioMap.keySet()) {
+              CurioStackHandler stackHandler = curioMap.get(identifier);
+              CompoundNBT itemtag = stackHandler.serializeNBT();
+              itemtag.putString("Identifier", identifier);
+              taglist.add(itemtag);
+            }
+            compound.put("Curios", taglist);
+            ListNBT taglist1 = new ListNBT();
 
-                                            for (String identifier : instance.getDisabled()) {
-                                              taglist1.add(new StringNBT(identifier));
-                                            }
-                                            compound.put("Disabled", taglist1);
-                                            return compound;
-                                          }
+            for (String identifier : instance.getDisabled()) {
+              taglist1.add(new StringNBT(identifier));
+            }
+            compound.put("Disabled", taglist1);
+            return compound;
+          }
 
-                                          @Override
-                                          public void readNBT(
-                                              Capability<ICurioItemHandler> capability,
-                                              ICurioItemHandler instance, Direction side,
-                                              INBT nbt) {
+          @Override
+          public void readNBT(
+              Capability<ICurioItemHandler> capability, ICurioItemHandler instance, Direction side,
+              INBT nbt) {
 
-                                            ListNBT tagList = ((CompoundNBT) nbt).getList("Curios",
-                                                                                          Constants.NBT.TAG_COMPOUND);
-                                            ListNBT tagList1 =
-                                                ((CompoundNBT) nbt).getList("Disabled",
-                                                                            Constants.NBT.TAG_STRING);
-                                            Set<String> disabled = Sets.newHashSet();
+            ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
+            ListNBT tagList1 = ((CompoundNBT) nbt).getList("Disabled", Constants.NBT.TAG_STRING);
+            Set<String> disabled = Sets.newHashSet();
 
-                                            for (int k = 0; k < tagList1.size(); k++) {
-                                              disabled.add(tagList1.getString(k));
-                                            }
-                                            instance.setDisabled(disabled);
+            for (int k = 0; k < tagList1.size(); k++) {
+              disabled.add(tagList1.getString(k));
+            }
+            instance.setDisabled(disabled);
 
-                                            if (!tagList.isEmpty()) {
-                                              SortedMap<String, CurioStackHandler> curios =
-                                                  instance.getDefaultSlots();
+            if (!tagList.isEmpty()) {
+              SortedMap<String, CurioStackHandler> curios = instance.getDefaultSlots();
 
-                                              for (int i = 0; i < tagList.size(); i++) {
-                                                CompoundNBT itemtag = tagList.getCompound(i);
-                                                String identifier = itemtag.getString("Identifier");
-                                                CurioStackHandler stackHandler =
-                                                    new CurioStackHandler();
-                                                stackHandler.deserializeNBT(itemtag);
+              for (int i = 0; i < tagList.size(); i++) {
+                CompoundNBT itemtag = tagList.getCompound(i);
+                String identifier = itemtag.getString("Identifier");
+                CurioStackHandler stackHandler = new CurioStackHandler();
+                stackHandler.deserializeNBT(itemtag);
 
-                                                if (CuriosAPI.getType(identifier).isPresent()) {
-                                                  curios.put(identifier, stackHandler);
-                                                } else {
+                if (CuriosAPI.getType(identifier).isPresent()) {
+                  curios.put(identifier, stackHandler);
+                } else {
 
-                                                  for (int j = 0; j < stackHandler.getSlots();
-                                                       j++) {
-                                                    ItemStack stack =
-                                                        stackHandler.getStackInSlot(j);
+                  for (int j = 0; j < stackHandler.getSlots(); j++) {
+                    ItemStack stack = stackHandler.getStackInSlot(j);
 
-                                                    if (!stack.isEmpty()) {
-                                                      instance.addInvalid(
-                                                          stackHandler.getStackInSlot(j));
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                              instance.setCurioMap(curios);
-                                            }
-                                          }
-                                        }, CurioInventoryWrapper::new);
+                    if (!stack.isEmpty()) {
+                      instance.addInvalid(stackHandler.getStackInSlot(j));
+                    }
+                  }
+                }
+              }
+              instance.setCurioMap(curios);
+            }
+          }
+        }, CurioInventoryWrapper::new);
   }
 
   public static ICapabilityProvider createProvider(final LivingEntity livingBase) {
@@ -148,9 +135,9 @@ public class CapCurioInventory {
   public static class CurioInventoryWrapper implements ICurioItemHandler {
 
     SortedMap<String, CurioStackHandler> curioSlots;
-    NonNullList<ItemStack>               invalidCache;
-    Set<String>                          disabled;
-    LivingEntity                         wearer;
+    NonNullList<ItemStack> invalidCache;
+    Set<String> disabled;
+    LivingEntity wearer;
 
     CurioInventoryWrapper() {
 
@@ -346,7 +333,7 @@ public class CapCurioInventory {
           CuriosAPI.getCurio(stack).ifPresent(curio -> {
             if (!stack.isEmpty()) {
               wearer.getAttributes()
-                    .removeAttributeModifiers(curio.getAttributeModifiers(identifier));
+                  .removeAttributeModifiers(curio.getAttributeModifiers(identifier));
             }
           });
           stackHandler.setStackInSlot(i, ItemStack.EMPTY);
@@ -374,7 +361,7 @@ public class CapCurioInventory {
   public static class Provider implements ICapabilitySerializable<INBT> {
 
     final LazyOptional<ICurioItemHandler> optional;
-    final ICurioItemHandler               handler;
+    final ICurioItemHandler handler;
 
     Provider(final LivingEntity livingBase) {
 

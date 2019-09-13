@@ -19,7 +19,13 @@
 
 package top.theillusivec4.curios.client;
 
+import static net.minecraft.item.ItemStack.DECIMALFORMAT;
+
 import com.google.common.collect.Multimap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CreatureAttribute;
@@ -39,18 +45,11 @@ import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import static net.minecraft.item.ItemStack.DECIMALFORMAT;
-
 public class EventHandlerClient {
 
   private static final UUID ATTACK_DAMAGE_MODIFIER =
       UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
-  private static final UUID ATTACK_SPEED_MODIFIER  =
+  private static final UUID ATTACK_SPEED_MODIFIER =
       UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
 
   @SubscribeEvent
@@ -64,8 +63,8 @@ public class EventHandlerClient {
 
     if (KeyRegistry.openCurios.isPressed() && mc.isGameFocused()) {
       NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-                                   new CPacketOpenCurios((float) mc.mouseHelper.getMouseX(),
-                                                         (float) mc.mouseHelper.getMouseY()));
+          new CPacketOpenCurios((float) mc.mouseHelper.getMouseX(),
+              (float) mc.mouseHelper.getMouseY()));
     }
   }
 
@@ -106,9 +105,9 @@ public class EventHandlerClient {
 
                   if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
                     amount = amount + player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
-                                            .getBaseValue();
+                        .getBaseValue();
                     amount = amount + (double) EnchantmentHelper.getModifierForCreature(stack,
-                                                                                        CreatureAttribute.UNDEFINED);
+                        CreatureAttribute.UNDEFINED);
                     flag = true;
                   } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
                     amount +=
@@ -121,7 +120,7 @@ public class EventHandlerClient {
                   if (attributemodifier.getOperation() !=
                       AttributeModifier.Operation.MULTIPLY_BASE &&
                       attributemodifier.getOperation() !=
-                      AttributeModifier.Operation.MULTIPLY_TOTAL) {
+                          AttributeModifier.Operation.MULTIPLY_TOTAL) {
                     d1 = amount;
                   } else {
                     d1 = amount * 100.0D;
@@ -133,8 +132,8 @@ public class EventHandlerClient {
                             "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
                             DECIMALFORMAT.format(d1),
                             new TranslationTextComponent("attribute.name." + entry.getKey())))
-                                                              .applyTextStyle(
-                                                                  TextFormatting.DARK_GREEN));
+                        .applyTextStyle(
+                            TextFormatting.DARK_GREEN));
                   } else if (amount > 0.0D) {
                     tooltip.add((new TranslationTextComponent(
                         "attribute.modifier.plus." + attributemodifier.getOperation().getId(),

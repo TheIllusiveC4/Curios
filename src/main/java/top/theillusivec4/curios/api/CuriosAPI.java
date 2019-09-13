@@ -19,6 +19,15 @@
 
 package top.theillusivec4.curios.api;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -31,22 +40,30 @@ import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
-import javax.annotation.Nonnull;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 public final class CuriosAPI {
 
   /**
-   * Holds a reference to the Curios modid
+   * Holds a reference to the Curios modid.
    */
   public static final String MODID = "curios";
+  private static final ResourceLocation GENERIC_SLOT =
+      new ResourceLocation(MODID, "textures/item" + "/empty_generic_slot.png");
+  /**
+   * The maps containing the CurioType and icons with identifiers as keys Try not to access these
+   * directly and instead use {@link CuriosAPI#getType(String)} and {@link
+   * CuriosAPI#getIcon(String)}.
+   * <br>DO NOT REGISTER DIRECTLY - Use IMC to send the appropriate {@link
+   * top.theillusivec4.curios.api.imc.CurioIMCMessage}
+   */
+  public static Map<String, CurioType> idToType = new HashMap<>();
+  public static Map<String, ResourceLocation> idToIcon = new HashMap<>();
+  public static TriConsumer<String, Integer, LivingEntity> brokenCurioConsumer;
 
   /**
+   * Gets the LazyOptional of the curio capability attached to the ItemStack.
+   *
    * @param stack The ItemStack to get the curio capability from
-   * @return LazyOptional of the curio capability attached to the ItemStack
+   * @return LazyOptional of the curio capability
    */
   public static LazyOptional<ICurio> getCurio(ItemStack stack) {
 
@@ -54,25 +71,25 @@ public final class CuriosAPI {
   }
 
   /**
-   * @param entityLivingBase The ItemStack to get the curio inventory capability from
-   * @return LazyOptional of the curio inventory capability attached to the entity
+   * Gets the LazyOptional of the curio inventory capability attached to the entity.
+   *
+   * @param livingEntity The ItemStack to get the curio inventory capability from
+   * @return LazyOptional of the curio inventory capability
    */
   public static LazyOptional<ICurioItemHandler> getCuriosHandler(
-      @Nonnull final LivingEntity entityLivingBase) {
+      @Nonnull final LivingEntity livingEntity) {
 
-    return entityLivingBase.getCapability(CuriosCapability.INVENTORY);
+    return livingEntity.getCapability(CuriosCapability.INVENTORY);
   }
 
   /**
    * Passes three inputs into an internal triple-input consumer that should be used from the
    * single-input consumer in {@link ItemStack#damageItem(int, LivingEntity, Consumer)}
-   * <p>
+   * <br>
    * This will be necessary in order to trigger break animations in curio slots
-   * <p>
-   * Example:
-   * {
-   * stack.damageItem(amount, entity, damager -> CuriosAPI.onBrokenCurio(id, index, damager));
-   * }
+   * <br>
+   * Example: { stack.damageItem(amount, entity, damager -> CuriosAPI.onBrokenCurio(id, index,
+   * damager)); }
    *
    * @param id      The {@link CurioType} String identifier
    * @param index   The slot index of the identifier
@@ -84,9 +101,10 @@ public final class CuriosAPI {
   }
 
   /**
+   * Gets the Optional wrapper of the CurioType from the given identifier.
+   *
    * @param identifier The unique identifier for the {@link CurioType}
-   * @return Optional wrapper of the CurioType from the given identifier, or Optional.empty() if
-   * not present.
+   * @return Optional wrapper of the CurioType  or Optional.empty() if not present
    */
   public static Optional<CurioType> getType(String identifier) {
 
@@ -94,7 +112,9 @@ public final class CuriosAPI {
   }
 
   /**
-   * @return An unmodifiable list of all unique registered identifiers
+   * Gets an unmodifiable list of all unique registered identifiers.
+   *
+   * @return A list of identifiers
    */
   public static Set<String> getTypeIdentifiers() {
 
@@ -102,20 +122,18 @@ public final class CuriosAPI {
   }
 
   /**
-   * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no
-   * matches were found.
+   * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no matches
+   * were found.
    *
-   * @param item             The item to find
-   * @param entityLivingBase The wearer of the item to be found
-   * @return An instance of {@link ImmutableTriple} indicating the identifier of the curio slot,
-   * slot index, and the ItemStack of the first found ItemStack matching the parameters. All
-   * values will be empty if no matches were found.
+   * @param item         The item to find
+   * @param livingEntity The wearer of the item to be found
+   * @return An Optional wrapper of the found triplet, or Optional.empty() is nothing was found.
    */
   public static Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(Item item,
-                                                                                       @Nonnull final LivingEntity entityLivingBase) {
+      @Nonnull final LivingEntity livingEntity) {
 
     ImmutableTriple<String, Integer, ItemStack> result =
-        getCuriosHandler(entityLivingBase).map(handler -> {
+        getCuriosHandler(livingEntity).map(handler -> {
           Set<String> tags = getCurioTags(item);
 
           for (String id : tags) {
@@ -141,18 +159,16 @@ public final class CuriosAPI {
    * Gets the first found ItemStack of the item type equipped in a curio slot that matches the
    * filter, or null if no matches were found.
    *
-   * @param filter           The filter to test the ItemStack against
-   * @param entityLivingBase The wearer of the item to be found
-   * @return An instance of {@link ImmutableTriple} indicating the identifier of the curio slot,
-   * slot index, and the ItemStack of the first found ItemStack matching the parameters. All
-   * values will be empty if no matches were found.
+   * @param filter       The filter to test the ItemStack against
+   * @param livingEntity The wearer of the item to be found
+   * @return An Optional wrapper of the found triplet, or Optional.empty() is nothing was found.
    */
   @Nonnull
   public static Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(
-      Predicate<ItemStack> filter, @Nonnull final LivingEntity entityLivingBase) {
+      Predicate<ItemStack> filter, @Nonnull final LivingEntity livingEntity) {
 
     ImmutableTriple<String, Integer, ItemStack> result =
-        getCuriosHandler(entityLivingBase).map(handler -> {
+        getCuriosHandler(livingEntity).map(handler -> {
 
           for (String id : handler.getCurioMap().keySet()) {
             CurioStackHandler stackHandler = handler.getStackHandler(id);
@@ -175,10 +191,10 @@ public final class CuriosAPI {
   }
 
   /**
-   * Adds a single slot to the {@link CurioType} with the associated identifier.
-   * If the slot to be added is for a type that is not enabled on the entity, it will not be added.
-   * For adding slot(s) for types that are not yet available, there must first be a call to
-   * {@link CuriosAPI#enableTypeForEntity(String, LivingEntity)}
+   * Adds a single slot to the {@link CurioType} with the associated identifier. If the slot to be
+   * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
+   * for types that are not yet available, there must first be a call to {@link
+   * CuriosAPI#enableTypeForEntity(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
@@ -189,26 +205,25 @@ public final class CuriosAPI {
   }
 
   /**
-   * Adds multiple slots to the {@link CurioType} with the associated identifier.
-   * If the slot to be added is for a type that is not enabled on the entity, it will not be added.
-   * For adding slot(s) for types that are not yet available, there must first be a call to
-   * {@link CuriosAPI#enableTypeForEntity(String, LivingEntity)}
+   * Adds multiple slots to the {@link CurioType} with the associated identifier. If the slot to be
+   * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
+   * for types that are not yet available, there must first be a call to {@link
+   * CuriosAPI#enableTypeForEntity(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
    * @param amount           The number of slots to add
    * @param entityLivingBase The holder of the slots
    */
   public static void addTypeSlotsToEntity(String id, int amount,
-                                          final LivingEntity entityLivingBase) {
+      final LivingEntity entityLivingBase) {
 
     getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.addCurioSlot(id, amount));
   }
 
   /**
-   * Removes a single slot to the {@link CurioType} with the associated identifier.
-   * If the slot to be removed is the last slot available, it will not be removed.
-   * For the removal of the last slot, please see
-   * {@link CuriosAPI#disableTypeForEntity(String, LivingEntity)}
+   * Removes a single slot to the {@link CurioType} with the associated identifier. If the slot to
+   * be removed is the last slot available, it will not be removed. For the removal of the last
+   * slot, please see {@link CuriosAPI#disableTypeForEntity(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
@@ -219,23 +234,21 @@ public final class CuriosAPI {
   }
 
   /**
-   * Removes multiple slots to the {@link CurioType} with the associated identifier.
-   * If the slot to be removed is the last slot available, it will not be removed.
-   * For the removal of the last slot, please see
-   * {@link CuriosAPI#disableTypeForEntity(String, LivingEntity)}
+   * Removes multiple slots to the {@link CurioType} with the associated identifier. If the slot to
+   * be removed is the last slot available, it will not be removed. For the removal of the last
+   * slot, please see {@link CuriosAPI#disableTypeForEntity(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
    */
   public static void removeTypeSlotsFromEntity(String id, int amount,
-                                               final LivingEntity entityLivingBase) {
+      final LivingEntity entityLivingBase) {
 
     getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.removeCurioSlot(id, amount));
   }
 
   /**
-   * Adds a {@link CurioType} to the entity
-   * The number of slots given is the type's default
+   * Adds a {@link CurioType} to the entity The number of slots given is the type's default.
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
@@ -246,7 +259,7 @@ public final class CuriosAPI {
   }
 
   /**
-   * Removes a {@link CurioType} from the entity
+   * Removes a {@link CurioType} from the entity.
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
@@ -257,25 +270,21 @@ public final class CuriosAPI {
   }
 
   /**
-   * Retrieves a set of string identifiers from the curio tags associated with the given item
+   * Retrieves a set of string identifiers from the curio tags associated with the given item.
    *
    * @param item The item to retrieve curio tags for
-   * @return Unmodifiable list of unique curio identifiers associated with
-   * the item
+   * @return Unmodifiable list of unique curio identifiers associated with the item
    */
   public static Set<String> getCurioTags(Item item) {
 
     return item.getTags()
-               .stream().filter(tag -> tag.getNamespace().equals(MODID))
-               .map(ResourceLocation::getPath)
-               .collect(Collectors.toSet());
+        .stream().filter(tag -> tag.getNamespace().equals(MODID))
+        .map(ResourceLocation::getPath)
+        .collect(Collectors.toSet());
   }
 
-  private static final ResourceLocation GENERIC_SLOT =
-      new ResourceLocation(MODID, "textures/item" + "/empty_generic_slot.png");
-
   /**
-   * @return An unmodifiable map of identifiers and their registered icons
+   * @return An unmodifiable map of identifiers and their registered icons.
    */
   @Nonnull
   public static ResourceLocation getIcon(String identifier) {
@@ -284,24 +293,12 @@ public final class CuriosAPI {
   }
 
   /**
-   * The maps containing the CurioType and icons with identifiers as keys
-   * Try not to access these directly and instead use
-   * {@link CuriosAPI#getType(String)} and {@link CuriosAPI#getIcon(String)}
-   * DO NOT REGISTER DIRECTLY - Use IMC to send the appropriate
-   * {@link top.theillusivec4.curios.api.imc.CurioIMCMessage}
+   * Holder class for IMC message identifiers.
    */
-  public static Map<String, CurioType>        idToType = new HashMap<>();
-  public static Map<String, ResourceLocation> idToIcon = new HashMap<>();
-
-  public static TriConsumer<String, Integer, LivingEntity> brokenCurioConsumer;
-
-  /**
-   * Holder class for IMC message identifiers
-   */
-  public final static class IMC {
+  public static final class IMC {
 
     public static final String REGISTER_TYPE = "register_type";
-    public static final String MODIFY_TYPE   = "modify_type";
+    public static final String MODIFY_TYPE = "modify_type";
     public static final String REGISTER_ICON = "register_icon";
   }
 }

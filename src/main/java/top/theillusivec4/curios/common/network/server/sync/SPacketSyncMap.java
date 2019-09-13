@@ -20,6 +20,9 @@
 package top.theillusivec4.curios.common.network.server.sync;
 
 import com.google.common.collect.Maps;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -29,14 +32,10 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.function.Supplier;
-
 public class SPacketSyncMap {
 
-  private int                                  entityId;
-  private int                                  entrySize;
+  private int entityId;
+  private int entrySize;
   private SortedMap<String, CurioStackHandler> map;
 
   public SPacketSyncMap(int entityId, SortedMap<String, CurioStackHandler> map) {
@@ -83,7 +82,7 @@ public class SPacketSyncMap {
 
       if (entity instanceof LivingEntity) {
         CuriosAPI.getCuriosHandler((LivingEntity) entity)
-                 .ifPresent(handler -> handler.setCurioMap(msg.map));
+            .ifPresent(handler -> handler.setCurioMap(msg.map));
       }
     });
     ctx.get().setPacketHandled(true);

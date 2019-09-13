@@ -19,6 +19,9 @@
 
 package top.theillusivec4.curios.common.network;
 
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -33,11 +36,11 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
 import top.theillusivec4.curios.common.network.server.SPacketBreakCurio;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
-import top.theillusivec4.curios.common.network.server.sync.*;
-
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActive;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContents;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContentsWithTag;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncMap;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncSize;
 
 public class NetworkHandler {
 
@@ -50,36 +53,36 @@ public class NetworkHandler {
   public static void register() {
 
     INSTANCE = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(Curios.MODID, "main"))
-                                             .networkProtocolVersion(() -> PTC_VERSION)
-                                             .clientAcceptedVersions(PTC_VERSION::equals)
-                                             .serverAcceptedVersions(PTC_VERSION::equals)
-                                             .simpleChannel();
+        .networkProtocolVersion(() -> PTC_VERSION)
+        .clientAcceptedVersions(PTC_VERSION::equals)
+        .serverAcceptedVersions(PTC_VERSION::equals)
+        .simpleChannel();
 
     //Client Packets
     register(CPacketOpenCurios.class, CPacketOpenCurios::encode, CPacketOpenCurios::decode,
-             CPacketOpenCurios::handle);
+        CPacketOpenCurios::handle);
     register(CPacketOpenVanilla.class, CPacketOpenVanilla::encode, CPacketOpenVanilla::decode,
-             CPacketOpenVanilla::handle);
+        CPacketOpenVanilla::handle);
     register(CPacketScrollCurios.class, CPacketScrollCurios::encode, CPacketScrollCurios::decode,
-             CPacketScrollCurios::handle);
+        CPacketScrollCurios::handle);
     register(CPacketDestroyCurios.class, CPacketDestroyCurios::encode, CPacketDestroyCurios::decode,
-             CPacketDestroyCurios::handle);
+        CPacketDestroyCurios::handle);
 
     // Server Packets
     register(SPacketSyncContents.class, SPacketSyncContents::encode, SPacketSyncContents::decode,
-             SPacketSyncContents::handle);
+        SPacketSyncContents::handle);
     register(SPacketScrollCurios.class, SPacketScrollCurios::encode, SPacketScrollCurios::decode,
-             SPacketScrollCurios::handle);
+        SPacketScrollCurios::handle);
     register(SPacketSyncActive.class, SPacketSyncActive::encode, SPacketSyncActive::decode,
-             SPacketSyncActive::handle);
+        SPacketSyncActive::handle);
     register(SPacketSyncSize.class, SPacketSyncSize::encode, SPacketSyncSize::decode,
-             SPacketSyncSize::handle);
+        SPacketSyncSize::handle);
     register(SPacketSyncMap.class, SPacketSyncMap::encode, SPacketSyncMap::decode,
-             SPacketSyncMap::handle);
+        SPacketSyncMap::handle);
     register(SPacketSyncContentsWithTag.class, SPacketSyncContentsWithTag::encode,
-             SPacketSyncContentsWithTag::decode, SPacketSyncContentsWithTag::handle);
+        SPacketSyncContentsWithTag::decode, SPacketSyncContentsWithTag::handle);
     register(SPacketBreakCurio.class, SPacketBreakCurio::encode, SPacketBreakCurio::decode,
-             SPacketBreakCurio::handle);
+        SPacketBreakCurio::handle);
 
     // Assignment of curio breaking to the network instance
     CuriosAPI.brokenCurioConsumer = (id, index, livingEntity) -> INSTANCE.send(
@@ -87,9 +90,9 @@ public class NetworkHandler {
         new SPacketBreakCurio(livingEntity.getEntityId(), id, index));
   }
 
-  private static <MSG> void register(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder,
-                                     Function<PacketBuffer, MSG> decoder,
-                                     BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer) {
+  private static <M> void register(Class<M> messageType, BiConsumer<M, PacketBuffer> encoder,
+      Function<PacketBuffer, M> decoder,
+      BiConsumer<M, Supplier<NetworkEvent.Context>> messageConsumer) {
 
     INSTANCE.registerMessage(id++, messageType, encoder, decoder, messageConsumer);
   }
