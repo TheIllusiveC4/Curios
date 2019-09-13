@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [1.0] - 2019.09.13
+### Added
+- Added Curios button to the Creative inventory screen
+### Changed
+- [API] Re-formatted and updated some javadocs
+### Fixed
+- Fixed client desyncing with items in curio slots [#15](https://github.com/TheIllusiveC4/Curios/issues/14)
+
 ## [0.25] - 2019.09.08
 ### Fixed
 - Fixed sneak transformations on curio renders when in creative flight [#14](https://github.com/TheIllusiveC4/Curios/issues/14)
