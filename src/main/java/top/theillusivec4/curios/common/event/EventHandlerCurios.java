@@ -94,14 +94,14 @@ public class EventHandlerCurios {
   public void onPlayerStartTracking(PlayerEvent.StartTracking evt) {
 
     Entity target = evt.getTarget();
-    PlayerEntity player = evt.getEntityPlayer();
+    PlayerEntity player = evt.getPlayer();
 
     if (player instanceof ServerPlayerEntity && target instanceof LivingEntity) {
       LivingEntity livingBase = (LivingEntity) target;
       CuriosAPI.getCuriosHandler(livingBase)
                .ifPresent(handler -> NetworkHandler.INSTANCE.send(
                    PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
-                   new SPacketSyncMap(player.getEntityId(), handler.getCurioMap())));
+                   new SPacketSyncMap(target.getEntityId(), handler.getCurioMap())));
     }
   }
 
