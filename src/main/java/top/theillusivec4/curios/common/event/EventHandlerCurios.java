@@ -227,7 +227,12 @@ public class EventHandlerCurios {
                     if (stackHandler.getStackInSlot(i).isEmpty()) {
                       stackHandler.setStackInSlot(i, stack.copy());
                       curio.playEquipSound(player);
-                      stack.shrink(1);
+
+                      if (!player.isCreative()) {
+                        int count = stack.getCount();
+                        stack.shrink(count);
+                      }
+
                       evt.setCancellationResult(ActionResultType.SUCCESS);
                       evt.setCanceled(true);
                       return;
