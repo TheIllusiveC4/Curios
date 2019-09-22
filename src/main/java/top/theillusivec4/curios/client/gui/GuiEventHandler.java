@@ -27,6 +27,7 @@ import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemGroup;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -87,6 +88,11 @@ public class GuiEventHandler {
     }
 
     CreativeScreen gui = (CreativeScreen) evt.getGui();
+
+    if (gui.getSelectedTabIndex() != ItemGroup.INVENTORY.getIndex()) {
+      return;
+    }
+
     Slot destroyItemSlot =
         ObfuscationReflectionHelper.getPrivateValue(CreativeScreen.class, gui, "field_147064_C");
 
@@ -98,7 +104,7 @@ public class GuiEventHandler {
       Curios.LOGGER.error("Could not get selected slot in Creative gui!");
     }
 
-    if (slot == destroyItemSlot) {
+    if (destroyItemSlot != null && slot == destroyItemSlot) {
       NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketDestroyCurios());
     }
   }
