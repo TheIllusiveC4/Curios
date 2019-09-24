@@ -93,7 +93,7 @@ public class EventHandlerClient {
               PlayerEntity player = evt.getEntityPlayer();
               tooltip.add(new StringTextComponent(""));
               tooltip.add(
-                  new TranslationTextComponent("curios.modifiers", identifier).applyTextStyle(
+                  new TranslationTextComponent("curios.modifiers." + identifier).applyTextStyle(
                       TextFormatting.GOLD));
 
               for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
