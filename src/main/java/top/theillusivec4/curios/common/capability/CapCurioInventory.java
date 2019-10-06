@@ -107,6 +107,26 @@ public class CapCurioInventory {
                 String identifier = itemtag.getString("Identifier");
                 CurioStackHandler stackHandler = new CurioStackHandler();
                 stackHandler.deserializeNBT(itemtag);
+                CuriosAPI.getType(identifier).ifPresent(type -> {
+                  int size = type.getSize();
+                  int currentSize = stackHandler.getSlots();
+
+                  if (size > currentSize) {
+                    stackHandler.addSize(size - currentSize);
+                  } else if (size < currentSize) {
+
+                    for (int j = size; j < currentSize; j++) {
+                      ItemStack stack = stackHandler.getStackInSlot(j);
+
+                      if (!stack.isEmpty()) {
+                        instance.addInvalid(stackHandler.getStackInSlot(j));
+                      }
+                    }
+                    stackHandler.removeSize(currentSize - size);
+                  }
+
+                  curios.put(identifier, stackHandler);
+                });
 
                 if (CuriosAPI.getType(identifier).isPresent()) {
                   curios.put(identifier, stackHandler);

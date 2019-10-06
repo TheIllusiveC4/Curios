@@ -91,7 +91,18 @@ public class Curios {
   private void enqueue(InterModEnqueueEvent evt) {
 
     for (String id : CuriosConfig.COMMON.createCurios.get()) {
-      send(CuriosAPI.IMC.REGISTER_TYPE, new CurioIMCMessage(id));
+      String[] split = id.split(";");
+      CurioIMCMessage message = new CurioIMCMessage(split[0]);
+      int size = 1;
+
+      if (split.length > 1) {
+        try {
+          size = Math.max(1, Integer.parseInt(split[1]));
+        } catch (NumberFormatException e) {
+          LOGGER.error("Invalid size found in createCurios config for " + id);
+        }
+      }
+      send(CuriosAPI.IMC.REGISTER_TYPE, message.setSize(size));
     }
 
     for (String id : CuriosConfig.COMMON.disabledCurios.get()) {

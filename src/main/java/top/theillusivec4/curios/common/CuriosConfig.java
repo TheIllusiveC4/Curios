@@ -34,15 +34,15 @@ public class CuriosConfig {
   private static final String CONFIG_PREFIX = "gui." + Curios.MODID + ".config.";
 
   static {
-    final Pair<Client, ForgeConfigSpec> specPair =
-        new ForgeConfigSpec.Builder().configure(Client::new);
+    final Pair<Client, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder()
+        .configure(Client::new);
     clientSpec = specPair.getRight();
     CLIENT = specPair.getLeft();
   }
 
   static {
-    final Pair<Common, ForgeConfigSpec> specPair =
-        new ForgeConfigSpec.Builder().configure(Common::new);
+    final Pair<Common, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder()
+        .configure(Common::new);
     commonSpec = specPair.getRight();
     COMMON = specPair.getLeft();
   }
@@ -57,13 +57,12 @@ public class CuriosConfig {
       builder.push("common");
 
       disabledCurios = builder.comment("List of curio types to disable by default")
-          .translation(CONFIG_PREFIX + "disabledCurios")
-          .worldRestart()
+          .translation(CONFIG_PREFIX + "disabledCurios").worldRestart()
           .define("disabledCurios", Lists.newArrayList());
 
-      createCurios = builder.comment("List of curio types to create")
-          .translation(CONFIG_PREFIX + "createCurios")
-          .worldRestart()
+      createCurios = builder.comment("List of curio types to create."
+          + "Sizes can be defined by adding a semicolon and the size number (e.g. 'ring;4').")
+          .translation(CONFIG_PREFIX + "createCurios").worldRestart()
           .define("createCurios", Lists.newArrayList());
 
       builder.pop();
@@ -79,8 +78,7 @@ public class CuriosConfig {
       builder.comment("Client only settings, mostly things related to rendering").push("client");
 
       renderCurios = builder.comment("Set to true to enable rendering curios")
-          .translation(CONFIG_PREFIX + "renderCurios")
-          .define("renderCurios", true);
+          .translation(CONFIG_PREFIX + "renderCurios").define("renderCurios", true);
 
       builder.pop();
     }
