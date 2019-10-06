@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [1.0.1] - 2019.10.06
+### Added
+- [API] Added ICurio#getTagsTooltip to allow modders to customize curio tags tooltip information
+- Added size alteration to createCurios config option by appending a semicolon and a size amount
+### Fixed
+- Fixed curio attribute modifiers not respecting HideFlags
+
 ## [1.0.0.3] - 2019.09.24
 ### Added
 - Added Russian localization (thanks Extegral!) [#21](https://github.com/TheIllusiveC4/Curios/pull/21)
