@@ -94,8 +94,13 @@ public class EventHandlerClient {
           tagTooltips.add(new TranslationTextComponent(key).applyTextStyle(TextFormatting.GOLD));
         }
 
-        CuriosAPI.getCurio(stack)
-            .ifPresent(curio -> tooltip.addAll(1, curio.getTagsTooltip(tagTooltips)));
+        CuriosAPI.getCurio(stack).ifPresent(curio -> {
+          List<ITextComponent> curioTagsTooltip = curio.getTagsTooltip(tagTooltips);
+
+          if (!curioTagsTooltip.isEmpty()) {
+            tooltip.addAll(1, curio.getTagsTooltip(tagTooltips));
+          }
+        });
 
         if (!CuriosAPI.getCurio(stack).isPresent()) {
           tooltip.addAll(1, tagTooltips);
