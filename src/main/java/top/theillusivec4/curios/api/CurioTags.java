@@ -32,6 +32,11 @@ import net.minecraft.util.ResourceLocation;
 public final class CurioTags {
 
   /**
+   * Used for curios that can be worn anywhere.
+   */
+  public static final Tag<Item> CURIO = tag("curio");
+
+  /**
    * Used for capes, backpacks, or anything worn on the back.
    */
   public static final Tag<Item> BACK = tag("back");

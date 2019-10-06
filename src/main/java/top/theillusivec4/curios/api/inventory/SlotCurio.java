@@ -63,28 +63,21 @@ public class SlotCurio extends SlotItemHandler {
   public boolean isItemValid(@Nonnull ItemStack stack) {
 
     return hasValidTag(CuriosAPI.getCurioTags(stack.getItem())) && CuriosAPI.getCurio(stack)
-        .map(
-            curio -> curio.canEquip(
-                identifier,
-                player))
-        .orElse(true) &&
-        super.isItemValid(stack);
+        .map(curio -> curio.canEquip(identifier, player)).orElse(true) && super.isItemValid(stack);
   }
 
   protected boolean hasValidTag(Set<String> tags) {
 
-    return tags.contains(identifier);
+    return tags.contains(identifier) || tags.contains("curio");
   }
 
   @Override
   public boolean canTakeStack(PlayerEntity playerIn) {
 
     ItemStack stack = this.getStack();
-    return
-        (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) &&
-            CuriosAPI.getCurio(stack)
-                .map(curio -> curio.canUnequip(identifier, playerIn))
-                .orElse(true) && super.canTakeStack(playerIn);
+    return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
+        && CuriosAPI.getCurio(stack).map(curio -> curio.canUnequip(identifier, playerIn))
+        .orElse(true) && super.canTakeStack(playerIn);
   }
 
   @Nullable
@@ -101,8 +94,8 @@ public class SlotCurio extends SlotItemHandler {
 
     TextureAtlasSprite getSpriteForString(String id) {
 
-      return spriteMap.computeIfAbsent(id,
-          key -> new TextureAtlasSprite(backgroundLocation, 16, 16) {
+      return spriteMap
+          .computeIfAbsent(id, key -> new TextureAtlasSprite(backgroundLocation, 16, 16) {
             {
               func_217789_a(16, 16, 0, 0);
             }
