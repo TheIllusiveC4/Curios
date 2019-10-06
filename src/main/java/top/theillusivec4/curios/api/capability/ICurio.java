@@ -22,6 +22,7 @@ package top.theillusivec4.curios.api.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.platform.GlStateManager;
+import java.util.List;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -38,6 +39,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
 import top.theillusivec4.curios.api.CurioType;
 
 public interface ICurio {
@@ -108,6 +110,20 @@ public interface ICurio {
   default boolean canUnequip(String identifier, LivingEntity livingEntity) {
 
     return true;
+  }
+
+
+  /**
+   * Retrieves a list of tooltips when displaying curio tag information. By default, this will be a
+   * list of each tag identifier, translated and in gold text, associated with the curio.
+   * <br>
+   * If overriding, make sure the user has some indication which tags are associated with the curio.
+   *
+   * @param tagTooltips A list of {@link ITextComponent} with every curio tag
+   * @return A list of ITextComponent to display as curio tag information
+   */
+  default List<ITextComponent> getTagsTooltip(List<ITextComponent> tagTooltips) {
+    return tagTooltips;
   }
 
   /**

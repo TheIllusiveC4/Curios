@@ -22,6 +22,7 @@ package top.theillusivec4.curios.client;
 import static net.minecraft.item.ItemStack.DECIMALFORMAT;
 
 import com.google.common.collect.Multimap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,10 +87,18 @@ public class EventHandlerClient {
       Set<String> slots = CuriosAPI.getCurioTags(stack.getItem());
 
       if (!slots.isEmpty()) {
+        List<ITextComponent> tagTooltips = new ArrayList<>();
 
         for (String s : slots) {
           String key = "curios.identifier." + s;
-          tooltip.add(1, new TranslationTextComponent(key).applyTextStyle(TextFormatting.GOLD));
+          tagTooltips.add(new TranslationTextComponent(key).applyTextStyle(TextFormatting.GOLD));
+        }
+
+        CuriosAPI.getCurio(stack)
+            .ifPresent(curio -> tooltip.addAll(1, curio.getTagsTooltip(tagTooltips)));
+
+        if (!CuriosAPI.getCurio(stack).isPresent()) {
+          tooltip.addAll(1, tagTooltips);
         }
 
         final int hideFlags = i;
