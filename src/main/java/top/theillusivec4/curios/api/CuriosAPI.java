@@ -46,8 +46,8 @@ public final class CuriosAPI {
    * Holds a reference to the Curios modid.
    */
   public static final String MODID = "curios";
-  private static final ResourceLocation GENERIC_SLOT =
-      new ResourceLocation(MODID, "textures/item" + "/empty_generic_slot.png");
+  private static final ResourceLocation GENERIC_SLOT = new ResourceLocation(MODID,
+      "textures/item" + "/empty_generic_slot.png");
   /**
    * The maps containing the CurioType and icons with identifiers as keys Try not to access these
    * directly and instead use {@link CuriosAPI#getType(String)} and {@link
@@ -122,6 +122,20 @@ public final class CuriosAPI {
   }
 
   /**
+   * Retrieves the number of slots that an entity has for a specific curio type.
+   *
+   * @param livingEntity The entity that has the slot
+   * @param identifier   The type identifier of the slot
+   * @return The number of slots
+   */
+  public static int getSlotsForType(@Nonnull final LivingEntity livingEntity, String identifier) {
+    return CuriosAPI.getCuriosHandler(livingEntity).map(handler -> {
+      CurioStackHandler stacks = handler.getCurioMap().get(identifier);
+      return stacks != null ? stacks.getSlots() : 0;
+    }).orElse(0);
+  }
+
+  /**
    * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no matches
    * were found.
    *
@@ -132,8 +146,8 @@ public final class CuriosAPI {
   public static Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(Item item,
       @Nonnull final LivingEntity livingEntity) {
 
-    ImmutableTriple<String, Integer, ItemStack> result =
-        getCuriosHandler(livingEntity).map(handler -> {
+    ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(livingEntity)
+        .map(handler -> {
           Set<String> tags = getCurioTags(item);
 
           for (String id : tags) {
@@ -167,8 +181,8 @@ public final class CuriosAPI {
   public static Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(
       Predicate<ItemStack> filter, @Nonnull final LivingEntity livingEntity) {
 
-    ImmutableTriple<String, Integer, ItemStack> result =
-        getCuriosHandler(livingEntity).map(handler -> {
+    ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(livingEntity)
+        .map(handler -> {
 
           for (String id : handler.getCurioMap().keySet()) {
             CurioStackHandler stackHandler = handler.getStackHandler(id);
@@ -277,10 +291,8 @@ public final class CuriosAPI {
    */
   public static Set<String> getCurioTags(Item item) {
 
-    return item.getTags()
-        .stream().filter(tag -> tag.getNamespace().equals(MODID))
-        .map(ResourceLocation::getPath)
-        .collect(Collectors.toSet());
+    return item.getTags().stream().filter(tag -> tag.getNamespace().equals(MODID))
+        .map(ResourceLocation::getPath).collect(Collectors.toSet());
   }
 
   /**
