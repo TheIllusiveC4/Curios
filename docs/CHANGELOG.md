@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [1.0.3] - 2019.10.13
+### Added
+- [API] Added CuriosAPI#getSlotsForType helper method to retrieve slot sizes for a given entity and curio type identifier
+
 ## [1.0.2.1] - 2019.10.12
 ### Changed
 - Updated Russian localization (thanks Extegral!) [#24](https://github.com/TheIllusiveC4/Curios/pull/24)
