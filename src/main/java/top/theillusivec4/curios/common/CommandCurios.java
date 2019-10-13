@@ -131,17 +131,9 @@ public class CommandCurios {
 
   private static int setSlotsOfPlayer(CommandSource source, ServerPlayerEntity playerMP, String slot, int amount)
   {
-    int difference = amount - CuriosAPI.getSlotsForType(playerMP, slot);
-    if(difference > 0)
-    {
-      CuriosAPI.addTypeSlotsToEntity(slot, amount - CuriosAPI.getSlotsForType(playerMP, slot), playerMP);
-    }
-    else if(difference < 0)
-    {
-      CuriosAPI.removeTypeSlotsFromEntity(slot, Math.abs(difference), playerMP);
-    }
-      source.sendFeedback(new TranslationTextComponent("commands.curios.set.success", slot, CuriosAPI.getSlotsForType(playerMP, slot),
-              playerMP.getDisplayName()), true);
+    CuriosAPI.setSlotsForType(slot, playerMP, amount);
+    source.sendFeedback(new TranslationTextComponent("commands.curios.set.success", slot, CuriosAPI.getSlotsForType(playerMP, slot),
+            playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
 

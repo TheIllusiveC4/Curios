@@ -123,8 +123,6 @@ public class Curios {
         new Tuple<>("body", new ResourceLocation(MODID, "textures/item/empty_body_slot.png")));
     send(CuriosAPI.IMC.REGISTER_ICON,
         new Tuple<>("ring", new ResourceLocation(MODID, "textures/item/empty_ring_slot.png")));
-
-    InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("accessories").setEnabled(true).setSize(4).setHidden(false));
   }
 
   private void process(InterModProcessEvent evt) {

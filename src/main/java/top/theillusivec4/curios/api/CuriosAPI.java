@@ -197,7 +197,7 @@ public final class CuriosAPI {
     }).orElse(0);
   }
 
-  public static void setTypeSlotToEntity(String id, final LivingEntity entityLivingBase, int amount)
+  public static void setSlotsForType(String id, final LivingEntity entityLivingBase, int amount)
   {
     int difference = amount - CuriosAPI.getSlotsForType(entityLivingBase, id);
     if(difference > 0)
