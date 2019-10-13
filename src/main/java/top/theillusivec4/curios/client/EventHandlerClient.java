@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -91,7 +92,8 @@ public class EventHandlerClient {
 
         for (String s : slots) {
           String key = "curios.identifier." + s;
-          tagTooltips.add(new TranslationTextComponent(key).applyTextStyle(TextFormatting.GOLD));
+          ITextComponent type = new TranslationTextComponent("curios.slot").appendText(": ").applyTextStyle(TextFormatting.GOLD).appendSibling(new TranslationTextComponent(key).applyTextStyle(TextFormatting.GRAY));
+          tagTooltips.add(type);
         }
 
         CuriosAPI.getCurio(stack).ifPresent(curio -> {

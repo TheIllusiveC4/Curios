@@ -50,6 +50,20 @@ public class CommandCurios {
     LiteralArgumentBuilder<CommandSource> curiosCommand = Commands.literal("curios")
         .requires(player -> player.hasPermissionLevel(opPermissionLevel));
 
+    curiosCommand.then(Commands.literal("set")
+            .then(Commands.argument("slot", StringArgumentType.string())
+                    .suggests((ctx, builder) -> ISuggestionProvider
+                            .suggest(CuriosAPI.getTypeIdentifiers(), builder))
+                    .then(Commands.argument("player", EntityArgument.player())
+                            .executes(context -> setSlotsOfPlayer(context.getSource(),
+                                    EntityArgument.getPlayer(context, "player"),
+                                    StringArgumentType.getString(context, "slot"), 1))
+                            .then(Commands.argument("amount", IntegerArgumentType.integer())
+                                    .executes(context -> setSlotsOfPlayer(context.getSource(),
+                                            EntityArgument.getPlayer(context, "player"),
+                                            StringArgumentType.getString(context, "slot"),
+                                            IntegerArgumentType.getInteger(context, "amount")))))));
+
     curiosCommand.then(Commands.literal("add")
         .then(Commands.argument("slot", StringArgumentType.string())
             .suggests((ctx, builder) -> ISuggestionProvider
@@ -113,6 +127,22 @@ public class CommandCurios {
                 EntityArgument.getPlayer(context, "player")))));
 
     dispatcher.register(curiosCommand);
+  }
+
+  private static int setSlotsOfPlayer(CommandSource source, ServerPlayerEntity playerMP, String slot, int amount)
+  {
+    int difference = amount - CuriosAPI.getSlotsForType(playerMP, slot);
+    if(difference > 0)
+    {
+      CuriosAPI.addTypeSlotsToEntity(slot, amount - CuriosAPI.getSlotsForType(playerMP, slot), playerMP);
+    }
+    else if(difference < 0)
+    {
+      CuriosAPI.removeTypeSlotsFromEntity(slot, Math.abs(difference), playerMP);
+    }
+      source.sendFeedback(new TranslationTextComponent("commands.curios.set.success", slot, CuriosAPI.getSlotsForType(playerMP, slot),
+              playerMP.getDisplayName()), true);
+    return Command.SINGLE_SUCCESS;
   }
 
   private static int addSlotToPlayer(CommandSource source, ServerPlayerEntity playerMP, String slot,
