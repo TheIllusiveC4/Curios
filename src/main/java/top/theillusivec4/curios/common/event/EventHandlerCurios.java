@@ -97,9 +97,8 @@ public class EventHandlerCurios {
 
     if (player instanceof ServerPlayerEntity && target instanceof LivingEntity) {
       LivingEntity livingBase = (LivingEntity) target;
-      CuriosAPI.getCuriosHandler(livingBase)
-          .ifPresent(handler -> NetworkHandler.INSTANCE.send(
-              PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
+      CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> NetworkHandler.INSTANCE
+          .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
               new SPacketSyncMap(target.getEntityId(), handler.getCurioMap())));
     }
   }
@@ -118,8 +117,18 @@ public class EventHandlerCurios {
     LazyOptional<ICurioItemHandler> oldHandler = CuriosAPI.getCuriosHandler(oldPlayer);
     LazyOptional<ICurioItemHandler> newHandler = CuriosAPI.getCuriosHandler(player);
 
-    oldHandler.ifPresent(oldCurios -> newHandler.ifPresent(
-        newCurios -> newCurios.setCurioMap(oldCurios.getCurioMap())));
+    oldHandler.ifPresent(oldCurios -> newHandler.ifPresent(newCurios -> {
+      newCurios.setCurioMap(oldCurios.getCurioMap());
+      oldCurios.getCurioMap().forEach((identifier, stackHandler) -> {
+        for (int i = 0; i < stackHandler.getSlots(); i++) {
+          ItemStack stack = stackHandler.getStackInSlot(i);
+          CuriosAPI.getCurio(stack).ifPresent(curio -> {
+            player.getAttributes().applyAttributeModifiers(curio.getAttributeModifiers(identifier));
+            curio.onEquipped(identifier, player);
+          });
+        }
+      });
+    }));
   }
 
   @SubscribeEvent
@@ -127,8 +136,8 @@ public class EventHandlerCurios {
 
     LivingEntity livingEntity = evt.getEntityLiving();
 
-    if (!livingEntity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)
-        && !livingEntity.isSpectator()) {
+    if (!livingEntity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) && !livingEntity
+        .isSpectator()) {
       CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
         Collection<ItemEntity> entityItems = evt.getDrops();
         SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
@@ -167,8 +176,8 @@ public class EventHandlerCurios {
             ItemStack stack = stacks.getStackInSlot(i);
 
             if (!stack.isEmpty()
-                && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0
-                && stack.isDamaged()) {
+                && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0 && stack
+                .isDamaged()) {
               evt.setCanceled(true);
               ExperienceOrbEntity orb = evt.getOrb();
               player.xpCooldown = 2;
@@ -192,8 +201,8 @@ public class EventHandlerCurios {
   private ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
 
     double d0 = livingEntity.posY - 0.30000001192092896D + (double) livingEntity.getEyeHeight();
-    ItemEntity entityitem =
-        new ItemEntity(livingEntity.world, livingEntity.posX, d0, livingEntity.posZ, droppedItem);
+    ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.posX, d0,
+        livingEntity.posZ, droppedItem);
     entityitem.setPickupDelay(40);
     float f = livingEntity.world.rand.nextFloat() * 0.5F;
     float f1 = livingEntity.world.rand.nextFloat() * ((float) Math.PI * 2F);
@@ -288,15 +297,15 @@ public class EventHandlerCurios {
                 }
 
                 if (!syncTag.isEmpty()) {
-                  NetworkHandler.INSTANCE.send(
-                      PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
-                      new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier, i,
-                          stack, syncTag));
+                  NetworkHandler.INSTANCE
+                      .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
+                          new SPacketSyncContentsWithTag(entitylivingbase.getEntityId(), identifier,
+                              i, stack, syncTag));
                 } else {
-                  NetworkHandler.INSTANCE.send(
-                      PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
-                      new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i,
-                          stack));
+                  NetworkHandler.INSTANCE
+                      .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entitylivingbase),
+                          new SPacketSyncContents(entitylivingbase.getEntityId(), identifier, i,
+                              stack));
                 }
               }
               MinecraftForge.EVENT_BUS.post(
@@ -319,8 +328,8 @@ public class EventHandlerCurios {
                   curio.onEquipped(identifier, entitylivingbase);
                 }
               });
-              stackHandler.setPreviousStackInSlot(i,
-                  stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
+              stackHandler
+                  .setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
             }
           }
         }
