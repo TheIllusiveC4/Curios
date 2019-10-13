@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [1.0.2.1] - 2019.10.12
+### Changed
+- Updated Russian localization (thanks Extegral!) [#24](https://github.com/TheIllusiveC4/Curios/pull/24)
+### Fixed
+- Fixed attribute modifiers not being applied when respawning with keepInventory gamerule set to true [#23](https://github.com/TheIllusiveC4/Curios/issues/23)
+
 ## [1.0.2] - 2019.10.06
 ### Added
 - [API] Added generic "curio" tag for items that can go into any curio slot
