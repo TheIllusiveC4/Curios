@@ -48,7 +48,7 @@ import top.theillusivec4.curios.client.EventHandlerClient;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.client.gui.GuiEventHandler;
-import top.theillusivec4.curios.client.render.LayerCurios;
+import top.theillusivec4.curios.client.render.CuriosLayer;
 import top.theillusivec4.curios.common.CommandCurios;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosIMC;
@@ -155,7 +155,7 @@ public class Curios {
       Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
 
       for (PlayerRenderer render : skinMap.values()) {
-        render.addLayer(new LayerCurios<>(render));
+        render.addLayer(new CuriosLayer<>(render));
       }
     }
   }

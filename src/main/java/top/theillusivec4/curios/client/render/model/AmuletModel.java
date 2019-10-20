@@ -1,14 +1,14 @@
-package top.theillusivec4.curios.client.render;
+package top.theillusivec4.curios.client.render.model;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.entity.Entity;
 
-public class ModelAmulet extends EntityModel {
+public class AmuletModel extends EntityModel {
 
   public RendererModel amulet;
 
-  public ModelAmulet() {
+  public AmuletModel() {
 
     this.textureWidth = 16;
     this.textureHeight = 16;

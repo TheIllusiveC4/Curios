@@ -1,14 +1,14 @@
-package top.theillusivec4.curios.client.render;
+package top.theillusivec4.curios.client.render.model;
 
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.entity.Entity;
 
-public class ModelCrown extends EntityModel {
+public class CrownModel extends EntityModel {
 
   public RendererModel crown;
 
-  public ModelCrown() {
+  public CrownModel() {
 
     this.textureWidth = 32;
     this.textureHeight = 32;

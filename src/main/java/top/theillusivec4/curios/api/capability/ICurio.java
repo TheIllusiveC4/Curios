@@ -117,7 +117,8 @@ public interface ICurio {
    * Retrieves a list of tooltips when displaying curio tag information. By default, this will be a
    * list of each tag identifier, translated and in gold text, associated with the curio.
    * <br>
-   * If overriding, make sure the user has some indication which tags are associated with the curio.
+   * If overriding, make sure the user has some indication which tags are associated with the
+   * curio.
    *
    * @param tagTooltips A list of {@link ITextComponent} with every curio tag
    * @return A list of ITextComponent to display as curio tag information
@@ -146,9 +147,9 @@ public interface ICurio {
    */
   default void playEquipSound(LivingEntity livingEntity) {
 
-    livingEntity.world.playSound(null, livingEntity.getPosition(),
-        SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.NEUTRAL,
-        1.0f, 1.0f);
+    livingEntity.world
+        .playSound(null, livingEntity.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
+            SoundCategory.NEUTRAL, 1.0f, 1.0f);
   }
 
   /**
@@ -176,9 +177,8 @@ public interface ICurio {
 
       if (!livingEntity.isSilent()) {
         livingEntity.world.playSound(livingEntity.posX, livingEntity.posY, livingEntity.posZ,
-            SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(),
-            0.8F, 0.8F + livingEntity.world.rand.nextFloat() * 0.4F,
-            false);
+            SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(), 0.8F,
+            0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
       }
 
       for (int i = 0; i < 5; ++i) {
@@ -187,16 +187,17 @@ public interface ICurio {
         vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
         double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
-        Vec3d vec3d1 =
-            new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D, d0, 0.6D);
+        Vec3d vec3d1 = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D, d0,
+            0.6D);
         vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        vec3d1 =
-            vec3d1.add(livingEntity.posX, livingEntity.posY + (double) livingEntity.getEyeHeight(),
+        vec3d1 = vec3d1
+            .add(livingEntity.posX, livingEntity.posY + (double) livingEntity.getEyeHeight(),
                 livingEntity.posZ);
 
-        livingEntity.world.addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x,
-            vec3d1.y, vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
+        livingEntity.world
+            .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
+                vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
       }
     }
   }
@@ -240,7 +241,7 @@ public interface ICurio {
   /**
    * Determines if the ItemStack has rendering.
    *
-   * @param identifier       The identifier of the {@link CurioType} of the slot
+   * @param identifier   The identifier of the {@link CurioType} of the slot
    * @param livingEntity The EntityLivingBase that is wearing the ItemStack
    * @return True if the ItemStack has rendering, false if it does not
    */
@@ -258,8 +259,8 @@ public interface ICurio {
    * @param livingEntity The EntityLivingBase that is wearing the ItemStack
    */
   default void doRender(String identifier, LivingEntity livingEntity, float limbSwing,
-      float limbSwingAmount, float partialTicks, float ageInTicks,
-      float netHeadYaw, float headPitch, float scale) {
+      float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+      float headPitch, float scale) {
 
   }
 
@@ -294,8 +295,8 @@ public interface ICurio {
     public static void followHeadRotations(final LivingEntity livingEntity,
         RendererModel... renderers) {
 
-      EntityRenderer render =
-          Minecraft.getInstance().getRenderManager().getRenderer(livingEntity);
+      EntityRenderer<LivingEntity> render = Minecraft.getInstance().getRenderManager()
+          .getRenderer(livingEntity);
 
       if (render instanceof LivingRenderer) {
         EntityModel model = ((LivingRenderer) render).getEntityModel();
@@ -304,6 +305,27 @@ public interface ICurio {
 
           for (RendererModel renderer : renderers) {
             renderer.copyModelAngles(((BipedModel) model).bipedHead);
+          }
+        }
+      }
+    }
+
+    @SafeVarargs
+    public static <T extends LivingEntity, M extends EntityModel<T>> void followBodyRotations(
+        final LivingEntity livingEntity, final BipedModel<T>... models) {
+
+      EntityRenderer<LivingEntity> render = Minecraft.getInstance().getRenderManager()
+          .getRenderer(livingEntity);
+
+      if (render instanceof LivingRenderer) {
+        LivingRenderer<T, M> livingRenderer = (LivingRenderer<T, M>) render;
+        EntityModel<T> entityModel = livingRenderer.getEntityModel();
+
+        if (entityModel instanceof BipedModel) {
+
+          for (BipedModel<T> model : models) {
+            BipedModel<T> bipedModel = (BipedModel<T>) entityModel;
+            bipedModel.func_217148_a(model);
           }
         }
       }
