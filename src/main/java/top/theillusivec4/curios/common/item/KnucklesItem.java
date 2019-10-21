@@ -70,7 +70,7 @@ public class KnucklesItem extends Item {
         }
 
         KnucklesModel knuckles = (KnucklesModel) this.model;
-        ICurio.RenderHelper.followBodyRotations(livingEntity, new BipedModel[]{knuckles});
+        ICurio.RenderHelper.followBodyRotations(livingEntity, knuckles);
         knuckles.setLivingAnimations(livingEntity, limbSwing, limbSwingAmount, partialTicks);
         knuckles.setRotationAngles(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
             headPitch, scale);

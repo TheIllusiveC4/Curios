@@ -311,20 +311,20 @@ public interface ICurio {
     }
 
     @SafeVarargs
-    public static <T extends LivingEntity, M extends EntityModel<T>> void followBodyRotations(
-        final LivingEntity livingEntity, final BipedModel<T>... models) {
+    public static void followBodyRotations(final LivingEntity livingEntity,
+        final BipedModel<LivingEntity>... models) {
 
       EntityRenderer<LivingEntity> render = Minecraft.getInstance().getRenderManager()
           .getRenderer(livingEntity);
 
       if (render instanceof LivingRenderer) {
-        LivingRenderer<T, M> livingRenderer = (LivingRenderer<T, M>) render;
-        EntityModel<T> entityModel = livingRenderer.getEntityModel();
+        LivingRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        EntityModel<LivingEntity> entityModel = livingRenderer.getEntityModel();
 
         if (entityModel instanceof BipedModel) {
 
-          for (BipedModel<T> model : models) {
-            BipedModel<T> bipedModel = (BipedModel<T>) entityModel;
+          for (BipedModel<LivingEntity> model : models) {
+            BipedModel<LivingEntity> bipedModel = (BipedModel<LivingEntity>) entityModel;
             bipedModel.func_217148_a(model);
           }
         }
