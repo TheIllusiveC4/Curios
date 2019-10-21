@@ -1,5 +1,7 @@
 {
   "curios.name": "Curios",
+  "curios.slot": "Слот",
+  "commands.curios.set.success": "Количество слотов типа «%s» было изменено на %d для %s",
   "commands.curios.add.success": "%d слотов типа «%s» было добавлено для %s",
   "commands.curios.remove.success": "%d слотов типа «%s» было убрано у %s",
   "commands.curios.enable.success": "Слот «%s» был включён для %s",
@@ -10,6 +12,7 @@
   "item.curios.amulet": "Любопытный амулет",
   "item.curios.ring": "Любопытное кольцо",
   "item.curios.crown": "Любопытная корона",
+  "item.curios.knuckles": "Любопытный кастет",
   "curios.identifier.curio": "Аксессуар",
   "curios.identifier.necklace": "Ожерелье",
   "curios.identifier.ring": "Кольцо",
@@ -18,6 +21,7 @@
   "curios.identifier.belt": "Пояс",
   "curios.identifier.body": "Тело",
   "curios.identifier.charm": "Амулет",
+  "curios.identifier.hands": "Руки",
   "curios.modifiers.curio": "Если надето как аксессуар:",
   "curios.modifiers.necklace": "При ношении на шее:",
   "curios.modifiers.ring": "Если надето как кольцо:",
@@ -26,6 +30,7 @@
   "curios.modifiers.belt": "Если надето как пояс:",
   "curios.modifiers.body": "При ношении на теле:",
   "curios.modifiers.charm": "Если надето как амулет:",
+  "curios.modifiers.hands": "При ношении на руках:",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Открыть/Закрыть инвентарь Curios"
 }
