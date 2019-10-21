@@ -136,6 +136,23 @@ public final class CuriosAPI {
   }
 
   /**
+   * Sets the number of slots that an entity has for a specific curio type.
+   *
+   * @param livingEntity The entity that has the slot
+   * @param id           The type identifier of the slot
+   * @param amount       The number of slots
+   */
+  public static void setSlotsForType(String id, final LivingEntity livingEntity, int amount) {
+    int difference = amount - CuriosAPI.getSlotsForType(livingEntity, id);
+
+    if (difference > 0) {
+      CuriosAPI.addTypeSlotsToEntity(id, difference, livingEntity);
+    } else if (difference < 0) {
+      CuriosAPI.removeTypeSlotsFromEntity(id, Math.abs(difference), livingEntity);
+    }
+  }
+
+  /**
    * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no matches
    * were found.
    *
@@ -204,31 +221,10 @@ public final class CuriosAPI {
     return result.getLeft().isEmpty() ? Optional.empty() : Optional.of(result);
   }
 
-  public static int getSlotsForType(@Nonnull LivingEntity livingEntity, String identifier) {
-    return (Integer)getCuriosHandler(livingEntity).map((handler) -> {
-      CurioStackHandler stacks = (CurioStackHandler)handler.getCurioMap().get(identifier);
-      return stacks != null ? stacks.getSlots() : 0;
-    }).orElse(0);
-  }
-
-  public static void setSlotsForType(String id, final LivingEntity entityLivingBase, int amount)
-  {
-    int difference = amount - CuriosAPI.getSlotsForType(entityLivingBase, id);
-    if(difference > 0)
-    {
-      CuriosAPI.addTypeSlotsToEntity(id, amount - CuriosAPI.getSlotsForType(entityLivingBase, id), entityLivingBase);
-    }
-    else if(difference < 0)
-    {
-      CuriosAPI.removeTypeSlotsFromEntity(id, Math.abs(difference), entityLivingBase);
-    }
-  }
-
   /**
-  /**
-   * Adds a single slot to the {@link CurioType} with the associated identifier. If the slot to be
-   * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
-   * for types that are not yet available, there must first be a call to {@link
+   * /** Adds a single slot to the {@link CurioType} with the associated identifier. If the slot to
+   * be added is for a type that is not enabled on the entity, it will not be added. For adding
+   * slot(s) for types that are not yet available, there must first be a call to {@link
    * CuriosAPI#enableTypeForEntity(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType

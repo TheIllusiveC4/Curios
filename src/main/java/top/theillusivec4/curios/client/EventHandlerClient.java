@@ -84,16 +84,27 @@ public class EventHandlerClient {
         i = tag.getInt("HideFlags");
       }
 
-      Set<String> slots = CuriosAPI.getCurioTags(stack.getItem());
+      Set<String> curioTags = CuriosAPI.getCurioTags(stack.getItem());
+      List<String> slots = new ArrayList<>(curioTags);
 
       if (!slots.isEmpty()) {
         List<ITextComponent> tagTooltips = new ArrayList<>();
+        ITextComponent slotsTooltip = new TranslationTextComponent("curios.slot").appendText(": ")
+            .applyTextStyle(TextFormatting.GOLD);
 
-        for (String s : slots) {
-          String key = "curios.identifier." + s;
-          ITextComponent type = new TranslationTextComponent("curios.slot").appendText(": ").applyTextStyle(TextFormatting.GOLD).appendSibling(new TranslationTextComponent(key).applyTextStyle(TextFormatting.GRAY));
-          tagTooltips.add(type);
+        for (int j = 0; j < slots.size(); j++) {
+          String key = "curios.identifier." + slots.get(j);
+          ITextComponent type = new TranslationTextComponent(key);
+
+          if (j < slots.size() - 1) {
+            type = type.appendText(", ");
+          }
+
+          type = type.applyTextStyle(TextFormatting.YELLOW);
+          slotsTooltip.appendSibling(type);
         }
+
+        tagTooltips.add(slotsTooltip);
 
         CuriosAPI.getCurio(stack).ifPresent(curio -> {
           List<ITextComponent> curioTagsTooltip = curio.getTagsTooltip(tagTooltips);
