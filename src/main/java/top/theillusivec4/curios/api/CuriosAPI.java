@@ -204,6 +204,27 @@ public final class CuriosAPI {
     return result.getLeft().isEmpty() ? Optional.empty() : Optional.of(result);
   }
 
+  public static int getSlotsForType(@Nonnull LivingEntity livingEntity, String identifier) {
+    return (Integer)getCuriosHandler(livingEntity).map((handler) -> {
+      CurioStackHandler stacks = (CurioStackHandler)handler.getCurioMap().get(identifier);
+      return stacks != null ? stacks.getSlots() : 0;
+    }).orElse(0);
+  }
+
+  public static void setSlotsForType(String id, final LivingEntity entityLivingBase, int amount)
+  {
+    int difference = amount - CuriosAPI.getSlotsForType(entityLivingBase, id);
+    if(difference > 0)
+    {
+      CuriosAPI.addTypeSlotsToEntity(id, amount - CuriosAPI.getSlotsForType(entityLivingBase, id), entityLivingBase);
+    }
+    else if(difference < 0)
+    {
+      CuriosAPI.removeTypeSlotsFromEntity(id, Math.abs(difference), entityLivingBase);
+    }
+  }
+
+  /**
   /**
    * Adds a single slot to the {@link CurioType} with the associated identifier. If the slot to be
    * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
