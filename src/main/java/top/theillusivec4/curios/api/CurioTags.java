@@ -62,6 +62,11 @@ public final class CurioTags {
   public static final Tag<Item> HEAD = tag("head");
 
   /**
+   * Used for gloves, gauntlets, or anything worn on hands.
+   */
+  public static final Tag<Item> HANDS = tag("hands");
+
+  /**
    * Used for amulets, necklaces, or anything worn around the neck.
    */
   public static final Tag<Item> NECKLACE = tag("necklace");
