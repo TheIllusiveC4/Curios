@@ -91,7 +91,8 @@ public class EventHandlerClient {
 
         for (String s : slots) {
           String key = "curios.identifier." + s;
-          tagTooltips.add(new TranslationTextComponent(key).applyTextStyle(TextFormatting.GOLD));
+          ITextComponent type = new TranslationTextComponent("curios.slot").appendText(": ").applyTextStyle(TextFormatting.GOLD).appendSibling(new TranslationTextComponent(key).applyTextStyle(TextFormatting.GRAY));
+          tagTooltips.add(type);
         }
 
         CuriosAPI.getCurio(stack).ifPresent(curio -> {

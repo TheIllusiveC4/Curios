@@ -1,5 +1,7 @@
 {
   "curios.name": "Curios",
+  "curios.slot": "Slot",
+  "commands.curios.set.success": "type %s now has been set to %d slots for %s",
   "commands.curios.add.success": "%d slots of type %s have been added to %s",
   "commands.curios.remove.success": "%d slots of type %s have been removed from %s",
   "commands.curios.enable.success": "Slot %s has been enabled for %s",
