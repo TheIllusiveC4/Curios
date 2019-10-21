@@ -310,6 +310,14 @@ public interface ICurio {
       }
     }
 
+    /**
+     * Rotates the rendering for the models based on the entity's poses and movements. This will do
+     * nothing if the entity render object does not implement {@link LivingRenderer} or if the model
+     * does not implement {@link BipedModel}).
+     *
+     * @param livingEntity The wearer of the curio
+     * @param models       The list of models to align to the body movement
+     */
     @SafeVarargs
     public static void followBodyRotations(final LivingEntity livingEntity,
         final BipedModel<LivingEntity>... models) {
