@@ -22,6 +22,7 @@ package top.theillusivec4.curios.common.event;
 import java.util.Collection;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -118,7 +119,7 @@ public class EventHandlerCurios {
     LazyOptional<ICurioItemHandler> newHandler = CuriosAPI.getCuriosHandler(player);
 
     oldHandler.ifPresent(oldCurios -> newHandler.ifPresent(newCurios -> {
-      newCurios.setCurioMap(oldCurios.getCurioMap());
+      newCurios.setCurioMap(new TreeMap<>(oldCurios.getCurioMap()));
       oldCurios.getCurioMap().forEach((identifier, stackHandler) -> {
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
