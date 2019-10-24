@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [1.0.5] - 2019.10.23
+### Added
+- [API] Added LivingCurioDropsEvent, fired inside Curio's LivingDropsEvent handler and allowing modders to edit the list of dropped curios added to the overall drops list.
+### Changed
+- Updated Russian localization (thanks Extegral!) [#27](https://github.com/TheIllusiveC4/Curios/pull/27)
+### Fixed
+- Fixed scroll wheel not working in the Curios GUI for slot list
+
 ## [1.0.4.1] - 2019.10.22
 ### Fixed
 - Fixed UnsupportedOperationException crashes
