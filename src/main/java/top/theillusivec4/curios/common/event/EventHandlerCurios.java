@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.common.event;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.SortedMap;
@@ -53,8 +54,10 @@ import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
+import top.theillusivec4.curios.api.event.LivingCurioDropsEvent;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
+import top.theillusivec4.curios.common.item.RingItem;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContents;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContentsWithTag;
@@ -140,7 +143,8 @@ public class EventHandlerCurios {
     if (!livingEntity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) && !livingEntity
         .isSpectator()) {
       CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
-        Collection<ItemEntity> entityItems = evt.getDrops();
+        Collection<ItemEntity> drops = evt.getDrops();
+        Collection<ItemEntity> curioDrops = new ArrayList<>();
         SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
 
         for (String identifier : curioMap.keySet()) {
@@ -151,11 +155,17 @@ public class EventHandlerCurios {
 
             if (!stack.isEmpty()) {
               if (!EnchantmentHelper.hasVanishingCurse(stack)) {
-                entityItems.add(this.getDroppedItem(stack, livingEntity));
+                curioDrops.add(this.getDroppedItem(stack, livingEntity));
               }
               stacks.setStackInSlot(i, ItemStack.EMPTY);
             }
           }
+        }
+
+        if (!MinecraftForge.EVENT_BUS.post(
+            new LivingCurioDropsEvent(livingEntity, handler, evt.getSource(), curioDrops,
+                evt.getLootingLevel(), evt.isRecentlyHit()))) {
+          drops.addAll(curioDrops);
         }
       });
     }
