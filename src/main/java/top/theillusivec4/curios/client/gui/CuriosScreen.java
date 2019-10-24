@@ -209,7 +209,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
       return false;
     } else {
       int i = (this.container).curios.map(ICurioItemHandler::getSlots).orElse(1);
-      this.currentScroll = (float) ((double) this.currentScroll - pMouseScrolled1 / (double) i);
+      this.currentScroll = (float) ((double) this.currentScroll - pMouseScrolled5 / (double) i);
       this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
       this.container.scrollTo(this.currentScroll);
       return true;
