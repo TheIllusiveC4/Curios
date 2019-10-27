@@ -31,11 +31,10 @@ import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.CuriosConfig;
 
-public class LayerCurios<T extends LivingEntity, M extends EntityModel<T>>
-    extends LayerRenderer<T, M> {
+public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> extends
+    LayerRenderer<T, M> {
 
-  public LayerCurios(IEntityRenderer<T, M> renderer) {
-
+  public CuriosLayer(IEntityRenderer<T, M> renderer) {
     super(renderer);
   }
 

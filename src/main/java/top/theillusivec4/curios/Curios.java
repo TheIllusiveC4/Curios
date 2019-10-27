@@ -48,7 +48,7 @@ import top.theillusivec4.curios.client.EventHandlerClient;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.client.gui.GuiEventHandler;
-import top.theillusivec4.curios.client.render.LayerCurios;
+import top.theillusivec4.curios.client.render.CuriosLayer;
 import top.theillusivec4.curios.common.CommandCurios;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosIMC;
@@ -109,20 +109,13 @@ public class Curios {
       send(CuriosAPI.IMC.MODIFY_TYPE, new CurioIMCMessage(id).setEnabled(false));
     }
 
-    send(CuriosAPI.IMC.REGISTER_ICON,
-        new Tuple<>("charm", new ResourceLocation(MODID, "textures/item/empty_charm_slot.png")));
-    send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>("necklace",
-        new ResourceLocation(MODID, "textures/item/empty_necklace_slot.png")));
-    send(CuriosAPI.IMC.REGISTER_ICON,
-        new Tuple<>("belt", new ResourceLocation(MODID, "textures/item/empty_belt_slot.png")));
-    send(CuriosAPI.IMC.REGISTER_ICON,
-        new Tuple<>("head", new ResourceLocation(MODID, "textures/item/empty_head_slot.png")));
-    send(CuriosAPI.IMC.REGISTER_ICON,
-        new Tuple<>("back", new ResourceLocation(MODID, "textures/item/empty_back_slot.png")));
-    send(CuriosAPI.IMC.REGISTER_ICON,
-        new Tuple<>("body", new ResourceLocation(MODID, "textures/item/empty_body_slot.png")));
-    send(CuriosAPI.IMC.REGISTER_ICON,
-        new Tuple<>("ring", new ResourceLocation(MODID, "textures/item/empty_ring_slot.png")));
+    String[] icons = new String[]{"charm", "necklace", "belt", "head", "back", "body", "hands",
+        "ring"};
+
+    for (String icon : icons) {
+      send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>(icon,
+          new ResourceLocation(MODID, "textures/item/empty_" + icon + "_slot.png")));
+    }
   }
 
   private void process(InterModProcessEvent evt) {
@@ -155,7 +148,7 @@ public class Curios {
       Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
 
       for (PlayerRenderer render : skinMap.values()) {
-        render.addLayer(new LayerCurios<>(render));
+        render.addLayer(new CuriosLayer<>(render));
       }
     }
   }

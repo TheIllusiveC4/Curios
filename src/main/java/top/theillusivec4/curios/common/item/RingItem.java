@@ -39,12 +39,12 @@ import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 
-public class ItemRing extends Item {
+public class RingItem extends Item {
 
   private static final UUID SPEED_UUID = UUID.fromString("8b7c8fcd-89bc-4794-8bb9-eddeb32753a5");
   private static final UUID ARMOR_UUID = UUID.fromString("38faf191-bf78-4654-b349-cc1f4f1143bf");
 
-  public ItemRing() {
+  public RingItem() {
 
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
     this.setRegistryName(Curios.MODID, "ring");
@@ -56,7 +56,7 @@ public class ItemRing extends Item {
     return CapCurioItem.createProvider(new ICurio() {
 
       @Override
-      public void onCurioTick(String identifier, LivingEntity livingEntity) {
+      public void onCurioTick(String identifier, int index, LivingEntity livingEntity) {
 
         if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 19 == 0) {
           livingEntity.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));

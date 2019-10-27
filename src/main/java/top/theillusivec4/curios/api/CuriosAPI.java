@@ -46,8 +46,8 @@ public final class CuriosAPI {
    * Holds a reference to the Curios modid.
    */
   public static final String MODID = "curios";
-  private static final ResourceLocation GENERIC_SLOT =
-      new ResourceLocation(MODID, "textures/item" + "/empty_generic_slot.png");
+  private static final ResourceLocation GENERIC_SLOT = new ResourceLocation(MODID,
+      "textures/item" + "/empty_generic_slot.png");
   /**
    * The maps containing the CurioType and icons with identifiers as keys Try not to access these
    * directly and instead use {@link CuriosAPI#getType(String)} and {@link
@@ -122,6 +122,37 @@ public final class CuriosAPI {
   }
 
   /**
+   * Retrieves the number of slots that an entity has for a specific curio type.
+   *
+   * @param livingEntity The entity that has the slot
+   * @param identifier   The type identifier of the slot
+   * @return The number of slots
+   */
+  public static int getSlotsForType(@Nonnull final LivingEntity livingEntity, String identifier) {
+    return CuriosAPI.getCuriosHandler(livingEntity).map(handler -> {
+      CurioStackHandler stacks = handler.getCurioMap().get(identifier);
+      return stacks != null ? stacks.getSlots() : 0;
+    }).orElse(0);
+  }
+
+  /**
+   * Sets the number of slots that an entity has for a specific curio type.
+   *
+   * @param livingEntity The entity that has the slot
+   * @param id           The type identifier of the slot
+   * @param amount       The number of slots
+   */
+  public static void setSlotsForType(String id, final LivingEntity livingEntity, int amount) {
+    int difference = amount - CuriosAPI.getSlotsForType(livingEntity, id);
+
+    if (difference > 0) {
+      CuriosAPI.addTypeSlotsToEntity(id, difference, livingEntity);
+    } else if (difference < 0) {
+      CuriosAPI.removeTypeSlotsFromEntity(id, Math.abs(difference), livingEntity);
+    }
+  }
+
+  /**
    * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no matches
    * were found.
    *
@@ -132,8 +163,8 @@ public final class CuriosAPI {
   public static Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(Item item,
       @Nonnull final LivingEntity livingEntity) {
 
-    ImmutableTriple<String, Integer, ItemStack> result =
-        getCuriosHandler(livingEntity).map(handler -> {
+    ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(livingEntity)
+        .map(handler -> {
           Set<String> tags = getCurioTags(item);
 
           for (String id : tags) {
@@ -167,8 +198,8 @@ public final class CuriosAPI {
   public static Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(
       Predicate<ItemStack> filter, @Nonnull final LivingEntity livingEntity) {
 
-    ImmutableTriple<String, Integer, ItemStack> result =
-        getCuriosHandler(livingEntity).map(handler -> {
+    ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(livingEntity)
+        .map(handler -> {
 
           for (String id : handler.getCurioMap().keySet()) {
             CurioStackHandler stackHandler = handler.getStackHandler(id);
@@ -190,31 +221,10 @@ public final class CuriosAPI {
     return result.getLeft().isEmpty() ? Optional.empty() : Optional.of(result);
   }
 
-  public static int getSlotsForType(@Nonnull LivingEntity livingEntity, String identifier) {
-    return (Integer)getCuriosHandler(livingEntity).map((handler) -> {
-      CurioStackHandler stacks = (CurioStackHandler)handler.getCurioMap().get(identifier);
-      return stacks != null ? stacks.getSlots() : 0;
-    }).orElse(0);
-  }
-
-  public static void setSlotsForType(String id, final LivingEntity entityLivingBase, int amount)
-  {
-    int difference = amount - CuriosAPI.getSlotsForType(entityLivingBase, id);
-    if(difference > 0)
-    {
-      CuriosAPI.addTypeSlotsToEntity(id, amount - CuriosAPI.getSlotsForType(entityLivingBase, id), entityLivingBase);
-    }
-    else if(difference < 0)
-    {
-      CuriosAPI.removeTypeSlotsFromEntity(id, Math.abs(difference), entityLivingBase);
-    }
-  }
-
   /**
-  /**
-   * Adds a single slot to the {@link CurioType} with the associated identifier. If the slot to be
-   * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
-   * for types that are not yet available, there must first be a call to {@link
+   * /** Adds a single slot to the {@link CurioType} with the associated identifier. If the slot to
+   * be added is for a type that is not enabled on the entity, it will not be added. For adding
+   * slot(s) for types that are not yet available, there must first be a call to {@link
    * CuriosAPI#enableTypeForEntity(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
@@ -298,10 +308,8 @@ public final class CuriosAPI {
    */
   public static Set<String> getCurioTags(Item item) {
 
-    return item.getTags()
-        .stream().filter(tag -> tag.getNamespace().equals(MODID))
-        .map(ResourceLocation::getPath)
-        .collect(Collectors.toSet());
+    return item.getTags().stream().filter(tag -> tag.getNamespace().equals(MODID))
+        .map(ResourceLocation::getPath).collect(Collectors.toSet());
   }
 
   /**

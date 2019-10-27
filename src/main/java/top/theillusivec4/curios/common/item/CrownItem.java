@@ -13,15 +13,15 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurio;
-import top.theillusivec4.curios.client.render.ModelCrown;
+import top.theillusivec4.curios.client.render.model.CrownModel;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 
-public class ItemCrown extends Item {
+public class CrownItem extends Item {
 
   private static final ResourceLocation CROWN_TEXTURE = new ResourceLocation(Curios.MODID,
       "textures/entity/crown.png");
 
-  public ItemCrown() {
+  public CrownItem() {
 
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(2000));
     this.setRegistryName(Curios.MODID, "crown");
@@ -68,11 +68,11 @@ public class ItemCrown extends Item {
 
         Minecraft.getInstance().getTextureManager().bindTexture(CROWN_TEXTURE);
 
-        if (!(this.model instanceof ModelCrown)) {
-          model = new ModelCrown();
+        if (!(this.model instanceof CrownModel)) {
+          model = new CrownModel();
         }
 
-        ModelCrown crown = (ModelCrown) this.model;
+        CrownModel crown = (CrownModel) this.model;
         ICurio.RenderHelper.followHeadRotations(livingEntity, crown.crown);
         crown.render(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
             headPitch, scale);

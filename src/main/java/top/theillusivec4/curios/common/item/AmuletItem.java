@@ -31,15 +31,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.capability.ICurio;
-import top.theillusivec4.curios.client.render.ModelAmulet;
+import top.theillusivec4.curios.client.render.model.AmuletModel;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 
-public class ItemAmulet extends Item {
+public class AmuletItem extends Item {
 
   private static final ResourceLocation AMULET_TEXTURE = new ResourceLocation(Curios.MODID,
       "textures/entity/amulet.png");
 
-  public ItemAmulet() {
+  public AmuletItem() {
 
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
     this.setRegistryName(Curios.MODID, "amulet");
@@ -74,10 +74,10 @@ public class ItemAmulet extends Item {
         Minecraft.getInstance().getTextureManager().bindTexture(AMULET_TEXTURE);
         ICurio.RenderHelper.rotateIfSneaking(livingEntity);
 
-        if (!(this.model instanceof ModelAmulet)) {
-          this.model = new ModelAmulet();
+        if (!(this.model instanceof AmuletModel)) {
+          this.model = new AmuletModel();
         }
-        ((ModelAmulet) model).render(livingEntity, limbSwing, limbSwingAmount, ageInTicks,
+        ((AmuletModel) model).render(livingEntity, limbSwing, limbSwingAmount, ageInTicks,
             netHeadYaw, headPitch, scale);
       }
     });

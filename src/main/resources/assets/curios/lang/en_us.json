@@ -1,7 +1,7 @@
 {
   "curios.name": "Curios",
   "curios.slot": "Slot",
-  "commands.curios.set.success": "type %s now has been set to %d slots for %s",
+  "commands.curios.set.success": "Type %s now has been set to %d slots for %s",
   "commands.curios.add.success": "%d slots of type %s have been added to %s",
   "commands.curios.remove.success": "%d slots of type %s have been removed from %s",
   "commands.curios.enable.success": "Slot %s has been enabled for %s",
@@ -12,6 +12,7 @@
   "item.curios.amulet": "Curious Amulet",
   "item.curios.ring": "Curious Ring",
   "item.curios.crown": "Curious Crown",
+  "item.curios.knuckles": "Curious Knuckles",
   "curios.identifier.curio": "Curio",
   "curios.identifier.necklace": "Necklace",
   "curios.identifier.ring": "Ring",
@@ -20,6 +21,7 @@
   "curios.identifier.belt": "Belt",
   "curios.identifier.body": "Body",
   "curios.identifier.charm": "Charm",
+  "curios.identifier.hands": "Hands",
   "curios.modifiers.curio": "When worn as curio:",
   "curios.modifiers.necklace": "When around neck:",
   "curios.modifiers.ring": "When worn as ring:",
@@ -28,6 +30,7 @@
   "curios.modifiers.belt": "When worn as belt:",
   "curios.modifiers.body": "When on body:",
   "curios.modifiers.charm": "When worn as charm:",
+  "curios.modifiers.hands": "When on hands:",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Open/Close Curios Inventory"
 }
