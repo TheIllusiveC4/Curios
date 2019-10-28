@@ -49,7 +49,7 @@ import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.client.gui.GuiEventHandler;
 import top.theillusivec4.curios.client.render.CuriosLayer;
-import top.theillusivec4.curios.common.CommandCurios;
+import top.theillusivec4.curios.common.command.CommandCurios;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosIMC;
 import top.theillusivec4.curios.common.CuriosRegistry;
@@ -116,7 +116,7 @@ public class Curios {
       send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>(icon,
           new ResourceLocation(MODID, "textures/item/empty_" + icon + "_slot.png")));
     }
-  }
+}
 
   private void process(InterModProcessEvent evt) {
 
