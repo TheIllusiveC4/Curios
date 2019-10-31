@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [1.0.5.1] - 2019.10.30
+### Changed
+- Using the curios command with an invalid slot type will now throw an error (thanks ItsTheBdoge!) [#29](https://github.com/TheIllusiveC4/Curios/pull/29)
+### Fixed
+- Fixed JEI bookmarks overlapping with Curios GUI
+
 ## [1.0.5] - 2019.10.23
 ### Added
 - [API] Added LivingCurioDropsEvent, fired inside Curio's LivingDropsEvent handler and allowing modders to edit the list of dropped curios added to the overall drops list.
@@ -18,7 +24,7 @@ This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
 ## [1.0.4] - 2019.10.20
 ### Added
-- [API] Added CuriosAPI#setSlotsForType helper method to set slot sizes for a given entity and curio type identifier [#26](https://github.com/TheIllusiveC4/Curios/pull/26)
+- [API] Added CuriosAPI#setSlotsForType helper method to set slot sizes for a given entity and curio type identifier (thanks ItsTheBdoge!) [#26](https://github.com/TheIllusiveC4/Curios/pull/26)
 - [API] Added built-in support for "hands" curio type
 - [API] Added ICurio.RenderHelper#followBodyRotations to rotate models according to entity pose
 - Added new test item for "hands", Curious Knuckles
