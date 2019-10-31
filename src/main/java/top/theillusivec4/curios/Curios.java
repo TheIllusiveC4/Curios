@@ -23,6 +23,8 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
+import net.minecraft.command.arguments.ArgumentSerializer;
+import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.api.distmarker.Dist;
@@ -49,7 +51,6 @@ import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.client.gui.GuiEventHandler;
 import top.theillusivec4.curios.client.render.CuriosLayer;
-import top.theillusivec4.curios.common.command.CommandCurios;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosIMC;
 import top.theillusivec4.curios.common.CuriosRegistry;
@@ -57,6 +58,8 @@ import top.theillusivec4.curios.common.capability.CapCurioInventory;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
 import top.theillusivec4.curios.common.event.EventHandlerCurios;
 import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.server.command.CommandCurios;
+import top.theillusivec4.curios.server.command.CurioArgumentType;
 
 @Mod(Curios.MODID)
 public class Curios {
@@ -86,6 +89,8 @@ public class Curios {
     CapCurioItem.register();
     MinecraftForge.EVENT_BUS.register(new EventHandlerCurios());
     NetworkHandler.register();
+    ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
+        new ArgumentSerializer<>(CurioArgumentType::slot));
   }
 
   private void enqueue(InterModEnqueueEvent evt) {
@@ -116,7 +121,7 @@ public class Curios {
       send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>(icon,
           new ResourceLocation(MODID, "textures/item/empty_" + icon + "_slot.png")));
     }
-}
+  }
 
   private void process(InterModProcessEvent evt) {
 
