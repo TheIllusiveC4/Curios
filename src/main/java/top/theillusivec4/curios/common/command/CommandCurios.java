@@ -17,13 +17,12 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.common;
+package top.theillusivec4.curios.common.command;
 
 import com.google.common.collect.Maps;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import java.util.SortedMap;
 import net.minecraft.command.CommandSource;
@@ -51,75 +50,75 @@ public class CommandCurios {
         .requires(player -> player.hasPermissionLevel(opPermissionLevel));
 
     curiosCommand.then(Commands.literal("set")
-            .then(Commands.argument("slot", StringArgumentType.string())
+            .then(Commands.argument("slot", CuriosStringArgType.string())
                     .suggests((ctx, builder) -> ISuggestionProvider
                             .suggest(CuriosAPI.getTypeIdentifiers(), builder))
                     .then(Commands.argument("player", EntityArgument.player())
                             .executes(context -> setSlotsOfPlayer(context.getSource(),
                                     EntityArgument.getPlayer(context, "player"),
-                                    StringArgumentType.getString(context, "slot"), 1))
+                                    CuriosStringArgType.getString(context, "slot"), 1))
                             .then(Commands.argument("amount", IntegerArgumentType.integer())
                                     .executes(context -> setSlotsOfPlayer(context.getSource(),
                                             EntityArgument.getPlayer(context, "player"),
-                                            StringArgumentType.getString(context, "slot"),
+                                            CuriosStringArgType.getString(context, "slot"),
                                             IntegerArgumentType.getInteger(context, "amount")))))));
 
     curiosCommand.then(Commands.literal("add")
-        .then(Commands.argument("slot", StringArgumentType.string())
+        .then(Commands.argument("slot", CuriosStringArgType.string())
             .suggests((ctx, builder) -> ISuggestionProvider
                 .suggest(CuriosAPI.getTypeIdentifiers(), builder))
             .then(Commands.argument("player", EntityArgument.player())
                 .executes(context -> addSlotToPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
-                    StringArgumentType.getString(context, "slot"), 1))
+                    CuriosStringArgType.getString(context, "slot"), 1))
                 .then(Commands.argument("amount", IntegerArgumentType.integer())
                     .executes(context -> addSlotToPlayer(context.getSource(),
                         EntityArgument.getPlayer(context, "player"),
-                        StringArgumentType.getString(context, "slot"),
+                        CuriosStringArgType.getString(context, "slot"),
                         IntegerArgumentType.getInteger(context, "amount")))))));
 
     curiosCommand.then(Commands.literal("remove")
-        .then(Commands.argument("slot", StringArgumentType.string())
+        .then(Commands.argument("slot", CuriosStringArgType.string())
             .suggests((ctx, builder) -> ISuggestionProvider
                 .suggest(CuriosAPI.getTypeIdentifiers(), builder))
             .then(Commands.argument("player", EntityArgument.player())
                 .executes(context -> removeSlotFromPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
-                    StringArgumentType.getString(context, "slot"), 1))
+                    CuriosStringArgType.getString(context, "slot"), 1))
                 .then(Commands.argument("amount", IntegerArgumentType.integer())
                     .executes(context -> removeSlotFromPlayer(context.getSource(),
                         EntityArgument.getPlayer(context, "player"),
-                        StringArgumentType.getString(context, "slot"),
+                        CuriosStringArgType.getString(context, "slot"),
                         IntegerArgumentType.getInteger(context, "amount")))))));
 
     curiosCommand.then(Commands.literal("enable")
-        .then(Commands.argument("slot", StringArgumentType.string())
+        .then(Commands.argument("slot", CuriosStringArgType.string())
             .suggests((ctx, builder) -> ISuggestionProvider
                 .suggest(CuriosAPI.getTypeIdentifiers(), builder))
             .then(Commands.argument("player", EntityArgument.player())
                 .executes(context -> enableSlotForPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
-                    StringArgumentType.getString(context, "slot"))))));
+                    CuriosStringArgType.getString(context, "slot"))))));
 
     curiosCommand.then(Commands.literal("disable")
-        .then(Commands.argument("slot", StringArgumentType.string())
+        .then(Commands.argument("slot", CuriosStringArgType.string())
             .suggests((ctx, builder) -> ISuggestionProvider
                 .suggest(CuriosAPI.getTypeIdentifiers(), builder))
             .then(Commands.argument("player", EntityArgument.player())
                 .executes(context -> disableSlotForPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
-                    StringArgumentType.getString(context, "slot"))))));
+                    CuriosStringArgType.getString(context, "slot"))))));
 
     curiosCommand.then(Commands.literal("clear")
         .then(Commands.argument("player", EntityArgument.player())
             .executes(context -> clearSlotsForPlayer(context.getSource(),
                 EntityArgument.getPlayer(context, "player"), ""))
-            .then(Commands.argument("slot", StringArgumentType.string())
+            .then(Commands.argument("slot", CuriosStringArgType.string())
                 .suggests((ctx, builder) -> ISuggestionProvider
                     .suggest(CuriosAPI.getTypeIdentifiers(), builder))
                 .executes(context -> clearSlotsForPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
-                    StringArgumentType.getString(context, "slot"))))));
+                    CuriosStringArgType.getString(context, "slot"))))));
 
     curiosCommand.then(Commands.literal("reset")
         .then(Commands.argument("player", EntityArgument.player())
@@ -131,10 +130,10 @@ public class CommandCurios {
 
   private static int setSlotsOfPlayer(CommandSource source, ServerPlayerEntity playerMP, String slot, int amount)
   {
-    CuriosAPI.setSlotsForType(slot, playerMP, amount);
-    source.sendFeedback(new TranslationTextComponent("commands.curios.set.success", slot, CuriosAPI.getSlotsForType(playerMP, slot),
-            playerMP.getDisplayName()), true);
-    return Command.SINGLE_SUCCESS;
+      CuriosAPI.setSlotsForType(slot, playerMP, amount);
+      source.sendFeedback(new TranslationTextComponent("commands.curios.set.success", slot, CuriosAPI.getSlotsForType(playerMP, slot),
+              playerMP.getDisplayName()), true);
+      return Command.SINGLE_SUCCESS;
   }
 
   private static int addSlotToPlayer(CommandSource source, ServerPlayerEntity playerMP, String slot,
@@ -217,6 +216,8 @@ public class CommandCurios {
         true);
     return Command.SINGLE_SUCCESS;
   }
+
+  private static boolean doesSlotExist(String identifier) { return CuriosAPI.getTypeIdentifiers().contains(identifier); }
 
   private static void clear(CurioStackHandler stacks) {
 
