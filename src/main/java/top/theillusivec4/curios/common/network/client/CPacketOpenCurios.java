@@ -21,6 +21,7 @@ package top.theillusivec4.curios.common.network.client;
 
 import java.util.function.Supplier;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -28,24 +29,14 @@ import top.theillusivec4.curios.common.inventory.CuriosContainerProvider;
 
 public class CPacketOpenCurios {
 
-  private float oldMouseX;
-  private float oldMouseY;
-
-  public CPacketOpenCurios(float oldMouseX, float oldMouseY) {
-
-    this.oldMouseX = oldMouseX;
-    this.oldMouseY = oldMouseY;
+  public CPacketOpenCurios() {
   }
 
   public static void encode(CPacketOpenCurios msg, PacketBuffer buf) {
-
-    buf.writeFloat(msg.oldMouseX);
-    buf.writeFloat(msg.oldMouseY);
   }
 
   public static CPacketOpenCurios decode(PacketBuffer buf) {
-
-    return new CPacketOpenCurios(buf.readFloat(), buf.readFloat());
+    return new CPacketOpenCurios();
   }
 
   public static void handle(CPacketOpenCurios msg, Supplier<NetworkEvent.Context> ctx) {

@@ -50,8 +50,7 @@ public class GuiButtonCurios extends ImageButton {
             NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
                 new CPacketOpenVanilla());
           } else {
-            NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-                new CPacketOpenCurios(0, 0));
+            NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios());
           }
         });
     this.parentGui = parentGui;

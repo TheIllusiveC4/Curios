@@ -76,12 +76,10 @@ public class CuriosContainer extends Container {
   private int lastScrollIndex;
 
   public CuriosContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packetBuffer) {
-
     this(windowId, playerInventory);
   }
 
   public CuriosContainer(int windowId, PlayerInventory playerInventory) {
-
     super(CuriosRegistry.CONTAINER_TYPE, windowId);
     this.player = playerInventory.player;
     this.isLocalWorld = player.world.isRemote;
@@ -259,8 +257,6 @@ public class CuriosContainer extends Container {
 
   @Override
   public void onContainerClosed(PlayerEntity playerIn) {
-
-    super.onContainerClosed(playerIn);
     this.craftResult.clear();
 
     if (!playerIn.world.isRemote) {

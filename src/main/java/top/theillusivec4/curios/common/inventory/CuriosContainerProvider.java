@@ -42,6 +42,6 @@ public class CuriosContainerProvider implements INamedContainerProvider {
   public Container createMenu(int i, @Nonnull PlayerInventory playerInventory,
       @Nonnull PlayerEntity playerEntity) {
 
-    return new CuriosContainer(i, playerInventory, null);
+    return new CuriosContainer(i, playerInventory);
   }
 }
