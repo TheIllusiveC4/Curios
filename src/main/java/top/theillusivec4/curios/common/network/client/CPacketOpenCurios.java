@@ -48,5 +48,6 @@ public class CPacketOpenCurios {
         NetworkHooks.openGui(sender, new CuriosContainerProvider());
       }
     });
+    ctx.get().setPacketHandled(true);
   }
 }

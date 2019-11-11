@@ -257,6 +257,7 @@ public class CuriosContainer extends Container {
 
   @Override
   public void onContainerClosed(PlayerEntity playerIn) {
+    super.onContainerClosed(playerIn);
     this.craftResult.clear();
 
     if (!playerIn.world.isRemote) {
