@@ -25,6 +25,7 @@ import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -46,7 +47,10 @@ public class GuiButtonCurios extends ImageButton {
 
           if (parentGui instanceof CuriosScreen) {
             InventoryScreen inventory = new InventoryScreen(mc.player);
+            ItemStack stack = mc.player.inventory.getItemStack();
+            mc.player.inventory.setItemStack(ItemStack.EMPTY);
             mc.displayGuiScreen(inventory);
+            mc.player.inventory.setItemStack(stack);
             NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
                 new CPacketOpenVanilla());
           } else {
