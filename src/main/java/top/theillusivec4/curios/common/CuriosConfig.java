@@ -72,6 +72,9 @@ public class CuriosConfig {
   public static class Client {
 
     public final ForgeConfigSpec.BooleanValue renderCurios;
+    public final ForgeConfigSpec.IntValue buttonXOffset;
+    public final ForgeConfigSpec.IntValue buttonYOffset;
+    public final ForgeConfigSpec.EnumValue<ButtonCorner> buttonCorner;
 
     Client(ForgeConfigSpec.Builder builder) {
 
@@ -79,8 +82,40 @@ public class CuriosConfig {
 
       renderCurios = builder.comment("Set to true to enable rendering curios")
           .translation(CONFIG_PREFIX + "renderCurios").define("renderCurios", true);
+      buttonXOffset = builder.comment("The X-Offset for the Curios GUI button")
+          .translation(CONFIG_PREFIX + "buttonXOffset")
+          .defineInRange("buttonXOffset", 0, -100, 100);
+      buttonYOffset = builder.comment("The Y-Offset for the Curios GUI button")
+          .translation(CONFIG_PREFIX + "buttonYOffset")
+          .defineInRange("buttonYOffset", 0, -100, 100);
+      buttonCorner = builder.comment("The corner for the Curios GUI button")
+          .translation(CONFIG_PREFIX + "buttonCorner")
+          .defineEnum("buttonCorner", ButtonCorner.TOP_LEFT);
 
       builder.pop();
+    }
+
+    public enum ButtonCorner {
+      TOP_LEFT(26, -75),
+      TOP_RIGHT(61, -75),
+      BOTTOM_LEFT(26, -20),
+      BOTTOM_RIGHT(61, -20);
+
+      int xoffset = 0;
+      int yoffset = 0;
+
+      ButtonCorner(int x, int y) {
+        xoffset = x;
+        yoffset = y;
+      }
+
+      public int getXoffset() {
+        return xoffset;
+      }
+
+      public int getYoffset() {
+        return yoffset;
+      }
     }
   }
 }

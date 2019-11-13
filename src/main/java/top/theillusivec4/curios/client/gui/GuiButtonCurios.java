@@ -27,6 +27,7 @@ import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
@@ -38,10 +39,9 @@ public class GuiButtonCurios extends ImageButton {
   private boolean isRecipeBookVisible = false;
 
   GuiButtonCurios(ContainerScreen parentGui, int xIn, int yIn, int widthIn, int heightIn,
-      int textureOffestX, int textureOffestY, int yDiffText,
-      ResourceLocation resource) {
+      int textureOffsetX, int textureOffsetY, int yDiffText, ResourceLocation resource) {
 
-    super(xIn, yIn, widthIn, heightIn, textureOffestX, textureOffestY, yDiffText, resource,
+    super(xIn, yIn, widthIn, heightIn, textureOffsetX, textureOffsetY, yDiffText, resource,
         (button) -> {
           Minecraft mc = Minecraft.getInstance();
 
@@ -51,8 +51,8 @@ public class GuiButtonCurios extends ImageButton {
             mc.player.inventory.setItemStack(ItemStack.EMPTY);
             mc.displayGuiScreen(inventory);
             mc.player.inventory.setItemStack(stack);
-            NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-                new CPacketOpenVanilla());
+            NetworkHandler.INSTANCE
+                .send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla());
           } else {
             NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios());
           }
@@ -68,7 +68,9 @@ public class GuiButtonCurios extends ImageButton {
       isRecipeBookVisible = ((InventoryScreen) parentGui).getRecipeGui().isVisible();
 
       if (lastVisible != isRecipeBookVisible) {
-        this.setPosition(parentGui.getGuiLeft() + 26, parentGui.height / 2 - 75);
+        Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset();
+        this.setPosition(parentGui.getGuiLeft() + offsets.getA(),
+            parentGui.height / 2 + offsets.getB());
       }
     } else if (parentGui instanceof CreativeScreen) {
       CreativeScreen gui = (CreativeScreen) parentGui;
