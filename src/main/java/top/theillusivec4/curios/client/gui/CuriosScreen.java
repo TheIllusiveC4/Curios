@@ -27,6 +27,7 @@ import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import top.theillusivec4.curios.Curios;
@@ -34,15 +35,17 @@ import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.SlotCurio;
 import top.theillusivec4.curios.client.KeyRegistry;
+import top.theillusivec4.curios.common.CuriosConfig;
+import top.theillusivec4.curios.common.CuriosConfig.Client;
 import top.theillusivec4.curios.common.inventory.CuriosContainer;
 
 public class CuriosScreen extends ContainerScreen<CuriosContainer> {
 
-  static final ResourceLocation CURIO_INVENTORY =
-      new ResourceLocation(Curios.MODID, "textures/gui/inventory.png");
+  static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID,
+      "textures/gui/inventory.png");
 
-  private static final ResourceLocation CREATIVE_INVENTORY_TABS =
-      new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
+  private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
+      "textures/gui/container/creative_inventory/tabs.png");
 
   private boolean widthTooNarrow;
   private float currentScroll;
@@ -62,9 +65,16 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
     super.init();
     this.widthTooNarrow = this.width < 379;
     this.guiLeft = (this.width - this.xSize) / 2;
-    this.addButton(
-        new GuiButtonCurios(this, this.getGuiLeft() + 26, this.height / 2 - 75, 14, 14, 50, 0, 14,
-            CURIO_INVENTORY));
+    Tuple<Integer, Integer> offsets = getButtonOffset();
+    this.addButton(new GuiButtonCurios(this, this.getGuiLeft() + offsets.getA(),
+        this.height / 2 + offsets.getB(), 14, 14, 50, 0, 14, CURIO_INVENTORY));
+  }
+
+  public static Tuple<Integer, Integer> getButtonOffset() {
+    Client client = CuriosConfig.CLIENT;
+    int x = client.buttonCorner.get().getXoffset() + client.buttonXOffset.get();
+    int y = client.buttonCorner.get().getYoffset() + client.buttonYOffset.get();
+    return new Tuple<>(x, y);
   }
 
   private boolean inScrollBar(double mouseX, double mouseY) {
@@ -75,8 +85,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
     int l = j + 12;
     int i1 = k + 14;
     int j1 = l + 139;
-    return mouseX >= (double) k && mouseY >= (double) l && mouseX < (double) i1 &&
-        mouseY < (double) j1;
+    return mouseX >= (double) k && mouseY >= (double) l && mouseX < (double) i1
+        && mouseY < (double) j1;
   }
 
   @Override
@@ -90,8 +100,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
   @Override
   public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
 
-    if (KeyRegistry.openCurios.isActiveAndMatches(
-        InputMappings.getInputByCode(p_keyPressed_1_, p_keyPressed_2_))) {
+    if (KeyRegistry.openCurios
+        .isActiveAndMatches(InputMappings.getInputByCode(p_keyPressed_1_, p_keyPressed_2_))) {
       this.getMinecraft().player.closeScreen();
       return true;
     } else {
@@ -104,8 +114,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
 
     this.getMinecraft().fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
 
-    if (this.getMinecraft().player.inventory.getItemStack().isEmpty() &&
-        this.getSlotUnderMouse() != null) {
+    if (this.getMinecraft().player.inventory.getItemStack().isEmpty()
+        && this.getSlotUnderMouse() != null) {
       Slot slot = this.getSlotUnderMouse();
       if (slot instanceof SlotCurio && !slot.getHasStack()) {
         SlotCurio slotCurio = (SlotCurio) slot;
@@ -152,8 +162,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
   protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight,
       double pointX, double pointY) {
 
-    return !this.widthTooNarrow &&
-        super.isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
+    return !this.widthTooNarrow && super
+        .isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
   }
 
   /**

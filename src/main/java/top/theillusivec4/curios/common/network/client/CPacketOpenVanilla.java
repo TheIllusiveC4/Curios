@@ -21,8 +21,14 @@ package top.theillusivec4.curios.common.network.client;
 
 import java.util.function.Supplier;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fml.network.PacketDistributor;
+import top.theillusivec4.curios.common.inventory.CuriosContainerProvider;
+import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
 
 public class CPacketOpenVanilla {
 
@@ -41,7 +47,15 @@ public class CPacketOpenVanilla {
       ServerPlayerEntity sender = ctx.get().getSender();
 
       if (sender != null) {
+        ItemStack stack = sender.inventory.getItemStack();
+        sender.inventory.setItemStack(ItemStack.EMPTY);
         sender.closeContainer();
+
+        if (!stack.isEmpty()) {
+          sender.inventory.setItemStack(stack);
+          NetworkHandler.INSTANCE
+              .send(PacketDistributor.PLAYER.with(() -> sender), new SPacketGrabbedItem(stack));
+        }
       }
     });
     ctx.get().setPacketHandled(true);

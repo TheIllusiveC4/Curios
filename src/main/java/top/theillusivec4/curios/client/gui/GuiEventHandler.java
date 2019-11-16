@@ -28,6 +28,7 @@ import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -39,25 +40,28 @@ import top.theillusivec4.curios.common.network.client.CPacketDestroyCurios;
 
 public class GuiEventHandler {
 
-  private static final Method GET_SELECTED_SLOT =
-      ObfuscationReflectionHelper.findMethod(ContainerScreen.class, "func_195360_a", double.class,
-          double.class);
+  private static final Method GET_SELECTED_SLOT = ObfuscationReflectionHelper
+      .findMethod(ContainerScreen.class, "func_195360_a", double.class, double.class);
 
   @SubscribeEvent
   public void onInventoryGuiInit(GuiScreenEvent.InitGuiEvent.Post evt) {
 
     Screen screen = evt.getGui();
+    Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset();
+    int x = offsets.getA();
+    int y = offsets.getB();
 
     if (screen instanceof InventoryScreen) {
       InventoryScreen gui = (InventoryScreen) screen;
       evt.addWidget(
-          new GuiButtonCurios(gui, gui.getGuiLeft() + 26, gui.height / 2 - 75, 14, 14, 50, 0, 14,
+          new GuiButtonCurios(gui, gui.getGuiLeft() + x, gui.height / 2 + y, 14, 14, 50, 0, 14,
               CuriosScreen.CURIO_INVENTORY));
     } else if (screen instanceof CreativeScreen) {
       CreativeScreen gui = (CreativeScreen) screen;
-      evt.addWidget(
-          new GuiButtonCurios(gui, gui.getGuiLeft() + 36, gui.height / 2 - 64, 14, 14, 50, 0, 14,
-              CuriosScreen.CURIO_INVENTORY));
+      int creativexoffset = 10;
+      int creativeyoffset = 11;
+      evt.addWidget(new GuiButtonCurios(gui, gui.getGuiLeft() + x + creativexoffset,
+          gui.height / 2 + y + creativeyoffset, 14, 14, 50, 0, 14, CuriosScreen.CURIO_INVENTORY));
     }
   }
 
@@ -69,10 +73,10 @@ public class GuiEventHandler {
     }
 
     InventoryScreen gui = (InventoryScreen) evt.getGui();
-    ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, gui, evt.getMouseX(),
-        "field_147048_u");
-    ObfuscationReflectionHelper.setPrivateValue(InventoryScreen.class, gui, evt.getMouseY(),
-        "field_147047_v");
+    ObfuscationReflectionHelper
+        .setPrivateValue(InventoryScreen.class, gui, evt.getMouseX(), "field_147048_u");
+    ObfuscationReflectionHelper
+        .setPrivateValue(InventoryScreen.class, gui, evt.getMouseY(), "field_147047_v");
   }
 
   @SubscribeEvent
@@ -93,8 +97,8 @@ public class GuiEventHandler {
       return;
     }
 
-    Slot destroyItemSlot =
-        ObfuscationReflectionHelper.getPrivateValue(CreativeScreen.class, gui, "field_147064_C");
+    Slot destroyItemSlot = ObfuscationReflectionHelper
+        .getPrivateValue(CreativeScreen.class, gui, "field_147064_C");
 
     Slot slot = null;
 

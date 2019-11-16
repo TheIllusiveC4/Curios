@@ -57,7 +57,6 @@ import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
 import top.theillusivec4.curios.api.event.LivingCurioDropsEvent;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
-import top.theillusivec4.curios.common.item.RingItem;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContents;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContentsWithTag;

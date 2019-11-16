@@ -64,9 +64,7 @@ public class EventHandlerClient {
     Minecraft mc = Minecraft.getInstance();
 
     if (KeyRegistry.openCurios.isPressed() && mc.isGameFocused()) {
-      NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-          new CPacketOpenCurios((float) mc.mouseHelper.getMouseX(),
-              (float) mc.mouseHelper.getMouseY()));
+      NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios());
     }
   }
 
