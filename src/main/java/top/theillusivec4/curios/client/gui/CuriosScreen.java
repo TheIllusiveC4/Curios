@@ -20,16 +20,21 @@
 package top.theillusivec4.curios.client.gui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
@@ -38,12 +43,14 @@ import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosConfig.Client;
 import top.theillusivec4.curios.common.inventory.CuriosContainer;
+import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 
 public class CuriosScreen extends ContainerScreen<CuriosContainer> {
 
   static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID,
-      "textures/gui/inventory.png");
-
+          "textures/gui/inventory.png");
+  private static final ResourceLocation RECIPE_BUTTON_TEXTURE = new ResourceLocation("textures/gui/recipe_button.png");
   private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
       "textures/gui/container/creative_inventory/tabs.png");
 
@@ -52,9 +59,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
   private boolean isScrolling;
   private boolean buttonClicked;
 
-  public CuriosScreen(CuriosContainer curiosContainer, PlayerInventory playerInventory,
-      ITextComponent title) {
-
+  public CuriosScreen(CuriosContainer curiosContainer, PlayerInventory playerInventory, ITextComponent title)
+  {
     super(curiosContainer, playerInventory, title);
     this.passEvents = true;
   }
@@ -68,6 +74,24 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
     Tuple<Integer, Integer> offsets = getButtonOffset();
     this.addButton(new GuiButtonCurios(this, this.getGuiLeft() + offsets.getA(),
         this.height / 2 + offsets.getB(), 14, 14, 50, 0, 14, CURIO_INVENTORY));
+    this.addButton(new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (button) -> {
+      ((ImageButton)button).setPosition(this.guiLeft + 104, this.height / 2 - 22);
+    })
+    {
+      @Override
+      public void onRelease(double p_onRelease_1_, double p_onRelease_3_)
+      {
+        Minecraft mc = Minecraft.getInstance();
+        InventoryScreen inventory = new InventoryScreen(mc.player);
+        ItemStack stack = mc.player.inventory.getItemStack();
+        mc.player.inventory.setItemStack(ItemStack.EMPTY);
+        mc.displayGuiScreen(inventory);
+        mc.player.inventory.setItemStack(stack);
+        NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla());
+
+      }
+    }
+    );
   }
 
   public static Tuple<Integer, Integer> getButtonOffset() {
