@@ -21,7 +21,7 @@ public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen
       int height = 7 + slotCount * 18;
       int left = containerScreen.getGuiLeft() - width;
       int top = containerScreen.getGuiTop() + 4;
-      areas.add(new Rectangle2d(left, top, left + width, top + height));
+      areas.add(new Rectangle2d(left, top, width, height));
       return areas;
     }).orElse(Collections.emptyList());
   }
