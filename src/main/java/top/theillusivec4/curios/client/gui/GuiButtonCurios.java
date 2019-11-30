@@ -68,7 +68,7 @@ public class GuiButtonCurios extends ImageButton {
       isRecipeBookVisible = ((InventoryScreen) parentGui).getRecipeGui().isVisible();
 
       if (lastVisible != isRecipeBookVisible) {
-        Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset();
+        Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset(false);
         this.setPosition(parentGui.getGuiLeft() + offsets.getA(),
             parentGui.height / 2 + offsets.getB());
       }

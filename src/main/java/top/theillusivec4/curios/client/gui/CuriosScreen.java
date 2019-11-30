@@ -37,6 +37,7 @@ import top.theillusivec4.curios.api.inventory.SlotCurio;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosConfig.Client;
+import top.theillusivec4.curios.common.CuriosConfig.Client.ButtonCorner;
 import top.theillusivec4.curios.common.inventory.CuriosContainer;
 
 public class CuriosScreen extends ContainerScreen<CuriosContainer> {
@@ -65,15 +66,24 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
     super.init();
     this.widthTooNarrow = this.width < 379;
     this.guiLeft = (this.width - this.xSize) / 2;
-    Tuple<Integer, Integer> offsets = getButtonOffset();
+    Tuple<Integer, Integer> offsets = getButtonOffset(false);
     this.addButton(new GuiButtonCurios(this, this.getGuiLeft() + offsets.getA(),
         this.height / 2 + offsets.getB(), 14, 14, 50, 0, 14, CURIO_INVENTORY));
   }
 
-  public static Tuple<Integer, Integer> getButtonOffset() {
+  public static Tuple<Integer, Integer> getButtonOffset(boolean isCreative) {
     Client client = CuriosConfig.CLIENT;
-    int x = client.buttonCorner.get().getXoffset() + client.buttonXOffset.get();
-    int y = client.buttonCorner.get().getYoffset() + client.buttonYOffset.get();
+    ButtonCorner corner = client.buttonCorner.get();
+    int x = 0;
+    int y = 0;
+
+    if (isCreative) {
+      x += corner.getCreativeXoffset() + client.creativeButtonXOffset.get();
+      y += corner.getCreativeYoffset() + client.creativeButtonYOffset.get();
+    } else {
+      x += corner.getXoffset() + client.buttonXOffset.get();
+      y += corner.getYoffset() + client.buttonYOffset.get();
+    }
     return new Tuple<>(x, y);
   }
 

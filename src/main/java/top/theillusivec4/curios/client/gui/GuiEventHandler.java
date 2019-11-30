@@ -45,23 +45,18 @@ public class GuiEventHandler {
 
   @SubscribeEvent
   public void onInventoryGuiInit(GuiScreenEvent.InitGuiEvent.Post evt) {
-
     Screen screen = evt.getGui();
-    Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset();
-    int x = offsets.getA();
-    int y = offsets.getB();
 
-    if (screen instanceof InventoryScreen) {
-      InventoryScreen gui = (InventoryScreen) screen;
-      evt.addWidget(
-          new GuiButtonCurios(gui, gui.getGuiLeft() + x, gui.height / 2 + y, 14, 14, 50, 0, 14,
-              CuriosScreen.CURIO_INVENTORY));
-    } else if (screen instanceof CreativeScreen) {
-      CreativeScreen gui = (CreativeScreen) screen;
-      int creativexoffset = 10;
-      int creativeyoffset = 11;
-      evt.addWidget(new GuiButtonCurios(gui, gui.getGuiLeft() + x + creativexoffset,
-          gui.height / 2 + y + creativeyoffset, 14, 14, 50, 0, 14, CuriosScreen.CURIO_INVENTORY));
+    if (screen instanceof InventoryScreen || screen instanceof CreativeScreen) {
+      ContainerScreen gui = (ContainerScreen) screen;
+      boolean isCreative = screen instanceof CreativeScreen;
+      Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset(isCreative);
+      int x = offsets.getA();
+      int y = offsets.getB();
+      int size = isCreative ? 10 : 14;
+      int textureOffsetX = isCreative ? 64 : 50;
+      evt.addWidget(new GuiButtonCurios(gui, gui.getGuiLeft() + x, gui.height / 2 + y, size, size,
+          textureOffsetX, 0, size, CuriosScreen.CURIO_INVENTORY));
     }
   }
 
@@ -81,7 +76,6 @@ public class GuiEventHandler {
 
   @SubscribeEvent
   public void onMouseClick(GuiScreenEvent.MouseClickedEvent.Pre evt) {
-
     long handle = Minecraft.getInstance().mainWindow.getHandle();
     boolean isLeftShiftDown = InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT);
     boolean isRightShiftDown = InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);

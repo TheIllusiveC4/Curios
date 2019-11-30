@@ -74,6 +74,8 @@ public class CuriosConfig {
     public final ForgeConfigSpec.BooleanValue renderCurios;
     public final ForgeConfigSpec.IntValue buttonXOffset;
     public final ForgeConfigSpec.IntValue buttonYOffset;
+    public final ForgeConfigSpec.IntValue creativeButtonXOffset;
+    public final ForgeConfigSpec.IntValue creativeButtonYOffset;
     public final ForgeConfigSpec.EnumValue<ButtonCorner> buttonCorner;
 
     Client(ForgeConfigSpec.Builder builder) {
@@ -88,6 +90,12 @@ public class CuriosConfig {
       buttonYOffset = builder.comment("The Y-Offset for the Curios GUI button")
           .translation(CONFIG_PREFIX + "buttonYOffset")
           .defineInRange("buttonYOffset", 0, -100, 100);
+      creativeButtonXOffset = builder.comment("The X-Offset for the Creative Curios GUI button")
+          .translation(CONFIG_PREFIX + "creativeButtonXOffset")
+          .defineInRange("creativeButtonXOffset", 0, -100, 100);
+      creativeButtonYOffset = builder.comment("The Y-Offset for the Creative Curios GUI button")
+          .translation(CONFIG_PREFIX + "creativeButtonYOffset")
+          .defineInRange("creativeButtonYOffset", 0, -100, 100);
       buttonCorner = builder.comment("The corner for the Curios GUI button")
           .translation(CONFIG_PREFIX + "buttonCorner")
           .defineEnum("buttonCorner", ButtonCorner.TOP_LEFT);
@@ -96,17 +104,21 @@ public class CuriosConfig {
     }
 
     public enum ButtonCorner {
-      TOP_LEFT(26, -75),
-      TOP_RIGHT(61, -75),
-      BOTTOM_LEFT(26, -20),
-      BOTTOM_RIGHT(61, -20);
+      TOP_LEFT(26, -75, 73, -62),
+      TOP_RIGHT(61, -75, 95, -62),
+      BOTTOM_LEFT(26, -20, 73, -29),
+      BOTTOM_RIGHT(61, -20, 95, -29);
 
-      int xoffset = 0;
-      int yoffset = 0;
+      final int xoffset;
+      final int yoffset;
+      final int creativeXoffset;
+      final int creativeYoffset;
 
-      ButtonCorner(int x, int y) {
+      ButtonCorner(int x, int y, int creativeX, int creativeY) {
         xoffset = x;
         yoffset = y;
+        creativeXoffset = creativeX;
+        creativeYoffset = creativeY;
       }
 
       public int getXoffset() {
@@ -115,6 +127,14 @@ public class CuriosConfig {
 
       public int getYoffset() {
         return yoffset;
+      }
+
+      public int getCreativeXoffset() {
+        return creativeXoffset;
+      }
+
+      public int getCreativeYoffset() {
+        return creativeYoffset;
       }
     }
   }
