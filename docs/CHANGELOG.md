@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [1.0.5.4] - 2019.11.30
+### Added
+- Added separate config options for Curio button positioning in Creative GUI [#35](https://github.com/TheIllusiveC4/Curios/issues/35)
+- Added recipe book button to Curios GUI [#31](https://github.com/TheIllusiveC4/Curios/issues/31)
+### Fixed
+- Fixed rendering bug with JEI integration [#35](https://github.com/TheIllusiveC4/Curios/issues/35)
+
 ## [1.0.5.3] - 2019.11.12
 ### Added
 - Added config options for Curio button positioning [#33](https://github.com/TheIllusiveC4/Curios/issues/33)
