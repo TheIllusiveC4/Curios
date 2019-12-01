@@ -62,22 +62,7 @@ public class GuiButtonCurios extends ImageButton {
               RecipeBookGui recipeBookGui = inventory.getRecipeGui();
 
               if (recipeBookGui.isVisible()) {
-//                recipeBookGui.initSearchBar(inventory.width < 379);
                 recipeBookGui.toggleVisibility();
-//                ObfuscationReflectionHelper.setPrivateValue(ContainerScreen.class, inventory,
-//                    recipeBookGui.updateScreenPosition(inventory.width < 379, inventory.width,
-//                        inventory.getXSize()), "field_147003_i");
-//                inventory.children().forEach((listener) -> {
-//                  if (listener instanceof ImageButton) {
-//                    ImageButton imgButton = (ImageButton) listener;
-//                    ResourceLocation resourceLocation = ObfuscationReflectionHelper
-//                        .getPrivateValue(ImageButton.class, imgButton, "field_191750_o");
-//
-//                    if (resourceLocation != null && resourceLocation.equals(CuriosScreen.RECIPE_BUTTON_TEXTURE)) {
-//                      imgButton.setPosition(inventory.getGuiLeft() + 104, inventory.height / 2 - 22);
-//                    }
-//                  }
-//                });
               }
             }
             NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios());
