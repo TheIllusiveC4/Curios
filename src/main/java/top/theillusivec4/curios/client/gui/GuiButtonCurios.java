@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.client.gui;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
@@ -28,6 +29,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
@@ -54,6 +56,30 @@ public class GuiButtonCurios extends ImageButton {
             NetworkHandler.INSTANCE
                 .send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla());
           } else {
+
+            if (parentGui instanceof InventoryScreen) {
+              InventoryScreen inventory = (InventoryScreen) parentGui;
+              RecipeBookGui recipeBookGui = inventory.getRecipeGui();
+
+              if (recipeBookGui.isVisible()) {
+//                recipeBookGui.initSearchBar(inventory.width < 379);
+                recipeBookGui.toggleVisibility();
+//                ObfuscationReflectionHelper.setPrivateValue(ContainerScreen.class, inventory,
+//                    recipeBookGui.updateScreenPosition(inventory.width < 379, inventory.width,
+//                        inventory.getXSize()), "field_147003_i");
+//                inventory.children().forEach((listener) -> {
+//                  if (listener instanceof ImageButton) {
+//                    ImageButton imgButton = (ImageButton) listener;
+//                    ResourceLocation resourceLocation = ObfuscationReflectionHelper
+//                        .getPrivateValue(ImageButton.class, imgButton, "field_191750_o");
+//
+//                    if (resourceLocation != null && resourceLocation.equals(CuriosScreen.RECIPE_BUTTON_TEXTURE)) {
+//                      imgButton.setPosition(inventory.getGuiLeft() + 104, inventory.height / 2 - 22);
+//                    }
+//                  }
+//                });
+              }
+            }
             NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios());
           }
         });

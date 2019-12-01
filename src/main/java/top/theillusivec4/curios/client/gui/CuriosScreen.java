@@ -20,16 +20,22 @@
 package top.theillusivec4.curios.client.gui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
@@ -39,11 +45,15 @@ import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosConfig.Client;
 import top.theillusivec4.curios.common.CuriosConfig.Client.ButtonCorner;
 import top.theillusivec4.curios.common.inventory.CuriosContainer;
+import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 
 public class CuriosScreen extends ContainerScreen<CuriosContainer> {
 
   static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID,
       "textures/gui/inventory.png");
+  static final ResourceLocation RECIPE_BUTTON_TEXTURE = new ResourceLocation(
+      "minecraft:textures/gui/recipe_button.png");
 
   private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
       "textures/gui/container/creative_inventory/tabs.png");
@@ -69,6 +79,39 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
     Tuple<Integer, Integer> offsets = getButtonOffset(false);
     this.addButton(new GuiButtonCurios(this, this.getGuiLeft() + offsets.getA(),
         this.height / 2 + offsets.getB(), 14, 14, 50, 0, 14, CURIO_INVENTORY));
+
+    if (!this.playerInventory.player.isCreative() && this.minecraft != null) {
+      this.addButton(new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19,
+          RECIPE_BUTTON_TEXTURE, (button) -> {
+        Minecraft mc = this.minecraft;
+        InventoryScreen inventory = new InventoryScreen(mc.player);
+        ItemStack stack = mc.player.inventory.getItemStack();
+        mc.player.inventory.setItemStack(ItemStack.EMPTY);
+        mc.displayGuiScreen(inventory);
+        RecipeBookGui recipeBookGui = inventory.getRecipeGui();
+
+        if (!recipeBookGui.isVisible()) {
+          recipeBookGui.initSearchBar(inventory.width < 379);
+          recipeBookGui.toggleVisibility();
+          ObfuscationReflectionHelper.setPrivateValue(ContainerScreen.class, inventory,
+              recipeBookGui.updateScreenPosition(inventory.width < 379, inventory.width,
+                  inventory.getXSize()), "field_147003_i");
+          inventory.children().forEach((listener) -> {
+            if (listener instanceof ImageButton) {
+              ImageButton imgButton = (ImageButton) listener;
+              ResourceLocation resourceLocation = ObfuscationReflectionHelper
+                  .getPrivateValue(ImageButton.class, imgButton, "field_191750_o");
+
+              if (resourceLocation != null && resourceLocation.equals(RECIPE_BUTTON_TEXTURE)) {
+                imgButton.setPosition(inventory.getGuiLeft() + 104, inventory.height / 2 - 22);
+              }
+            }
+          });
+        }
+        mc.player.inventory.setItemStack(stack);
+        NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla());
+      }));
+    }
   }
 
   public static Tuple<Integer, Integer> getButtonOffset(boolean isCreative) {
