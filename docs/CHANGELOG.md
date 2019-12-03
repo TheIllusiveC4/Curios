@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [1.0.6] - 2019.12.03
+### Added
+- [API] ICurio#getDropRule for specifying drop on death behavior (DEFAULT, ALWAYS_DROP, ALWAYS_KEEP, DESTROY)
+- [API] LivingCurioDropRulesEvent for specifying drop on death behavior overrides based off a Predicate<ItemStack>
+
 ## [1.0.5.4] - 2019.11.30
 ### Added
 - Added separate config options for Curio button positioning in Creative GUI [#35](https://github.com/TheIllusiveC4/Curios/issues/35)
