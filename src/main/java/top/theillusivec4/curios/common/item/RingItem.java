@@ -22,6 +22,7 @@ package top.theillusivec4.curios.common.item;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -85,6 +86,12 @@ public class RingItem extends Item {
                   AttributeModifier.Operation.ADDITION));
         }
         return atts;
+      }
+
+      @Nonnull
+      @Override
+      public DropRule getDropRule(LivingEntity livingEntity) {
+        return DropRule.DEFAULT;
       }
 
       @Override

@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.BiPredicate;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -52,9 +53,11 @@ import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.curios.api.capability.ICurio.DropRule;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
 import top.theillusivec4.curios.api.event.LivingCurioDropsEvent;
+import top.theillusivec4.curios.api.event.LivingKeepCurioCheckEvent;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -108,12 +111,7 @@ public class EventHandlerCurios {
 
   @SubscribeEvent
   public void onPlayerClone(PlayerEvent.Clone evt) {
-
     PlayerEntity player = evt.getPlayer();
-
-    if (evt.isWasDeath() && !player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
-      return;
-    }
 
     PlayerEntity oldPlayer = evt.getOriginal();
     oldPlayer.revive();
@@ -139,12 +137,20 @@ public class EventHandlerCurios {
 
     LivingEntity livingEntity = evt.getEntityLiving();
 
-    if (!livingEntity.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) && !livingEntity
-        .isSpectator()) {
+    if (!livingEntity.isSpectator()) {
       CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
         Collection<ItemEntity> drops = evt.getDrops();
         Collection<ItemEntity> curioDrops = new ArrayList<>();
         SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
+        LivingKeepCurioCheckEvent keepEvent = new LivingKeepCurioCheckEvent(livingEntity, handler,
+            evt.getSource(), evt.getLootingLevel(), evt.isRecentlyHit());
+        MinecraftForge.EVENT_BUS.post(keepEvent);
+        Collection<BiPredicate<LivingKeepCurioCheckEvent, ItemStack>> keepPredicates = keepEvent
+            .getKeepPredicates();
+        BiPredicate<LivingKeepCurioCheckEvent, ItemStack> predicate = keepPredicates.stream()
+            .reduce(BiPredicate::or).orElse((x, y) -> false);
+        boolean keepInventory = livingEntity.world.getGameRules()
+            .getBoolean(GameRules.KEEP_INVENTORY);
 
         for (String identifier : curioMap.keySet()) {
           ItemStackHandler stacks = curioMap.get(identifier);
@@ -153,7 +159,15 @@ public class EventHandlerCurios {
             ItemStack stack = stacks.getStackInSlot(i);
 
             if (!stack.isEmpty()) {
-              if (!EnchantmentHelper.hasVanishingCurse(stack)) {
+              DropRule dropRule = CuriosAPI.getCurio(stack)
+                  .map(curio -> curio.getDropRule(livingEntity)).orElse(DropRule.DEFAULT);
+
+              if ((dropRule == DropRule.DEFAULT && keepInventory)
+                  || dropRule == DropRule.ALWAYS_KEEP || predicate.test(keepEvent, stack)) {
+                continue;
+              }
+
+              if (!EnchantmentHelper.hasVanishingCurse(stack) && dropRule != DropRule.DESTROY) {
                 curioDrops.add(this.getDroppedItem(stack, livingEntity));
               }
               stacks.setStackInSlot(i, ItemStack.EMPTY);

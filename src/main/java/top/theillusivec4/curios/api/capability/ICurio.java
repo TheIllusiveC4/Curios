@@ -239,6 +239,35 @@ public interface ICurio {
   }
 
   /**
+   * Determines if the ItemStack should drop on death and persist through respawn. This will persist
+   * the ItemStack in the curio slot to the respawned player if applicable.
+   *
+   * @param livingEntity The entity that died
+   * @return Tuple object with the left value returning true if the ItemStack should be dropped on
+   * death and the right value returning true if the ItemStack should persist to the respawned
+   * player if applicable (given the left value was false).
+   */
+  @Nonnull
+  default DropRule getDropRule(LivingEntity livingEntity) {
+    return DropRule.DEFAULT;
+  }
+
+  /**
+   * Used by {@link ICurio#getDropRule(LivingEntity)} to determine drop on death behavior.
+   * <br>
+   * DEFAULT - normal vanilla behavior with drops dictated by the Keep Inventory game rule.
+   * <br>
+   * ALWAYS_DROP - always drop regardless of game rules.
+   * <br>
+   * ALWAYS_KEEP - always keep regardless of game rules.
+   * <br>
+   * DESTROY - destroy the item upon death
+   */
+  enum DropRule {
+    DEFAULT, ALWAYS_DROP, ALWAYS_KEEP, DESTROY
+  }
+
+  /**
    * Determines if the ItemStack has rendering.
    *
    * @param identifier   The identifier of the {@link CurioType} of the slot
