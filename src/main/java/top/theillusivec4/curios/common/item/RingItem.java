@@ -91,7 +91,7 @@ public class RingItem extends Item {
       @Nonnull
       @Override
       public DropRule getDropRule(LivingEntity livingEntity) {
-        return DropRule.DEFAULT;
+        return DropRule.ALWAYS_KEEP;
       }
 
       @Override
