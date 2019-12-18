@@ -48,7 +48,7 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
+import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemStackHandler;
@@ -192,8 +192,7 @@ public class EventHandlerCurios {
   }
 
   @SubscribeEvent
-  public void onPlayerXPPickUp(PlayerPickupXpEvent evt) {
-
+  public void onPlayerXPPickUp(PlayerXpEvent.PickupXp evt) {
     PlayerEntity player = evt.getPlayer();
 
     if (!player.world.isRemote) {
@@ -230,10 +229,10 @@ public class EventHandlerCurios {
   }
 
   private ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
-
-    double d0 = livingEntity.posY - 0.30000001192092896D + (double) livingEntity.getEyeHeight();
-    ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.posX, d0,
-        livingEntity.posZ, droppedItem);
+    double d0 = livingEntity.func_226278_cu_() - 0.30000001192092896D + (double) livingEntity
+        .getEyeHeight();
+    ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.func_226277_ct_(), d0,
+        livingEntity.func_226281_cx_(), droppedItem);
     entityitem.setPickupDelay(40);
     float f = livingEntity.world.rand.nextFloat() * 0.5F;
     float f1 = livingEntity.world.rand.nextFloat() * ((float) Math.PI * 2F);

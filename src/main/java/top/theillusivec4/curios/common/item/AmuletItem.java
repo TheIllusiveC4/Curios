@@ -40,20 +40,18 @@ public class AmuletItem extends Item {
       "textures/entity/amulet.png");
 
   public AmuletItem() {
-
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
     this.setRegistryName(Curios.MODID, "amulet");
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-
     return CapCurioItem.createProvider(new ICurio() {
 
       private Object model;
 
       @Override
-      public void onCurioTick(String identifier, LivingEntity livingEntity) {
+      public void onCurioTick(String identifier, int index, LivingEntity livingEntity) {
 
         if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 40 == 0) {
           livingEntity.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
@@ -62,7 +60,6 @@ public class AmuletItem extends Item {
 
       @Override
       public boolean hasRender(String identifier, LivingEntity livingEntity) {
-
         return true;
       }
 
@@ -70,7 +67,6 @@ public class AmuletItem extends Item {
       public void doRender(String identifier, LivingEntity livingEntity, float limbSwing,
           float limbSwingAmount, float partialTicks, float ageInTicks,
           float netHeadYaw, float headPitch, float scale) {
-
         Minecraft.getInstance().getTextureManager().bindTexture(AMULET_TEXTURE);
         ICurio.RenderHelper.rotateIfSneaking(livingEntity);
 
@@ -85,7 +81,6 @@ public class AmuletItem extends Item {
 
   @Override
   public boolean hasEffect(ItemStack stack) {
-
     return true;
   }
 }

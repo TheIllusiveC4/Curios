@@ -22,6 +22,7 @@ package top.theillusivec4.curios.api.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.List;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
@@ -29,8 +30,8 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -52,19 +53,6 @@ public interface ICurio {
    * @param livingEntity The wearer of the ItemStack
    */
   default void onCurioTick(String identifier, int index, LivingEntity livingEntity) {
-
-    onCurioTick(identifier, livingEntity);
-  }
-
-  /**
-   * Deprecated - use index-sensitive version. {@link ICurio#onCurioTick(String, int,
-   * LivingEntity)}
-   *
-   * @param identifier   The {@link CurioType} identifier of the ItemStack's slot
-   * @param livingEntity The wearer of the ItemStack
-   */
-  @Deprecated
-  default void onCurioTick(String identifier, LivingEntity livingEntity) {
 
   }
 
@@ -96,7 +84,6 @@ public interface ICurio {
    * @return True if the ItemStack can be equipped/put in, false if not
    */
   default boolean canEquip(String identifier, LivingEntity livingEntity) {
-
     return true;
   }
 
@@ -108,7 +95,6 @@ public interface ICurio {
    * @return True if the ItemStack can be unequipped/taken out, false if not
    */
   default boolean canUnequip(String identifier, LivingEntity livingEntity) {
-
     return true;
   }
 
@@ -134,7 +120,6 @@ public interface ICurio {
    * @return A map of attribute modifiers to apply
    */
   default Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
-
     return HashMultimap.create();
   }
 
@@ -146,7 +131,6 @@ public interface ICurio {
    * @param livingEntity The wearer of the ItemStack
    */
   default void playEquipSound(LivingEntity livingEntity) {
-
     livingEntity.world
         .playSound(null, livingEntity.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
             SoundCategory.NEUTRAL, 1.0f, 1.0f);
@@ -159,7 +143,6 @@ public interface ICurio {
    * @return True to enable right-clicking auto-equip, false to disable
    */
   default boolean canRightClickEquip() {
-
     return false;
   }
 
@@ -176,8 +159,9 @@ public interface ICurio {
     if (!stack.isEmpty()) {
 
       if (!livingEntity.isSilent()) {
-        livingEntity.world.playSound(livingEntity.posX, livingEntity.posY, livingEntity.posZ,
-            SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(), 0.8F,
+        livingEntity.world.playSound(livingEntity.func_226277_ct_(), livingEntity.func_226278_cu_(),
+            livingEntity.func_226281_cx_(), SoundEvents.ENTITY_ITEM_BREAK,
+            livingEntity.getSoundCategory(), 0.8F,
             0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
       }
 
@@ -191,9 +175,9 @@ public interface ICurio {
             0.6D);
         vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        vec3d1 = vec3d1
-            .add(livingEntity.posX, livingEntity.posY + (double) livingEntity.getEyeHeight(),
-                livingEntity.posZ);
+        vec3d1 = vec3d1.add(livingEntity.func_226277_ct_(),
+            livingEntity.func_226278_cu_() + (double) livingEntity.getEyeHeight(),
+            livingEntity.func_226281_cx_());
 
         livingEntity.world
             .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
@@ -212,7 +196,6 @@ public interface ICurio {
    * @return True to curios the ItemStack change to all tracking clients, false to do nothing
    */
   default boolean shouldSyncToTracking(String identifier, LivingEntity livingEntity) {
-
     return false;
   }
 
@@ -224,7 +207,6 @@ public interface ICurio {
    */
   @Nonnull
   default CompoundNBT getSyncTag() {
-
     return new CompoundNBT();
   }
 
@@ -275,7 +257,6 @@ public interface ICurio {
    * @return True if the ItemStack has rendering, false if it does not
    */
   default boolean hasRender(String identifier, LivingEntity livingEntity) {
-
     return false;
   }
 
@@ -307,8 +288,8 @@ public interface ICurio {
      */
     public static void rotateIfSneaking(final LivingEntity livingEntity) {
 
-      if (livingEntity.isSneaking()) {
-        GlStateManager.rotatef(90.0F / (float) Math.PI, 1.0F, 0.0F, 0.0F);
+      if (livingEntity.isCrouching()) {
+        RenderSystem.rotatef(90.0F / (float) Math.PI, 1.0F, 0.0F, 0.0F);
       }
     }
 

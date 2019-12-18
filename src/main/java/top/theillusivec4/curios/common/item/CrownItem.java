@@ -22,14 +22,12 @@ public class CrownItem extends Item {
       "textures/entity/crown.png");
 
   public CrownItem() {
-
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(2000));
     this.setRegistryName(Curios.MODID, "crown");
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-
     return CapCurioItem.createProvider(new ICurio() {
 
       private Object model;
@@ -47,7 +45,6 @@ public class CrownItem extends Item {
 
       @Override
       public void onUnequipped(String identifier, LivingEntity livingEntity) {
-
         EffectInstance effect = livingEntity.getActivePotionEffect(Effects.NIGHT_VISION);
 
         if (effect != null && effect.getAmplifier() == 44) {
@@ -57,7 +54,6 @@ public class CrownItem extends Item {
 
       @Override
       public boolean hasRender(String identifier, LivingEntity livingEntity) {
-
         return true;
       }
 
@@ -65,13 +61,11 @@ public class CrownItem extends Item {
       public void doRender(String identifier, LivingEntity livingEntity, float limbSwing,
           float limbSwingAmount, float partialTicks, float ageInTicks,
           float netHeadYaw, float headPitch, float scale) {
-
         Minecraft.getInstance().getTextureManager().bindTexture(CROWN_TEXTURE);
 
         if (!(this.model instanceof CrownModel)) {
           model = new CrownModel();
         }
-
         CrownModel crown = (CrownModel) this.model;
         ICurio.RenderHelper.followHeadRotations(livingEntity, crown.crown);
         crown.render(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
@@ -82,7 +76,6 @@ public class CrownItem extends Item {
 
   @Override
   public boolean hasEffect(ItemStack stack) {
-
     return true;
   }
 }

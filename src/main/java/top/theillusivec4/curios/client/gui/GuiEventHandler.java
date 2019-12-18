@@ -48,7 +48,7 @@ public class GuiEventHandler {
     Screen screen = evt.getGui();
 
     if (screen instanceof InventoryScreen || screen instanceof CreativeScreen) {
-      ContainerScreen gui = (ContainerScreen) screen;
+      ContainerScreen<?> gui = (ContainerScreen<?>) screen;
       boolean isCreative = screen instanceof CreativeScreen;
       Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset(isCreative);
       int x = offsets.getA();
@@ -66,7 +66,6 @@ public class GuiEventHandler {
     if (!(evt.getGui() instanceof InventoryScreen)) {
       return;
     }
-
     InventoryScreen gui = (InventoryScreen) evt.getGui();
     ObfuscationReflectionHelper
         .setPrivateValue(InventoryScreen.class, gui, evt.getMouseX(), "field_147048_u");
@@ -76,7 +75,7 @@ public class GuiEventHandler {
 
   @SubscribeEvent
   public void onMouseClick(GuiScreenEvent.MouseClickedEvent.Pre evt) {
-    long handle = Minecraft.getInstance().mainWindow.getHandle();
+    long handle = Minecraft.getInstance().func_228018_at_().getHandle();
     boolean isLeftShiftDown = InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT);
     boolean isRightShiftDown = InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);
     boolean isShiftDown = isLeftShiftDown || isRightShiftDown;
@@ -90,10 +89,8 @@ public class GuiEventHandler {
     if (gui.getSelectedTabIndex() != ItemGroup.INVENTORY.getIndex()) {
       return;
     }
-
     Slot destroyItemSlot = ObfuscationReflectionHelper
         .getPrivateValue(CreativeScreen.class, gui, "field_147064_C");
-
     Slot slot = null;
 
     try {

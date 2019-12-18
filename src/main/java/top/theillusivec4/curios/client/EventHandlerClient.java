@@ -123,7 +123,7 @@ public class EventHandlerClient {
             Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier);
 
             if (!multimap.isEmpty() && (hideFlags & 2) == 0) {
-              PlayerEntity player = evt.getEntityPlayer();
+              PlayerEntity player = evt.getPlayer();
               tooltip.add(new StringTextComponent(""));
               tooltip.add(new TranslationTextComponent("curios.modifiers." + identifier)
                   .applyTextStyle(TextFormatting.GOLD));

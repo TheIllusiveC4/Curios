@@ -26,21 +26,18 @@ public class KnucklesItem extends Item {
       "textures/entity/knuckles.png");
 
   public KnucklesItem() {
-
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1));
     this.setRegistryName(Curios.MODID, "knuckles");
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-
     return CapCurioItem.createProvider(new ICurio() {
 
       private Object model;
 
       @Override
       public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
-
         Multimap<String, AttributeModifier> atts = HashMultimap.create();
 
         if (CuriosAPI.getCurioTags(stack.getItem()).contains(identifier)) {
@@ -53,7 +50,6 @@ public class KnucklesItem extends Item {
 
       @Override
       public boolean hasRender(String identifier, LivingEntity livingEntity) {
-
         return true;
       }
 
@@ -61,7 +57,6 @@ public class KnucklesItem extends Item {
       public void doRender(String identifier, LivingEntity livingEntity, float limbSwing,
           float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
           float headPitch, float scale) {
-
         Minecraft.getInstance().getTextureManager().bindTexture(KNUCKLES_TEXTURE);
 
         if (!(this.model instanceof KnucklesModel)) {
@@ -71,8 +66,8 @@ public class KnucklesItem extends Item {
         KnucklesModel knuckles = (KnucklesModel) this.model;
         ICurio.RenderHelper.followBodyRotations(livingEntity, knuckles);
         knuckles.setLivingAnimations(livingEntity, limbSwing, limbSwingAmount, partialTicks);
-        knuckles.setRotationAngles(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
-            headPitch, scale);
+        knuckles.func_225597_a_(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
+            headPitch);
         knuckles.render(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch,
             scale);
       }
@@ -81,7 +76,6 @@ public class KnucklesItem extends Item {
 
   @Override
   public boolean hasEffect(ItemStack stack) {
-
     return true;
   }
 }

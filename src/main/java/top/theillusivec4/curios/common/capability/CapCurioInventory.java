@@ -64,7 +64,6 @@ public class CapCurioInventory {
           @Override
           public INBT writeNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance,
               Direction side) {
-
             SortedMap<String, CurioStackHandler> curioMap = instance.getCurioMap();
             CompoundNBT compound = new CompoundNBT();
             ListNBT taglist = new ListNBT();
@@ -79,7 +78,7 @@ public class CapCurioInventory {
             ListNBT taglist1 = new ListNBT();
 
             for (String identifier : instance.getDisabled()) {
-              taglist1.add(new StringNBT(identifier));
+              taglist1.add(StringNBT.func_229705_a_(identifier));
             }
             compound.put("Disabled", taglist1);
             return compound;
@@ -89,7 +88,6 @@ public class CapCurioInventory {
           public void readNBT(
               Capability<ICurioItemHandler> capability, ICurioItemHandler instance, Direction side,
               INBT nbt) {
-
             ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
             ListNBT tagList1 = ((CompoundNBT) nbt).getList("Disabled", Constants.NBT.TAG_STRING);
             Set<String> disabled = Sets.newHashSet();

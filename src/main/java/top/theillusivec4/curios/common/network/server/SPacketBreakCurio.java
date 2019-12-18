@@ -73,11 +73,11 @@ public class SPacketBreakCurio {
             if (!stack.isEmpty()) {
 
               if (!livingEntity.isSilent()) {
-                livingEntity.world.playSound(livingEntity.posX, livingEntity.posY,
-                    livingEntity.posZ, SoundEvents.ENTITY_ITEM_BREAK,
-                    livingEntity.getSoundCategory(), 0.8F,
-                    0.8F + livingEntity.world.rand.nextFloat() * 0.4F,
-                    false);
+                livingEntity.world
+                    .playSound(livingEntity.func_226277_ct_(), livingEntity.func_226278_cu_(),
+                        livingEntity.func_226281_cx_(), SoundEvents.ENTITY_ITEM_BREAK,
+                        livingEntity.getSoundCategory(), 0.8F,
+                        0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
               }
 
               for (int i = 0; i < 5; ++i) {
@@ -86,17 +86,17 @@ public class SPacketBreakCurio {
                 vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
                 vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
                 double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
-                Vec3d vec3d1 =
-                    new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D, d0, 0.6D);
+                Vec3d vec3d1 = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D,
+                    d0, 0.6D);
                 vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
                 vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-                vec3d1 = vec3d1.add(livingEntity.posX,
-                    livingEntity.posY + (double) livingEntity.getEyeHeight(),
-                    livingEntity.posZ);
+                vec3d1 = vec3d1.add(livingEntity.func_226277_ct_(),
+                    livingEntity.func_226278_cu_() + (double) livingEntity.getEyeHeight(),
+                    livingEntity.func_226281_cx_());
 
-                livingEntity.world.addParticle(new ItemParticleData(ParticleTypes.ITEM, stack),
-                    vec3d1.x, vec3d1.y, vec3d1.z, vec3d.x,
-                    vec3d.y + 0.05D, vec3d.z);
+                livingEntity.world
+                    .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x,
+                        vec3d1.y, vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
               }
             }
           }

@@ -46,14 +46,12 @@ public class RingItem extends Item {
   private static final UUID ARMOR_UUID = UUID.fromString("38faf191-bf78-4654-b349-cc1f4f1143bf");
 
   public RingItem() {
-
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
     this.setRegistryName(Curios.MODID, "ring");
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-
     return CapCurioItem.createProvider(new ICurio() {
 
       @Override
@@ -66,7 +64,6 @@ public class RingItem extends Item {
 
       @Override
       public void playEquipSound(LivingEntity livingEntity) {
-
         livingEntity.world
             .playSound(null, livingEntity.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GOLD,
                 SoundCategory.NEUTRAL, 1.0f, 1.0f);
@@ -74,7 +71,6 @@ public class RingItem extends Item {
 
       @Override
       public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
-
         Multimap<String, AttributeModifier> atts = HashMultimap.create();
 
         if (CuriosAPI.getCurioTags(stack.getItem()).contains(identifier)) {
@@ -96,7 +92,6 @@ public class RingItem extends Item {
 
       @Override
       public boolean canRightClickEquip() {
-
         return true;
       }
     });
@@ -104,7 +99,6 @@ public class RingItem extends Item {
 
   @Override
   public boolean hasEffect(ItemStack stack) {
-
     return true;
   }
 }
