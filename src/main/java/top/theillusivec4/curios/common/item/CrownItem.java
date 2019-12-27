@@ -1,6 +1,11 @@
 package top.theillusivec4.curios.common.item;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -58,18 +63,23 @@ public class CrownItem extends Item {
       }
 
       @Override
-      public void doRender(String identifier, LivingEntity livingEntity, float limbSwing,
-          float limbSwingAmount, float partialTicks, float ageInTicks,
-          float netHeadYaw, float headPitch, float scale) {
+      public void render(String identifier, MatrixStack matrixStack,
+          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
+          float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+          float headPitch) {
         Minecraft.getInstance().getTextureManager().bindTexture(CROWN_TEXTURE);
 
         if (!(this.model instanceof CrownModel)) {
-          model = new CrownModel();
+          model = new CrownModel<>();
         }
-        CrownModel crown = (CrownModel) this.model;
+        CrownModel<?> crown = (CrownModel<?>) this.model;
         ICurio.RenderHelper.followHeadRotations(livingEntity, crown.crown);
-        crown.render(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
-            headPitch, scale);
+        IVertexBuilder vertexBuilder = ItemRenderer
+            .func_229113_a_(renderTypeBuffer, crown.func_228282_a_(CROWN_TEXTURE), false,
+                stack.hasEffect());
+        crown
+            .func_225598_a_(matrixStack, vertexBuilder, light, OverlayTexture.field_229196_a_, 1.0F,
+                1.0F, 1.0F, 1.0F);
       }
     });
   }

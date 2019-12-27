@@ -21,17 +21,18 @@ package top.theillusivec4.curios.api.capability;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.List;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.Pose;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -268,9 +269,10 @@ public interface ICurio {
    * @param identifier   The identifier of the {@link CurioType} of the slot
    * @param livingEntity The EntityLivingBase that is wearing the ItemStack
    */
-  default void doRender(String identifier, LivingEntity livingEntity, float limbSwing,
+  default void render(String identifier, MatrixStack matrixStack,
+      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
       float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-      float headPitch, float scale) {
+      float headPitch) {
 
   }
 
@@ -303,18 +305,19 @@ public interface ICurio {
      * @param renderers    The list of model renderers to align to the head movement
      */
     public static void followHeadRotations(final LivingEntity livingEntity,
-        RendererModel... renderers) {
+        ModelRenderer... renderers) {
 
-      EntityRenderer<LivingEntity> render = Minecraft.getInstance().getRenderManager()
+      EntityRenderer<? super LivingEntity> render = Minecraft.getInstance().getRenderManager()
           .getRenderer(livingEntity);
 
       if (render instanceof LivingRenderer) {
-        EntityModel model = ((LivingRenderer) render).getEntityModel();
+        LivingRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        EntityModel<LivingEntity> model = livingRenderer.getEntityModel();
 
         if (model instanceof BipedModel) {
 
-          for (RendererModel renderer : renderers) {
-            renderer.copyModelAngles(((BipedModel) model).bipedHead);
+          for (ModelRenderer renderer : renderers) {
+            renderer.copyModelAngles(((BipedModel<LivingEntity>) model).bipedHead);
           }
         }
       }
@@ -332,7 +335,7 @@ public interface ICurio {
     public static void followBodyRotations(final LivingEntity livingEntity,
         final BipedModel<LivingEntity>... models) {
 
-      EntityRenderer<LivingEntity> render = Minecraft.getInstance().getRenderManager()
+      EntityRenderer<? super LivingEntity> render = Minecraft.getInstance().getRenderManager()
           .getRenderer(livingEntity);
 
       if (render instanceof LivingRenderer) {

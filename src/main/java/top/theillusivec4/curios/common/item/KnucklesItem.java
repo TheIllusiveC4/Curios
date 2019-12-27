@@ -2,8 +2,13 @@ package top.theillusivec4.curios.common.item;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -54,9 +59,10 @@ public class KnucklesItem extends Item {
       }
 
       @Override
-      public void doRender(String identifier, LivingEntity livingEntity, float limbSwing,
+      public void render(String identifier, MatrixStack matrixStack,
+          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
           float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-          float headPitch, float scale) {
+          float headPitch) {
         Minecraft.getInstance().getTextureManager().bindTexture(KNUCKLES_TEXTURE);
 
         if (!(this.model instanceof KnucklesModel)) {
@@ -68,8 +74,12 @@ public class KnucklesItem extends Item {
         knuckles.setLivingAnimations(livingEntity, limbSwing, limbSwingAmount, partialTicks);
         knuckles.func_225597_a_(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
             headPitch);
-        knuckles.render(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch,
-            scale);
+        IVertexBuilder vertexBuilder = ItemRenderer
+            .func_229113_a_(renderTypeBuffer, knuckles.func_228282_a_(KNUCKLES_TEXTURE), false,
+                stack.hasEffect());
+        knuckles
+            .func_225598_a_(matrixStack, vertexBuilder, light, OverlayTexture.field_229196_a_, 1.0F,
+                1.0F, 1.0F, 1.0F);
       }
     });
   }

@@ -19,7 +19,12 @@
 
 package top.theillusivec4.curios.common.item;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -64,17 +69,23 @@ public class AmuletItem extends Item {
       }
 
       @Override
-      public void doRender(String identifier, LivingEntity livingEntity, float limbSwing,
-          float limbSwingAmount, float partialTicks, float ageInTicks,
-          float netHeadYaw, float headPitch, float scale) {
+      public void render(String identifier, MatrixStack matrixStack,
+          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
+          float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+          float headPitch) {
         Minecraft.getInstance().getTextureManager().bindTexture(AMULET_TEXTURE);
         ICurio.RenderHelper.rotateIfSneaking(livingEntity);
 
         if (!(this.model instanceof AmuletModel)) {
-          this.model = new AmuletModel();
+          this.model = new AmuletModel<>();
         }
-        ((AmuletModel) model).render(livingEntity, limbSwing, limbSwingAmount, ageInTicks,
-            netHeadYaw, headPitch, scale);
+        AmuletModel<?> amuletModel = (AmuletModel<?>) this.model;
+        IVertexBuilder vertexBuilder = ItemRenderer
+            .func_229113_a_(renderTypeBuffer, amuletModel.func_228282_a_(AMULET_TEXTURE), false,
+                stack.hasEffect());
+        amuletModel
+            .func_225598_a_(matrixStack, vertexBuilder, light, OverlayTexture.field_229196_a_, 1.0F,
+                1.0F, 1.0F, 1.0F);
       }
     });
   }

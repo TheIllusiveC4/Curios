@@ -19,9 +19,11 @@
 
 package top.theillusivec4.curios.client.render;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.SortedMap;
 import javax.annotation.Nonnull;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
@@ -39,18 +41,20 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
   }
 
   @Override
-  public void render(@Nonnull LivingEntity livingEntity, float limbSwing, float limbSwingAmount,
-      float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+  public void func_225628_a_(@Nonnull MatrixStack matrixStack,
+      @Nonnull IRenderTypeBuffer renderTypeBuffer, int light, @Nonnull T livingEntity,
+      float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
+      float netHeadYaw, float headPitch) {
 
     if (!CuriosConfig.CLIENT.renderCurios.get()) {
       return;
     }
-    GlStateManager.pushMatrix();
+    matrixStack.func_227860_a_();
     CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
       SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
-      if (livingEntity.shouldRenderSneaking()) {
-        GlStateManager.translatef(0.0f, 0.2f, 0.0f);
+      if (livingEntity.isCrouching()) {
+        RenderSystem.translatef(0.0f, 0.2f, 0.0f);
       }
 
       for (String id : curios.keySet()) {
@@ -62,23 +66,17 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
           if (!stack.isEmpty()) {
             CuriosAPI.getCurio(stack).ifPresent(curio -> {
               if (curio.hasRender(id, livingEntity)) {
-                GlStateManager.pushMatrix();
-                GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-                curio.doRender(id, livingEntity, limbSwing, limbSwingAmount, partialTicks,
-                    ageInTicks, netHeadYaw, headPitch, scale);
-                GlStateManager.popMatrix();
+                matrixStack.func_227860_a_();
+                RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+                curio.render(id, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing,
+                    limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+                matrixStack.func_227865_b_();
               }
             });
           }
         }
       }
     });
-    GlStateManager.popMatrix();
-  }
-
-  @Override
-  public boolean shouldCombineTextures() {
-
-    return false;
+    matrixStack.func_227865_b_();
   }
 }
