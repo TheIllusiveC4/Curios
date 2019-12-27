@@ -23,11 +23,14 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.command.arguments.ArgumentSerializer;
 import net.minecraft.command.arguments.ArgumentTypes;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -119,7 +122,7 @@ public class Curios {
 
     for (String icon : icons) {
       send(CuriosAPI.IMC.REGISTER_ICON, new Tuple<>(icon,
-          new ResourceLocation(MODID, "textures/item/empty_" + icon + "_slot.png")));
+          new ResourceLocation(MODID, "item/empty_" + icon + "_slot")));
     }
   }
 
@@ -137,6 +140,19 @@ public class Curios {
 
   @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
   public static class ClientProxy {
+
+    @SubscribeEvent
+    public static void stitchTextures(TextureStitchEvent.Pre evt) {
+
+      if (evt.getMap().func_229223_g_() == PlayerContainer.field_226615_c_) {
+        String[] icons = new String[]{"charm", "necklace", "belt", "head", "back", "body", "hands",
+            "ring"};
+
+        for (String icon : icons) {
+          evt.addSprite(new ResourceLocation(MODID, "item/empty_" + icon + "_slot"));
+        }
+      }
+    }
 
     @SubscribeEvent
     public static void setupClient(FMLClientSetupEvent evt) {

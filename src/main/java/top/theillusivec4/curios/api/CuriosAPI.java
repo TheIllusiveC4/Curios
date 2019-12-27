@@ -47,7 +47,7 @@ public final class CuriosAPI {
    */
   public static final String MODID = "curios";
   private static final ResourceLocation GENERIC_SLOT = new ResourceLocation(MODID,
-      "textures/item" + "/empty_generic_slot.png");
+      "textures/item/empty_generic_slot.png");
   /**
    * The maps containing the CurioType and icons with identifiers as keys Try not to access these
    * directly and instead use {@link CuriosAPI#getType(String)} and {@link

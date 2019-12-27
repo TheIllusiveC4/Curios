@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.common.inventory;
 
+import com.mojang.datafixers.util.Pair;
 import java.util.Optional;
 import java.util.SortedMap;
 import javax.annotation.Nonnull;
@@ -33,6 +34,7 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.CraftingResultSlot;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ICraftingRecipe;
@@ -41,6 +43,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SSetSlotPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
@@ -57,14 +60,12 @@ import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
 
 public class CuriosContainer extends Container {
 
-  private static final String[] EMPTY_SLOT_NAMES =
-      new String[]{"minecraft:item/empty_armor_slot_boots",
-          "minecraft:item/empty_armor_slot_leggings",
-          "minecraft:item/empty_armor_slot_chestplate",
-          "minecraft:item/empty_armor_slot_helmet"};
-  private static final EquipmentSlotType[] VALID_EQUIPMENT_SLOTS =
-      new EquipmentSlotType[]{EquipmentSlotType.HEAD, EquipmentSlotType.CHEST,
-          EquipmentSlotType.LEGS, EquipmentSlotType.FEET};
+  private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[]{
+      PlayerContainer.field_226619_g_, PlayerContainer.field_226618_f_,
+      PlayerContainer.field_226617_e_, PlayerContainer.field_226616_d_};
+  private static final EquipmentSlotType[] VALID_EQUIPMENT_SLOTS = new EquipmentSlotType[]{
+      EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS,
+      EquipmentSlotType.FEET};
 
   public final LazyOptional<ICurioItemHandler> curios;
 
@@ -96,7 +97,7 @@ public class CuriosContainer extends Container {
     }
 
     for (int k = 0; k < 4; ++k) {
-      final EquipmentSlotType entityequipmentslot = VALID_EQUIPMENT_SLOTS[k];
+      final EquipmentSlotType equipmentslottype = VALID_EQUIPMENT_SLOTS[k];
       this.addSlot(new Slot(playerInventory, 36 + (3 - k), 8, 8 + k * 18) {
 
         @Override
@@ -108,21 +109,22 @@ public class CuriosContainer extends Container {
         @Override
         public boolean isItemValid(ItemStack stack) {
 
-          return stack.canEquip(entityequipmentslot, player);
+          return stack.canEquip(equipmentslottype, player);
         }
 
         @Override
         public boolean canTakeStack(PlayerEntity playerIn) {
 
           ItemStack itemstack = this.getStack();
-          return (itemstack.isEmpty() || playerIn.isCreative()
-              || !EnchantmentHelper.hasBindingCurse(itemstack)) && super.canTakeStack(playerIn);
+          return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper
+              .hasBindingCurse(itemstack)) && super.canTakeStack(playerIn);
         }
 
         @OnlyIn(Dist.CLIENT)
-        public String getSlotTexture() {
-
-          return EMPTY_SLOT_NAMES[entityequipmentslot.getIndex()];
+        @Override
+        public Pair<ResourceLocation, ResourceLocation> func_225517_c_() {
+          return Pair.of(PlayerContainer.field_226615_c_,
+              ARMOR_SLOT_TEXTURES[equipmentslottype.getIndex()]);
         }
       });
     }
@@ -139,9 +141,9 @@ public class CuriosContainer extends Container {
     }
     this.addSlot(new Slot(playerInventory, 40, 77, 62) {
       @OnlyIn(Dist.CLIENT)
-      public String getSlotTexture() {
-
-        return "minecraft:item/empty_armor_slot_shield";
+      @Override
+      public Pair<ResourceLocation, ResourceLocation> func_225517_c_() {
+        return Pair.of(PlayerContainer.field_226615_c_, PlayerContainer.field_226620_h_);
       }
     });
 
@@ -174,8 +176,8 @@ public class CuriosContainer extends Container {
       int yOffset = 12;
       int index = 0;
       this.inventorySlots.subList(46, this.inventorySlots.size()).clear();
-      NonNullList<ItemStack> inventoryItemStacks =
-          ObfuscationReflectionHelper.getPrivateValue(Container.class, this, "field_75153_a");
+      NonNullList<ItemStack> inventoryItemStacks = ObfuscationReflectionHelper
+          .getPrivateValue(Container.class, this, "field_75153_a");
 
       if (inventoryItemStacks != null) {
         inventoryItemStacks.subList(46, inventoryItemStacks.size()).clear();
@@ -199,9 +201,9 @@ public class CuriosContainer extends Container {
       }
 
       if (!this.isLocalWorld) {
-        NetworkHandler.INSTANCE.send(
-            PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
-            new SPacketScrollCurios(this.windowId, indexIn));
+        NetworkHandler.INSTANCE
+            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
+                new SPacketScrollCurios(this.windowId, indexIn));
       }
       lastScrollIndex = indexIn;
     });
@@ -222,8 +224,8 @@ public class CuriosContainer extends Container {
       }
 
       if (this.isLocalWorld) {
-        NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-            new CPacketScrollCurios(this.windowId, j));
+        NetworkHandler.INSTANCE
+            .send(PacketDistributor.SERVER.noArg(), new CPacketScrollCurios(this.windowId, j));
       }
     });
   }
@@ -240,9 +242,8 @@ public class CuriosContainer extends Container {
         return;
       }
 
-      Optional<ICraftingRecipe> recipe = server.getRecipeManager().getRecipe(IRecipeType.CRAFTING,
-          this.craftMatrix,
-          this.player.world);
+      Optional<ICraftingRecipe> recipe = server.getRecipeManager()
+          .getRecipe(IRecipeType.CRAFTING, this.craftMatrix, this.player.world);
 
       if (recipe.isPresent()) {
         ICraftingRecipe craftingRecipe = recipe.get();
@@ -321,8 +322,8 @@ public class CuriosContainer extends Container {
         if (!this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
           return ItemStack.EMPTY;
         }
-      } else if (entityequipmentslot == EquipmentSlotType.OFFHAND
-          && !(this.inventorySlots.get(45)).getHasStack()) {
+      } else if (entityequipmentslot == EquipmentSlotType.OFFHAND && !(this.inventorySlots.get(45))
+          .getHasStack()) {
 
         if (!this.mergeItemStack(itemstack1, 45, 46, false)) {
           return ItemStack.EMPTY;
