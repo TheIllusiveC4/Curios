@@ -2,7 +2,6 @@ package top.theillusivec4.curios.common.item;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -67,7 +66,6 @@ public class CrownItem extends Item {
           IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
           float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
           float headPitch) {
-        Minecraft.getInstance().getTextureManager().bindTexture(CROWN_TEXTURE);
 
         if (!(this.model instanceof CrownModel)) {
           model = new CrownModel<>();

@@ -22,11 +22,11 @@ package top.theillusivec4.curios.api.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.List;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
@@ -282,16 +282,31 @@ public interface ICurio {
   final class RenderHelper {
 
     /**
+     * Translates the rendering for the curio if the entity is sneaking.
+     *
+     * @param livingEntity The wearer of the curio
+     */
+    public static void translateIfSneaking(final MatrixStack matrixStack,
+        final LivingEntity livingEntity) {
+      if (livingEntity.isCrouching()) {
+        matrixStack.func_227861_a_(0.0f, 0.2f, 0.0f);
+      }
+    }
+
+    /**
      * Rotates the rendering for the curio if the entity is sneaking. The rotation angle is based on
      * the body of a player model when sneaking, so this is typically used for items being rendered
      * on the body.
      *
      * @param livingEntity The wearer of the curio
      */
-    public static void rotateIfSneaking(final LivingEntity livingEntity) {
+    public static void rotateIfSneaking(final MatrixStack matrixStack,
+        final LivingEntity livingEntity) {
 
       if (livingEntity.isCrouching()) {
-        RenderSystem.rotatef(90.0F / (float) Math.PI, 1.0F, 0.0F, 0.0F);
+        matrixStack
+            .func_227863_a_(Vector3f.field_229179_b_.func_229187_a_(90.0F / (float) Math.PI));
+        //        RenderSystem.rotatef(90.0F / (float) Math.PI, 1.0F, 0.0F, 0.0F);
       }
     }
 

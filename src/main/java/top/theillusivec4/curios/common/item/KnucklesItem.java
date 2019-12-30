@@ -5,7 +5,6 @@ import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import java.util.UUID;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -63,7 +62,6 @@ public class KnucklesItem extends Item {
           IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
           float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
           float headPitch) {
-        Minecraft.getInstance().getTextureManager().bindTexture(KNUCKLES_TEXTURE);
 
         if (!(this.model instanceof KnucklesModel)) {
           model = new KnucklesModel();

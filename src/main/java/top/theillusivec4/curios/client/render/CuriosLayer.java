@@ -53,10 +53,6 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
     CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
       SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
-      if (livingEntity.isCrouching()) {
-        RenderSystem.translatef(0.0f, 0.2f, 0.0f);
-      }
-
       for (String id : curios.keySet()) {
         CurioStackHandler stackHandler = curios.get(id);
 
