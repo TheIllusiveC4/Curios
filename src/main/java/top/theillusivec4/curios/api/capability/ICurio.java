@@ -306,7 +306,6 @@ public interface ICurio {
       if (livingEntity.isCrouching()) {
         matrixStack
             .func_227863_a_(Vector3f.field_229179_b_.func_229187_a_(90.0F / (float) Math.PI));
-        //        RenderSystem.rotatef(90.0F / (float) Math.PI, 1.0F, 0.0F, 0.0F);
       }
     }
 
