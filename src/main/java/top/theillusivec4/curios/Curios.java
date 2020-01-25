@@ -145,7 +145,7 @@ public class Curios {
 
       if (evt.getMap().func_229223_g_() == PlayerContainer.field_226615_c_) {
         String[] icons = new String[]{"charm", "necklace", "belt", "head", "back", "body", "hands",
-            "ring"};
+            "ring", "generic"};
 
         for (String icon : icons) {
           evt.addSprite(new ResourceLocation(MODID, "item/empty_" + icon + "_slot"));
