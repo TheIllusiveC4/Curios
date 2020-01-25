@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [1.0.6.1] - 2020.1.24
+### Added
+- Japanese localization (thanks MORIMORI0317!)
+
 ## [1.0.6] - 2019.12.03
 ### Added
 - [API] ICurio#getDropRule for specifying drop on death behavior (DEFAULT, ALWAYS_DROP, ALWAYS_KEEP, DESTROY)
