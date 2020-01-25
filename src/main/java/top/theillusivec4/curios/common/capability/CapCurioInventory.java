@@ -78,7 +78,7 @@ public class CapCurioInventory {
             ListNBT taglist1 = new ListNBT();
 
             for (String identifier : instance.getDisabled()) {
-              taglist1.add(StringNBT.func_229705_a_(identifier));
+              taglist1.add(StringNBT.valueOf(identifier));
             }
             compound.put("Disabled", taglist1);
             return compound;

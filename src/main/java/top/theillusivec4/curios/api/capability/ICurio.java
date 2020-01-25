@@ -160,10 +160,10 @@ public interface ICurio {
     if (!stack.isEmpty()) {
 
       if (!livingEntity.isSilent()) {
-        livingEntity.world.playSound(livingEntity.func_226277_ct_(), livingEntity.func_226278_cu_(),
-            livingEntity.func_226281_cx_(), SoundEvents.ENTITY_ITEM_BREAK,
-            livingEntity.getSoundCategory(), 0.8F,
-            0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
+        livingEntity.world
+            .playSound(livingEntity.getPosX(), livingEntity.getPosY(), livingEntity.getPosZ(),
+                SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(), 0.8F,
+                0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
       }
 
       for (int i = 0; i < 5; ++i) {
@@ -176,9 +176,8 @@ public interface ICurio {
             0.6D);
         vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        vec3d1 = vec3d1.add(livingEntity.func_226277_ct_(),
-            livingEntity.func_226278_cu_() + (double) livingEntity.getEyeHeight(),
-            livingEntity.func_226281_cx_());
+        vec3d1 = vec3d1.add(livingEntity.getPosX(),
+            livingEntity.getPosY() + (double) livingEntity.getEyeHeight(), livingEntity.getPosZ());
 
         livingEntity.world
             .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
@@ -289,7 +288,7 @@ public interface ICurio {
     public static void translateIfSneaking(final MatrixStack matrixStack,
         final LivingEntity livingEntity) {
       if (livingEntity.isCrouching()) {
-        matrixStack.func_227861_a_(0.0f, 0.2f, 0.0f);
+        matrixStack.translate(0.0f, 0.2f, 0.0f);
       }
     }
 
@@ -305,7 +304,7 @@ public interface ICurio {
 
       if (livingEntity.isCrouching()) {
         matrixStack
-            .func_227863_a_(Vector3f.field_229179_b_.func_229187_a_(90.0F / (float) Math.PI));
+            .rotate(Vector3f.field_229179_b_.func_229187_a_(90.0F / (float) Math.PI));
       }
     }
 
@@ -360,7 +359,7 @@ public interface ICurio {
 
           for (BipedModel<LivingEntity> model : models) {
             BipedModel<LivingEntity> bipedModel = (BipedModel<LivingEntity>) entityModel;
-            bipedModel.func_217148_a(model);
+            bipedModel.setModelAttributes(model);
           }
         }
       }

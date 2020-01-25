@@ -143,7 +143,7 @@ public class Curios {
     @SubscribeEvent
     public static void stitchTextures(TextureStitchEvent.Pre evt) {
 
-      if (evt.getMap().func_229223_g_() == PlayerContainer.field_226615_c_) {
+      if (evt.getMap().getBasePath() == PlayerContainer.LOCATION_BLOCKS_TEXTURE) {
         String[] icons = new String[]{"charm", "necklace", "belt", "head", "back", "body", "hands",
             "ring", "generic"};
 

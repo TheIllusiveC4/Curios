@@ -16,19 +16,19 @@ public class AmuletModel<T extends LivingEntity> extends EntityModel<T> {
     this.textureHeight = 16;
     this.amulet = new ModelRenderer(this, 0, 0);
     this.amulet.setRotationPoint(0.0F, 0.0F, 0.0F);
-    this.amulet.func_228301_a_(-2.0F, 2.0F, -3.0F, 4, 4, 1, 0.0F);
+    this.amulet.addBox(-2.0F, 2.0F, -3.0F, 4, 4, 1, 0.0F);
   }
 
   @Override
-  public void func_225597_a_(@Nonnull T entity, float limbSwing, float limbSwingAmount,
+  public void render(@Nonnull T entity, float limbSwing, float limbSwingAmount,
       float ageInTicks, float netHeadYaw, float netHeadPitch) {
 
   }
 
   @Override
-  public void func_225598_a_(@Nonnull MatrixStack matrixStack,
+  public void render(@Nonnull MatrixStack matrixStack,
       @Nonnull IVertexBuilder vertexBuilder, int light, int overlay, float red, float green,
       float blue, float alpha) {
-    this.amulet.func_228308_a_(matrixStack, vertexBuilder, light, overlay);
+    this.amulet.render(matrixStack, vertexBuilder, light, overlay);
   }
 }

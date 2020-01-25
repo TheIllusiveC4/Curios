@@ -70,13 +70,13 @@ public class KnucklesItem extends Item {
         KnucklesModel knuckles = (KnucklesModel) this.model;
         ICurio.RenderHelper.followBodyRotations(livingEntity, knuckles);
         knuckles.setLivingAnimations(livingEntity, limbSwing, limbSwingAmount, partialTicks);
-        knuckles.func_225597_a_(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
+        knuckles.render(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
             headPitch);
         IVertexBuilder vertexBuilder = ItemRenderer
             .func_229113_a_(renderTypeBuffer, knuckles.func_228282_a_(KNUCKLES_TEXTURE), false,
                 stack.hasEffect());
         knuckles
-            .func_225598_a_(matrixStack, vertexBuilder, light, OverlayTexture.field_229196_a_, 1.0F,
+            .render(matrixStack, vertexBuilder, light, OverlayTexture.DEFAULT_LIGHT, 1.0F,
                 1.0F, 1.0F, 1.0F);
       }
     });

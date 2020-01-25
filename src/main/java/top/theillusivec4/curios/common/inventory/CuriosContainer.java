@@ -61,8 +61,8 @@ import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
 public class CuriosContainer extends Container {
 
   private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[]{
-      PlayerContainer.field_226619_g_, PlayerContainer.field_226618_f_,
-      PlayerContainer.field_226617_e_, PlayerContainer.field_226616_d_};
+      PlayerContainer.EMPTY_ARMOR_SLOT_BOOTS, PlayerContainer.EMPTY_ARMOR_SLOT_LEGGINGS,
+      PlayerContainer.EMPTY_ARMOR_SLOT_CHESTPLATE, PlayerContainer.EMPTY_ARMOR_SLOT_HELMET};
   private static final EquipmentSlotType[] VALID_EQUIPMENT_SLOTS = new EquipmentSlotType[]{
       EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS,
       EquipmentSlotType.FEET};
@@ -123,7 +123,7 @@ public class CuriosContainer extends Container {
         @OnlyIn(Dist.CLIENT)
         @Override
         public Pair<ResourceLocation, ResourceLocation> func_225517_c_() {
-          return Pair.of(PlayerContainer.field_226615_c_,
+          return Pair.of(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
               ARMOR_SLOT_TEXTURES[equipmentslottype.getIndex()]);
         }
       });
@@ -143,7 +143,8 @@ public class CuriosContainer extends Container {
       @OnlyIn(Dist.CLIENT)
       @Override
       public Pair<ResourceLocation, ResourceLocation> func_225517_c_() {
-        return Pair.of(PlayerContainer.field_226615_c_, PlayerContainer.field_226620_h_);
+        return Pair
+            .of(PlayerContainer.LOCATION_BLOCKS_TEXTURE, PlayerContainer.EMPTY_ARMOR_SLOT_SHIELD);
       }
     });
 

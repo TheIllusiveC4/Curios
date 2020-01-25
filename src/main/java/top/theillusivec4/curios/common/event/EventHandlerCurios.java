@@ -229,10 +229,10 @@ public class EventHandlerCurios {
   }
 
   private ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
-    double d0 = livingEntity.func_226278_cu_() - 0.30000001192092896D + (double) livingEntity
+    double d0 = livingEntity.getPosY() - 0.30000001192092896D + (double) livingEntity
         .getEyeHeight();
-    ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.func_226277_ct_(), d0,
-        livingEntity.func_226281_cx_(), droppedItem);
+    ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.getPosX(), d0,
+        livingEntity.getPosZ(), droppedItem);
     entityitem.setPickupDelay(40);
     float f = livingEntity.world.rand.nextFloat() * 0.5F;
     float f1 = livingEntity.world.rand.nextFloat() * ((float) Math.PI * 2F);

@@ -83,7 +83,7 @@ public class AmuletItem extends Item {
             .func_229113_a_(renderTypeBuffer, amuletModel.func_228282_a_(AMULET_TEXTURE), false,
                 stack.hasEffect());
         amuletModel
-            .func_225598_a_(matrixStack, vertexBuilder, light, OverlayTexture.field_229196_a_, 1.0F,
+            .render(matrixStack, vertexBuilder, light, OverlayTexture.DEFAULT_LIGHT, 1.0F,
                 1.0F, 1.0F, 1.0F);
       }
     });

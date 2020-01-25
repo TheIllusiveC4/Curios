@@ -21,6 +21,7 @@ package top.theillusivec4.curios.api.inventory;
 
 import java.util.Set;
 import javax.annotation.Nonnull;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,7 +42,7 @@ public class SlotCurio extends SlotItemHandler {
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;
     this.player = player;
-    setBackground(PlayerContainer.field_226615_c_, CuriosAPI.getIcon(identifier));
+    setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE, CuriosAPI.getIcon(identifier));
   }
 
   @OnlyIn(Dist.CLIENT)

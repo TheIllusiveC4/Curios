@@ -49,7 +49,7 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
     if (!CuriosConfig.CLIENT.renderCurios.get()) {
       return;
     }
-    matrixStack.func_227860_a_();
+    matrixStack.push();
     CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
       SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
 
@@ -62,17 +62,17 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
           if (!stack.isEmpty()) {
             CuriosAPI.getCurio(stack).ifPresent(curio -> {
               if (curio.hasRender(id, livingEntity)) {
-                matrixStack.func_227860_a_();
+                matrixStack.push();
                 RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
                 curio.render(id, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing,
                     limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
-                matrixStack.func_227865_b_();
+                matrixStack.pop();
               }
             });
           }
         }
       }
     });
-    matrixStack.func_227865_b_();
+    matrixStack.pop();
   }
 }

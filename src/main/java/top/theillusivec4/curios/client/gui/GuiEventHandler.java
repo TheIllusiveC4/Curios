@@ -75,7 +75,7 @@ public class GuiEventHandler {
 
   @SubscribeEvent
   public void onMouseClick(GuiScreenEvent.MouseClickedEvent.Pre evt) {
-    long handle = Minecraft.getInstance().func_228018_at_().getHandle();
+    long handle = Minecraft.getInstance().getMainWindow().getHandle();
     boolean isLeftShiftDown = InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT);
     boolean isRightShiftDown = InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);
     boolean isShiftDown = isLeftShiftDown || isRightShiftDown;
