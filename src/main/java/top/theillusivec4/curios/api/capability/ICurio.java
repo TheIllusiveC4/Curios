@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019  C4
+ * Copyright (c) 2018-2020 C4
  *
  * This file is part of Curios, a mod made for Minecraft.
  *
