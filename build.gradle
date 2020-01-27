@@ -55,22 +55,22 @@ minecraft {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
-//    compileOnly fg.deobf("mezz.jei:jei-${version_mc}:${version_jei}:api")
-//    runtimeOnly fg.deobf("mezz.jei:jei-${version_mc}:${version_jei}")
+    compileOnly fg.deobf("mezz.jei:jei-${version_mc}:${version_jei}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-${version_mc}:${version_jei}")
 }
 
-//repositories {
-//    maven {
-//        // location of the maven that hosts JEI files
-//        name = "Progwml6 maven"
-//        url = "https://dvs1.progwml6.com/files/maven/"
-//    }
-//    maven {
-//        // location of a maven mirror for JEI files, as a fallback
-//        name = "ModMaven"
-//        url = "https://modmaven.k-4u.nl"
-//    }
-//}
+repositories {
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.k-4u.nl"
+    }
+}
 
 sourceSets {
     main {
