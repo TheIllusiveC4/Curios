@@ -39,7 +39,7 @@ public class AmuletModel<T extends LivingEntity> extends EntityModel<T> {
   }
 
   @Override
-  public void render(@Nonnull T entity, float limbSwing, float limbSwingAmount,
+  public void setRotationAngles(@Nonnull T entity, float limbSwing, float limbSwingAmount,
       float ageInTicks, float netHeadYaw, float netHeadPitch) {
 
   }

@@ -80,10 +80,10 @@ public class AmuletItem extends Item {
         }
         AmuletModel<?> amuletModel = (AmuletModel<?>) this.model;
         IVertexBuilder vertexBuilder = ItemRenderer
-            .func_229113_a_(renderTypeBuffer, amuletModel.func_228282_a_(AMULET_TEXTURE), false,
+            .getBuffer(renderTypeBuffer, amuletModel.getRenderType(AMULET_TEXTURE), false,
                 stack.hasEffect());
         amuletModel
-            .render(matrixStack, vertexBuilder, light, OverlayTexture.DEFAULT_LIGHT, 1.0F,
+            .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F,
                 1.0F, 1.0F, 1.0F);
       }
     });

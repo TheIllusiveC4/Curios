@@ -41,7 +41,7 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
   }
 
   @Override
-  public void func_225628_a_(@Nonnull MatrixStack matrixStack,
+  public void render(@Nonnull MatrixStack matrixStack,
       @Nonnull IRenderTypeBuffer renderTypeBuffer, int light, @Nonnull T livingEntity,
       float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
       float netHeadYaw, float headPitch) {

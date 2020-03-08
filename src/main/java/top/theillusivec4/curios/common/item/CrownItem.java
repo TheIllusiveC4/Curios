@@ -92,10 +92,10 @@ public class CrownItem extends Item {
         CrownModel<?> crown = (CrownModel<?>) this.model;
         ICurio.RenderHelper.followHeadRotations(livingEntity, crown.crown);
         IVertexBuilder vertexBuilder = ItemRenderer
-            .func_229113_a_(renderTypeBuffer, crown.func_228282_a_(CROWN_TEXTURE), false,
+            .getBuffer(renderTypeBuffer, crown.getRenderType(CROWN_TEXTURE), false,
                 stack.hasEffect());
         crown
-            .render(matrixStack, vertexBuilder, light, OverlayTexture.DEFAULT_LIGHT, 1.0F,
+            .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F,
                 1.0F, 1.0F, 1.0F);
       }
     });
