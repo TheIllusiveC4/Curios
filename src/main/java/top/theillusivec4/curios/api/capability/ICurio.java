@@ -47,13 +47,24 @@ import top.theillusivec4.curios.api.CurioType;
 public interface ICurio {
 
   /**
-   * Called every tick while the ItemStack is equipped.
+   * Called every tick on both client and server while the ItemStack is equipped.
    *
    * @param identifier   The {@link CurioType} identifier of the ItemStack's slot
    * @param index        The index of the ItemStack's slot
    * @param livingEntity The wearer of the ItemStack
    */
   default void onCurioTick(String identifier, int index, LivingEntity livingEntity) {
+
+  }
+
+  /**
+   * Called every tick client-side only while the ItemStack is equipped
+   *
+   * @param identifier   The {@link CurioType} identifier of the ItemStack's slot
+   * @param index        The index of the ItemStack's slot
+   * @param livingEntity The wearer of the ItemStack
+   */
+  default void onCurioAnimate(String identifier, int index, LivingEntity livingEntity) {
 
   }
 

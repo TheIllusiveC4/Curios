@@ -305,7 +305,13 @@ public class EventHandlerCurios {
           stack.inventoryTick(entitylivingbase.world, entitylivingbase, -1, false);
           LazyOptional<ICurio> currentCurio = CuriosAPI.getCurio(stack);
           final int index = i;
-          currentCurio.ifPresent(curio -> curio.onCurioTick(identifier, index, entitylivingbase));
+          currentCurio.ifPresent(curio -> {
+            curio.onCurioTick(identifier, index, entitylivingbase);
+
+            if (entitylivingbase.world.isRemote) {
+              curio.onCurioAnimate(identifier, index, entitylivingbase);
+            }
+          });
 
           if (!entitylivingbase.world.isRemote) {
             ItemStack prevStack = stackHandler.getPreviousStackInSlot(i);
