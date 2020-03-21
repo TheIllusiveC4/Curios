@@ -62,6 +62,7 @@ import top.theillusivec4.curios.api.event.LivingCurioChangeEvent;
 import top.theillusivec4.curios.api.event.LivingCurioDropRulesEvent;
 import top.theillusivec4.curios.api.event.LivingCurioDropsEvent;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.common.CurioUtils;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContents;
@@ -126,8 +127,9 @@ public class EventHandlerCurios {
       oldCurios.getCurioMap().forEach((identifier, stackHandler) -> {
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
+          player.getAttributes()
+              .applyAttributeModifiers(CurioUtils.getAttributeModifiers(identifier, stack));
           CuriosAPI.getCurio(stack).ifPresent(curio -> {
-            player.getAttributes().applyAttributeModifiers(curio.getAttributeModifiers(identifier));
             curio.onEquipped(identifier, player);
           });
         }
@@ -230,8 +232,8 @@ public class EventHandlerCurios {
   }
 
   private ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
-    double d0 = livingEntity.getPosY() - 0.30000001192092896D + (double) livingEntity
-        .getEyeHeight();
+    double d0 =
+        livingEntity.getPosY() - 0.30000001192092896D + (double) livingEntity.getEyeHeight();
     ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.getPosX(), d0,
         livingEntity.getPosZ(), droppedItem);
     entityitem.setPickupDelay(40);
@@ -349,18 +351,16 @@ public class EventHandlerCurios {
                   new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
 
               boolean changeEquipped = !ItemStack.areItemsEqualIgnoreDurability(prevStack, stack);
+              entitylivingbase.getAttributes().removeAttributeModifiers(
+                  CurioUtils.getAttributeModifiers(identifier, prevStack));
               prevCurio.ifPresent(curio -> {
-                entitylivingbase.getAttributes()
-                    .removeAttributeModifiers(curio.getAttributeModifiers(identifier));
-
                 if (changeEquipped) {
                   curio.onUnequipped(identifier, entitylivingbase);
                 }
               });
+              entitylivingbase.getAttributes()
+                  .applyAttributeModifiers(CurioUtils.getAttributeModifiers(identifier, stack));
               currentCurio.ifPresent(curio -> {
-                entitylivingbase.getAttributes()
-                    .applyAttributeModifiers(curio.getAttributeModifiers(identifier));
-
                 if (changeEquipped) {
                   curio.onEquipped(identifier, entitylivingbase);
                 }

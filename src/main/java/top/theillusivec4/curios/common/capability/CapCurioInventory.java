@@ -51,6 +51,7 @@ import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.common.CurioUtils;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActive;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncSize;
@@ -59,8 +60,8 @@ public class CapCurioInventory {
 
   public static void register() {
 
-    CapabilityManager.INSTANCE.register(ICurioItemHandler.class,
-        new Capability.IStorage<ICurioItemHandler>() {
+    CapabilityManager.INSTANCE
+        .register(ICurioItemHandler.class, new Capability.IStorage<ICurioItemHandler>() {
           @Override
           public INBT writeNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance,
               Direction side) {
@@ -85,9 +86,8 @@ public class CapCurioInventory {
           }
 
           @Override
-          public void readNBT(
-              Capability<ICurioItemHandler> capability, ICurioItemHandler instance, Direction side,
-              INBT nbt) {
+          public void readNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance,
+              Direction side, INBT nbt) {
             ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
             ListNBT tagList1 = ((CompoundNBT) nbt).getList("Disabled", Constants.NBT.TAG_STRING);
             Set<String> disabled = Sets.newHashSet();
@@ -241,9 +241,9 @@ public class CapCurioInventory {
         this.disabled.remove(identifier);
 
         if (!wearer.world.isRemote && wearer instanceof ServerPlayerEntity) {
-          NetworkHandler.INSTANCE.send(
-              PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
-              new SPacketSyncActive(wearer.getEntityId(), identifier, false));
+          NetworkHandler.INSTANCE
+              .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
+                  new SPacketSyncActive(wearer.getEntityId(), identifier, false));
         }
       });
     }
@@ -259,9 +259,9 @@ public class CapCurioInventory {
         this.disabled.add(identifier);
 
         if (wearer instanceof ServerPlayerEntity) {
-          NetworkHandler.INSTANCE.send(
-              PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
-              new SPacketSyncActive(wearer.getEntityId(), identifier, true));
+          NetworkHandler.INSTANCE
+              .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
+                  new SPacketSyncActive(wearer.getEntityId(), identifier, true));
         }
       }
     }
@@ -276,10 +276,10 @@ public class CapCurioInventory {
           stackHandler.addSize(amount);
 
           if (wearer instanceof ServerPlayerEntity) {
-            NetworkHandler.INSTANCE.sendTo(
-                new SPacketSyncSize(wearer.getEntityId(), identifier, amount, false),
-                ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
-                NetworkDirection.PLAY_TO_CLIENT);
+            NetworkHandler.INSTANCE
+                .sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount, false),
+                    ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
+                    NetworkDirection.PLAY_TO_CLIENT);
           }
         }
       }
@@ -296,10 +296,10 @@ public class CapCurioInventory {
           dropOrGiveLast(stackHandler, identifier, amount);
 
           if (wearer instanceof ServerPlayerEntity) {
-            NetworkHandler.INSTANCE.sendTo(
-                new SPacketSyncSize(wearer.getEntityId(), identifier, amount, true),
-                ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
-                NetworkDirection.PLAY_TO_CLIENT);
+            NetworkHandler.INSTANCE
+                .sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount, true),
+                    ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
+                    NetworkDirection.PLAY_TO_CLIENT);
           }
           stackHandler.removeSize(amount);
         }
@@ -348,12 +348,10 @@ public class CapCurioInventory {
         for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
           drops.add(stackHandler.getStackInSlot(i));
-          CuriosAPI.getCurio(stack).ifPresent(curio -> {
-            if (!stack.isEmpty()) {
-              wearer.getAttributes()
-                  .removeAttributeModifiers(curio.getAttributeModifiers(identifier));
-            }
-          });
+          if (!stack.isEmpty()) {
+            wearer.getAttributes()
+                .removeAttributeModifiers(CurioUtils.getAttributeModifiers(identifier, stack));
+          }
           stackHandler.setStackInSlot(i, ItemStack.EMPTY);
         }
         dropOrGive(drops);

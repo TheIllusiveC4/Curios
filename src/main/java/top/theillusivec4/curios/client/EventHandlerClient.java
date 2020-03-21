@@ -44,6 +44,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.common.CurioUtils;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
@@ -116,73 +117,70 @@ public class EventHandlerClient {
           tooltip.addAll(1, tagTooltips);
         }
 
-        final int hideFlags = i;
-        CuriosAPI.getCurio(stack).ifPresent(curio -> {
+        for (String identifier : slots) {
+          Multimap<String, AttributeModifier> multimap = CurioUtils
+              .getAttributeModifiers(identifier, stack);
 
-          for (String identifier : slots) {
-            Multimap<String, AttributeModifier> multimap = curio.getAttributeModifiers(identifier);
+          if (!multimap.isEmpty() && (i & 2) == 0) {
+            PlayerEntity player = evt.getPlayer();
+            tooltip.add(new StringTextComponent(""));
+            tooltip.add(new TranslationTextComponent("curios.modifiers." + identifier)
+                .applyTextStyle(TextFormatting.GOLD));
 
-            if (!multimap.isEmpty() && (hideFlags & 2) == 0) {
-              PlayerEntity player = evt.getPlayer();
-              tooltip.add(new StringTextComponent(""));
-              tooltip.add(new TranslationTextComponent("curios.modifiers." + identifier)
-                  .applyTextStyle(TextFormatting.GOLD));
+            for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
+              AttributeModifier attributemodifier = entry.getValue();
+              double amount = attributemodifier.getAmount();
+              boolean flag = false;
 
-              for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
-                AttributeModifier attributemodifier = entry.getValue();
-                double amount = attributemodifier.getAmount();
-                boolean flag = false;
+              if (player != null) {
 
-                if (player != null) {
+                if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
+                  amount = amount + player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
+                      .getBaseValue();
+                  amount = amount + (double) EnchantmentHelper
+                      .getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
+                  flag = true;
+                } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
+                  amount += player.getAttribute(SharedMonsterAttributes.ATTACK_SPEED)
+                      .getBaseValue();
+                  flag = true;
+                }
 
-                  if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
-                    amount = amount + player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
-                        .getBaseValue();
-                    amount = amount + (double) EnchantmentHelper
-                        .getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
-                    flag = true;
-                  } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
-                    amount += player.getAttribute(SharedMonsterAttributes.ATTACK_SPEED)
-                        .getBaseValue();
-                    flag = true;
-                  }
+                double d1;
 
-                  double d1;
+                if (attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_BASE
+                    && attributemodifier.getOperation()
+                    != AttributeModifier.Operation.MULTIPLY_TOTAL) {
+                  d1 = amount;
+                } else {
+                  d1 = amount * 100.0D;
+                }
 
-                  if (attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_BASE
-                      && attributemodifier.getOperation()
-                      != AttributeModifier.Operation.MULTIPLY_TOTAL) {
-                    d1 = amount;
-                  } else {
-                    d1 = amount * 100.0D;
-                  }
-
-                  if (flag) {
-                    tooltip.add((new StringTextComponent(" ")).appendSibling(
-                        new TranslationTextComponent(
-                            "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
-                            DECIMALFORMAT.format(d1),
-                            new TranslationTextComponent("attribute.name." + entry.getKey())))
-                        .applyTextStyle(TextFormatting.DARK_GREEN));
-                  } else if (amount > 0.0D) {
-                    tooltip.add((new TranslationTextComponent(
-                        "attribute.modifier.plus." + attributemodifier.getOperation().getId(),
-                        DECIMALFORMAT.format(d1),
-                        new TranslationTextComponent("attribute.name." + entry.getKey())))
-                        .applyTextStyle(TextFormatting.BLUE));
-                  } else if (amount < 0.0D) {
-                    d1 = d1 * -1.0D;
-                    tooltip.add((new TranslationTextComponent(
-                        "attribute.modifier.take." + attributemodifier.getOperation().getId(),
-                        DECIMALFORMAT.format(d1),
-                        new TranslationTextComponent("attribute.name." + entry.getKey())))
-                        .applyTextStyle(TextFormatting.RED));
-                  }
+                if (flag) {
+                  tooltip.add((new StringTextComponent(" ")).appendSibling(
+                      new TranslationTextComponent(
+                          "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
+                          DECIMALFORMAT.format(d1),
+                          new TranslationTextComponent("attribute.name." + entry.getKey())))
+                      .applyTextStyle(TextFormatting.DARK_GREEN));
+                } else if (amount > 0.0D) {
+                  tooltip.add((new TranslationTextComponent(
+                      "attribute.modifier.plus." + attributemodifier.getOperation().getId(),
+                      DECIMALFORMAT.format(d1),
+                      new TranslationTextComponent("attribute.name." + entry.getKey())))
+                      .applyTextStyle(TextFormatting.BLUE));
+                } else if (amount < 0.0D) {
+                  d1 = d1 * -1.0D;
+                  tooltip.add((new TranslationTextComponent(
+                      "attribute.modifier.take." + attributemodifier.getOperation().getId(),
+                      DECIMALFORMAT.format(d1),
+                      new TranslationTextComponent("attribute.name." + entry.getKey())))
+                      .applyTextStyle(TextFormatting.RED));
                 }
               }
             }
           }
-        });
+        }
       }
     }
   }
