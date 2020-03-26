@@ -1,5 +1,5 @@
 {
-  "curios.name": "珍宝",
+  "curios.name": "饰品",
   "curios.slot": "插槽",
   "commands.curios.set.success": "类型%s的%d插槽已设置为到%s中",
   "commands.curios.add.success": "类型%s的%d插槽已添加到%s中",
@@ -14,7 +14,7 @@
   "item.curios.ring": "奇异戒指",
   "item.curios.crown": "奇异之冠",
   "item.curios.knuckles": "奇异手指",
-  "curios.identifier.curio": "珍宝",
+  "curios.identifier.curio": "饰品",
   "curios.identifier.necklace": "项链",
   "curios.identifier.ring": "戒指",
   "curios.identifier.head": "头部",
@@ -23,7 +23,7 @@
   "curios.identifier.body": "胸部",
   "curios.identifier.charm": "护符",
   "curios.identifier.hands": "手部",
-  "curios.modifiers.curio": "当佩戴珍宝时:",
+  "curios.modifiers.curio": "当佩戴饰品时:",
   "curios.modifiers.necklace": "当佩戴脖子时:",
   "curios.modifiers.ring": "当佩戴戒指时:",
   "curios.modifiers.head": "当佩戴头部时:",
@@ -32,6 +32,6 @@
   "curios.modifiers.body": "当佩戴胸部时:",
   "curios.modifiers.charm": "当佩戴护符时:",
   "curios.modifiers.hands": "当佩戴手部时:",
-  "key.curios.category": "珍宝",
-  "key.curios.open.desc": "打开/关闭珍宝清单"
+  "key.curios.category": "饰品",
+  "key.curios.open.desc": "打开/关闭饰品栏"
 }
