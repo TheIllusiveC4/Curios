@@ -19,10 +19,13 @@
 
 package top.theillusivec4.curios.common.inventory;
 
+import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
+import java.util.List;
 import java.util.Optional;
 import java.util.SortedMap;
 import javax.annotation.Nonnull;
+import net.minecraft.client.util.RecipeBookCategories;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,10 +38,13 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.CraftingResultSlot;
 import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.inventory.container.RecipeBookContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ICraftingRecipe;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SSetSlotPacket;
 import net.minecraft.server.MinecraftServer;
@@ -58,7 +64,7 @@ import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
 import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
 
-public class CuriosContainer extends Container {
+public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
   private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[]{
       PlayerContainer.EMPTY_ARMOR_SLOT_BOOTS, PlayerContainer.EMPTY_ARMOR_SLOT_LEGGINGS,
@@ -358,5 +364,49 @@ public class CuriosContainer extends Container {
     }
 
     return itemstack;
+  }
+
+  @Nonnull
+  @Override
+  public List<RecipeBookCategories> getRecipeBookCategories() {
+    return Lists.newArrayList(RecipeBookCategories.SEARCH, RecipeBookCategories.EQUIPMENT,
+        RecipeBookCategories.BUILDING_BLOCKS, RecipeBookCategories.MISC,
+        RecipeBookCategories.REDSTONE);
+  }
+
+  @Override
+  public void fillStackedContents(@Nonnull RecipeItemHelper itemHelperIn) {
+    this.craftMatrix.fillStackedContents(itemHelperIn);
+  }
+
+  @Override
+  public void clear() {
+    this.craftMatrix.clear();
+    this.craftResult.clear();
+  }
+
+  @Override
+  public boolean matches(IRecipe<? super CraftingInventory> recipeIn) {
+    return recipeIn.matches(this.craftMatrix, this.player.world);
+  }
+
+  @Override
+  public int getOutputSlot() {
+    return 0;
+  }
+
+  @Override
+  public int getWidth() {
+    return this.craftMatrix.getWidth();
+  }
+
+  @Override
+  public int getHeight() {
+    return this.craftMatrix.getHeight();
+  }
+
+  @Override
+  public int getSize() {
+    return 5;
   }
 }

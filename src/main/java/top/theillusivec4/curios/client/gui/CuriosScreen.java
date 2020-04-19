@@ -20,7 +20,9 @@
 package top.theillusivec4.curios.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
+import javax.annotation.Nonnull;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
@@ -28,14 +30,12 @@ import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
@@ -45,10 +45,8 @@ import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosConfig.Client;
 import top.theillusivec4.curios.common.CuriosConfig.Client.ButtonCorner;
 import top.theillusivec4.curios.common.inventory.CuriosContainer;
-import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 
-public class CuriosScreen extends ContainerScreen<CuriosContainer> {
+public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IRecipeShownListener {
 
   static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID,
       "textures/gui/inventory.png");
@@ -58,7 +56,12 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
   private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
       "textures/gui/container/creative_inventory/tabs.png");
 
-  private boolean widthTooNarrow;
+  private final RecipeBookGui recipeBookGui = new RecipeBookGui();
+
+  public boolean hasScrollBar;
+  public boolean widthTooNarrow;
+
+  private GuiButtonCurios buttonCurios;
   private float currentScroll;
   private boolean isScrolling;
   private boolean buttonClicked;
@@ -72,44 +75,53 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
   @Override
   public void init() {
     super.init();
-    this.widthTooNarrow = this.width < 379;
-    this.guiLeft = (this.width - this.xSize) / 2;
-    Tuple<Integer, Integer> offsets = getButtonOffset(false);
-    this.addButton(new GuiButtonCurios(this, this.getGuiLeft() + offsets.getA(),
-        this.height / 2 + offsets.getB(), 14, 14, 50, 0, 14, CURIO_INVENTORY));
 
-    if (!this.playerInventory.player.isCreative() && this.minecraft != null) {
-      this.addButton(new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19,
-          RECIPE_BUTTON_TEXTURE, (button) -> {
-        Minecraft mc = this.minecraft;
-        InventoryScreen inventory = new InventoryScreen(mc.player);
-        ItemStack stack = mc.player.inventory.getItemStack();
-        mc.player.inventory.setItemStack(ItemStack.EMPTY);
-        mc.displayGuiScreen(inventory);
-        RecipeBookGui recipeBookGui = inventory.getRecipeGui();
+    if (this.minecraft != null) {
 
-        if (!recipeBookGui.isVisible()) {
-          recipeBookGui.initSearchBar(inventory.width < 379);
-          recipeBookGui.toggleVisibility();
-          ObfuscationReflectionHelper.setPrivateValue(ContainerScreen.class, inventory,
-              recipeBookGui.updateScreenPosition(inventory.width < 379, inventory.width,
-                  inventory.getXSize()), "field_147003_i");
-          inventory.children().forEach((listener) -> {
-            if (listener instanceof ImageButton) {
-              ImageButton imgButton = (ImageButton) listener;
-              ResourceLocation resourceLocation = ObfuscationReflectionHelper
-                  .getPrivateValue(ImageButton.class, imgButton, "field_191750_o");
+      if (this.minecraft.player != null) {
+        hasScrollBar = CuriosAPI.getCuriosHandler(this.minecraft.player)
+            .map(handler -> handler.getSlots() > 8).orElse(false);
+      }
+      this.widthTooNarrow = this.width < (hasScrollBar ? 461 : 491);
+      this.recipeBookGui
+          .init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.container);
+      this.updateScreenPosition();
+      this.children.add(this.recipeBookGui);
+      this.setFocusedDefault(this.recipeBookGui);
+      Tuple<Integer, Integer> offsets = getButtonOffset(false);
+      this.buttonCurios = new GuiButtonCurios(this, this.getGuiLeft() + offsets.getA(),
+          this.height / 2 + offsets.getB(), 14, 14, 50, 0, 14, CURIO_INVENTORY);
+      this.addButton(this.buttonCurios);
 
-              if (resourceLocation != null && resourceLocation.equals(RECIPE_BUTTON_TEXTURE)) {
-                imgButton.setPosition(inventory.getGuiLeft() + 104, inventory.height / 2 - 22);
-              }
-            }
-          });
-        }
-        mc.player.inventory.setItemStack(stack);
-        NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla());
-      }));
+      if (!this.playerInventory.player.isCreative()) {
+        this.addButton(new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19,
+            RECIPE_BUTTON_TEXTURE, (button) -> {
+          this.recipeBookGui.initSearchBar(this.widthTooNarrow);
+          this.recipeBookGui.toggleVisibility();
+          this.updateScreenPosition();
+          ((ImageButton) button).setPosition(this.guiLeft + 104, this.height / 2 - 22);
+          this.buttonCurios
+              .setPosition(this.guiLeft + offsets.getA(), this.height / 2 + offsets.getB());
+        }));
+      }
     }
+  }
+
+  private void updateScreenPosition() {
+    int i;
+
+    if (this.recipeBookGui.isVisible() && !this.widthTooNarrow) {
+      i = 177 + (this.width - this.xSize - (hasScrollBar ? 118 : 148)) / 2;
+    } else {
+      i = (this.width - this.xSize) / 2;
+    }
+    this.guiLeft = i;
+  }
+
+  @Override
+  public void tick() {
+    super.tick();
+    this.recipeBookGui.tick();
   }
 
   public static Tuple<Integer, Integer> getButtonOffset(boolean isCreative) {
@@ -142,16 +154,32 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
   @Override
   public void render(int mouseX, int mouseY, float partialTicks) {
     this.renderBackground();
-    super.render(mouseX, mouseY, partialTicks);
+
+    if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
+      this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
+      this.recipeBookGui.render(mouseX, mouseY, partialTicks);
+    } else {
+      this.recipeBookGui.render(mouseX, mouseY, partialTicks);
+      super.render(mouseX, mouseY, partialTicks);
+      this.recipeBookGui.renderGhostRecipe(this.guiLeft, this.guiTop, true, partialTicks);
+    }
     this.renderHoveredToolTip(mouseX, mouseY);
   }
 
   @Override
   public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
 
-    if (KeyRegistry.openCurios
+    if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
+      this.recipeBookGui.toggleVisibility();
+      this.updateScreenPosition();
+      return true;
+    } else if (KeyRegistry.openCurios
         .isActiveAndMatches(InputMappings.getInputByCode(p_keyPressed_1_, p_keyPressed_2_))) {
-      this.getMinecraft().player.closeScreen();
+      ClientPlayerEntity playerEntity = this.getMinecraft().player;
+
+      if (playerEntity != null) {
+        playerEntity.closeScreen();
+      }
       return true;
     } else {
       return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
@@ -214,7 +242,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
   @Override
   protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight,
       double pointX, double pointY) {
-    return !this.widthTooNarrow && super
+    return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super
         .isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
   }
 
@@ -224,11 +252,14 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 
-    if (this.inScrollBar(mouseX, mouseY)) {
+    if (this.recipeBookGui.mouseClicked(mouseX, mouseY, mouseButton)) {
+      return true;
+    } else if (this.inScrollBar(mouseX, mouseY)) {
       this.isScrolling = this.needsScrollBars();
       return true;
     }
-    return !this.widthTooNarrow && super.mouseClicked(mouseX, mouseY, mouseButton);
+    return this.widthTooNarrow && this.recipeBookGui.isVisible() || super
+        .mouseClicked(mouseX, mouseY, mouseButton);
   }
 
   @Override
@@ -280,5 +311,38 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> {
 
   private boolean needsScrollBars() {
     return this.container.canScroll();
+  }
+
+  protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn,
+      int mouseButton) {
+    boolean flag =
+        mouseX < (double) guiLeftIn || mouseY < (double) guiTopIn || mouseX >= (double) (guiLeftIn
+            + this.xSize) || mouseY >= (double) (guiTopIn + this.ySize);
+    return this.recipeBookGui
+        .func_195604_a(mouseX, mouseY, this.guiLeft, this.guiTop, this.xSize, this.ySize,
+            mouseButton) && flag;
+  }
+
+  @Override
+  protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type) {
+    super.handleMouseClick(slotIn, slotId, mouseButton, type);
+    this.recipeBookGui.slotClicked(slotIn);
+  }
+
+  @Override
+  public void recipesUpdated() {
+    this.recipeBookGui.recipesUpdated();
+  }
+
+  @Override
+  public void removed() {
+    this.recipeBookGui.removed();
+    super.removed();
+  }
+
+  @Nonnull
+  @Override
+  public RecipeBookGui getRecipeGui() {
+    return this.recipeBookGui;
   }
 }
