@@ -56,13 +56,14 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
       "textures/gui/container/creative_inventory/tabs.png");
 
+  private static float currentScroll;
+
   private final RecipeBookGui recipeBookGui = new RecipeBookGui();
 
   public boolean hasScrollBar;
   public boolean widthTooNarrow;
 
   private GuiButtonCurios buttonCurios;
-  private float currentScroll;
   private boolean isScrolling;
   private boolean buttonClicked;
 
@@ -81,6 +82,10 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       if (this.minecraft.player != null) {
         hasScrollBar = CuriosAPI.getCuriosHandler(this.minecraft.player)
             .map(handler -> handler.getSlots() > 8).orElse(false);
+
+        if (hasScrollBar) {
+          this.container.scrollTo(currentScroll);
+        }
       }
       this.widthTooNarrow = this.width < (hasScrollBar ? 461 : 491);
       this.recipeBookGui
@@ -229,7 +234,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
         } else {
           this.blit(i - 42, j + 4, 27, 0, 23, 158);
           this.getMinecraft().getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
-          this.blit(i - 34, j + 12 + (int) (127f * this.currentScroll), 232, 0, 12, 15);
+          this.blit(i - 34, j + 12 + (int) (127f * currentScroll), 232, 0, 12, 15);
         }
       });
     }
@@ -282,11 +287,11 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       double pMouseDragged6, double pMouseDragged8) {
 
     if (this.isScrolling) {
-      int i = this.guiTop + 18;
-      int j = i + 112;
-      this.currentScroll = ((float) pMouseDragged3 - (float) i - 7.5F) / ((float) (j - i) - 15.0F);
-      this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
-      this.container.scrollTo(this.currentScroll);
+      int i = this.guiTop + 8;
+      int j = i + 148;
+      currentScroll = ((float) pMouseDragged3 - (float) i - 7.5F) / ((float) (j - i) - 15.0F);
+      currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
+      this.container.scrollTo(currentScroll);
       return true;
     } else {
       return super.mouseDragged(pMouseDragged1, pMouseDragged3, pMouseDragged5, pMouseDragged6,
@@ -302,9 +307,9 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       return false;
     } else {
       int i = (this.container).curios.map(ICurioItemHandler::getSlots).orElse(1);
-      this.currentScroll = (float) ((double) this.currentScroll - pMouseScrolled5 / (double) i);
-      this.currentScroll = MathHelper.clamp(this.currentScroll, 0.0F, 1.0F);
-      this.container.scrollTo(this.currentScroll);
+      currentScroll = (float) ((double) currentScroll - pMouseScrolled5 / (double) i);
+      currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
+      this.container.scrollTo(currentScroll);
       return true;
     }
   }
