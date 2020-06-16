@@ -27,7 +27,7 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 
 /**
- * {@link LivingCurioChangeEvent} is fired when the Curio of a LivingEntity changes. <br> This event
+ * {@link CurioChangeEvent} is fired when the Curio of a LivingEntity changes. <br> This event
  * is fired whenever changes in curios are detected in
  * <br> {@link net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent}.
  * <br> This also includes entities joining the World, as well as being cloned. <br> This event is
@@ -45,16 +45,15 @@ import net.minecraftforge.eventbus.api.Cancelable;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-public class LivingCurioChangeEvent extends LivingEvent {
+public class CurioChangeEvent extends LivingEvent {
 
   private final String type;
   private final ItemStack from;
   private final ItemStack to;
   private final int index;
 
-  public LivingCurioChangeEvent(LivingEntity living, String type, int index,
+  public CurioChangeEvent(LivingEntity living, String type, int index,
       @Nonnull ItemStack from, @Nonnull ItemStack to) {
-
     super(living);
     this.type = type;
     this.from = from;
@@ -62,25 +61,21 @@ public class LivingCurioChangeEvent extends LivingEvent {
     this.index = index;
   }
 
-  public String getTypeIdentifier() {
-
+  public String getIdentifier() {
     return this.type;
   }
 
   public int getSlotIndex() {
-
     return this.index;
   }
 
   @Nonnull
   public ItemStack getFrom() {
-
     return this.from;
   }
 
   @Nonnull
   public ItemStack getTo() {
-
     return this.to;
   }
 }

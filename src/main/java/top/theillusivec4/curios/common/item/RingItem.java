@@ -55,7 +55,7 @@ public class RingItem extends Item {
     return CapCurioItem.createProvider(new ICurio() {
 
       @Override
-      public void onCurioTick(String identifier, int index, LivingEntity livingEntity) {
+      public void curioTick(String identifier, int index, LivingEntity livingEntity) {
 
         if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 19 == 0) {
           livingEntity.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));
@@ -63,7 +63,7 @@ public class RingItem extends Item {
       }
 
       @Override
-      public void playEquipSound(LivingEntity livingEntity) {
+      public void playRightClickEquipSound(LivingEntity livingEntity) {
         livingEntity.world
             .playSound(null, livingEntity.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GOLD,
                 SoundCategory.NEUTRAL, 1.0f, 1.0f);

@@ -70,7 +70,7 @@ public class SPacketSyncContentsWithTag {
       if (entity instanceof LivingEntity) {
         CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
           ItemStack stack = msg.stack;
-          CuriosAPI.getCurio(stack).ifPresent(curio -> curio.readSyncTag(msg.compound));
+          CuriosAPI.getCurio(stack).ifPresent(curio -> curio.readSyncData(msg.compound));
           handler.setStackInSlot(msg.curioId, msg.slotId, stack);
         });
       }

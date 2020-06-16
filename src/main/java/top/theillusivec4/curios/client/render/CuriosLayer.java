@@ -41,10 +41,9 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
   }
 
   @Override
-  public void render(@Nonnull MatrixStack matrixStack,
-      @Nonnull IRenderTypeBuffer renderTypeBuffer, int light, @Nonnull T livingEntity,
-      float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
-      float netHeadYaw, float headPitch) {
+  public void render(@Nonnull MatrixStack matrixStack, @Nonnull IRenderTypeBuffer renderTypeBuffer,
+      int light, @Nonnull T livingEntity, float limbSwing, float limbSwingAmount,
+      float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 
     if (!CuriosConfig.CLIENT.renderCurios.get()) {
       return;
@@ -60,12 +59,15 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
           ItemStack stack = stackHandler.getStackInSlot(i);
 
           if (!stack.isEmpty()) {
+            int index = i;
+
             CuriosAPI.getCurio(stack).ifPresent(curio -> {
-              if (curio.hasRender(id, livingEntity)) {
+
+              if (curio.canRender(id, index, livingEntity)) {
                 matrixStack.push();
                 RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-                curio.render(id, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing,
-                    limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+                curio.render(id, index, matrixStack, renderTypeBuffer, light, livingEntity,
+                    limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
                 matrixStack.pop();
               }
             });

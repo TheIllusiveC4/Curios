@@ -50,21 +50,21 @@ public interface ICurio {
    * Called every tick on both client and server while the ItemStack is equipped.
    *
    * @param identifier   The {@link CurioType} identifier of the ItemStack's slot
-   * @param index        The index of the ItemStack's slot
+   * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
-  default void onCurioTick(String identifier, int index, LivingEntity livingEntity) {
+  default void curioTick(String identifier, int index, LivingEntity livingEntity) {
 
   }
 
   /**
-   * Called every tick client-side only while the ItemStack is equipped
+   * Called every tick only on the client while the ItemStack is equipped.
    *
    * @param identifier   The {@link CurioType} identifier of the ItemStack's slot
-   * @param index        The index of the ItemStack's slot
+   * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
-  default void onCurioAnimate(String identifier, int index, LivingEntity livingEntity) {
+  default void curioAnimate(String identifier, int index, LivingEntity livingEntity) {
 
   }
 
@@ -72,9 +72,10 @@ public interface ICurio {
    * Called when the ItemStack is equipped into a slot.
    *
    * @param identifier   The {@link CurioType} identifier of the slot being equipped into
+   * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
-  default void onEquipped(String identifier, LivingEntity livingEntity) {
+  default void onEquip(String identifier, int index, LivingEntity livingEntity) {
 
   }
 
@@ -82,9 +83,10 @@ public interface ICurio {
    * Called when the ItemStack is unequipped from a slot.
    *
    * @param identifier   The {@link CurioType} identifier of the slot being unequipped from
+   * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
-  default void onUnequipped(String identifier, LivingEntity livingEntity) {
+  default void onUnequip(String identifier, int index, LivingEntity livingEntity) {
 
   }
 
@@ -92,10 +94,11 @@ public interface ICurio {
    * Determines if the ItemStack can be equipped into a slot.
    *
    * @param identifier   The {@link CurioType} identifier of the slot being equipped into
+   * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    * @return True if the ItemStack can be equipped/put in, false if not
    */
-  default boolean canEquip(String identifier, LivingEntity livingEntity) {
+  default boolean canEquip(String identifier, int index, LivingEntity livingEntity) {
     return true;
   }
 
@@ -103,10 +106,11 @@ public interface ICurio {
    * Determines if the ItemStack can be unequipped from a slot.
    *
    * @param identifier   The {@link CurioType} identifier of the slot being unequipped from
+   * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    * @return True if the ItemStack can be unequipped/taken out, false if not
    */
-  default boolean canUnequip(String identifier, LivingEntity livingEntity) {
+  default boolean canUnequip(String identifier, int index, LivingEntity livingEntity) {
     return true;
   }
 
@@ -142,7 +146,7 @@ public interface ICurio {
    *
    * @param livingEntity The wearer of the ItemStack
    */
-  default void playEquipSound(LivingEntity livingEntity) {
+  default void playRightClickEquipSound(LivingEntity livingEntity) {
     livingEntity.world
         .playSound(null, livingEntity.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
             SoundCategory.NEUTRAL, 1.0f, 1.0f);
@@ -166,7 +170,100 @@ public interface ICurio {
    * @param stack        The ItemStack that was broken
    * @param livingEntity The entity that broke the curio
    */
-  default void onCurioBreak(ItemStack stack, LivingEntity livingEntity) {
+  default void curioBreak(ItemStack stack, LivingEntity livingEntity) {
+    playDefaultBreakSound(stack, livingEntity);
+  }
+
+  /**
+   * Compares the current ItemStack and the previous ItemStack in the slot to detect any changes and
+   * returns true if the change should be synced to all tracking clients. Note that this check
+   * occurs every tick so implementations need to code their own timers for other intervals.
+   *
+   * @param identifier   The identifier of the {@link CurioType} of the slot
+   * @param index        The index of the slot
+   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @return True to sync the ItemStack change to all tracking clients, false to do nothing
+   */
+  default boolean canSync(String identifier, int index, LivingEntity livingEntity) {
+    return false;
+  }
+
+  /**
+   * Gets a tag that is used to sync extra curio data from the server to the client. Only used when
+   * {@link ICurio#canSync(String, int, LivingEntity)} returns true.
+   *
+   * @return Data to be sent to the client
+   */
+  @Nonnull
+  default CompoundNBT writeSyncData() {
+    return new CompoundNBT();
+  }
+
+  /**
+   * Used client-side to read data tags created by {@link ICurio#writeSyncData()} received from the
+   * server.
+   *
+   * @param compound Data received from the server
+   */
+  default void readSyncData(CompoundNBT compound) {
+
+  }
+
+  /**
+   * Determines if the ItemStack should drop on death and persist through respawn. This will persist
+   * the ItemStack in the curio slot to the respawned player if applicable.
+   *
+   * @param livingEntity The entity that died
+   * @return {@link DropRule}
+   */
+  @Nonnull
+  default DropRule getDropRule(LivingEntity livingEntity) {
+    return DropRule.DEFAULT;
+  }
+
+  /**
+   * Used by {@link ICurio#getDropRule(LivingEntity)} to determine drop on death behavior.
+   * <br>
+   * DEFAULT - normal vanilla behavior with drops dictated by the Keep Inventory game rule
+   * <br>
+   * ALWAYS_DROP - always drop regardless of game rules
+   * <br>
+   * ALWAYS_KEEP - always keep regardless of game rules
+   * <br>
+   * DESTROY - destroy the item upon death
+   */
+  enum DropRule {
+    DEFAULT, ALWAYS_DROP, ALWAYS_KEEP, DESTROY
+  }
+
+  /**
+   * Determines if the ItemStack has rendering.
+   *
+   * @param identifier   The identifier of the {@link CurioType} of the slot
+   * @param index        The index of the slot
+   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @return True if the ItemStack has rendering, false if it does not
+   */
+  default boolean canRender(String identifier, int index, LivingEntity livingEntity) {
+    return false;
+  }
+
+  /**
+   * Performs rendering of the ItemStack if {@link ICurio#canRender(String, int, LivingEntity)} returns
+   * true. Note that vertical sneaking translations are automatically applied before this rendering
+   * method is called.
+   *
+   * @param identifier   The identifier of the {@link CurioType} of the slot
+   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   */
+  default void render(String identifier, int index, MatrixStack matrixStack,
+      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
+      float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+      float headPitch) {
+
+  }
+
+  static void playDefaultBreakSound(ItemStack stack, LivingEntity livingEntity) {
 
     if (!stack.isEmpty()) {
 
@@ -183,6 +280,7 @@ public interface ICurio {
         vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
         double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
+
         Vec3d vec3d1 = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D, d0,
             0.6D);
         vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
@@ -198,95 +296,6 @@ public interface ICurio {
   }
 
   /**
-   * Compares the current ItemStack and the previous ItemStack in the slot to detect any changes and
-   * returns true if the change should be synced to all tracking clients. Note that this check
-   * occurs every tick so implementations need to code their own timers for other intervals.
-   *
-   * @param identifier   The identifier of the {@link CurioType} of the slot
-   * @param livingEntity The EntityLivingBase that is wearing the ItemStack
-   * @return True to curios the ItemStack change to all tracking clients, false to do nothing
-   */
-  default boolean shouldSyncToTracking(String identifier, LivingEntity livingEntity) {
-    return false;
-  }
-
-  /**
-   * Gets a tag that is used to sync extra curio data from the server to the client. Only used when
-   * {@link ICurio#shouldSyncToTracking(String, LivingEntity)} returns true.
-   *
-   * @return Data to be sent to the client
-   */
-  @Nonnull
-  default CompoundNBT getSyncTag() {
-    return new CompoundNBT();
-  }
-
-  /**
-   * Used client-side to read data tags created by {@link ICurio#getSyncTag()} received from the
-   * server.
-   *
-   * @param compound Data received from the server
-   */
-  default void readSyncTag(CompoundNBT compound) {
-
-  }
-
-  /**
-   * Determines if the ItemStack should drop on death and persist through respawn. This will persist
-   * the ItemStack in the curio slot to the respawned player if applicable.
-   *
-   * @param livingEntity The entity that died
-   * @return Tuple object with the left value returning true if the ItemStack should be dropped on
-   * death and the right value returning true if the ItemStack should persist to the respawned
-   * player if applicable (given the left value was false).
-   */
-  @Nonnull
-  default DropRule getDropRule(LivingEntity livingEntity) {
-    return DropRule.DEFAULT;
-  }
-
-  /**
-   * Used by {@link ICurio#getDropRule(LivingEntity)} to determine drop on death behavior.
-   * <br>
-   * DEFAULT - normal vanilla behavior with drops dictated by the Keep Inventory game rule.
-   * <br>
-   * ALWAYS_DROP - always drop regardless of game rules.
-   * <br>
-   * ALWAYS_KEEP - always keep regardless of game rules.
-   * <br>
-   * DESTROY - destroy the item upon death
-   */
-  enum DropRule {
-    DEFAULT, ALWAYS_DROP, ALWAYS_KEEP, DESTROY
-  }
-
-  /**
-   * Determines if the ItemStack has rendering.
-   *
-   * @param identifier   The identifier of the {@link CurioType} of the slot
-   * @param livingEntity The EntityLivingBase that is wearing the ItemStack
-   * @return True if the ItemStack has rendering, false if it does not
-   */
-  default boolean hasRender(String identifier, LivingEntity livingEntity) {
-    return false;
-  }
-
-  /**
-   * Performs rendering of the ItemStack if {@link ICurio#hasRender(String, LivingEntity)} returns
-   * true. Note that vertical sneaking translations are automatically applied before this rendering
-   * method is called.
-   *
-   * @param identifier   The identifier of the {@link CurioType} of the slot
-   * @param livingEntity The EntityLivingBase that is wearing the ItemStack
-   */
-  default void render(String identifier, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
-      float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-      float headPitch) {
-
-  }
-
-  /**
    * Some helper methods for rendering curios.
    */
   final class RenderHelper {
@@ -298,6 +307,7 @@ public interface ICurio {
      */
     public static void translateIfSneaking(final MatrixStack matrixStack,
         final LivingEntity livingEntity) {
+
       if (livingEntity.isCrouching()) {
         matrixStack.translate(0.0f, 0.2f, 0.0f);
       }
@@ -314,8 +324,7 @@ public interface ICurio {
         final LivingEntity livingEntity) {
 
       if (livingEntity.isCrouching()) {
-        matrixStack
-            .rotate(Vector3f.XP.rotationDegrees(90.0F / (float) Math.PI));
+        matrixStack.rotate(Vector3f.XP.rotationDegrees(90.0F / (float) Math.PI));
       }
     }
 
@@ -335,7 +344,7 @@ public interface ICurio {
           .getRenderer(livingEntity);
 
       if (render instanceof LivingRenderer) {
-        LivingRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
         EntityModel<LivingEntity> model = livingRenderer.getEntityModel();
 
         if (model instanceof BipedModel) {
@@ -363,7 +372,7 @@ public interface ICurio {
           .getRenderer(livingEntity);
 
       if (render instanceof LivingRenderer) {
-        LivingRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
         EntityModel<LivingEntity> entityModel = livingRenderer.getEntityModel();
 
         if (entityModel instanceof BipedModel) {

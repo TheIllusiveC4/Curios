@@ -58,7 +58,7 @@ import top.theillusivec4.curios.common.CuriosIMC;
 import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
 import top.theillusivec4.curios.common.capability.CapCurioItem;
-import top.theillusivec4.curios.common.event.EventHandlerCurios;
+import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.server.command.CommandCurios;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
@@ -89,7 +89,7 @@ public class Curios {
 
     CapCurioInventory.register();
     CapCurioItem.register();
-    MinecraftForge.EVENT_BUS.register(new EventHandlerCurios());
+    MinecraftForge.EVENT_BUS.register(new CuriosEventHandler());
     NetworkHandler.register();
     ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
         new ArgumentSerializer<>(CurioArgumentType::slot));

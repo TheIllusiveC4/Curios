@@ -56,7 +56,6 @@ public class KnucklesItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
     return CapCurioItem.createProvider(new ICurio() {
-
       private Object model;
 
       @Override
@@ -72,12 +71,12 @@ public class KnucklesItem extends Item {
       }
 
       @Override
-      public boolean hasRender(String identifier, LivingEntity livingEntity) {
+      public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
         return true;
       }
 
       @Override
-      public void render(String identifier, MatrixStack matrixStack,
+      public void render(String identifier, int index, MatrixStack matrixStack,
           IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
           float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
           float headPitch) {

@@ -52,11 +52,10 @@ public class CrownItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
     return CapCurioItem.createProvider(new ICurio() {
-
       private Object model;
 
       @Override
-      public void onCurioTick(String identifier, int index, LivingEntity livingEntity) {
+      public void curioTick(String identifier, int index, LivingEntity livingEntity) {
 
         if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 20 == 0) {
           livingEntity
@@ -67,7 +66,7 @@ public class CrownItem extends Item {
       }
 
       @Override
-      public void onUnequipped(String identifier, LivingEntity livingEntity) {
+      public void onUnequip(String identifier, int index, LivingEntity livingEntity) {
         EffectInstance effect = livingEntity.getActivePotionEffect(Effects.NIGHT_VISION);
 
         if (effect != null && effect.getAmplifier() == 44) {
@@ -76,12 +75,12 @@ public class CrownItem extends Item {
       }
 
       @Override
-      public boolean hasRender(String identifier, LivingEntity livingEntity) {
+      public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
         return true;
       }
 
       @Override
-      public void render(String identifier, MatrixStack matrixStack,
+      public void render(String identifier, int index, MatrixStack matrixStack,
           IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
           float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
           float headPitch) {
@@ -94,9 +93,8 @@ public class CrownItem extends Item {
         IVertexBuilder vertexBuilder = ItemRenderer
             .getBuffer(renderTypeBuffer, crown.getRenderType(CROWN_TEXTURE), false,
                 stack.hasEffect());
-        crown
-            .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F,
-                1.0F, 1.0F, 1.0F);
+        crown.render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
+            1.0F);
       }
     });
   }
