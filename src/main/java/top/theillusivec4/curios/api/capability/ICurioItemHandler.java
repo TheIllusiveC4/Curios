@@ -26,7 +26,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.CurioType;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
 
 public interface ICurioItemHandler {
 
@@ -36,14 +36,14 @@ public interface ICurioItemHandler {
    *
    * @return The current curios equipped
    */
-  SortedMap<String, CurioStackHandler> getCurioMap();
+  SortedMap<String, CurioSlotStackHandler> getCurioMap();
 
   /**
    * Sets the current curios map to the one passed in.
    *
    * @param map The curios collection that will replace the current one
    */
-  void setCurioMap(SortedMap<String, CurioStackHandler> map);
+  void setCurioMap(SortedMap<String, CurioSlotStackHandler> map);
 
   /**
    * Gets the number of slots across all {@link CurioType} identifiers.
@@ -53,18 +53,18 @@ public interface ICurioItemHandler {
   int getSlots();
 
   /**
-   * Gets the {@link CurioStackHandler} associated with the given {@link CurioType} identifier.
+   * Gets the {@link CurioSlotStackHandler} associated with the given {@link CurioType} identifier.
    *
    * @param identifier The identifier for the {@link CurioType}
    * @return The stack handler
    */
-  CurioStackHandler getStackHandler(String identifier);
+  CurioSlotStackHandler getStackHandler(String identifier);
 
   /**
    * Gets the ItemStack in the specified identifier and slot index.
    *
    * @param identifier The identifier for the {@link CurioType}
-   * @param slot       The slot index of the {@link CurioStackHandler} for the given identifier
+   * @param slot       The slot index of the {@link CurioSlotStackHandler} for the given identifier
    * @return The ItemStack in the slot
    */
   ItemStack getStackInSlot(String identifier, int slot);
@@ -73,7 +73,7 @@ public interface ICurioItemHandler {
    * Sets the ItemStack in the given slot index for the given {@link CurioType} identifier.
    *
    * @param identifier The identifier for the {@link CurioType}
-   * @param slot       The slot index of the {@link CurioStackHandler} for the given identifier
+   * @param slot       The slot index of the {@link CurioSlotStackHandler} for the given identifier
    * @param stack      The ItemStack to place in the slot
    */
   void setStackInSlot(String identifier, int slot, ItemStack stack);
@@ -96,7 +96,7 @@ public interface ICurioItemHandler {
   void disableCurio(String identifier);
 
   /**
-   * Adds an amount of slots to the {@link CurioStackHandler} of a {@link CurioType} associated with
+   * Adds an amount of slots to the {@link CurioSlotStackHandler} of a {@link CurioType} associated with
    * the identifier.
    *
    * @param identifier The identifier for the {@link CurioType}
@@ -105,7 +105,7 @@ public interface ICurioItemHandler {
   void addCurioSlot(String identifier, int amount);
 
   /**
-   * Removes an amount of slots from the {@link CurioStackHandler} of a {@link CurioType} associated
+   * Removes an amount of slots from the {@link CurioSlotStackHandler} of a {@link CurioType} associated
    * with the identifier. Note that the default implementation handles catching and returning
    * ItemStacks that are found in these slots.
    *
@@ -127,7 +127,7 @@ public interface ICurioItemHandler {
    *
    * @return A default curio map from the registry
    */
-  SortedMap<String, CurioStackHandler> getDefaultSlots();
+  SortedMap<String, CurioSlotStackHandler> getDefaultSlots();
 
   /**
    * Used internally for retrieving a list of disabled identifiers.

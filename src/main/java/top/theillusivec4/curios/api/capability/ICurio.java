@@ -94,11 +94,10 @@ public interface ICurio {
    * Determines if the ItemStack can be equipped into a slot.
    *
    * @param identifier   The {@link CurioType} identifier of the slot being equipped into
-   * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    * @return True if the ItemStack can be equipped/put in, false if not
    */
-  default boolean canEquip(String identifier, int index, LivingEntity livingEntity) {
+  default boolean canEquip(String identifier, LivingEntity livingEntity) {
     return true;
   }
 
@@ -106,11 +105,10 @@ public interface ICurio {
    * Determines if the ItemStack can be unequipped from a slot.
    *
    * @param identifier   The {@link CurioType} identifier of the slot being unequipped from
-   * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    * @return True if the ItemStack can be unequipped/taken out, false if not
    */
-  default boolean canUnequip(String identifier, int index, LivingEntity livingEntity) {
+  default boolean canUnequip(String identifier, LivingEntity livingEntity) {
     return true;
   }
 

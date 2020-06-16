@@ -34,7 +34,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncMap;
 
@@ -162,7 +162,7 @@ public class CommandCurios {
       String slot) {
 
     CuriosAPI.getCuriosHandler(playerMP).ifPresent(handler -> {
-      SortedMap<String, CurioStackHandler> map = handler.getCurioMap();
+      SortedMap<String, CurioSlotStackHandler> map = handler.getCurioMap();
 
       if (!slot.isEmpty() && map.get(slot) != null) {
         clear(map.get(slot));
@@ -187,9 +187,9 @@ public class CommandCurios {
   private static int resetSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP) {
 
     CuriosAPI.getCuriosHandler(playerMP).ifPresent(handler -> {
-      SortedMap<String, CurioStackHandler> slots = Maps.newTreeMap();
+      SortedMap<String, CurioSlotStackHandler> slots = Maps.newTreeMap();
       CuriosAPI.getTypeIdentifiers().forEach(id -> CuriosAPI.getType(id)
-          .ifPresent(type -> slots.put(id, new CurioStackHandler(type.getSize()))));
+          .ifPresent(type -> slots.put(id, new CurioSlotStackHandler(type.getSize()))));
       handler.setCurioMap(slots);
       NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> playerMP),
           new SPacketSyncMap(playerMP.getEntityId(), handler.getCurioMap()));
@@ -200,7 +200,7 @@ public class CommandCurios {
     return Command.SINGLE_SUCCESS;
   }
 
-  private static void clear(CurioStackHandler stacks) {
+  private static void clear(CurioSlotStackHandler stacks) {
 
     for (int i = 0; i < stacks.getSlots(); i++) {
       stacks.setStackInSlot(i, ItemStack.EMPTY);

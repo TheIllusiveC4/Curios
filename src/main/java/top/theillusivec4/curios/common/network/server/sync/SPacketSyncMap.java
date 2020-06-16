@@ -30,15 +30,15 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
 
 public class SPacketSyncMap {
 
   private int entityId;
   private int entrySize;
-  private SortedMap<String, CurioStackHandler> map;
+  private SortedMap<String, CurioSlotStackHandler> map;
 
-  public SPacketSyncMap(int entityId, SortedMap<String, CurioStackHandler> map) {
+  public SPacketSyncMap(int entityId, SortedMap<String, CurioSlotStackHandler> map) {
 
     this.entityId = entityId;
     this.entrySize = map.size();
@@ -50,7 +50,7 @@ public class SPacketSyncMap {
     buf.writeInt(msg.entityId);
     buf.writeInt(msg.entrySize);
 
-    for (Map.Entry<String, CurioStackHandler> entry : msg.map.entrySet()) {
+    for (Map.Entry<String, CurioSlotStackHandler> entry : msg.map.entrySet()) {
       buf.writeString(entry.getKey());
       buf.writeCompoundTag(entry.getValue().serializeNBT());
     }
@@ -60,11 +60,11 @@ public class SPacketSyncMap {
 
     int entityId = buf.readInt();
     int entrySize = buf.readInt();
-    SortedMap<String, CurioStackHandler> map = Maps.newTreeMap();
+    SortedMap<String, CurioSlotStackHandler> map = Maps.newTreeMap();
 
     for (int i = 0; i < entrySize; i++) {
       String key = buf.readString(25);
-      CurioStackHandler stackHandler = new CurioStackHandler();
+      CurioSlotStackHandler stackHandler = new CurioSlotStackHandler();
       CompoundNBT compound = buf.readCompoundTag();
 
       if (compound != null) {

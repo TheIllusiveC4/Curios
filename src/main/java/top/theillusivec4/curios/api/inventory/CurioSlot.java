@@ -21,7 +21,6 @@ package top.theillusivec4.curios.api.inventory;
 
 import java.util.Set;
 import javax.annotation.Nonnull;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,12 +31,12 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.SlotItemHandler;
 import top.theillusivec4.curios.api.CuriosAPI;
 
-public class SlotCurio extends SlotItemHandler {
+public final class CurioSlot extends SlotItemHandler {
 
   private final String identifier;
   private final PlayerEntity player;
 
-  public SlotCurio(PlayerEntity player, CurioStackHandler handler, int index, String identifier,
+  public CurioSlot(PlayerEntity player, CurioSlotStackHandler handler, int index, String identifier,
       int xPosition, int yPosition) {
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;

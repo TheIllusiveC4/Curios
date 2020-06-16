@@ -61,7 +61,7 @@ import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 import top.theillusivec4.curios.api.event.CurioDropsEvent;
 import top.theillusivec4.curios.api.event.GatherCurioDropRulesEvent;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
 import top.theillusivec4.curios.common.CurioUtils;
 import top.theillusivec4.curios.common.capability.CapCurioInventory;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -148,7 +148,7 @@ public class CuriosEventHandler {
       CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
         Collection<ItemEntity> drops = evt.getDrops();
         Collection<ItemEntity> curioDrops = new ArrayList<>();
-        SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
+        SortedMap<String, CurioSlotStackHandler> curioMap = handler.getCurioMap();
 
         GatherCurioDropRulesEvent dropRulesEvent = new GatherCurioDropRulesEvent(livingEntity,
             handler, evt.getSource(), evt.getLootingLevel(), evt.isRecentlyHit());
@@ -205,7 +205,7 @@ public class CuriosEventHandler {
 
     if (!player.world.isRemote) {
       CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
-        SortedMap<String, CurioStackHandler> curioMap = handler.getCurioMap();
+        SortedMap<String, CurioSlotStackHandler> curioMap = handler.getCurioMap();
 
         for (String identifier : curioMap.keySet()) {
           ItemStackHandler stacks = curioMap.get(identifier);
@@ -258,7 +258,7 @@ public class CuriosEventHandler {
         CuriosAPI.getCuriosHandler(player).ifPresent(handler -> {
 
           if (!player.world.isRemote) {
-            SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
+            SortedMap<String, CurioSlotStackHandler> curios = handler.getCurioMap();
             Set<String> tags = CuriosAPI.getCurioTags(stack.getItem());
 
             for (String id : tags) {
@@ -269,7 +269,7 @@ public class CuriosEventHandler {
                 for (int i = 0; i < stackHandler.getSlots(); i++) {
                   ItemStack present = stackHandler.getStackInSlot(i);
 
-                  if (present.isEmpty() && curio.canEquip(id, i, player)) {
+                  if (present.isEmpty() && curio.canEquip(id, player)) {
                     stackHandler.setStackInSlot(i, stack.copy());
                     curio.playRightClickEquipSound(player);
 
@@ -297,10 +297,10 @@ public class CuriosEventHandler {
   public void tick(LivingEvent.LivingUpdateEvent evt) {
     LivingEntity livingEntity = evt.getEntityLiving();
     CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
-      SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
+      SortedMap<String, CurioSlotStackHandler> curios = handler.getCurioMap();
 
       for (String identifier : curios.keySet()) {
-        CurioStackHandler stackHandler = curios.get(identifier);
+        CurioSlotStackHandler stackHandler = curios.get(identifier);
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);

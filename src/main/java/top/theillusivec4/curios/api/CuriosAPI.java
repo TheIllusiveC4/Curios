@@ -38,7 +38,7 @@ import org.apache.logging.log4j.util.TriConsumer;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
 
 public final class CuriosAPI {
 
@@ -130,7 +130,7 @@ public final class CuriosAPI {
    */
   public static int getSlotsForType(@Nonnull final LivingEntity livingEntity, String identifier) {
     return CuriosAPI.getCuriosHandler(livingEntity).map(handler -> {
-      CurioStackHandler stacks = handler.getCurioMap().get(identifier);
+      CurioSlotStackHandler stacks = handler.getCurioMap().get(identifier);
       return stacks != null ? stacks.getSlots() : 0;
     }).orElse(0);
   }
@@ -168,7 +168,7 @@ public final class CuriosAPI {
           Set<String> tags = getCurioTags(item);
 
           for (String id : tags) {
-            CurioStackHandler stackHandler = handler.getStackHandler(id);
+            CurioSlotStackHandler stackHandler = handler.getStackHandler(id);
 
             if (stackHandler != null) {
 
@@ -202,7 +202,7 @@ public final class CuriosAPI {
         .map(handler -> {
 
           for (String id : handler.getCurioMap().keySet()) {
-            CurioStackHandler stackHandler = handler.getStackHandler(id);
+            CurioSlotStackHandler stackHandler = handler.getStackHandler(id);
 
             if (stackHandler != null) {
 

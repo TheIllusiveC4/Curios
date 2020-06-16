@@ -57,8 +57,8 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
-import top.theillusivec4.curios.api.inventory.SlotCurio;
+import top.theillusivec4.curios.api.inventory.CurioSlot;
+import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
 import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
@@ -155,20 +155,17 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
     });
 
     this.curios.ifPresent(curios -> {
-      SortedMap<String, CurioStackHandler> curioMap = curios.getCurioMap();
+      SortedMap<String, CurioSlotStackHandler> curioMap = curios.getCurioMap();
       int slots = 0;
       int yOffset = 12;
 
       for (String identifier : curioMap.keySet()) {
-        CurioStackHandler stackHandler = curioMap.get(identifier);
+        CurioSlotStackHandler stackHandler = curioMap.get(identifier);
 
-        if (!stackHandler.isHidden()) {
-
-          for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
-            this.addSlot(new SlotCurio(player, stackHandler, i, identifier, -18, yOffset));
-            yOffset += 18;
-            slots++;
-          }
+        for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+          this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset));
+          yOffset += 18;
+          slots++;
         }
       }
     });
@@ -178,7 +175,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
   public void scrollToIndex(int indexIn) {
 
     this.curios.ifPresent(curios -> {
-      SortedMap<String, CurioStackHandler> curioMap = curios.getCurioMap();
+      SortedMap<String, CurioSlotStackHandler> curioMap = curios.getCurioMap();
       int slots = 0;
       int yOffset = 12;
       int index = 0;
@@ -191,19 +188,16 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
       }
 
       for (String identifier : curioMap.keySet()) {
-        CurioStackHandler stackHandler = curioMap.get(identifier);
+        CurioSlotStackHandler stackHandler = curioMap.get(identifier);
 
-        if (!stackHandler.isHidden()) {
+        for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
-          for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
-
-            if (index >= indexIn) {
-              this.addSlot(new SlotCurio(player, stackHandler, i, identifier, -18, yOffset));
-              yOffset += 18;
-              slots++;
-            }
-            index++;
+          if (index >= indexIn) {
+            this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset));
+            yOffset += 18;
+            slots++;
           }
+          index++;
         }
       }
 

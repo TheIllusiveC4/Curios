@@ -50,7 +50,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
 import top.theillusivec4.curios.common.CurioUtils;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActive;
@@ -65,12 +65,12 @@ public class CapCurioInventory {
           @Override
           public INBT writeNBT(Capability<ICurioItemHandler> capability, ICurioItemHandler instance,
               Direction side) {
-            SortedMap<String, CurioStackHandler> curioMap = instance.getCurioMap();
+            SortedMap<String, CurioSlotStackHandler> curioMap = instance.getCurioMap();
             CompoundNBT compound = new CompoundNBT();
             ListNBT taglist = new ListNBT();
 
             for (String identifier : curioMap.keySet()) {
-              CurioStackHandler stackHandler = curioMap.get(identifier);
+              CurioSlotStackHandler stackHandler = curioMap.get(identifier);
               CompoundNBT itemtag = stackHandler.serializeNBT();
               itemtag.putString("Identifier", identifier);
               taglist.add(itemtag);
@@ -98,19 +98,19 @@ public class CapCurioInventory {
             instance.setDisabled(disabled);
 
             if (!tagList.isEmpty()) {
-              SortedMap<String, CurioStackHandler> curios = instance.getDefaultSlots();
+              SortedMap<String, CurioSlotStackHandler> curios = instance.getDefaultSlots();
 
               for (int i = 0; i < tagList.size(); i++) {
                 CompoundNBT itemtag = tagList.getCompound(i);
                 String identifier = itemtag.getString("Identifier");
-                CurioStackHandler stackHandler = new CurioStackHandler();
+                CurioSlotStackHandler stackHandler = new CurioSlotStackHandler();
                 stackHandler.deserializeNBT(itemtag);
                 CuriosAPI.getType(identifier).ifPresent(type -> {
                   int size = type.getSize();
                   int currentSize = stackHandler.getSlots();
 
                   if (size > currentSize) {
-                    stackHandler.addSize(size - currentSize);
+                    stackHandler.increaseSize(size - currentSize);
                   } else if (size < currentSize) {
 
                     for (int j = size; j < currentSize; j++) {
@@ -120,7 +120,7 @@ public class CapCurioInventory {
                         instance.addInvalid(stackHandler.getStackInSlot(j));
                       }
                     }
-                    stackHandler.removeSize(currentSize - size);
+                    stackHandler.decreaseSize(currentSize - size);
                   }
 
                   curios.put(identifier, stackHandler);
@@ -152,7 +152,7 @@ public class CapCurioInventory {
 
   public static class CurioInventoryWrapper implements ICurioItemHandler {
 
-    SortedMap<String, CurioStackHandler> curioSlots;
+    SortedMap<String, CurioSlotStackHandler> curioSlots;
     NonNullList<ItemStack> invalidCache;
     Set<String> disabled;
     LivingEntity wearer;
@@ -177,9 +177,9 @@ public class CapCurioInventory {
     }
 
     @Override
-    public SortedMap<String, CurioStackHandler> getDefaultSlots() {
+    public SortedMap<String, CurioSlotStackHandler> getDefaultSlots() {
 
-      SortedMap<String, CurioStackHandler> slots = Maps.newTreeMap();
+      SortedMap<String, CurioSlotStackHandler> slots = Maps.newTreeMap();
 
       for (String id : CuriosAPI.getTypeIdentifiers()) {
 
@@ -187,8 +187,7 @@ public class CapCurioInventory {
           CuriosAPI.getType(id).ifPresent(type -> {
 
             if (type.isEnabled()) {
-              CurioStackHandler handler = new CurioStackHandler(type.getSize());
-              handler.setHidden(type.isHidden());
+              CurioSlotStackHandler handler = new CurioSlotStackHandler(type.getSize());
               slots.put(id, handler);
             }
           });
@@ -216,19 +215,19 @@ public class CapCurioInventory {
 
     @Nullable
     @Override
-    public CurioStackHandler getStackHandler(String identifier) {
+    public CurioSlotStackHandler getStackHandler(String identifier) {
 
       return this.curioSlots.get(identifier);
     }
 
     @Override
-    public SortedMap<String, CurioStackHandler> getCurioMap() {
+    public SortedMap<String, CurioSlotStackHandler> getCurioMap() {
 
       return Collections.unmodifiableSortedMap(this.curioSlots);
     }
 
     @Override
-    public void setCurioMap(SortedMap<String, CurioStackHandler> map) {
+    public void setCurioMap(SortedMap<String, CurioSlotStackHandler> map) {
 
       this.curioSlots = map;
     }
@@ -237,7 +236,7 @@ public class CapCurioInventory {
     public void enableCurio(String identifier) {
 
       CuriosAPI.getType(identifier).ifPresent(type -> {
-        this.curioSlots.putIfAbsent(identifier, new CurioStackHandler(type.getSize()));
+        this.curioSlots.putIfAbsent(identifier, new CurioSlotStackHandler(type.getSize()));
         this.disabled.remove(identifier);
 
         if (!wearer.world.isRemote && wearer instanceof ServerPlayerEntity) {
@@ -251,7 +250,7 @@ public class CapCurioInventory {
     @Override
     public void disableCurio(String identifier) {
 
-      CurioStackHandler stackHandler = this.curioSlots.get(identifier);
+      CurioSlotStackHandler stackHandler = this.curioSlots.get(identifier);
 
       if (stackHandler != null) {
         dropOrGiveLast(stackHandler, identifier, stackHandler.getSlots());
@@ -270,10 +269,10 @@ public class CapCurioInventory {
     public void addCurioSlot(String identifier, int amount) {
 
       if (amount > 0) {
-        CurioStackHandler stackHandler = this.curioSlots.get(identifier);
+        CurioSlotStackHandler stackHandler = this.curioSlots.get(identifier);
 
         if (stackHandler != null) {
-          stackHandler.addSize(amount);
+          stackHandler.increaseSize(amount);
 
           if (wearer instanceof ServerPlayerEntity) {
             NetworkHandler.INSTANCE
@@ -289,7 +288,7 @@ public class CapCurioInventory {
     public void removeCurioSlot(String identifier, int amount) {
 
       if (amount > 0) {
-        CurioStackHandler stackHandler = this.curioSlots.get(identifier);
+        CurioSlotStackHandler stackHandler = this.curioSlots.get(identifier);
 
         if (stackHandler != null) {
           amount = Math.min(stackHandler.getSlots() - 1, amount);
@@ -301,7 +300,7 @@ public class CapCurioInventory {
                     ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
                     NetworkDirection.PLAY_TO_CLIENT);
           }
-          stackHandler.removeSize(amount);
+          stackHandler.decreaseSize(amount);
         }
       }
     }

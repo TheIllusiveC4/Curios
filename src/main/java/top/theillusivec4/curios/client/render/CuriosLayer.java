@@ -30,7 +30,7 @@ import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
 import top.theillusivec4.curios.common.CuriosConfig;
 
 public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> extends
@@ -50,10 +50,10 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
     }
     matrixStack.push();
     CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
-      SortedMap<String, CurioStackHandler> curios = handler.getCurioMap();
+      SortedMap<String, CurioSlotStackHandler> curios = handler.getCurioMap();
 
       for (String id : curios.keySet()) {
-        CurioStackHandler stackHandler = curios.get(id);
+        CurioSlotStackHandler stackHandler = curios.get(id);
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);

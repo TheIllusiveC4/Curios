@@ -25,7 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
 
 public class CPacketDestroyCurios {
 
@@ -45,7 +45,7 @@ public class CPacketDestroyCurios {
 
       if (sender != null) {
         CuriosAPI.getCuriosHandler(sender).ifPresent(handler -> {
-          for (CurioStackHandler stackHandler : handler.getCurioMap().values()) {
+          for (CurioSlotStackHandler stackHandler : handler.getCurioMap().values()) {
 
             for (int i = 0; i < stackHandler.getSlots(); i++) {
               stackHandler.setStackInSlot(i, ItemStack.EMPTY);

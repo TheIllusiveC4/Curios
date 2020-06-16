@@ -39,7 +39,7 @@ import net.minecraft.util.text.ITextComponent;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
-import top.theillusivec4.curios.api.inventory.SlotCurio;
+import top.theillusivec4.curios.api.inventory.CurioSlot;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosConfig.Client;
@@ -200,8 +200,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       if (this.minecraft.player.inventory.getItemStack().isEmpty()
           && this.getSlotUnderMouse() != null) {
         Slot slot = this.getSlotUnderMouse();
-        if (slot instanceof SlotCurio && !slot.getHasStack()) {
-          SlotCurio slotCurio = (SlotCurio) slot;
+        if (slot instanceof CurioSlot && !slot.getHasStack()) {
+          CurioSlot slotCurio = (CurioSlot) slot;
           this.renderTooltip(slotCurio.getSlotName(), mouseX - this.guiLeft, mouseY - this.guiTop);
         }
       }
@@ -329,7 +329,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   }
 
   @Override
-  protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type) {
+  protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, @Nonnull ClickType type) {
     super.handleMouseClick(slotIn, slotId, mouseButton, type);
     this.recipeBookGui.slotClicked(slotIn);
   }
