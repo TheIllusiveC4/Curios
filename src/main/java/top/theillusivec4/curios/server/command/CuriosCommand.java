@@ -33,12 +33,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncMap;
 
-public class CommandCurios {
+public class CuriosCommand {
 
   public static void register(CommandDispatcher<CommandSource> dispatcher) {
 
@@ -116,16 +115,16 @@ public class CommandCurios {
 
   private static int setSlotsOfPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot, int amount) {
-    CuriosAPI.setSlotsForType(slot, playerMP, amount);
+    CuriosApi.setSlotsForType(slot, playerMP, amount);
     source.sendFeedback(new TranslationTextComponent("commands.curios.set.success", slot,
-        CuriosAPI.getSlotsForType(playerMP, slot), playerMP.getDisplayName()), true);
+        CuriosApi.getSlotsForType(playerMP, slot), playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
 
   private static int addSlotToPlayer(CommandSource source, ServerPlayerEntity playerMP, String slot,
       int amount) {
 
-    CuriosAPI.addTypeSlotsToEntity(slot, amount, playerMP);
+    CuriosApi.growSlotType(slot, amount, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.add.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
@@ -134,7 +133,7 @@ public class CommandCurios {
   private static int removeSlotFromPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot, int amount) {
 
-    CuriosAPI.removeTypeSlotsFromEntity(slot, amount, playerMP);
+    CuriosApi.shrinkSlotType(slot, amount, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.remove.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
@@ -143,7 +142,7 @@ public class CommandCurios {
   private static int enableSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
 
-    CuriosAPI.enableTypeForEntity(slot, playerMP);
+    CuriosApi.unlockSlotType(slot, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.enable.success", slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
@@ -152,7 +151,7 @@ public class CommandCurios {
   private static int disableSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
 
-    CuriosAPI.disableTypeForEntity(slot, playerMP);
+    CuriosApi.lockSlotType(slot, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.disable.success", slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
@@ -161,8 +160,8 @@ public class CommandCurios {
   private static int clearSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
 
-    CuriosAPI.getCuriosHandler(playerMP).ifPresent(handler -> {
-      SortedMap<String, CurioSlotStackHandler> map = handler.getCurioMap();
+    CuriosApi.getCuriosHandler(playerMP).ifPresent(handler -> {
+      SortedMap<String, CurioSlotStackHandler> map = handler.getCurios();
 
       if (!slot.isEmpty() && map.get(slot) != null) {
         clear(map.get(slot));
@@ -186,13 +185,13 @@ public class CommandCurios {
 
   private static int resetSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP) {
 
-    CuriosAPI.getCuriosHandler(playerMP).ifPresent(handler -> {
+    CuriosApi.getCuriosHandler(playerMP).ifPresent(handler -> {
       SortedMap<String, CurioSlotStackHandler> slots = Maps.newTreeMap();
-      CuriosAPI.getTypeIdentifiers().forEach(id -> CuriosAPI.getType(id)
+      CuriosApi.getTypeIdentifiers().forEach(id -> CuriosApi.getType(id)
           .ifPresent(type -> slots.put(id, new CurioSlotStackHandler(type.getSize()))));
-      handler.setCurioMap(slots);
+      handler.setCurios(slots);
       NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> playerMP),
-          new SPacketSyncMap(playerMP.getEntityId(), handler.getCurioMap()));
+          new SPacketSyncMap(playerMP.getEntityId(), handler.getCurios()));
     });
     source.sendFeedback(
         new TranslationTextComponent("commands.curios.reset.success", playerMP.getDisplayName()),

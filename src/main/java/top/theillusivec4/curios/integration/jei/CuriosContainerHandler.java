@@ -31,7 +31,7 @@ import net.minecraft.client.gui.recipebook.RecipeTabToggleWidget;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 
 public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen> {
@@ -45,7 +45,7 @@ public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen
     ClientPlayerEntity player = containerScreen.getMinecraft().player;
 
     if (player != null) {
-      return CuriosAPI.getCuriosHandler(containerScreen.getMinecraft().player).map(handler -> {
+      return CuriosApi.getCuriosHandler(containerScreen.getMinecraft().player).map(handler -> {
         List<Rectangle2d> areas = new ArrayList<>();
         int slotCount = handler.getSlots();
         int width = slotCount > 8 ? 42 : 26;
@@ -60,7 +60,7 @@ public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen
           int j = (containerScreen.height - 166) / 2;
           areas.add(new Rectangle2d(i, j, 147, 166));
           try {
-            List<RecipeTabToggleWidget> tabs = (List<RecipeTabToggleWidget>) RECIPE_TABS
+            @SuppressWarnings("unchecked") List<RecipeTabToggleWidget> tabs = (List<RecipeTabToggleWidget>) RECIPE_TABS
                 .get(guiRecipeBook);
 
             for (RecipeTabToggleWidget tab : tabs) {

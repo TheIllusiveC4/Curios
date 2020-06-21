@@ -37,10 +37,10 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.client.render.model.KnucklesModel;
-import top.theillusivec4.curios.common.capability.CapCurioItem;
+import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
 public class KnucklesItem extends Item {
 
@@ -55,14 +55,14 @@ public class KnucklesItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-    return CapCurioItem.createProvider(new ICurio() {
+    return CurioItemCapability.createProvider(new ICurio() {
       private Object model;
 
       @Override
       public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
         Multimap<String, AttributeModifier> atts = HashMultimap.create();
 
-        if (CuriosAPI.getCurioTags(stack.getItem()).contains(identifier)) {
+        if (CuriosApi.getCurioTags(stack.getItem()).contains(identifier)) {
           atts.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
               new AttributeModifier(AD_UUID, "Attack damage bonus", 4,
                   AttributeModifier.Operation.ADDITION));

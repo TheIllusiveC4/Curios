@@ -19,70 +19,70 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
-import com.google.common.collect.Maps;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
 
 public class SPacketSyncMap {
 
   private int entityId;
   private int entrySize;
-  private SortedMap<String, CurioSlotStackHandler> map;
+  private Map<String, CurioStacksHandler> map;
 
-  public SPacketSyncMap(int entityId, SortedMap<String, CurioSlotStackHandler> map) {
-
+  public SPacketSyncMap(int entityId, Map<String, CurioStacksHandler> map) {
     this.entityId = entityId;
     this.entrySize = map.size();
     this.map = map;
   }
 
   public static void encode(SPacketSyncMap msg, PacketBuffer buf) {
-
     buf.writeInt(msg.entityId);
     buf.writeInt(msg.entrySize);
 
-    for (Map.Entry<String, CurioSlotStackHandler> entry : msg.map.entrySet()) {
+    for (Map.Entry<String, CurioStacksHandler> entry : msg.map.entrySet()) {
       buf.writeString(entry.getKey());
       buf.writeCompoundTag(entry.getValue().serializeNBT());
     }
   }
 
   public static SPacketSyncMap decode(PacketBuffer buf) {
-
     int entityId = buf.readInt();
     int entrySize = buf.readInt();
-    SortedMap<String, CurioSlotStackHandler> map = Maps.newTreeMap();
+    Map<String, CurioStacksHandler> map = new HashMap<>();
 
     for (int i = 0; i < entrySize; i++) {
       String key = buf.readString(25);
-      CurioSlotStackHandler stackHandler = new CurioSlotStackHandler();
+      CurioStacksHandler stacksHandler = new CurioStacksHandler();
       CompoundNBT compound = buf.readCompoundTag();
 
       if (compound != null) {
-        stackHandler.deserializeNBT(compound);
+        stacksHandler.deserializeNBT(compound);
       }
-      map.put(key, stackHandler);
+      map.put(key, stacksHandler);
     }
     return new SPacketSyncMap(entityId, map);
   }
 
   public static void handle(SPacketSyncMap msg, Supplier<NetworkEvent.Context> ctx) {
-
     ctx.get().enqueueWork(() -> {
-      Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+      ClientWorld world = Minecraft.getInstance().world;
 
-      if (entity instanceof LivingEntity) {
-        CuriosAPI.getCuriosHandler((LivingEntity) entity)
-            .ifPresent(handler -> handler.setCurioMap(msg.map));
+      if (world != null) {
+        Entity entity = world.getEntityByID(msg.entityId);
+
+        if (entity instanceof LivingEntity) {
+          CuriosApi.getCuriosHandler((LivingEntity) entity)
+              .ifPresent(handler -> handler.setCurios(msg.map));
+        }
       }
     });
     ctx.get().setPacketHandled(true);

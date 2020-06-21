@@ -37,13 +37,13 @@ import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioSlot;
+import top.theillusivec4.curios.client.CuriosClientConfig;
+import top.theillusivec4.curios.client.CuriosClientConfig.Client;
+import top.theillusivec4.curios.client.CuriosClientConfig.Client.ButtonCorner;
 import top.theillusivec4.curios.client.KeyRegistry;
-import top.theillusivec4.curios.common.CuriosConfig;
-import top.theillusivec4.curios.common.CuriosConfig.Client;
-import top.theillusivec4.curios.common.CuriosConfig.Client.ButtonCorner;
 import top.theillusivec4.curios.common.inventory.CuriosContainer;
 
 public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IRecipeShownListener {
@@ -80,7 +80,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (this.minecraft != null) {
 
       if (this.minecraft.player != null) {
-        hasScrollBar = CuriosAPI.getCuriosHandler(this.minecraft.player)
+        hasScrollBar = CuriosApi.getCuriosHandler(this.minecraft.player)
             .map(handler -> handler.getSlots() > 8).orElse(false);
 
         if (hasScrollBar) {
@@ -130,7 +130,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   }
 
   public static Tuple<Integer, Integer> getButtonOffset(boolean isCreative) {
-    Client client = CuriosConfig.CLIENT;
+    Client client = CuriosClientConfig.CLIENT;
     ButtonCorner corner = client.buttonCorner.get();
     int x = 0;
     int y = 0;
@@ -222,7 +222,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       this.blit(i, j, 0, 0, this.xSize, this.ySize);
       InventoryScreen.drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - mouseX,
           (float) (j + 75 - 50) - mouseY, this.minecraft.player);
-      CuriosAPI.getCuriosHandler(this.minecraft.player).ifPresent(handler -> {
+      CuriosApi.getCuriosHandler(this.minecraft.player).ifPresent(handler -> {
         int slotCount = handler.getSlots();
         int upperHeight = 7 + slotCount * 18;
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -306,7 +306,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (!this.needsScrollBars()) {
       return false;
     } else {
-      int i = (this.container).curios.map(ICurioItemHandler::getSlots).orElse(1);
+      int i = (this.container).curiosHandler.map(ICurioItemHandler::getSlots).orElse(1);
       currentScroll = (float) ((double) currentScroll - pMouseScrolled5 / (double) i);
       currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
       this.container.scrollTo(currentScroll);

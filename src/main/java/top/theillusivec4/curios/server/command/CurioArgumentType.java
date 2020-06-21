@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.text.TranslationTextComponent;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class CurioArgumentType implements ArgumentType<String> {
 
@@ -51,7 +51,7 @@ public class CurioArgumentType implements ArgumentType<String> {
   @Override
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
       SuggestionsBuilder builder) {
-    return ISuggestionProvider.suggest(CuriosAPI.getTypeIdentifiers(), builder);
+    return ISuggestionProvider.suggest(CuriosApi.getTypeIdentifiers(), builder);
   }
 
   @Override
@@ -62,7 +62,8 @@ public class CurioArgumentType implements ArgumentType<String> {
   @Override
   public String parse(StringReader reader) throws CommandSyntaxException {
     String s = reader.readUnquotedString();
-    if (!CuriosAPI.getTypeIdentifiers().contains(s)) {
+
+    if (!CuriosApi.getTypeIdentifiers().contains(s)) {
       throw UNKNOWN_TYPE.create(s);
     } else {
       return s;

@@ -33,7 +33,6 @@ public class CuriosContainerProvider implements INamedContainerProvider {
   @Nonnull
   @Override
   public ITextComponent getDisplayName() {
-
     return new TranslationTextComponent("curios.name");
   }
 
@@ -41,7 +40,6 @@ public class CuriosContainerProvider implements INamedContainerProvider {
   @Override
   public Container createMenu(int i, @Nonnull PlayerInventory playerInventory,
       @Nonnull PlayerEntity playerEntity) {
-
     return new CuriosContainer(i, playerInventory);
   }
 }

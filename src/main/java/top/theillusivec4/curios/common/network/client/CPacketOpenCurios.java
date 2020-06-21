@@ -32,9 +32,6 @@ import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
 
 public class CPacketOpenCurios {
 
-  public CPacketOpenCurios() {
-  }
-
   public static void encode(CPacketOpenCurios msg, PacketBuffer buf) {
   }
 
@@ -43,7 +40,6 @@ public class CPacketOpenCurios {
   }
 
   public static void handle(CPacketOpenCurios msg, Supplier<NetworkEvent.Context> ctx) {
-
     ctx.get().enqueueWork(() -> {
       ServerPlayerEntity sender = ctx.get().getSender();
 

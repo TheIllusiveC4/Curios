@@ -19,6 +19,9 @@
 
 package top.theillusivec4.curios.api;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,18 +32,23 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.ItemStackHandler;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
-import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
+import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
 
-public final class CuriosAPI {
+public final class CuriosApi {
 
   /**
    * Holds a reference to the Curios modid.
@@ -50,12 +58,12 @@ public final class CuriosAPI {
       "item/empty_generic_slot");
   /**
    * The maps containing the CurioType and icons with identifiers as keys Try not to access these
-   * directly and instead use {@link CuriosAPI#getType(String)} and {@link
-   * CuriosAPI#getIcon(String)}.
+   * directly and instead use {@link CuriosApi#getType(String)} and {@link
+   * CuriosApi#getIcon(String)}.
    * <br>DO NOT REGISTER DIRECTLY - Use IMC to send the appropriate {@link
    * top.theillusivec4.curios.api.imc.CurioIMCMessage}
    */
-  public static Map<String, CurioType> idToType = new HashMap<>();
+  public static Map<String, CurioSlotType> idToType = new HashMap<>();
   public static Map<String, ResourceLocation> idToIcon = new HashMap<>();
   public static TriConsumer<String, Integer, LivingEntity> brokenCurioConsumer;
 
@@ -66,7 +74,6 @@ public final class CuriosAPI {
    * @return LazyOptional of the curio capability
    */
   public static LazyOptional<ICurio> getCurio(ItemStack stack) {
-
     return stack.getCapability(CuriosCapability.ITEM);
   }
 
@@ -78,8 +85,12 @@ public final class CuriosAPI {
    */
   public static LazyOptional<ICurioItemHandler> getCuriosHandler(
       @Nonnull final LivingEntity livingEntity) {
-
     return livingEntity.getCapability(CuriosCapability.INVENTORY);
+  }
+
+  public static Collection<CurioSlotType> getUnlockedTypes() {
+    return Collections.unmodifiableList(
+        idToType.values().stream().filter(type -> !type.isLocked()).collect(Collectors.toList()));
   }
 
   /**
@@ -91,23 +102,21 @@ public final class CuriosAPI {
    * Example: { stack.damageItem(amount, entity, damager -> CuriosAPI.onBrokenCurio(id, index,
    * damager)); }
    *
-   * @param id      The {@link CurioType} String identifier
+   * @param id      The {@link CurioSlotType} String identifier
    * @param index   The slot index of the identifier
    * @param damager The entity that is breaking the item
    */
   public static void onBrokenCurio(String id, int index, LivingEntity damager) {
-
     brokenCurioConsumer.accept(id, index, damager);
   }
 
   /**
    * Gets the Optional wrapper of the CurioType from the given identifier.
    *
-   * @param identifier The unique identifier for the {@link CurioType}
+   * @param identifier The unique identifier for the {@link CurioSlotType}
    * @return Optional wrapper of the CurioType  or Optional.empty() if not present
    */
-  public static Optional<CurioType> getType(String identifier) {
-
+  public static Optional<CurioSlotType> getType(String identifier) {
     return Optional.ofNullable(idToType.get(identifier));
   }
 
@@ -117,7 +126,6 @@ public final class CuriosAPI {
    * @return A list of identifiers
    */
   public static Set<String> getTypeIdentifiers() {
-
     return Collections.unmodifiableSet(idToType.keySet());
   }
 
@@ -129,10 +137,9 @@ public final class CuriosAPI {
    * @return The number of slots
    */
   public static int getSlotsForType(@Nonnull final LivingEntity livingEntity, String identifier) {
-    return CuriosAPI.getCuriosHandler(livingEntity).map(handler -> {
-      CurioSlotStackHandler stacks = handler.getCurioMap().get(identifier);
-      return stacks != null ? stacks.getSlots() : 0;
-    }).orElse(0);
+    return CuriosApi.getCuriosHandler(livingEntity).map(
+        handler -> handler.getStacksHandler(identifier).map(CurioStacksHandler::getSlots).orElse(0))
+        .orElse(0);
   }
 
   /**
@@ -143,12 +150,12 @@ public final class CuriosAPI {
    * @param amount       The number of slots
    */
   public static void setSlotsForType(String id, final LivingEntity livingEntity, int amount) {
-    int difference = amount - CuriosAPI.getSlotsForType(livingEntity, id);
+    int difference = amount - CuriosApi.getSlotsForType(livingEntity, id);
 
     if (difference > 0) {
-      CuriosAPI.addTypeSlotsToEntity(id, difference, livingEntity);
+      CuriosApi.growSlotType(id, difference, livingEntity);
     } else if (difference < 0) {
-      CuriosAPI.removeTypeSlotsFromEntity(id, Math.abs(difference), livingEntity);
+      CuriosApi.shrinkSlotType(id, Math.abs(difference), livingEntity);
     }
   }
 
@@ -162,28 +169,7 @@ public final class CuriosAPI {
    */
   public static Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(Item item,
       @Nonnull final LivingEntity livingEntity) {
-
-    ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(livingEntity)
-        .map(handler -> {
-          Set<String> tags = getCurioTags(item);
-
-          for (String id : tags) {
-            CurioSlotStackHandler stackHandler = handler.getStackHandler(id);
-
-            if (stackHandler != null) {
-
-              for (int i = 0; i < stackHandler.getSlots(); i++) {
-                ItemStack stack = stackHandler.getStackInSlot(i);
-
-                if (!stack.isEmpty() && item == stack.getItem()) {
-                  return new ImmutableTriple<>(id, i, stack);
-                }
-              }
-            }
-          }
-          return new ImmutableTriple<>("", 0, ItemStack.EMPTY);
-        }).orElse(new ImmutableTriple<>("", 0, ItemStack.EMPTY));
-    return result.getLeft().isEmpty() ? Optional.empty() : Optional.of(result);
+    return getCurioEquipped((stack) -> stack.getItem() == item, livingEntity);
   }
 
   /**
@@ -200,104 +186,121 @@ public final class CuriosAPI {
 
     ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(livingEntity)
         .map(handler -> {
+          Map<String, CurioStacksHandler> curios = handler.getCurios();
 
-          for (String id : handler.getCurioMap().keySet()) {
-            CurioSlotStackHandler stackHandler = handler.getStackHandler(id);
+          for (String id : curios.keySet()) {
+            CurioStacksHandler stacksHandler = curios.get(id);
+            ItemStackHandler stackHandler = stacksHandler.getStacks();
 
-            if (stackHandler != null) {
+            for (int i = 0; i < stackHandler.getSlots(); i++) {
+              ItemStack stack = stackHandler.getStackInSlot(i);
 
-              for (int i = 0; i < stackHandler.getSlots(); i++) {
-                ItemStack stack = stackHandler.getStackInSlot(i);
-
-                if (!stack.isEmpty() && filter.test(stack)) {
-                  return new ImmutableTriple<>(id, i, stack);
-                }
+              if (!stack.isEmpty() && filter.test(stack)) {
+                return new ImmutableTriple<>(id, i, stack);
               }
-
             }
           }
           return new ImmutableTriple<>("", 0, ItemStack.EMPTY);
         }).orElse(new ImmutableTriple<>("", 0, ItemStack.EMPTY));
+
     return result.getLeft().isEmpty() ? Optional.empty() : Optional.of(result);
   }
 
+  public static Multimap<String, AttributeModifier> getAttributeModifiers(String identifier,
+      ItemStack stack) {
+    Multimap<String, AttributeModifier> multimap;
+
+    if (stack.getTag() != null && stack.getTag().contains("CurioAttributeModifiers", 9)) {
+      multimap = HashMultimap.create();
+      ListNBT listnbt = stack.getTag().getList("CurioAttributeModifiers", 10);
+
+      for (int i = 0; i < listnbt.size(); ++i) {
+        CompoundNBT compoundnbt = listnbt.getCompound(i);
+        AttributeModifier attributemodifier = SharedMonsterAttributes
+            .readAttributeModifier(compoundnbt);
+
+        if (attributemodifier != null && (!compoundnbt.contains("Slot", 8) || compoundnbt
+            .getString("Slot").equals(identifier))
+            && attributemodifier.getID().getLeastSignificantBits() != 0L
+            && attributemodifier.getID().getMostSignificantBits() != 0L) {
+          multimap.put(compoundnbt.getString("AttributeName"), attributemodifier);
+        }
+      }
+      return multimap;
+    }
+    return getCurio(stack).map(curio -> curio.getAttributeModifiers(identifier))
+        .orElse(HashMultimap.create());
+  }
+
   /**
-   * /** Adds a single slot to the {@link CurioType} with the associated identifier. If the slot to
-   * be added is for a type that is not enabled on the entity, it will not be added. For adding
+   * /** Adds a single slot to the {@link CurioSlotType} with the associated identifier. If the slot
+   * to be added is for a type that is not enabled on the entity, it will not be added. For adding
    * slot(s) for types that are not yet available, there must first be a call to {@link
-   * CuriosAPI#enableTypeForEntity(String, LivingEntity)}
+   * CuriosApi#unlockSlotType(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
    */
-  public static void addTypeSlotToEntity(String id, final LivingEntity entityLivingBase) {
-
-    addTypeSlotsToEntity(id, 1, entityLivingBase);
+  public static void growSlotType(String id, final LivingEntity entityLivingBase) {
+    growSlotType(id, 1, entityLivingBase);
   }
 
   /**
-   * Adds multiple slots to the {@link CurioType} with the associated identifier. If the slot to be
-   * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
-   * for types that are not yet available, there must first be a call to {@link
-   * CuriosAPI#enableTypeForEntity(String, LivingEntity)}
+   * Adds multiple slots to the {@link CurioSlotType} with the associated identifier. If the slot to
+   * be added is for a type that is not enabled on the entity, it will not be added. For adding
+   * slot(s) for types that are not yet available, there must first be a call to {@link
+   * CuriosApi#unlockSlotType(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
    * @param amount           The number of slots to add
    * @param entityLivingBase The holder of the slots
    */
-  public static void addTypeSlotsToEntity(String id, int amount,
-      final LivingEntity entityLivingBase) {
-
-    getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.addCurioSlot(id, amount));
+  public static void growSlotType(String id, int amount, final LivingEntity entityLivingBase) {
+    getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.growSlotType(id, amount));
   }
 
   /**
-   * Removes a single slot to the {@link CurioType} with the associated identifier. If the slot to
-   * be removed is the last slot available, it will not be removed. For the removal of the last
-   * slot, please see {@link CuriosAPI#disableTypeForEntity(String, LivingEntity)}
+   * Removes a single slot to the {@link CurioSlotType} with the associated identifier. If the slot
+   * to be removed is the last slot available, it will not be removed. For the removal of the last
+   * slot, please see {@link CuriosApi#lockSlotType(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
    */
-  public static void removeTypeSlotFromEntity(String id, final LivingEntity entityLivingBase) {
-
-    removeTypeSlotsFromEntity(id, 1, entityLivingBase);
+  public static void shrinkSlotType(String id, final LivingEntity entityLivingBase) {
+    shrinkSlotType(id, 1, entityLivingBase);
   }
 
   /**
-   * Removes multiple slots to the {@link CurioType} with the associated identifier. If the slot to
-   * be removed is the last slot available, it will not be removed. For the removal of the last
-   * slot, please see {@link CuriosAPI#disableTypeForEntity(String, LivingEntity)}
+   * Removes multiple slots to the {@link CurioSlotType} with the associated identifier. If the slot
+   * to be removed is the last slot available, it will not be removed. For the removal of the last
+   * slot, please see {@link CuriosApi#lockSlotType(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
    */
-  public static void removeTypeSlotsFromEntity(String id, int amount,
-      final LivingEntity entityLivingBase) {
-
-    getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.removeCurioSlot(id, amount));
+  public static void shrinkSlotType(String id, int amount, final LivingEntity entityLivingBase) {
+    getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.shrinkSlotType(id, amount));
   }
 
   /**
-   * Adds a {@link CurioType} to the entity The number of slots given is the type's default.
+   * Adds a {@link CurioSlotType} to the entity The number of slots given is the type's default.
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
    */
-  public static void enableTypeForEntity(String id, final LivingEntity entityLivingBase) {
-
-    getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.enableCurio(id));
+  public static void unlockSlotType(String id, final LivingEntity entityLivingBase) {
+    getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.unlockSlotType(id));
   }
 
   /**
-   * Removes a {@link CurioType} from the entity.
+   * Removes a {@link CurioSlotType} from the entity.
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
    */
-  public static void disableTypeForEntity(String id, final LivingEntity entityLivingBase) {
-
-    getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.disableCurio(id));
+  public static void lockSlotType(String id, final LivingEntity entityLivingBase) {
+    getCuriosHandler(entityLivingBase).ifPresent(handler -> handler.lockSlotType(id));
   }
 
   /**
@@ -307,7 +310,6 @@ public final class CuriosAPI {
    * @return Unmodifiable list of unique curio identifiers associated with the item
    */
   public static Set<String> getCurioTags(Item item) {
-
     return item.getTags().stream().filter(tag -> tag.getNamespace().equals(MODID))
         .map(ResourceLocation::getPath).collect(Collectors.toSet());
   }
@@ -317,7 +319,6 @@ public final class CuriosAPI {
    */
   @Nonnull
   public static ResourceLocation getIcon(String identifier) {
-
     return idToIcon.getOrDefault(identifier, GENERIC_SLOT);
   }
 

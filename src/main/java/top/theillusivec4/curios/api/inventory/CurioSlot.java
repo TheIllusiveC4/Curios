@@ -28,20 +28,21 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public final class CurioSlot extends SlotItemHandler {
 
   private final String identifier;
   private final PlayerEntity player;
 
-  public CurioSlot(PlayerEntity player, CurioSlotStackHandler handler, int index, String identifier,
+  public CurioSlot(PlayerEntity player, ItemStackHandler handler, int index, String identifier,
       int xPosition, int yPosition) {
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;
     this.player = player;
-    setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE, CuriosAPI.getIcon(identifier));
+    setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE, CuriosApi.getIcon(identifier));
   }
 
   @OnlyIn(Dist.CLIENT)
@@ -51,7 +52,7 @@ public final class CurioSlot extends SlotItemHandler {
 
   @Override
   public boolean isItemValid(@Nonnull ItemStack stack) {
-    return hasValidTag(CuriosAPI.getCurioTags(stack.getItem())) && CuriosAPI.getCurio(stack)
+    return hasValidTag(CuriosApi.getCurioTags(stack.getItem())) && CuriosApi.getCurio(stack)
         .map(curio -> curio.canEquip(identifier, player)).orElse(true) && super.isItemValid(stack);
   }
 
@@ -63,7 +64,7 @@ public final class CurioSlot extends SlotItemHandler {
   public boolean canTakeStack(PlayerEntity playerIn) {
     ItemStack stack = this.getStack();
     return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
-        && CuriosAPI.getCurio(stack).map(curio -> curio.canUnequip(identifier, playerIn))
+        && CuriosApi.getCurio(stack).map(curio -> curio.canUnequip(identifier, playerIn))
         .orElse(true) && super.canTakeStack(playerIn);
   }
 }

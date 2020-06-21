@@ -21,7 +21,6 @@ package top.theillusivec4.curios.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import java.util.SortedMap;
 import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
@@ -29,9 +28,8 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
-import top.theillusivec4.curios.common.CuriosConfig;
+import net.minecraftforge.items.ItemStackHandler;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> extends
     LayerRenderer<T, M> {
@@ -44,37 +42,35 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
   public void render(@Nonnull MatrixStack matrixStack, @Nonnull IRenderTypeBuffer renderTypeBuffer,
       int light, @Nonnull T livingEntity, float limbSwing, float limbSwingAmount,
       float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-
-    if (!CuriosConfig.CLIENT.renderCurios.get()) {
-      return;
-    }
     matrixStack.push();
-    CuriosAPI.getCuriosHandler(livingEntity).ifPresent(handler -> {
-      SortedMap<String, CurioSlotStackHandler> curios = handler.getCurioMap();
+    CuriosApi.getCuriosHandler(livingEntity)
+        .ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {
+          ItemStackHandler stackHandler = stacksHandler.getStacks();
+          ItemStackHandler cosmeticStacksHandler = stacksHandler.getCosmeticStacks();
 
-      for (String id : curios.keySet()) {
-        CurioSlotStackHandler stackHandler = curios.get(id);
+          for (int i = 0; i < stackHandler.getSlots(); i++) {
+            ItemStack stack = cosmeticStacksHandler.getStackInSlot(i);
 
-        for (int i = 0; i < stackHandler.getSlots(); i++) {
-          ItemStack stack = stackHandler.getStackInSlot(i);
+            if (stack.isEmpty()) {
+              stack = stackHandler.getStackInSlot(i);
+            }
 
-          if (!stack.isEmpty()) {
-            int index = i;
+            if (!stack.isEmpty()) {
+              int index = i;
 
-            CuriosAPI.getCurio(stack).ifPresent(curio -> {
+              CuriosApi.getCurio(stack).ifPresent(curio -> {
 
-              if (curio.canRender(id, index, livingEntity)) {
-                matrixStack.push();
-                RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-                curio.render(id, index, matrixStack, renderTypeBuffer, light, livingEntity,
-                    limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
-                matrixStack.pop();
-              }
-            });
+                if (curio.canRender(id, index, livingEntity)) {
+                  matrixStack.push();
+                  RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+                  curio.render(id, index, matrixStack, renderTypeBuffer, light, livingEntity,
+                      limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+                  matrixStack.pop();
+                }
+              });
+            }
           }
-        }
-      }
-    });
+        }));
     matrixStack.pop();
   }
 }

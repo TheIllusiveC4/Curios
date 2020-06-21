@@ -29,7 +29,7 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.network.client.CPacketDestroyCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
@@ -88,7 +88,7 @@ public class NetworkHandler {
         SPacketGrabbedItem::handle);
 
     // Assignment of curio breaking to the network instance
-    CuriosAPI.brokenCurioConsumer = (id, index, livingEntity) -> INSTANCE.send(
+    CuriosApi.brokenCurioConsumer = (id, index, livingEntity) -> INSTANCE.send(
         PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
         new SPacketBreakCurio(livingEntity.getEntityId(), id, index));
   }

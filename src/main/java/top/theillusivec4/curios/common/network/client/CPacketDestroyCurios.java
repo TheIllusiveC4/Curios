@@ -24,34 +24,33 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class CPacketDestroyCurios {
 
   public static void encode(CPacketDestroyCurios msg, PacketBuffer buf) {
-
   }
 
   public static CPacketDestroyCurios decode(PacketBuffer buf) {
-
     return new CPacketDestroyCurios();
   }
 
   public static void handle(CPacketDestroyCurios msg, Supplier<NetworkEvent.Context> ctx) {
-
     ctx.get().enqueueWork(() -> {
       ServerPlayerEntity sender = ctx.get().getSender();
 
       if (sender != null) {
-        CuriosAPI.getCuriosHandler(sender).ifPresent(handler -> {
-          for (CurioSlotStackHandler stackHandler : handler.getCurioMap().values()) {
+        CuriosApi.getCuriosHandler(sender)
+            .ifPresent(handler -> handler.getCurios().values().forEach(stacksHandler -> {
+              ItemStackHandler stackHandler = stacksHandler.getStacks();
+              ItemStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
 
-            for (int i = 0; i < stackHandler.getSlots(); i++) {
-              stackHandler.setStackInSlot(i, ItemStack.EMPTY);
-            }
-          }
-        });
+              for (int i = 0; i < stackHandler.getSlots(); i++) {
+                stackHandler.setStackInSlot(i, ItemStack.EMPTY);
+                cosmeticStackHandler.setStackInSlot(i, ItemStack.EMPTY);
+              }
+            }));
       }
     });
     ctx.get().setPacketHandled(true);

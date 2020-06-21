@@ -21,51 +21,52 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class SPacketSyncActive {
 
   private int entityId;
   private String curioId;
-  private boolean remove;
+  private boolean lock;
 
-  public SPacketSyncActive(int entityId, String curioId, boolean remove) {
-
+  public SPacketSyncActive(int entityId, String curioId, boolean lock) {
     this.entityId = entityId;
     this.curioId = curioId;
-    this.remove = remove;
+    this.lock = lock;
   }
 
   public static void encode(SPacketSyncActive msg, PacketBuffer buf) {
-
     buf.writeInt(msg.entityId);
     buf.writeString(msg.curioId);
-    buf.writeBoolean(msg.remove);
+    buf.writeBoolean(msg.lock);
   }
 
   public static SPacketSyncActive decode(PacketBuffer buf) {
-
     return new SPacketSyncActive(buf.readInt(), buf.readString(25), buf.readBoolean());
   }
 
   public static void handle(SPacketSyncActive msg, Supplier<NetworkEvent.Context> ctx) {
-
     ctx.get().enqueueWork(() -> {
-      Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+      ClientWorld world = Minecraft.getInstance().world;
 
-      if (entity instanceof LivingEntity) {
-        CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
+      if (world != null) {
+        Entity entity = world.getEntityByID(msg.entityId);
 
-          if (msg.remove) {
-            handler.disableCurio(msg.curioId);
-          } else {
-            handler.enableCurio(msg.curioId);
-          }
-        });
+        if (entity instanceof LivingEntity) {
+          CuriosApi.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
+
+            if (msg.lock) {
+              handler.lockSlotType(msg.curioId);
+            } else {
+              handler.unlockSlotType(msg.curioId);
+            }
+          });
+        }
       }
     });
     ctx.get().setPacketHandled(true);

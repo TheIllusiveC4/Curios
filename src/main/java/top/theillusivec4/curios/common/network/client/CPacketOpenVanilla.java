@@ -31,16 +31,13 @@ import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
 public class CPacketOpenVanilla {
 
   public static void encode(CPacketOpenVanilla msg, PacketBuffer buf) {
-
   }
 
   public static CPacketOpenVanilla decode(PacketBuffer buf) {
-
     return new CPacketOpenVanilla();
   }
 
   public static void handle(CPacketOpenVanilla msg, Supplier<NetworkEvent.Context> ctx) {
-
     ctx.get().enqueueWork(() -> {
       ServerPlayerEntity sender = ctx.get().getSender();
 

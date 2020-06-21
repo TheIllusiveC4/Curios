@@ -21,54 +21,56 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class SPacketSyncSize {
 
   private int entityId;
   private String curioId;
   private int amount;
-  private boolean remove;
+  private boolean shrink;
 
-  public SPacketSyncSize(int entityId, String curioId, int amount, boolean remove) {
-
+  public SPacketSyncSize(int entityId, String curioId, int amount, boolean shrink) {
     this.entityId = entityId;
     this.curioId = curioId;
     this.amount = amount;
-    this.remove = remove;
+    this.shrink = shrink;
   }
 
   public static void encode(SPacketSyncSize msg, PacketBuffer buf) {
-
     buf.writeInt(msg.entityId);
     buf.writeString(msg.curioId);
     buf.writeInt(msg.amount);
-    buf.writeBoolean(msg.remove);
+    buf.writeBoolean(msg.shrink);
   }
 
   public static SPacketSyncSize decode(PacketBuffer buf) {
-
     return new SPacketSyncSize(buf.readInt(), buf.readString(25), buf.readInt(), buf.readBoolean());
   }
 
   public static void handle(SPacketSyncSize msg, Supplier<NetworkEvent.Context> ctx) {
 
     ctx.get().enqueueWork(() -> {
-      Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+      ClientWorld world = Minecraft.getInstance().world;
 
-      if (entity instanceof LivingEntity) {
-        CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
+      if (world != null) {
+        Entity entity = world.getEntityByID(msg.entityId);
 
-          if (msg.remove) {
-            handler.removeCurioSlot(msg.curioId, msg.amount);
-          } else {
-            handler.addCurioSlot(msg.curioId, msg.amount);
-          }
-        });
+        if (entity instanceof LivingEntity) {
+          CuriosApi.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
+
+            if (msg.shrink) {
+              handler.shrinkSlotType(msg.curioId, msg.amount);
+            } else {
+              handler.growSlotType(msg.curioId, msg.amount);
+            }
+          });
+        }
       }
     });
     ctx.get().setPacketHandled(true);

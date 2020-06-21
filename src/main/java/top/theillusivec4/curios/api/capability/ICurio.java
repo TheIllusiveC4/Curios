@@ -42,14 +42,14 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
-import top.theillusivec4.curios.api.CurioType;
+import top.theillusivec4.curios.api.CurioSlotType;
 
 public interface ICurio {
 
   /**
    * Called every tick on both client and server while the ItemStack is equipped.
    *
-   * @param identifier   The {@link CurioType} identifier of the ItemStack's slot
+   * @param identifier   The {@link CurioSlotType} identifier of the ItemStack's slot
    * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
@@ -60,7 +60,7 @@ public interface ICurio {
   /**
    * Called every tick only on the client while the ItemStack is equipped.
    *
-   * @param identifier   The {@link CurioType} identifier of the ItemStack's slot
+   * @param identifier   The {@link CurioSlotType} identifier of the ItemStack's slot
    * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
@@ -71,7 +71,7 @@ public interface ICurio {
   /**
    * Called when the ItemStack is equipped into a slot.
    *
-   * @param identifier   The {@link CurioType} identifier of the slot being equipped into
+   * @param identifier   The {@link CurioSlotType} identifier of the slot being equipped into
    * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
@@ -82,7 +82,7 @@ public interface ICurio {
   /**
    * Called when the ItemStack is unequipped from a slot.
    *
-   * @param identifier   The {@link CurioType} identifier of the slot being unequipped from
+   * @param identifier   The {@link CurioSlotType} identifier of the slot being unequipped from
    * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
@@ -93,7 +93,7 @@ public interface ICurio {
   /**
    * Determines if the ItemStack can be equipped into a slot.
    *
-   * @param identifier   The {@link CurioType} identifier of the slot being equipped into
+   * @param identifier   The {@link CurioSlotType} identifier of the slot being equipped into
    * @param livingEntity The wearer of the ItemStack
    * @return True if the ItemStack can be equipped/put in, false if not
    */
@@ -104,7 +104,7 @@ public interface ICurio {
   /**
    * Determines if the ItemStack can be unequipped from a slot.
    *
-   * @param identifier   The {@link CurioType} identifier of the slot being unequipped from
+   * @param identifier   The {@link CurioSlotType} identifier of the slot being unequipped from
    * @param livingEntity The wearer of the ItemStack
    * @return True if the ItemStack can be unequipped/taken out, false if not
    */
@@ -128,7 +128,7 @@ public interface ICurio {
   }
 
   /**
-   * A map of AttributeModifier associated with the ItemStack and the {@link CurioType} identifier.
+   * A map of AttributeModifier associated with the ItemStack and the {@link CurioSlotType} identifier.
    *
    * @param identifier The CurioType identifier for the context
    * @return A map of attribute modifiers to apply
@@ -177,7 +177,7 @@ public interface ICurio {
    * returns true if the change should be synced to all tracking clients. Note that this check
    * occurs every tick so implementations need to code their own timers for other intervals.
    *
-   * @param identifier   The identifier of the {@link CurioType} of the slot
+   * @param identifier   The identifier of the {@link CurioSlotType} of the slot
    * @param index        The index of the slot
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    * @return True to sync the ItemStack change to all tracking clients, false to do nothing
@@ -237,7 +237,7 @@ public interface ICurio {
   /**
    * Determines if the ItemStack has rendering.
    *
-   * @param identifier   The identifier of the {@link CurioType} of the slot
+   * @param identifier   The identifier of the {@link CurioSlotType} of the slot
    * @param index        The index of the slot
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    * @return True if the ItemStack has rendering, false if it does not
@@ -251,7 +251,7 @@ public interface ICurio {
    * true. Note that vertical sneaking translations are automatically applied before this rendering
    * method is called.
    *
-   * @param identifier   The identifier of the {@link CurioType} of the slot
+   * @param identifier   The identifier of the {@link CurioSlotType} of the slot
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    */
   default void render(String identifier, int index, MatrixStack matrixStack,

@@ -21,12 +21,13 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class SPacketSyncContents {
 
@@ -36,7 +37,6 @@ public class SPacketSyncContents {
   private ItemStack stack;
 
   public SPacketSyncContents(int entityId, String curioId, int slotId, ItemStack stack) {
-
     this.entityId = entityId;
     this.slotId = slotId;
     this.stack = stack.copy();
@@ -44,7 +44,6 @@ public class SPacketSyncContents {
   }
 
   public static void encode(SPacketSyncContents msg, PacketBuffer buf) {
-
     buf.writeInt(msg.entityId);
     buf.writeString(msg.curioId);
     buf.writeInt(msg.slotId);
@@ -52,19 +51,23 @@ public class SPacketSyncContents {
   }
 
   public static SPacketSyncContents decode(PacketBuffer buf) {
-
     return new SPacketSyncContents(buf.readInt(), buf.readString(25), buf.readInt(),
         buf.readItemStack());
   }
 
   public static void handle(SPacketSyncContents msg, Supplier<NetworkEvent.Context> ctx) {
-
     ctx.get().enqueueWork(() -> {
-      Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+      ClientWorld world = Minecraft.getInstance().world;
 
-      if (entity instanceof LivingEntity) {
-        CuriosAPI.getCuriosHandler((LivingEntity) entity)
-            .ifPresent(handler -> handler.setStackInSlot(msg.curioId, msg.slotId, msg.stack));
+      if (world != null) {
+        Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+
+        if (entity instanceof LivingEntity) {
+          CuriosApi.getCuriosHandler((LivingEntity) entity).ifPresent(
+              handler -> handler.getStacksHandler(msg.curioId).ifPresent(
+                  stacksHandler -> stacksHandler.getStacks()
+                      .setStackInSlot(msg.slotId, msg.stack)));
+        }
       }
     });
     ctx.get().setPacketHandled(true);

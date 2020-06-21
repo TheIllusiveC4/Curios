@@ -49,7 +49,7 @@ import top.theillusivec4.curios.api.capability.ICurioItemHandler;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-public class GatherCurioDropRulesEvent extends LivingEvent {
+public class DropRulesEvent extends LivingEvent {
 
   private final DamageSource source;
   private final int lootingLevel;
@@ -57,7 +57,7 @@ public class GatherCurioDropRulesEvent extends LivingEvent {
   private final ICurioItemHandler curioHandler; // Curio handler for the entity
   private final List<Tuple<Predicate<ItemStack>, DropRule>> overrides = new ArrayList<>(); // List of drop rule overrides
 
-  public GatherCurioDropRulesEvent(LivingEntity entity, ICurioItemHandler handler,
+  public DropRulesEvent(LivingEntity entity, ICurioItemHandler handler,
       DamageSource source, int lootingLevel, boolean recentlyHit) {
     super(entity);
     this.source = source;

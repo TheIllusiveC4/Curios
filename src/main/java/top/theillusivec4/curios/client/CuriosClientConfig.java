@@ -1,36 +1,16 @@
-/*
- * Copyright (c) 2018-2020 C4
- *
- * This file is part of Curios, a mod made for Minecraft.
- *
- * Curios is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Curios is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
- */
+package top.theillusivec4.curios.client;
 
-package top.theillusivec4.curios.common;
-
-import com.google.common.collect.Lists;
-import java.util.List;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.EnumValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import org.apache.commons.lang3.tuple.Pair;
 import top.theillusivec4.curios.Curios;
 
-public class CuriosConfig {
+public class CuriosClientConfig {
 
   public static final ForgeConfigSpec clientSpec;
   public static final Client CLIENT;
-  public static final ForgeConfigSpec commonSpec;
-  public static final Common COMMON;
   private static final String CONFIG_PREFIX = "gui." + Curios.MODID + ".config.";
 
   static {
@@ -40,43 +20,14 @@ public class CuriosConfig {
     CLIENT = specPair.getLeft();
   }
 
-  static {
-    final Pair<Common, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder()
-        .configure(Common::new);
-    commonSpec = specPair.getRight();
-    COMMON = specPair.getLeft();
-  }
-
-  public static class Common {
-
-    public final ForgeConfigSpec.ConfigValue<List<String>> disabledCurios;
-    public final ForgeConfigSpec.ConfigValue<List<String>> createCurios;
-
-    Common(ForgeConfigSpec.Builder builder) {
-
-      builder.push("common");
-
-      disabledCurios = builder.comment("List of curio types to disable by default")
-          .translation(CONFIG_PREFIX + "disabledCurios").worldRestart()
-          .define("disabledCurios", Lists.newArrayList());
-
-      createCurios = builder.comment("List of curio types to create."
-          + "Sizes can be defined by adding a semicolon and the size number (e.g. 'ring;4').")
-          .translation(CONFIG_PREFIX + "createCurios").worldRestart()
-          .define("createCurios", Lists.newArrayList());
-
-      builder.pop();
-    }
-  }
-
   public static class Client {
 
-    public final ForgeConfigSpec.BooleanValue renderCurios;
-    public final ForgeConfigSpec.IntValue buttonXOffset;
-    public final ForgeConfigSpec.IntValue buttonYOffset;
-    public final ForgeConfigSpec.IntValue creativeButtonXOffset;
-    public final ForgeConfigSpec.IntValue creativeButtonYOffset;
-    public final ForgeConfigSpec.EnumValue<ButtonCorner> buttonCorner;
+    public final BooleanValue renderCurios;
+    public final IntValue buttonXOffset;
+    public final IntValue buttonYOffset;
+    public final IntValue creativeButtonXOffset;
+    public final IntValue creativeButtonYOffset;
+    public final EnumValue<ButtonCorner> buttonCorner;
 
     Client(ForgeConfigSpec.Builder builder) {
 

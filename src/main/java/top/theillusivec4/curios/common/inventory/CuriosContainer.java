@@ -55,10 +55,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.network.PacketDistributor;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioSlot;
-import top.theillusivec4.curios.api.inventory.CurioSlotStackHandler;
 import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
@@ -73,7 +72,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
       EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS,
       EquipmentSlotType.FEET};
 
-  public final LazyOptional<ICurioItemHandler> curios;
+  public final LazyOptional<ICurioItemHandler> curiosHandler;
 
   private final PlayerEntity player;
   private final boolean isLocalWorld;
@@ -90,7 +89,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
     super(CuriosRegistry.CONTAINER_TYPE, windowId);
     this.player = playerInventory.player;
     this.isLocalWorld = player.world.isRemote;
-    this.curios = CuriosAPI.getCuriosHandler(player);
+    this.curiosHandler = CuriosApi.getCuriosHandler(player);
     this.addSlot(
         new CraftingResultSlot(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154,
             28));
@@ -108,19 +107,16 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
         @Override
         public int getSlotStackLimit() {
-
           return 1;
         }
 
         @Override
         public boolean isItemValid(ItemStack stack) {
-
           return stack.canEquip(equipmentslottype, player);
         }
 
         @Override
         public boolean canTakeStack(PlayerEntity playerIn) {
-
           ItemStack itemstack = this.getStack();
           return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper
               .hasBindingCurse(itemstack)) && super.canTakeStack(playerIn);
@@ -154,8 +150,8 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
       }
     });
 
-    this.curios.ifPresent(curios -> {
-      SortedMap<String, CurioSlotStackHandler> curioMap = curios.getCurioMap();
+    this.curiosHandler.ifPresent(curios -> {
+      SortedMap<String, CurioSlotStackHandler> curioMap = curios.getCurios();
       int slots = 0;
       int yOffset = 12;
 
@@ -174,8 +170,8 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
   public void scrollToIndex(int indexIn) {
 
-    this.curios.ifPresent(curios -> {
-      SortedMap<String, CurioSlotStackHandler> curioMap = curios.getCurioMap();
+    this.curiosHandler.ifPresent(curios -> {
+      SortedMap<String, CurioSlotStackHandler> curioMap = curios.getCurios();
       int slots = 0;
       int yOffset = 12;
       int index = 0;
@@ -212,7 +208,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
   public void scrollTo(float pos) {
 
-    this.curios.ifPresent(curios -> {
+    this.curiosHandler.ifPresent(curios -> {
       int k = (curios.getSlots() - 8);
       int j = (int) ((double) (pos * (float) k) + 0.5D);
 
@@ -269,7 +265,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
   public boolean canScroll() {
 
-    return this.curios.map(curios -> {
+    return this.curiosHandler.map(curios -> {
 
       if (curios.getSlots() > 8) {
         return 1;
@@ -318,7 +314,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
         if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
           return ItemStack.EMPTY;
         }
-      } else if (index < 46 && !CuriosAPI.getCurioTags(itemstack.getItem()).isEmpty()) {
+      } else if (index < 46 && !CuriosApi.getCurioTags(itemstack.getItem()).isEmpty()) {
 
         if (!this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
           return ItemStack.EMPTY;

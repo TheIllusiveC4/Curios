@@ -43,8 +43,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.common.CurioUtils;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
@@ -83,7 +82,7 @@ public class EventHandlerClient {
         i = tag.getInt("HideFlags");
       }
 
-      Set<String> curioTags = CuriosAPI.getCurioTags(stack.getItem());
+      Set<String> curioTags = CuriosApi.getCurioTags(stack.getItem());
       List<String> slots = new ArrayList<>(curioTags);
 
       if (!slots.isEmpty()) {
@@ -105,7 +104,7 @@ public class EventHandlerClient {
 
         tagTooltips.add(slotsTooltip);
 
-        CuriosAPI.getCurio(stack).ifPresent(curio -> {
+        CuriosApi.getCurio(stack).ifPresent(curio -> {
           List<ITextComponent> curioTagsTooltip = curio.getTagsTooltip(tagTooltips);
 
           if (!curioTagsTooltip.isEmpty()) {
@@ -113,12 +112,12 @@ public class EventHandlerClient {
           }
         });
 
-        if (!CuriosAPI.getCurio(stack).isPresent()) {
+        if (!CuriosApi.getCurio(stack).isPresent()) {
           tooltip.addAll(1, tagTooltips);
         }
 
         for (String identifier : slots) {
-          Multimap<String, AttributeModifier> multimap = CurioUtils
+          Multimap<String, AttributeModifier> multimap = CuriosApi
               .getAttributeModifiers(identifier, stack);
 
           if (!multimap.isEmpty() && (i & 2) == 0) {

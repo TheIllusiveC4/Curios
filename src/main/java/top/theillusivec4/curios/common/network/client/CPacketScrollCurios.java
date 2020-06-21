@@ -32,24 +32,20 @@ public class CPacketScrollCurios {
   private int index;
 
   public CPacketScrollCurios(int windowId, int index) {
-
     this.windowId = windowId;
     this.index = index;
   }
 
   public static void encode(CPacketScrollCurios msg, PacketBuffer buf) {
-
     buf.writeInt(msg.windowId);
     buf.writeInt(msg.index);
   }
 
   public static CPacketScrollCurios decode(PacketBuffer buf) {
-
     return new CPacketScrollCurios(buf.readInt(), buf.readInt());
   }
 
   public static void handle(CPacketScrollCurios msg, Supplier<NetworkEvent.Context> ctx) {
-
     ctx.get().enqueueWork(() -> {
       ServerPlayerEntity sender = ctx.get().getSender();
 

@@ -33,7 +33,7 @@ public class CuriosJeiPlugin implements IModPlugin {
   @Override
   @Nonnull
   public ResourceLocation getPluginUid() {
-    return new ResourceLocation(Curios.MODID, "jei");
+    return new ResourceLocation(Curios.MODID, Curios.MODID);
   }
 
   @Override

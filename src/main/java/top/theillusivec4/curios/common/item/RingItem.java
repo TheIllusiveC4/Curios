@@ -36,9 +36,9 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.capability.ICurio;
-import top.theillusivec4.curios.common.capability.CapCurioItem;
+import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
 public class RingItem extends Item {
 
@@ -52,7 +52,7 @@ public class RingItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-    return CapCurioItem.createProvider(new ICurio() {
+    return CurioItemCapability.createProvider(new ICurio() {
 
       @Override
       public void curioTick(String identifier, int index, LivingEntity livingEntity) {
@@ -73,7 +73,7 @@ public class RingItem extends Item {
       public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
         Multimap<String, AttributeModifier> atts = HashMultimap.create();
 
-        if (CuriosAPI.getCurioTags(stack.getItem()).contains(identifier)) {
+        if (CuriosApi.getCurioTags(stack.getItem()).contains(identifier)) {
           atts.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(),
               new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
                   AttributeModifier.Operation.MULTIPLY_TOTAL));

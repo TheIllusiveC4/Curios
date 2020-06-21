@@ -21,13 +21,14 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class SPacketSyncContentsWithTag {
 
@@ -39,7 +40,6 @@ public class SPacketSyncContentsWithTag {
 
   public SPacketSyncContentsWithTag(int entityId, String curioId, int slotId, ItemStack stack,
       CompoundNBT compound) {
-
     this.entityId = entityId;
     this.slotId = slotId;
     this.stack = stack.copy();
@@ -48,7 +48,6 @@ public class SPacketSyncContentsWithTag {
   }
 
   public static void encode(SPacketSyncContentsWithTag msg, PacketBuffer buf) {
-
     buf.writeInt(msg.entityId);
     buf.writeString(msg.curioId);
     buf.writeInt(msg.slotId);
@@ -57,7 +56,6 @@ public class SPacketSyncContentsWithTag {
   }
 
   public static SPacketSyncContentsWithTag decode(PacketBuffer buf) {
-
     return new SPacketSyncContentsWithTag(buf.readInt(), buf.readString(25), buf.readInt(),
         buf.readItemStack(), buf.readCompoundTag());
   }
@@ -65,14 +63,19 @@ public class SPacketSyncContentsWithTag {
   public static void handle(SPacketSyncContentsWithTag msg, Supplier<NetworkEvent.Context> ctx) {
 
     ctx.get().enqueueWork(() -> {
-      Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+      ClientWorld world = Minecraft.getInstance().world;
 
-      if (entity instanceof LivingEntity) {
-        CuriosAPI.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
-          ItemStack stack = msg.stack;
-          CuriosAPI.getCurio(stack).ifPresent(curio -> curio.readSyncData(msg.compound));
-          handler.setStackInSlot(msg.curioId, msg.slotId, stack);
-        });
+      if (world != null) {
+        Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+
+        if (entity instanceof LivingEntity) {
+          CuriosApi.getCuriosHandler((LivingEntity) entity).ifPresent(
+              handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacksHandler -> {
+                ItemStack stack = msg.stack;
+                CuriosApi.getCurio(stack).ifPresent(curio -> curio.readSyncData(msg.compound));
+                stacksHandler.getStacks().setStackInSlot(msg.slotId, stack);
+              }));
+        }
       }
     });
     ctx.get().setPacketHandled(true);

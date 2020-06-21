@@ -45,8 +45,11 @@ public class SPacketGrabbedItem {
   public static void handle(SPacketGrabbedItem msg, Supplier<Context> ctx) {
 
     ctx.get().enqueueWork(() -> {
-      ClientPlayerEntity sp = Minecraft.getInstance().player;
-      sp.inventory.setItemStack(msg.stack);
+      ClientPlayerEntity clientPlayer = Minecraft.getInstance().player;
+
+      if (clientPlayer != null) {
+        clientPlayer.inventory.setItemStack(msg.stack);
+      }
     });
     ctx.get().setPacketHandled(true);
   }

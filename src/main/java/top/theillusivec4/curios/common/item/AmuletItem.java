@@ -36,7 +36,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.client.render.model.AmuletModel;
-import top.theillusivec4.curios.common.capability.CapCurioItem;
+import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
 public class AmuletItem extends Item {
 
@@ -50,7 +50,7 @@ public class AmuletItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-    return CapCurioItem.createProvider(new ICurio() {
+    return CurioItemCapability.createProvider(new ICurio() {
       private Object model;
 
       @Override

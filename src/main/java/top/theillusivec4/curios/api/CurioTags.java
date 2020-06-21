@@ -78,6 +78,6 @@ public final class CurioTags {
 
   private static Tag<Item> tag(String name) {
 
-    return new ItemTags.Wrapper(new ResourceLocation(CuriosAPI.MODID, name));
+    return new ItemTags.Wrapper(new ResourceLocation(CuriosApi.MODID, name));
   }
 }

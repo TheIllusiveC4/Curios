@@ -37,31 +37,37 @@ import top.theillusivec4.curios.common.item.RingItem;
 public class CuriosRegistry {
 
   @ObjectHolder("curios:ring")
-  public static final Item RING = null;
+  public static final Item RING;
 
   @ObjectHolder("curios:amulet")
-  public static final Item AMULET = null;
+  public static final Item AMULET;
 
   @ObjectHolder("curios:crown")
-  public static final Item CROWN = null;
+  public static final Item CROWN;
 
   @ObjectHolder("curios:knuckles")
-  public static final Item KNUCKLES = null;
+  public static final Item KNUCKLES;
 
   @ObjectHolder("curios:curios_container")
-  public static final ContainerType<CuriosContainer> CONTAINER_TYPE = null;
+  public static final ContainerType<CuriosContainer> CONTAINER_TYPE;
 
   @SubscribeEvent
   public static void registerItems(RegistryEvent.Register<Item> evt) {
-
     evt.getRegistry()
         .registerAll(new RingItem(), new AmuletItem(), new CrownItem(), new KnucklesItem());
   }
 
   @SubscribeEvent
   public static void registerContainer(RegistryEvent.Register<ContainerType<?>> evt) {
-
     evt.getRegistry().register(
         IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
+  }
+
+  static {
+    RING = null;
+    AMULET = null;
+    CROWN = null;
+    KNUCKLES = null;
+    CONTAINER_TYPE = null;
   }
 }
