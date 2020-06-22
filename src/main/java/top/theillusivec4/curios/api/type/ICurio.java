@@ -17,7 +17,7 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.api.capability;
+package top.theillusivec4.curios.api.type;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -42,14 +42,46 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
-import top.theillusivec4.curios.api.CurioSlotType;
+import top.theillusivec4.curios.common.SlotType;
 
 public interface ICurio {
+
+  static void playDefaultBreakSound(ItemStack stack, LivingEntity livingEntity) {
+
+    if (!stack.isEmpty()) {
+
+      if (!livingEntity.isSilent()) {
+        livingEntity.world
+            .playSound(livingEntity.getPosX(), livingEntity.getPosY(), livingEntity.getPosZ(),
+                SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(), 0.8F,
+                0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
+      }
+
+      for (int i = 0; i < 5; ++i) {
+        Vec3d vec3d = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
+            Math.random() * 0.1D + 0.1D, 0.0D);
+        vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
+        vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
+        double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
+
+        Vec3d vec3d1 = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D, d0,
+            0.6D);
+        vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
+        vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
+        vec3d1 = vec3d1.add(livingEntity.getPosX(),
+            livingEntity.getPosY() + (double) livingEntity.getEyeHeight(), livingEntity.getPosZ());
+
+        livingEntity.world
+            .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
+                vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
+      }
+    }
+  }
 
   /**
    * Called every tick on both client and server while the ItemStack is equipped.
    *
-   * @param identifier   The {@link CurioSlotType} identifier of the ItemStack's slot
+   * @param identifier   The {@link SlotType} identifier of the ItemStack's slot
    * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
@@ -60,7 +92,7 @@ public interface ICurio {
   /**
    * Called every tick only on the client while the ItemStack is equipped.
    *
-   * @param identifier   The {@link CurioSlotType} identifier of the ItemStack's slot
+   * @param identifier   The {@link SlotType} identifier of the ItemStack's slot
    * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
@@ -71,7 +103,7 @@ public interface ICurio {
   /**
    * Called when the ItemStack is equipped into a slot.
    *
-   * @param identifier   The {@link CurioSlotType} identifier of the slot being equipped into
+   * @param identifier   The {@link SlotType} identifier of the slot being equipped into
    * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
@@ -82,7 +114,7 @@ public interface ICurio {
   /**
    * Called when the ItemStack is unequipped from a slot.
    *
-   * @param identifier   The {@link CurioSlotType} identifier of the slot being unequipped from
+   * @param identifier   The {@link SlotType} identifier of the slot being unequipped from
    * @param index        The index of the slot
    * @param livingEntity The wearer of the ItemStack
    */
@@ -93,7 +125,7 @@ public interface ICurio {
   /**
    * Determines if the ItemStack can be equipped into a slot.
    *
-   * @param identifier   The {@link CurioSlotType} identifier of the slot being equipped into
+   * @param identifier   The {@link SlotType} identifier of the slot being equipped into
    * @param livingEntity The wearer of the ItemStack
    * @return True if the ItemStack can be equipped/put in, false if not
    */
@@ -104,14 +136,13 @@ public interface ICurio {
   /**
    * Determines if the ItemStack can be unequipped from a slot.
    *
-   * @param identifier   The {@link CurioSlotType} identifier of the slot being unequipped from
+   * @param identifier   The {@link SlotType} identifier of the slot being unequipped from
    * @param livingEntity The wearer of the ItemStack
    * @return True if the ItemStack can be unequipped/taken out, false if not
    */
   default boolean canUnequip(String identifier, LivingEntity livingEntity) {
     return true;
   }
-
 
   /**
    * Retrieves a list of tooltips when displaying curio tag information. By default, this will be a
@@ -128,7 +159,7 @@ public interface ICurio {
   }
 
   /**
-   * A map of AttributeModifier associated with the ItemStack and the {@link CurioSlotType} identifier.
+   * A map of AttributeModifier associated with the ItemStack and the {@link SlotType} identifier.
    *
    * @param identifier The CurioType identifier for the context
    * @return A map of attribute modifiers to apply
@@ -160,7 +191,6 @@ public interface ICurio {
     return false;
   }
 
-
   /**
    * Called when rendering break animations and sounds client-side when a worn curio item is
    * broken.
@@ -177,7 +207,7 @@ public interface ICurio {
    * returns true if the change should be synced to all tracking clients. Note that this check
    * occurs every tick so implementations need to code their own timers for other intervals.
    *
-   * @param identifier   The identifier of the {@link CurioSlotType} of the slot
+   * @param identifier   The identifier of the {@link SlotType} of the slot
    * @param index        The index of the slot
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    * @return True to sync the ItemStack change to all tracking clients, false to do nothing
@@ -220,6 +250,33 @@ public interface ICurio {
   }
 
   /**
+   * Determines if the ItemStack has rendering.
+   *
+   * @param identifier   The identifier of the {@link SlotType} of the slot
+   * @param index        The index of the slot
+   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @return True if the ItemStack has rendering, false if it does not
+   */
+  default boolean canRender(String identifier, int index, LivingEntity livingEntity) {
+    return false;
+  }
+
+  /**
+   * Performs rendering of the ItemStack if {@link ICurio#canRender(String, int, LivingEntity)}
+   * returns true. Note that vertical sneaking translations are automatically applied before this
+   * rendering method is called.
+   *
+   * @param identifier   The identifier of the {@link SlotType} of the slot
+   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   */
+  default void render(String identifier, int index, MatrixStack matrixStack,
+      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
+      float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+      float headPitch) {
+
+  }
+
+  /**
    * Used by {@link ICurio#getDropRule(LivingEntity)} to determine drop on death behavior.
    * <br>
    * DEFAULT - normal vanilla behavior with drops dictated by the Keep Inventory game rule
@@ -232,65 +289,6 @@ public interface ICurio {
    */
   enum DropRule {
     DEFAULT, ALWAYS_DROP, ALWAYS_KEEP, DESTROY
-  }
-
-  /**
-   * Determines if the ItemStack has rendering.
-   *
-   * @param identifier   The identifier of the {@link CurioSlotType} of the slot
-   * @param index        The index of the slot
-   * @param livingEntity The LivingEntity that is wearing the ItemStack
-   * @return True if the ItemStack has rendering, false if it does not
-   */
-  default boolean canRender(String identifier, int index, LivingEntity livingEntity) {
-    return false;
-  }
-
-  /**
-   * Performs rendering of the ItemStack if {@link ICurio#canRender(String, int, LivingEntity)} returns
-   * true. Note that vertical sneaking translations are automatically applied before this rendering
-   * method is called.
-   *
-   * @param identifier   The identifier of the {@link CurioSlotType} of the slot
-   * @param livingEntity The LivingEntity that is wearing the ItemStack
-   */
-  default void render(String identifier, int index, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
-      float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-      float headPitch) {
-
-  }
-
-  static void playDefaultBreakSound(ItemStack stack, LivingEntity livingEntity) {
-
-    if (!stack.isEmpty()) {
-
-      if (!livingEntity.isSilent()) {
-        livingEntity.world
-            .playSound(livingEntity.getPosX(), livingEntity.getPosY(), livingEntity.getPosZ(),
-                SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(), 0.8F,
-                0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
-      }
-
-      for (int i = 0; i < 5; ++i) {
-        Vec3d vec3d = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
-            Math.random() * 0.1D + 0.1D, 0.0D);
-        vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
-        vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
-
-        Vec3d vec3d1 = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D, d0,
-            0.6D);
-        vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
-        vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        vec3d1 = vec3d1.add(livingEntity.getPosX(),
-            livingEntity.getPosY() + (double) livingEntity.getEyeHeight(), livingEntity.getPosZ());
-
-        livingEntity.world
-            .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
-                vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
-      }
-    }
   }
 
   /**

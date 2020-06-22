@@ -19,12 +19,11 @@
 
 package top.theillusivec4.curios.server.command;
 
-import com.google.common.collect.Maps;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import java.util.SortedMap;
+import java.util.Map;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
@@ -34,8 +33,9 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncMap;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 
 public class CuriosCommand {
 
@@ -49,11 +49,11 @@ public class CuriosCommand {
     curiosCommand.then(Commands.literal("set").then(
         Commands.argument("slot", CurioArgumentType.slot()).then(
             Commands.argument("player", EntityArgument.player()).executes(
-                context -> setSlotsOfPlayer(context.getSource(),
+                context -> setSlotsForPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
                     CurioArgumentType.getSlot(context, "slot"), 1)).then(
                 Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                    context -> setSlotsOfPlayer(context.getSource(),
+                    context -> setSlotsForPlayer(context.getSource(),
                         EntityArgument.getPlayer(context, "player"),
                         CurioArgumentType.getSlot(context, "slot"),
                         IntegerArgumentType.getInteger(context, "amount")))))));
@@ -61,11 +61,11 @@ public class CuriosCommand {
     curiosCommand.then(Commands.literal("add").then(
         Commands.argument("slot", CurioArgumentType.slot()).then(
             Commands.argument("player", EntityArgument.player()).executes(
-                context -> addSlotToPlayer(context.getSource(),
+                context -> growSlotForPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
                     CurioArgumentType.getSlot(context, "slot"), 1)).then(
                 Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                    context -> addSlotToPlayer(context.getSource(),
+                    context -> growSlotForPlayer(context.getSource(),
                         EntityArgument.getPlayer(context, "player"),
                         CurioArgumentType.getSlot(context, "slot"),
                         IntegerArgumentType.getInteger(context, "amount")))))));
@@ -73,11 +73,11 @@ public class CuriosCommand {
     curiosCommand.then(Commands.literal("remove").then(
         Commands.argument("slot", CurioArgumentType.slot()).then(
             Commands.argument("player", EntityArgument.player()).executes(
-                context -> removeSlotFromPlayer(context.getSource(),
+                context -> shrinkSlotForPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
                     CurioArgumentType.getSlot(context, "slot"), 1)).then(
                 Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                    context -> removeSlotFromPlayer(context.getSource(),
+                    context -> shrinkSlotForPlayer(context.getSource(),
                         EntityArgument.getPlayer(context, "player"),
                         CurioArgumentType.getSlot(context, "slot"),
                         IntegerArgumentType.getInteger(context, "amount")))))));
@@ -85,14 +85,14 @@ public class CuriosCommand {
     curiosCommand.then(Commands.literal("enable").then(
         Commands.argument("slot", CurioArgumentType.slot()).then(
             Commands.argument("player", EntityArgument.player()).executes(
-                context -> enableSlotForPlayer(context.getSource(),
+                context -> unlockSlotForPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
                     CurioArgumentType.getSlot(context, "slot"))))));
 
     curiosCommand.then(Commands.literal("disable").then(
         Commands.argument("slot", CurioArgumentType.slot()).then(
             Commands.argument("player", EntityArgument.player()).executes(
-                context -> disableSlotForPlayer(context.getSource(),
+                context -> lockSlotForPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
                     CurioArgumentType.getSlot(context, "slot"))))));
 
@@ -113,7 +113,7 @@ public class CuriosCommand {
     dispatcher.register(curiosCommand);
   }
 
-  private static int setSlotsOfPlayer(CommandSource source, ServerPlayerEntity playerMP,
+  private static int setSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot, int amount) {
     CuriosApi.setSlotsForType(slot, playerMP, amount);
     source.sendFeedback(new TranslationTextComponent("commands.curios.set.success", slot,
@@ -121,36 +121,32 @@ public class CuriosCommand {
     return Command.SINGLE_SUCCESS;
   }
 
-  private static int addSlotToPlayer(CommandSource source, ServerPlayerEntity playerMP, String slot,
-      int amount) {
-
+  private static int growSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
+      String slot, int amount) {
     CuriosApi.growSlotType(slot, amount, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.add.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
 
-  private static int removeSlotFromPlayer(CommandSource source, ServerPlayerEntity playerMP,
+  private static int shrinkSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot, int amount) {
-
     CuriosApi.shrinkSlotType(slot, amount, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.remove.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
 
-  private static int enableSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
+  private static int unlockSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
-
     CuriosApi.unlockSlotType(slot, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.enable.success", slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
 
-  private static int disableSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
+  private static int lockSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
-
     CuriosApi.lockSlotType(slot, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.disable.success", slot,
         playerMP.getDisplayName()), true);
@@ -161,14 +157,14 @@ public class CuriosCommand {
       String slot) {
 
     CuriosApi.getCuriosHandler(playerMP).ifPresent(handler -> {
-      SortedMap<String, CurioSlotStackHandler> map = handler.getCurios();
+      Map<String, CurioStacksHandler> curios = handler.getCurios();
 
-      if (!slot.isEmpty() && map.get(slot) != null) {
-        clear(map.get(slot));
+      if (!slot.isEmpty() && curios.get(slot) != null) {
+        clear(curios.get(slot));
       } else {
 
-        for (String id : map.keySet()) {
-          clear(map.get(id));
+        for (String id : curios.keySet()) {
+          clear(curios.get(id));
         }
       }
     });
@@ -184,14 +180,10 @@ public class CuriosCommand {
   }
 
   private static int resetSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP) {
-
     CuriosApi.getCuriosHandler(playerMP).ifPresent(handler -> {
-      SortedMap<String, CurioSlotStackHandler> slots = Maps.newTreeMap();
-      CuriosApi.getTypeIdentifiers().forEach(id -> CuriosApi.getType(id)
-          .ifPresent(type -> slots.put(id, new CurioSlotStackHandler(type.getSize()))));
-      handler.setCurios(slots);
+      handler.reset();
       NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> playerMP),
-          new SPacketSyncMap(playerMP.getEntityId(), handler.getCurios()));
+          new SPacketSyncCurios(playerMP.getEntityId(), handler.getCurios()));
     });
     source.sendFeedback(
         new TranslationTextComponent("commands.curios.reset.success", playerMP.getDisplayName()),
@@ -199,10 +191,11 @@ public class CuriosCommand {
     return Command.SINGLE_SUCCESS;
   }
 
-  private static void clear(CurioSlotStackHandler stacks) {
+  private static void clear(CurioStacksHandler stacksHandler) {
 
-    for (int i = 0; i < stacks.getSlots(); i++) {
-      stacks.setStackInSlot(i, ItemStack.EMPTY);
+    for (int i = 0; i < stacksHandler.getSlots(); i++) {
+      stacksHandler.getStacks().setStackInSlot(i, ItemStack.EMPTY);
+      stacksHandler.getCosmeticStacks().setStackInSlot(i, ItemStack.EMPTY);
     }
   }
 }

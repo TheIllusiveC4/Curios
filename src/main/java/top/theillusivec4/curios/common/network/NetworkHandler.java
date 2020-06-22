@@ -30,18 +30,16 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.common.network.client.CPacketDestroyCurios;
+import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
-import top.theillusivec4.curios.common.network.client.CPacketScrollCurios;
-import top.theillusivec4.curios.common.network.server.SPacketBreakCurio;
+import top.theillusivec4.curios.common.network.client.CPacketScroll;
+import top.theillusivec4.curios.common.network.server.SPacketBreak;
 import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
-import top.theillusivec4.curios.common.network.server.SPacketScrollCurios;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActive;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContents;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContentsWithTag;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncMap;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncSize;
+import top.theillusivec4.curios.common.network.server.SPacketScroll;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 
 public class NetworkHandler {
 
@@ -54,49 +52,41 @@ public class NetworkHandler {
   public static void register() {
 
     INSTANCE = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(Curios.MODID, "main"))
-        .networkProtocolVersion(() -> PTC_VERSION)
-        .clientAcceptedVersions(PTC_VERSION::equals)
-        .serverAcceptedVersions(PTC_VERSION::equals)
-        .simpleChannel();
+        .networkProtocolVersion(() -> PTC_VERSION).clientAcceptedVersions(PTC_VERSION::equals)
+        .serverAcceptedVersions(PTC_VERSION::equals).simpleChannel();
 
     //Client Packets
     register(CPacketOpenCurios.class, CPacketOpenCurios::encode, CPacketOpenCurios::decode,
         CPacketOpenCurios::handle);
     register(CPacketOpenVanilla.class, CPacketOpenVanilla::encode, CPacketOpenVanilla::decode,
         CPacketOpenVanilla::handle);
-    register(CPacketScrollCurios.class, CPacketScrollCurios::encode, CPacketScrollCurios::decode,
-        CPacketScrollCurios::handle);
-    register(CPacketDestroyCurios.class, CPacketDestroyCurios::encode, CPacketDestroyCurios::decode,
-        CPacketDestroyCurios::handle);
+    register(CPacketScroll.class, CPacketScroll::encode, CPacketScroll::decode,
+        CPacketScroll::handle);
+    register(CPacketDestroy.class, CPacketDestroy::encode, CPacketDestroy::decode,
+        CPacketDestroy::handle);
 
     // Server Packets
-    register(SPacketSyncContents.class, SPacketSyncContents::encode, SPacketSyncContents::decode,
-        SPacketSyncContents::handle);
-    register(SPacketScrollCurios.class, SPacketScrollCurios::encode, SPacketScrollCurios::decode,
-        SPacketScrollCurios::handle);
-    register(SPacketSyncActive.class, SPacketSyncActive::encode, SPacketSyncActive::decode,
-        SPacketSyncActive::handle);
-    register(SPacketSyncSize.class, SPacketSyncSize::encode, SPacketSyncSize::decode,
-        SPacketSyncSize::handle);
-    register(SPacketSyncMap.class, SPacketSyncMap::encode, SPacketSyncMap::decode,
-        SPacketSyncMap::handle);
-    register(SPacketSyncContentsWithTag.class, SPacketSyncContentsWithTag::encode,
-        SPacketSyncContentsWithTag::decode, SPacketSyncContentsWithTag::handle);
-    register(SPacketBreakCurio.class, SPacketBreakCurio::encode, SPacketBreakCurio::decode,
-        SPacketBreakCurio::handle);
+    register(SPacketSyncStack.class, SPacketSyncStack::encode, SPacketSyncStack::decode,
+        SPacketSyncStack::handle);
+    register(SPacketScroll.class, SPacketScroll::encode, SPacketScroll::decode,
+        SPacketScroll::handle);
+    register(SPacketSyncOperation.class, SPacketSyncOperation::encode, SPacketSyncOperation::decode,
+        SPacketSyncOperation::handle);
+    register(SPacketSyncCurios.class, SPacketSyncCurios::encode, SPacketSyncCurios::decode,
+        SPacketSyncCurios::handle);
+    register(SPacketBreak.class, SPacketBreak::encode, SPacketBreak::decode, SPacketBreak::handle);
     register(SPacketGrabbedItem.class, SPacketGrabbedItem::encode, SPacketGrabbedItem::decode,
         SPacketGrabbedItem::handle);
 
     // Assignment of curio breaking to the network instance
-    CuriosApi.brokenCurioConsumer = (id, index, livingEntity) -> INSTANCE.send(
-        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-        new SPacketBreakCurio(livingEntity.getEntityId(), id, index));
+    CuriosApi.brokenCurioConsumer = (id, index, livingEntity) -> INSTANCE
+        .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
+            new SPacketBreak(livingEntity.getEntityId(), id, index));
   }
 
   private static <M> void register(Class<M> messageType, BiConsumer<M, PacketBuffer> encoder,
       Function<PacketBuffer, M> decoder,
       BiConsumer<M, Supplier<NetworkEvent.Context>> messageConsumer) {
-
     INSTANCE.registerMessage(id++, messageType, encoder, decoder, messageConsumer);
   }
 }

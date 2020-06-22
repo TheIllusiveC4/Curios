@@ -21,11 +21,9 @@ package top.theillusivec4.curios.common.event;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.function.Predicate;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -55,21 +53,90 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.capability.CuriosCapability;
-import top.theillusivec4.curios.api.capability.ICurio;
-import top.theillusivec4.curios.api.capability.ICurio.DropRule;
-import top.theillusivec4.curios.api.capability.ICurioItemHandler;
+import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.type.ICurio;
+import top.theillusivec4.curios.api.type.ICurio.DropRule;
+import top.theillusivec4.curios.api.type.ICurioItemHandler;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 import top.theillusivec4.curios.api.event.CurioDropsEvent;
 import top.theillusivec4.curios.api.event.DropRulesEvent;
 import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
+import top.theillusivec4.curios.api.inventory.DynamicStackHandler;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContents;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncContentsWithTag;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncMap;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
 
 public class CuriosEventHandler {
+
+  private static void handleDrops(LivingEntity livingEntity,
+      List<Tuple<Predicate<ItemStack>, DropRule>> dropRules, ItemStackHandler stacks,
+      Collection<ItemEntity> drops, boolean keepInventory) {
+    for (int i = 0; i < stacks.getSlots(); i++) {
+      ItemStack stack = stacks.getStackInSlot(i);
+
+      if (!stack.isEmpty()) {
+        DropRule dropRuleOverride = null;
+
+        for (Tuple<Predicate<ItemStack>, DropRule> override : dropRules) {
+
+          if (override.getA().test(stack)) {
+            dropRuleOverride = override.getB();
+          }
+        }
+        DropRule dropRule = dropRuleOverride != null ? dropRuleOverride
+            : CuriosApi.getCurio(stack).map(curio -> curio.getDropRule(livingEntity))
+                .orElse(DropRule.DEFAULT);
+
+        if ((dropRule == DropRule.DEFAULT && keepInventory) || dropRule == DropRule.ALWAYS_KEEP) {
+          continue;
+        }
+
+        if (!EnchantmentHelper.hasVanishingCurse(stack) && dropRule != DropRule.DESTROY) {
+          drops.add(getDroppedItem(stack, livingEntity));
+        }
+        stacks.setStackInSlot(i, ItemStack.EMPTY);
+      }
+    }
+  }
+
+  private static ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
+    double d0 =
+        livingEntity.getPosY() - 0.30000001192092896D + (double) livingEntity.getEyeHeight();
+    ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.getPosX(), d0,
+        livingEntity.getPosZ(), droppedItem);
+    entityitem.setPickupDelay(40);
+    float f = livingEntity.world.rand.nextFloat() * 0.5F;
+    float f1 = livingEntity.world.rand.nextFloat() * ((float) Math.PI * 2F);
+    entityitem.setMotion((-MathHelper.sin(f1) * f), 0.20000000298023224D, (MathHelper.cos(f1) * f));
+    return entityitem;
+  }
+
+  private static boolean handleMending(PlayerEntity player, ItemStackHandler stacks, PickupXp evt) {
+
+    for (int i = 0; i < stacks.getSlots(); i++) {
+      ItemStack stack = stacks.getStackInSlot(i);
+
+      if (!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0
+          && stack.isDamaged()) {
+        evt.setCanceled(true);
+        ExperienceOrbEntity orb = evt.getOrb();
+        player.xpCooldown = 2;
+        player.onItemPickup(orb, 1);
+        int toRepair = Math.min(orb.xpValue * 2, stack.getDamage());
+        orb.xpValue -= toRepair / 2;
+        stack.setDamage(stack.getDamage() - toRepair);
+
+        if (orb.xpValue > 0) {
+          player.giveExperiencePoints(orb.xpValue);
+        }
+        orb.remove();
+        return true;
+      }
+    }
+    return false;
+  }
 
   @SubscribeEvent
   public void attachEntitiesCapabilities(AttachCapabilitiesEvent<Entity> evt) {
@@ -93,7 +160,7 @@ public class CuriosEventHandler {
         if (entity instanceof ServerPlayerEntity) {
           ServerPlayerEntity mp = (ServerPlayerEntity) entity;
           NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
-              new SPacketSyncMap(mp.getEntityId(), handler.getCurios()));
+              new SPacketSyncCurios(mp.getEntityId(), handler.getCurios()));
         }
       });
     }
@@ -109,7 +176,7 @@ public class CuriosEventHandler {
       LivingEntity livingBase = (LivingEntity) target;
       CuriosApi.getCuriosHandler(livingBase).ifPresent(handler -> NetworkHandler.INSTANCE
           .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
-              new SPacketSyncMap(target.getEntityId(), handler.getCurios())));
+              new SPacketSyncCurios(target.getEntityId(), handler.getCurios())));
     }
   }
 
@@ -123,7 +190,7 @@ public class CuriosEventHandler {
     LazyOptional<ICurioItemHandler> newHandler = CuriosApi.getCuriosHandler(player);
 
     oldHandler.ifPresent(oldCurios -> newHandler.ifPresent(newCurios -> {
-      newCurios.setCurios(new TreeMap<>(oldCurios.getCurios()));
+      newCurios.setCurios(new LinkedHashMap<>(oldCurios.getCurios()));
 
       oldCurios.getCurios().forEach((identifier, stacksHandler) -> {
         ItemStackHandler stackHandler = stacksHandler.getStacks();
@@ -175,49 +242,6 @@ public class CuriosEventHandler {
     }
   }
 
-  private static void handleDrops(LivingEntity livingEntity,
-      List<Tuple<Predicate<ItemStack>, DropRule>> dropRules, ItemStackHandler stacks,
-      Collection<ItemEntity> drops, boolean keepInventory) {
-    for (int i = 0; i < stacks.getSlots(); i++) {
-      ItemStack stack = stacks.getStackInSlot(i);
-
-      if (!stack.isEmpty()) {
-        DropRule dropRuleOverride = null;
-
-        for (Tuple<Predicate<ItemStack>, DropRule> override : dropRules) {
-
-          if (override.getA().test(stack)) {
-            dropRuleOverride = override.getB();
-          }
-        }
-        DropRule dropRule = dropRuleOverride != null ? dropRuleOverride
-            : CuriosApi.getCurio(stack).map(curio -> curio.getDropRule(livingEntity))
-                .orElse(DropRule.DEFAULT);
-
-        if ((dropRule == DropRule.DEFAULT && keepInventory) || dropRule == DropRule.ALWAYS_KEEP) {
-          continue;
-        }
-
-        if (!EnchantmentHelper.hasVanishingCurse(stack) && dropRule != DropRule.DESTROY) {
-          drops.add(getDroppedItem(stack, livingEntity));
-        }
-        stacks.setStackInSlot(i, ItemStack.EMPTY);
-      }
-    }
-  }
-
-  private static ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
-    double d0 =
-        livingEntity.getPosY() - 0.30000001192092896D + (double) livingEntity.getEyeHeight();
-    ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.getPosX(), d0,
-        livingEntity.getPosZ(), droppedItem);
-    entityitem.setPickupDelay(40);
-    float f = livingEntity.world.rand.nextFloat() * 0.5F;
-    float f1 = livingEntity.world.rand.nextFloat() * ((float) Math.PI * 2F);
-    entityitem.setMotion((-MathHelper.sin(f1) * f), 0.20000000298023224D, (MathHelper.cos(f1) * f));
-    return entityitem;
-  }
-
   @SubscribeEvent
   public void playerXPPickUp(PickupXp evt) {
     PlayerEntity player = evt.getPlayer();
@@ -234,31 +258,6 @@ public class CuriosEventHandler {
         }
       });
     }
-  }
-
-  private static boolean handleMending(PlayerEntity player, ItemStackHandler stacks, PickupXp evt) {
-
-    for (int i = 0; i < stacks.getSlots(); i++) {
-      ItemStack stack = stacks.getStackInSlot(i);
-
-      if (!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0
-          && stack.isDamaged()) {
-        evt.setCanceled(true);
-        ExperienceOrbEntity orb = evt.getOrb();
-        player.xpCooldown = 2;
-        player.onItemPickup(orb, 1);
-        int toRepair = Math.min(orb.xpValue * 2, stack.getDamage());
-        orb.xpValue -= toRepair / 2;
-        stack.setDamage(stack.getDamage() - toRepair);
-
-        if (orb.xpValue > 0) {
-          player.giveExperiencePoints(orb.xpValue);
-        }
-        orb.remove();
-        return true;
-      }
-    }
-    return false;
   }
 
   @SubscribeEvent
@@ -309,7 +308,10 @@ public class CuriosEventHandler {
       Map<String, CurioStacksHandler> curios = handler.getCurios();
 
       for (Map.Entry<String, CurioStacksHandler> entry : curios.entrySet()) {
-        ItemStack stack 
+        CurioStacksHandler stacksHandler = entry.getValue();
+        String identifier = entry.getKey();
+        DynamicStackHandler stackHandler = stacksHandler.getStacks();
+        DynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
@@ -332,26 +334,18 @@ public class CuriosEventHandler {
 
             if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
               LazyOptional<ICurio> prevCurio = CuriosApi.getCurio(prevStack);
-              boolean syncable = !stack.equals(prevStack, true) || currentCurio
-                  .map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false)
-                  || prevCurio.map(curio -> curio.canSync(identifier, index, livingEntity))
-                  .orElse(false);
+              boolean syncable =
+                  currentCurio.map(curio -> curio.canSync(identifier, index, livingEntity))
+                      .orElse(false) || prevCurio
+                      .map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false);
 
               if (syncable) {
                 CompoundNBT syncTag = currentCurio.map(ICurio::writeSyncData)
                     .orElse(new CompoundNBT());
-
-                if (!syncTag.isEmpty()) {
-                  NetworkHandler.INSTANCE
-                      .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-                          new SPacketSyncContentsWithTag(livingEntity.getEntityId(), identifier, i,
-                              stack, syncTag));
-                } else {
-                  NetworkHandler.INSTANCE
-                      .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-                          new SPacketSyncContents(livingEntity.getEntityId(), identifier, i,
-                              stack));
-                }
+                NetworkHandler.INSTANCE
+                    .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
+                        new SPacketSyncStack(livingEntity.getEntityId(), identifier, i, stack,
+                            HandlerType.EQUIPMENT, syncTag));
               }
               MinecraftForge.EVENT_BUS
                   .post(new CurioChangeEvent(livingEntity, identifier, i, prevStack, stack));
@@ -363,6 +357,26 @@ public class CuriosEventHandler {
               currentCurio.ifPresent(curio -> curio.onEquip(identifier, index, livingEntity));
               stackHandler
                   .setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
+            }
+            ItemStack cosmeticStack = cosmeticStackHandler.getStackInSlot(i);
+            ItemStack prevCosmeticStack = cosmeticStackHandler.getPreviousStackInSlot(i);
+
+            if (ItemStack.areItemStacksEqual(cosmeticStack, prevCosmeticStack)) {
+              currentCurio = CuriosApi.getCurio(cosmeticStack);
+              LazyOptional<ICurio> prevCurio = CuriosApi.getCurio(prevCosmeticStack);
+              boolean syncable =
+                  currentCurio.map(curio -> curio.canSync(identifier, index, livingEntity))
+                      .orElse(false) || prevCurio
+                      .map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false);
+
+              if (syncable) {
+                CompoundNBT syncTag = currentCurio.map(ICurio::writeSyncData)
+                    .orElse(new CompoundNBT());
+                NetworkHandler.INSTANCE
+                    .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
+                        new SPacketSyncStack(livingEntity.getEntityId(), identifier, i, stack,
+                            HandlerType.COSMETIC, syncTag));
+              }
             }
           }
         }

@@ -38,12 +38,12 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.capability.ICurioItemHandler;
-import top.theillusivec4.curios.api.inventory.CurioSlot;
+import top.theillusivec4.curios.api.type.ICurioItemHandler;
 import top.theillusivec4.curios.client.CuriosClientConfig;
 import top.theillusivec4.curios.client.CuriosClientConfig.Client;
 import top.theillusivec4.curios.client.CuriosClientConfig.Client.ButtonCorner;
 import top.theillusivec4.curios.client.KeyRegistry;
+import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.inventory.CuriosContainer;
 
 public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IRecipeShownListener {
@@ -63,7 +63,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   public boolean hasScrollBar;
   public boolean widthTooNarrow;
 
-  private GuiButtonCurios buttonCurios;
+  private CuriosButton buttonCurios;
   private boolean isScrolling;
   private boolean buttonClicked;
 
@@ -71,6 +71,22 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       ITextComponent title) {
     super(curiosContainer, playerInventory, title);
     this.passEvents = true;
+  }
+
+  public static Tuple<Integer, Integer> getButtonOffset(boolean isCreative) {
+    Client client = CuriosClientConfig.CLIENT;
+    ButtonCorner corner = client.buttonCorner.get();
+    int x = 0;
+    int y = 0;
+
+    if (isCreative) {
+      x += corner.getCreativeXoffset() + client.creativeButtonXOffset.get();
+      y += corner.getCreativeYoffset() + client.creativeButtonYOffset.get();
+    } else {
+      x += corner.getXoffset() + client.buttonXOffset.get();
+      y += corner.getYoffset() + client.buttonYOffset.get();
+    }
+    return new Tuple<>(x, y);
   }
 
   @Override
@@ -94,7 +110,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       this.children.add(this.recipeBookGui);
       this.setFocusedDefault(this.recipeBookGui);
       Tuple<Integer, Integer> offsets = getButtonOffset(false);
-      this.buttonCurios = new GuiButtonCurios(this, this.getGuiLeft() + offsets.getA(),
+      this.buttonCurios = new CuriosButton(this, this.getGuiLeft() + offsets.getA(),
           this.height / 2 + offsets.getB(), 14, 14, 50, 0, 14, CURIO_INVENTORY);
       this.addButton(this.buttonCurios);
 
@@ -127,22 +143,6 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   public void tick() {
     super.tick();
     this.recipeBookGui.tick();
-  }
-
-  public static Tuple<Integer, Integer> getButtonOffset(boolean isCreative) {
-    Client client = CuriosClientConfig.CLIENT;
-    ButtonCorner corner = client.buttonCorner.get();
-    int x = 0;
-    int y = 0;
-
-    if (isCreative) {
-      x += corner.getCreativeXoffset() + client.creativeButtonXOffset.get();
-      y += corner.getCreativeYoffset() + client.creativeButtonYOffset.get();
-    } else {
-      x += corner.getXoffset() + client.buttonXOffset.get();
-      y += corner.getYoffset() + client.buttonYOffset.get();
-    }
-    return new Tuple<>(x, y);
   }
 
   private boolean inScrollBar(double mouseX, double mouseY) {
@@ -329,7 +329,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   }
 
   @Override
-  protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, @Nonnull ClickType type) {
+  protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton,
+      @Nonnull ClickType type) {
     super.handleMouseClick(slotIn, slotId, mouseButton, type);
     this.recipeBookGui.slotClicked(slotIn);
   }

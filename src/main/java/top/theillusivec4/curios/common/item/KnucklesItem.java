@@ -38,7 +38,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.curios.api.type.ICurio;
 import top.theillusivec4.curios.client.render.model.KnucklesModel;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
@@ -94,8 +94,8 @@ public class KnucklesItem extends Item {
             .getBuffer(renderTypeBuffer, knuckles.getRenderType(KNUCKLES_TEXTURE), false,
                 stack.hasEffect());
         knuckles
-            .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F,
-                1.0F, 1.0F, 1.0F);
+            .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
+                1.0F);
       }
     });
   }

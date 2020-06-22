@@ -47,7 +47,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
-public class EventHandlerClient {
+public class ClientEventHandler {
 
   private static final UUID ATTACK_DAMAGE_MODIFIER = UUID
       .fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");

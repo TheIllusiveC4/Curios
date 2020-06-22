@@ -17,20 +17,19 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.api.capability;
+package top.theillusivec4.curios.api.type;
 
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import top.theillusivec4.curios.api.CurioSlotType;
-import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
+import top.theillusivec4.curios.common.SlotType;
 
 public interface ICurioItemHandler {
 
   /**
-   * A map of the current curios, keyed by the {@link CurioSlotType} identifier.
+   * A map of the current curios, keyed by the {@link SlotType} identifier.
    *
    * @return The current curios equipped
    */
@@ -44,53 +43,58 @@ public interface ICurioItemHandler {
   void setCurios(Map<String, CurioStacksHandler> map);
 
   /**
-   * Gets the number of slots across all {@link CurioSlotType} identifiers.
+   * Gets the number of slots across all {@link SlotType} identifiers.
    *
    * @return The number of slots
    */
   int getSlots();
 
   /**
-   * Gets the an Optional {@link CurioStacksHandler} associated with the given {@link CurioSlotType}
+   * Resets the current curios map.
+   */
+  void reset();
+
+  /**
+   * Gets the an Optional {@link CurioStacksHandler} associated with the given {@link SlotType}
    * identifier or Optional.empty() if it doesn't exist.
    *
-   * @param identifier The identifier for the {@link CurioSlotType}
+   * @param identifier The identifier for the {@link SlotType}
    * @return The stack handler
    */
   Optional<CurioStacksHandler> getStacksHandler(String identifier);
 
   /**
-   * Enables the {@link CurioSlotType} for a given identifier, adding the default settings to the
-   * curio map.
+   * Enables the {@link SlotType} for a given identifier, adding the default settings to the curio
+   * map.
    *
-   * @param identifier The identifier for the {@link CurioSlotType}
+   * @param identifier The identifier for the {@link SlotType}
    */
   void unlockSlotType(String identifier);
 
   /**
-   * Disables the {@link CurioSlotType} for a given identifier, removing it from the curio map. Note
-   * that the default implementation handles catching and returning ItemStacks that are found in
-   * these slots.
+   * Disables the {@link SlotType} for a given identifier, removing it from the curio map. Note that
+   * the default implementation handles catching and returning ItemStacks that are found in these
+   * slots.
    *
-   * @param identifier The identifier for the {@link CurioSlotType}
+   * @param identifier The identifier for the {@link SlotType}
    */
   void lockSlotType(String identifier);
 
   /**
-   * Adds an amount of slots to the {@link CurioStacksHandler} of a {@link CurioSlotType}
-   * associated with the identifier.
+   * Adds an amount of slots to the {@link CurioStacksHandler} of a {@link SlotType} associated with
+   * the identifier.
    *
-   * @param identifier The identifier for the {@link CurioSlotType}
+   * @param identifier The identifier for the {@link SlotType}
    * @param amount     The number of slots to add, must be non-negative
    */
   void growSlotType(String identifier, int amount);
 
   /**
-   * Removes an amount of slots from the {@link CurioStacksHandler} of a {@link CurioSlotType}
-   * associated with the identifier. Note that the default implementation handles catching and
-   * returning ItemStacks that are found in these slots.
+   * Removes an amount of slots from the {@link CurioStacksHandler} of a {@link SlotType} associated
+   * with the identifier. Note that the default implementation handles catching and returning
+   * ItemStacks that are found in these slots.
    *
-   * @param identifier The identifier for the {@link CurioSlotType}
+   * @param identifier The identifier for the {@link SlotType}
    * @param amount     The number of slots to remove, must be non-negative
    */
   void shrinkSlotType(String identifier, int amount);
@@ -103,16 +107,16 @@ public interface ICurioItemHandler {
   LivingEntity getWearer();
 
   /**
-   * Adds an ItemStack to the invalid cache. Used for storing items found in the process
-   * of disabling/removing a non-empty slot.
+   * Adds an ItemStack to the invalid cache. Used for storing items found in the process of
+   * disabling/removing a non-empty slot.
    *
    * @param stack The ItemStack to add
    */
   void loseInvalidStack(ItemStack stack);
 
   /**
-   * Drops all of the ItemStacks found in the invalid stacks list. Used for handling items
-   * found in disabling/removing slots.
+   * Drops all of the ItemStacks found in the invalid stacks list. Used for handling items found in
+   * disabling/removing slots.
    */
   void handleInvalidStacks();
 }

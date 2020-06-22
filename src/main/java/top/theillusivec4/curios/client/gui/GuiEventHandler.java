@@ -36,7 +36,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.client.CPacketDestroyCurios;
+import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 
 public class GuiEventHandler {
 
@@ -55,7 +55,7 @@ public class GuiEventHandler {
       int y = offsets.getB();
       int size = isCreative ? 10 : 14;
       int textureOffsetX = isCreative ? 64 : 50;
-      evt.addWidget(new GuiButtonCurios(gui, gui.getGuiLeft() + x, gui.height / 2 + y, size, size,
+      evt.addWidget(new CuriosButton(gui, gui.getGuiLeft() + x, gui.height / 2 + y, size, size,
           textureOffsetX, 0, size, CuriosScreen.CURIO_INVENTORY));
     }
   }
@@ -100,7 +100,7 @@ public class GuiEventHandler {
     }
 
     if (destroyItemSlot != null && slot == destroyItemSlot) {
-      NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketDestroyCurios());
+      NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketDestroy());
     }
   }
 }

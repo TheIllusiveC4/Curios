@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
@@ -32,19 +32,19 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
 
-public class SPacketSyncMap {
+public class SPacketSyncCurios {
 
   private int entityId;
   private int entrySize;
   private Map<String, CurioStacksHandler> map;
 
-  public SPacketSyncMap(int entityId, Map<String, CurioStacksHandler> map) {
+  public SPacketSyncCurios(int entityId, Map<String, CurioStacksHandler> map) {
     this.entityId = entityId;
     this.entrySize = map.size();
     this.map = map;
   }
 
-  public static void encode(SPacketSyncMap msg, PacketBuffer buf) {
+  public static void encode(SPacketSyncCurios msg, PacketBuffer buf) {
     buf.writeInt(msg.entityId);
     buf.writeInt(msg.entrySize);
 
@@ -54,10 +54,10 @@ public class SPacketSyncMap {
     }
   }
 
-  public static SPacketSyncMap decode(PacketBuffer buf) {
+  public static SPacketSyncCurios decode(PacketBuffer buf) {
     int entityId = buf.readInt();
     int entrySize = buf.readInt();
-    Map<String, CurioStacksHandler> map = new HashMap<>();
+    Map<String, CurioStacksHandler> map = new LinkedHashMap<>();
 
     for (int i = 0; i < entrySize; i++) {
       String key = buf.readString(25);
@@ -69,10 +69,10 @@ public class SPacketSyncMap {
       }
       map.put(key, stacksHandler);
     }
-    return new SPacketSyncMap(entityId, map);
+    return new SPacketSyncCurios(entityId, map);
   }
 
-  public static void handle(SPacketSyncMap msg, Supplier<NetworkEvent.Context> ctx) {
+  public static void handle(SPacketSyncCurios msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
       ClientWorld world = Minecraft.getInstance().world;
 

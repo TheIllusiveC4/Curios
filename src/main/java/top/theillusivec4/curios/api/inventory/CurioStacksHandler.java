@@ -1,11 +1,9 @@
 package top.theillusivec4.curios.api.inventory;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.items.ItemStackHandler;
 
 public class CurioStacksHandler {
 
@@ -13,7 +11,7 @@ public class CurioStacksHandler {
   private DynamicStackHandler cosmeticStackHandler;
   private int sizeShift = 0;
 
-  private NonNullList<CurioStackMeta> metaHandler;
+  private NonNullList<Boolean> renderHandler;
 
   public CurioStacksHandler() {
     this(1);
@@ -26,31 +24,29 @@ public class CurioStacksHandler {
   public void setSize(int size) {
     this.stackHandler = new DynamicStackHandler(size);
     this.cosmeticStackHandler = new DynamicStackHandler(size);
-    this.metaHandler = NonNullList.withSize(size, new CurioStackMeta());
+    this.renderHandler = NonNullList.withSize(size, true);
     this.sizeShift = 0;
   }
 
-  public ItemStackHandler getStacks() {
+  public DynamicStackHandler getStacks() {
     return this.stackHandler;
   }
 
-  public ItemStackHandler getCosmeticStacks() {
+  public DynamicStackHandler getCosmeticStacks() {
     return this.cosmeticStackHandler;
   }
 
-  public void setPreviousStackInSlot(int index, ItemStack stack) {
-    this.metaHandler.get(index).setPreviousStack(stack);
-  }
-
-  public ItemStack getPreviousStackInSlot(int index) {
-    return this.metaHandler.get(index).getPreviousStack();
+  public NonNullList<Boolean> getRenders() {
+    return this.renderHandler;
   }
 
   public int getSlots() {
     return this.stackHandler.getSlots();
   }
 
-  public int getSizeShift() { return this.sizeShift; }
+  public int getSizeShift() {
+    return this.sizeShift;
+  }
 
   public void grow(int amount) {
     this.validateSizeChange(amount);
@@ -58,7 +54,7 @@ public class CurioStacksHandler {
     this.cosmeticStackHandler.grow(amount);
 
     for (int i = 0; i < amount; i++) {
-      this.metaHandler.add(new CurioStackMeta());
+      this.renderHandler.add(true);
     }
     this.sizeShift += amount;
   }
@@ -70,7 +66,7 @@ public class CurioStacksHandler {
     this.cosmeticStackHandler.shrink(amount);
 
     for (int i = 0; i < amount; i++) {
-      this.metaHandler.remove(this.metaHandler.size() - 1);
+      this.renderHandler.remove(this.renderHandler.size() - 1);
     }
     this.sizeShift -= amount;
   }
@@ -89,15 +85,15 @@ public class CurioStacksHandler {
 
     ListNBT nbtTagList = new ListNBT();
 
-    for (int i = 0; i < this.metaHandler.size(); i++) {
+    for (int i = 0; i < this.renderHandler.size(); i++) {
       CompoundNBT tag = new CompoundNBT();
       tag.putInt("Slot", i);
-      tag.putBoolean("Render", this.metaHandler.get(i).canRender());
+      tag.putBoolean("Render", this.renderHandler.get(i));
       nbtTagList.add(tag);
     }
     CompoundNBT nbt = new CompoundNBT();
     nbt.put("Renders", nbtTagList);
-    nbt.putInt("Size", this.metaHandler.size());
+    nbt.putInt("Size", this.renderHandler.size());
     compoundNBT.put("Renders", nbt);
     compoundNBT.putInt("SizeShift", this.sizeShift);
     return compoundNBT;
@@ -115,52 +111,23 @@ public class CurioStacksHandler {
 
     if (nbt.contains("Renders")) {
       CompoundNBT tag = nbt.getCompound("Renders");
-      this.metaHandler = NonNullList.withSize(
+      this.renderHandler = NonNullList.withSize(
           tag.contains("Size", Constants.NBT.TAG_INT) ? nbt.getInt("Size")
-              : this.stackHandler.getSlots(), new CurioStackMeta());
+              : this.stackHandler.getSlots(), true);
       ListNBT tagList = tag.getList("Renders", Constants.NBT.TAG_COMPOUND);
 
       for (int i = 0; i < tagList.size(); i++) {
         CompoundNBT tags = tagList.getCompound(i);
         int slot = tags.getInt("Slot");
 
-        if (slot >= 0 && slot < this.metaHandler.size()) {
-          this.metaHandler.get(slot).setRender(tags.getBoolean("Render"));
+        if (slot >= 0 && slot < this.renderHandler.size()) {
+          this.renderHandler.set(slot, tags.getBoolean("Render"));
         }
       }
     }
 
     if (nbt.contains("SizeShift")) {
       this.sizeShift = nbt.getInt("SizeShift");
-    }
-  }
-
-  public static class CurioStackMeta {
-
-    private ItemStack previousStack = ItemStack.EMPTY;
-    private boolean render = false;
-
-    public CurioStackMeta() {
-    }
-
-    public CurioStackMeta(boolean render) {
-      this.render = render;
-    }
-
-    public ItemStack getPreviousStack() {
-      return previousStack;
-    }
-
-    public void setPreviousStack(ItemStack previousStack) {
-      this.previousStack = previousStack;
-    }
-
-    public boolean canRender() {
-      return render;
-    }
-
-    public void setRender(boolean render) {
-      this.render = render;
     }
   }
 }

@@ -43,10 +43,12 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
-import top.theillusivec4.curios.api.capability.CuriosCapability;
-import top.theillusivec4.curios.api.capability.ICurio;
-import top.theillusivec4.curios.api.capability.ICurioItemHandler;
+import top.theillusivec4.curios.api.type.ICurio;
+import top.theillusivec4.curios.api.type.ICurioItemHandler;
+import top.theillusivec4.curios.api.imc.CurioImcMessage;
 import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
+import top.theillusivec4.curios.api.type.ISlotType;
+import top.theillusivec4.curios.common.SlotType;
 
 public final class CuriosApi {
 
@@ -54,16 +56,14 @@ public final class CuriosApi {
    * Holds a reference to the Curios modid.
    */
   public static final String MODID = "curios";
-  private static final ResourceLocation GENERIC_SLOT = new ResourceLocation(MODID,
-      "item/empty_generic_slot");
   /**
    * The maps containing the CurioType and icons with identifiers as keys Try not to access these
    * directly and instead use {@link CuriosApi#getType(String)} and {@link
    * CuriosApi#getIcon(String)}.
    * <br>DO NOT REGISTER DIRECTLY - Use IMC to send the appropriate {@link
-   * top.theillusivec4.curios.api.imc.CurioIMCMessage}
+   * CurioImcMessage}
    */
-  public static Map<String, CurioSlotType> idToType = new HashMap<>();
+  public static Map<String, ISlotType> idToType = new HashMap<>();
   public static Map<String, ResourceLocation> idToIcon = new HashMap<>();
   public static TriConsumer<String, Integer, LivingEntity> brokenCurioConsumer;
 
@@ -88,9 +88,8 @@ public final class CuriosApi {
     return livingEntity.getCapability(CuriosCapability.INVENTORY);
   }
 
-  public static Collection<CurioSlotType> getUnlockedTypes() {
-    return Collections.unmodifiableList(
-        idToType.values().stream().filter(type -> !type.isLocked()).collect(Collectors.toList()));
+  public static Collection<ISlotType> getTypes() {
+    return Collections.unmodifiableCollection(idToType.values());
   }
 
   /**
@@ -102,7 +101,7 @@ public final class CuriosApi {
    * Example: { stack.damageItem(amount, entity, damager -> CuriosAPI.onBrokenCurio(id, index,
    * damager)); }
    *
-   * @param id      The {@link CurioSlotType} String identifier
+   * @param id      The {@link SlotType} String identifier
    * @param index   The slot index of the identifier
    * @param damager The entity that is breaking the item
    */
@@ -113,10 +112,10 @@ public final class CuriosApi {
   /**
    * Gets the Optional wrapper of the CurioType from the given identifier.
    *
-   * @param identifier The unique identifier for the {@link CurioSlotType}
+   * @param identifier The unique identifier for the {@link ISlotType}
    * @return Optional wrapper of the CurioType  or Optional.empty() if not present
    */
-  public static Optional<CurioSlotType> getType(String identifier) {
+  public static Optional<ISlotType> getType(String identifier) {
     return Optional.ofNullable(idToType.get(identifier));
   }
 
@@ -233,8 +232,8 @@ public final class CuriosApi {
   }
 
   /**
-   * /** Adds a single slot to the {@link CurioSlotType} with the associated identifier. If the slot
-   * to be added is for a type that is not enabled on the entity, it will not be added. For adding
+   * /** Adds a single slot to the {@link SlotType} with the associated identifier. If the slot to
+   * be added is for a type that is not enabled on the entity, it will not be added. For adding
    * slot(s) for types that are not yet available, there must first be a call to {@link
    * CuriosApi#unlockSlotType(String, LivingEntity)}
    *
@@ -246,9 +245,9 @@ public final class CuriosApi {
   }
 
   /**
-   * Adds multiple slots to the {@link CurioSlotType} with the associated identifier. If the slot to
-   * be added is for a type that is not enabled on the entity, it will not be added. For adding
-   * slot(s) for types that are not yet available, there must first be a call to {@link
+   * Adds multiple slots to the {@link SlotType} with the associated identifier. If the slot to be
+   * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
+   * for types that are not yet available, there must first be a call to {@link
    * CuriosApi#unlockSlotType(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
@@ -260,9 +259,9 @@ public final class CuriosApi {
   }
 
   /**
-   * Removes a single slot to the {@link CurioSlotType} with the associated identifier. If the slot
-   * to be removed is the last slot available, it will not be removed. For the removal of the last
-   * slot, please see {@link CuriosApi#lockSlotType(String, LivingEntity)}
+   * Removes a single slot to the {@link SlotType} with the associated identifier. If the slot to be
+   * removed is the last slot available, it will not be removed. For the removal of the last slot,
+   * please see {@link CuriosApi#lockSlotType(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
@@ -272,8 +271,8 @@ public final class CuriosApi {
   }
 
   /**
-   * Removes multiple slots to the {@link CurioSlotType} with the associated identifier. If the slot
-   * to be removed is the last slot available, it will not be removed. For the removal of the last
+   * Removes multiple slots to the {@link SlotType} with the associated identifier. If the slot to
+   * be removed is the last slot available, it will not be removed. For the removal of the last
    * slot, please see {@link CuriosApi#lockSlotType(String, LivingEntity)}
    *
    * @param id               The identifier of the CurioType
@@ -284,7 +283,7 @@ public final class CuriosApi {
   }
 
   /**
-   * Adds a {@link CurioSlotType} to the entity The number of slots given is the type's default.
+   * Adds a {@link SlotType} to the entity The number of slots given is the type's default.
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
@@ -294,7 +293,7 @@ public final class CuriosApi {
   }
 
   /**
-   * Removes a {@link CurioSlotType} from the entity.
+   * Removes a {@link SlotType} from the entity.
    *
    * @param id               The identifier of the CurioType
    * @param entityLivingBase The holder of the slot(s)
@@ -319,16 +318,16 @@ public final class CuriosApi {
    */
   @Nonnull
   public static ResourceLocation getIcon(String identifier) {
-    return idToIcon.getOrDefault(identifier, GENERIC_SLOT);
+    return idToIcon
+        .getOrDefault(identifier, new ResourceLocation("item/empty_" + identifier + "_slot"));
   }
 
   /**
    * Holder class for IMC message identifiers.
    */
-  public static final class IMC {
+  public static final class Imc {
 
     public static final String REGISTER_TYPE = "register_type";
     public static final String MODIFY_TYPE = "modify_type";
-    public static final String REGISTER_ICON = "register_icon";
   }
 }

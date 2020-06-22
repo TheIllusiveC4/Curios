@@ -51,6 +51,14 @@ public class CuriosRegistry {
   @ObjectHolder("curios:curios_container")
   public static final ContainerType<CuriosContainer> CONTAINER_TYPE;
 
+  static {
+    RING = null;
+    AMULET = null;
+    CROWN = null;
+    KNUCKLES = null;
+    CONTAINER_TYPE = null;
+  }
+
   @SubscribeEvent
   public static void registerItems(RegistryEvent.Register<Item> evt) {
     evt.getRegistry()
@@ -61,13 +69,5 @@ public class CuriosRegistry {
   public static void registerContainer(RegistryEvent.Register<ContainerType<?>> evt) {
     evt.getRegistry().register(
         IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
-  }
-
-  static {
-    RING = null;
-    AMULET = null;
-    CROWN = null;
-    KNUCKLES = null;
-    CONTAINER_TYPE = null;
   }
 }

@@ -29,31 +29,31 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.curios.api.type.ICurio;
 
-public class SPacketBreakCurio {
+public class SPacketBreak {
 
   private int entityId;
   private int slotId;
   private String curioId;
 
-  public SPacketBreakCurio(int entityId, String curioId, int slotId) {
+  public SPacketBreak(int entityId, String curioId, int slotId) {
     this.entityId = entityId;
     this.slotId = slotId;
     this.curioId = curioId;
   }
 
-  public static void encode(SPacketBreakCurio msg, PacketBuffer buf) {
+  public static void encode(SPacketBreak msg, PacketBuffer buf) {
     buf.writeInt(msg.entityId);
     buf.writeString(msg.curioId);
     buf.writeInt(msg.slotId);
   }
 
-  public static SPacketBreakCurio decode(PacketBuffer buf) {
-    return new SPacketBreakCurio(buf.readInt(), buf.readString(25), buf.readInt());
+  public static SPacketBreak decode(PacketBuffer buf) {
+    return new SPacketBreak(buf.readInt(), buf.readString(25), buf.readInt());
   }
 
-  public static void handle(SPacketBreakCurio msg, Supplier<NetworkEvent.Context> ctx) {
+  public static void handle(SPacketBreak msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
       ClientWorld world = Minecraft.getInstance().world;
 

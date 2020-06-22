@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios;
 
+import com.electronwill.nightconfig.core.CommentedConfig;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
@@ -29,27 +30,34 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.CuriosApi.Imc;
+import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.client.CuriosClientConfig;
-import top.theillusivec4.curios.client.EventHandlerClient;
+import top.theillusivec4.curios.client.ClientEventHandler;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.client.gui.GuiEventHandler;
 import top.theillusivec4.curios.client.render.CuriosLayer;
+import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosRegistry;
+import top.theillusivec4.curios.common.SlotTypeManager;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
@@ -66,8 +74,11 @@ public class Curios {
   public Curios() {
     final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::setup);
+    eventBus.addListener(this::config);
+    eventBus.addListener(this::enqueue);
     MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
-    ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CuriosClientConfig.clientSpec);
+    ModLoadingContext.get().registerConfig(Type.CLIENT, CuriosClientConfig.CLIENT_SPEC);
+    ModLoadingContext.get().registerConfig(Type.SERVER, CuriosConfig.SERVER_SPEC);
   }
 
   private void setup(FMLCommonSetupEvent evt) {
@@ -79,8 +90,30 @@ public class Curios {
         new ArgumentSerializer<>(CurioArgumentType::slot));
   }
 
+  private void enqueue(InterModEnqueueEvent evt) {
+    SlotTypeManager.buildImcSlotTypes(evt.getIMCStream(Imc.REGISTER_TYPE::equals),
+        evt.getIMCStream(Imc.MODIFY_TYPE::equals));
+  }
+
   private void onServerStarting(FMLServerStartingEvent evt) {
     CuriosCommand.register(evt.getCommandDispatcher());
+  }
+
+  private void config(final ModConfig.Loading evt) {
+
+    if (evt.getConfig().getModId().equals(MODID)) {
+
+      if (evt.getConfig().getType() == Type.SERVER) {
+        ForgeConfigSpec spec = evt.getConfig().getSpec();
+        CommentedConfig commentedConfig = evt.getConfig().getConfigData();
+
+        if (spec == CuriosConfig.SERVER_SPEC) {
+          CuriosConfig.transformCurios(commentedConfig);
+          SlotTypeManager.buildConfigSlotTypes();
+          SlotTypeManager.buildSlotTypes();
+        }
+      }
+    }
   }
 
   @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -90,18 +123,17 @@ public class Curios {
     public static void stitchTextures(TextureStitchEvent.Pre evt) {
 
       if (evt.getMap().getTextureLocation() == PlayerContainer.LOCATION_BLOCKS_TEXTURE) {
-        String[] icons = new String[]{"charm", "necklace", "belt", "head", "back", "body", "hands",
-            "ring", "generic"};
 
-        for (String icon : icons) {
-          evt.addSprite(new ResourceLocation(MODID, "item/empty_" + icon + "_slot"));
+        for (SlotTypePreset preset : SlotTypePreset.values()) {
+          evt.addSprite(
+              new ResourceLocation(MODID, "item/empty_" + preset.getIdentifier() + "_slot"));
         }
       }
     }
 
     @SubscribeEvent
     public static void setupClient(FMLClientSetupEvent evt) {
-      MinecraftForge.EVENT_BUS.register(new EventHandlerClient());
+      MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
       MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
       ScreenManager.registerFactory(CuriosRegistry.CONTAINER_TYPE, CuriosScreen::new);
       KeyRegistry.registerKeys();

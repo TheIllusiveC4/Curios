@@ -21,12 +21,14 @@ package top.theillusivec4.curios.common.capability;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.entity.LivingEntity;
@@ -48,14 +50,14 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
-import top.theillusivec4.curios.api.CurioSlotType;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.capability.CuriosCapability;
-import top.theillusivec4.curios.api.capability.ICurioItemHandler;
+import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
+import top.theillusivec4.curios.api.type.ICurioItemHandler;
+import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActive;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncSize;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation.Operation;
 
 public class CurioInventoryCapability {
 
@@ -83,9 +85,8 @@ public class CurioInventoryCapability {
             ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
 
             if (!tagList.isEmpty()) {
-              Map<String, CurioStacksHandler> curios = new HashMap<>();
-              CuriosApi.getUnlockedTypes().forEach(
-                  type -> curios.put(type.getIdentifier(), new CurioStacksHandler(type.getSize())));
+              instance.reset();
+              Map<String, CurioStacksHandler> curios = instance.getCurios();
 
               for (int i = 0; i < tagList.size(); i++) {
                 CompoundNBT tag = tagList.getCompound(i);
@@ -93,7 +94,7 @@ public class CurioInventoryCapability {
                 CurioStacksHandler prevStacksHandler = new CurioStacksHandler();
                 prevStacksHandler.deserializeNBT(tag.getCompound("StacksHandler"));
 
-                Optional<CurioSlotType> optionalType = CuriosApi.getType(identifier);
+                Optional<ISlotType> optionalType = CuriosApi.getType(identifier);
                 optionalType.ifPresent(type -> {
                   int targetSize = type.getSize() + prevStacksHandler.getSizeShift();
                   CurioStacksHandler newStacksHandler = new CurioStacksHandler(targetSize);
@@ -148,8 +149,8 @@ public class CurioInventoryCapability {
 
   public static class CurioInventoryWrapper implements ICurioItemHandler {
 
-    Map<String, CurioStacksHandler> curios = new HashMap<>();
-    SortedSet<CurioSlotType> sortedTypes = new TreeSet<>();
+    Map<String, CurioStacksHandler> curios = new LinkedHashMap<>();
+    SortedSet<ISlotType> sortedTypes = new TreeSet<>();
     NonNullList<ItemStack> invalidStacks = NonNullList.create();
     PlayerEntity wearer;
 
@@ -159,14 +160,16 @@ public class CurioInventoryCapability {
 
     CurioInventoryWrapper(final PlayerEntity playerEntity) {
       this.wearer = playerEntity;
-      this.initializeCurios();
+      this.reset();
     }
 
-    public void initializeCurios() {
-      CuriosApi.getUnlockedTypes().forEach(type -> {
-        this.curios.put(type.getIdentifier(), new CurioStacksHandler(type.getSize()));
-        this.sortedTypes.add(type);
-      });
+    @Override
+    public void reset() {
+      Set<ISlotType> types = CuriosApi.getTypes().stream().filter(type -> !type.isLocked())
+          .collect(Collectors.toSet());
+      this.sortedTypes.addAll(types);
+      this.sortedTypes.forEach(
+          type -> curios.put(type.getIdentifier(), new CurioStacksHandler(type.getSize())));
     }
 
     @Override
@@ -201,7 +204,7 @@ public class CurioInventoryCapability {
         if (!wearer.world.isRemote && wearer instanceof ServerPlayerEntity) {
           NetworkHandler.INSTANCE
               .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
-                  new SPacketSyncActive(wearer.getEntityId(), identifier, false));
+                  new SPacketSyncOperation(wearer.getEntityId(), identifier, Operation.UNLOCK));
         }
       });
     }
@@ -216,7 +219,7 @@ public class CurioInventoryCapability {
         if (wearer instanceof ServerPlayerEntity) {
           NetworkHandler.INSTANCE
               .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
-                  new SPacketSyncActive(wearer.getEntityId(), identifier, true));
+                  new SPacketSyncOperation(wearer.getEntityId(), identifier, Operation.LOCK));
         }
       });
     }
@@ -229,10 +232,10 @@ public class CurioInventoryCapability {
           stackHandler.grow(amount);
 
           if (wearer instanceof ServerPlayerEntity) {
-            NetworkHandler.INSTANCE
-                .sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount, false),
-                    ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
-                    NetworkDirection.PLAY_TO_CLIENT);
+            NetworkHandler.INSTANCE.sendTo(
+                new SPacketSyncOperation(wearer.getEntityId(), identifier, Operation.GROW, amount),
+                ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
+                NetworkDirection.PLAY_TO_CLIENT);
           }
         });
       }
@@ -247,10 +250,10 @@ public class CurioInventoryCapability {
           this.loseStacks(stackHandler.getStacks(), identifier, toShrink);
 
           if (wearer instanceof ServerPlayerEntity) {
-            NetworkHandler.INSTANCE
-                .sendTo(new SPacketSyncSize(wearer.getEntityId(), identifier, amount, true),
-                    ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
-                    NetworkDirection.PLAY_TO_CLIENT);
+            NetworkHandler.INSTANCE.sendTo(
+                new SPacketSyncOperation(wearer.getEntityId(), identifier, Operation.SHRINK,
+                    amount), ((ServerPlayerEntity) wearer).connection.getNetworkManager(),
+                NetworkDirection.PLAY_TO_CLIENT);
           }
           stackHandler.shrink(amount);
         });

@@ -30,8 +30,8 @@ import net.minecraft.util.Tuple;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
-import top.theillusivec4.curios.api.capability.ICurio.DropRule;
-import top.theillusivec4.curios.api.capability.ICurioItemHandler;
+import top.theillusivec4.curios.api.type.ICurio.DropRule;
+import top.theillusivec4.curios.api.type.ICurioItemHandler;
 
 /**
  * LivingCurioDropsEvent is fired when an Entity's death causes dropped curios to appear.<br> This
@@ -57,8 +57,8 @@ public class DropRulesEvent extends LivingEvent {
   private final ICurioItemHandler curioHandler; // Curio handler for the entity
   private final List<Tuple<Predicate<ItemStack>, DropRule>> overrides = new ArrayList<>(); // List of drop rule overrides
 
-  public DropRulesEvent(LivingEntity entity, ICurioItemHandler handler,
-      DamageSource source, int lootingLevel, boolean recentlyHit) {
+  public DropRulesEvent(LivingEntity entity, ICurioItemHandler handler, DamageSource source,
+      int lootingLevel, boolean recentlyHit) {
     super(entity);
     this.source = source;
     this.lootingLevel = lootingLevel;
@@ -83,7 +83,7 @@ public class DropRulesEvent extends LivingEvent {
   }
 
   /**
-   * Adds an override {@link top.theillusivec4.curios.api.capability.ICurio.DropRule} for the given
+   * Adds an override {@link top.theillusivec4.curios.api.type.ICurio.DropRule} for the given
    * predicate. Each predicate will be applied to each ItemStack and those that pass will be given
    * the paired DropRule.
    *

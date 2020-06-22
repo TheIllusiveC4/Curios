@@ -28,29 +28,38 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 
-public class SPacketSyncActive {
+public class SPacketSyncOperation {
 
   private int entityId;
   private String curioId;
-  private boolean lock;
+  private int operation;
+  private int amount;
 
-  public SPacketSyncActive(int entityId, String curioId, boolean lock) {
+  public SPacketSyncOperation(int entityId, String curioId, Operation operation) {
+    this(entityId, curioId, operation, 0);
+  }
+
+  public SPacketSyncOperation(int entityId, String curioId, Operation operation, int amount) {
     this.entityId = entityId;
     this.curioId = curioId;
-    this.lock = lock;
+    this.amount = amount;
+    this.operation = operation.ordinal();
   }
 
-  public static void encode(SPacketSyncActive msg, PacketBuffer buf) {
+  public static void encode(SPacketSyncOperation msg, PacketBuffer buf) {
     buf.writeInt(msg.entityId);
     buf.writeString(msg.curioId);
-    buf.writeBoolean(msg.lock);
+    buf.writeInt(msg.operation);
+    buf.writeInt(msg.amount);
   }
 
-  public static SPacketSyncActive decode(PacketBuffer buf) {
-    return new SPacketSyncActive(buf.readInt(), buf.readString(25), buf.readBoolean());
+  public static SPacketSyncOperation decode(PacketBuffer buf) {
+    return new SPacketSyncOperation(buf.readInt(), buf.readString(25),
+        Operation.fromValue(buf.readInt()), buf.readInt());
   }
 
-  public static void handle(SPacketSyncActive msg, Supplier<NetworkEvent.Context> ctx) {
+  public static void handle(SPacketSyncOperation msg, Supplier<NetworkEvent.Context> ctx) {
+
     ctx.get().enqueueWork(() -> {
       ClientWorld world = Minecraft.getInstance().world;
 
@@ -59,16 +68,40 @@ public class SPacketSyncActive {
 
         if (entity instanceof LivingEntity) {
           CuriosApi.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
+            Operation op = Operation.fromValue(msg.operation);
+            String id = msg.curioId;
+            int amount = msg.amount;
 
-            if (msg.lock) {
-              handler.lockSlotType(msg.curioId);
-            } else {
-              handler.unlockSlotType(msg.curioId);
+            switch (op) {
+              case GROW:
+                handler.growSlotType(id, amount);
+                break;
+              case SHRINK:
+                handler.shrinkSlotType(id, amount);
+                break;
+              case LOCK:
+                handler.lockSlotType(id);
+                break;
+              case UNLOCK:
+                handler.unlockSlotType(id);
+                break;
             }
           });
         }
       }
     });
     ctx.get().setPacketHandled(true);
+  }
+
+  public enum Operation {
+    LOCK, UNLOCK, SHRINK, GROW;
+
+    public static Operation fromValue(int value) {
+      try {
+        return Operation.values()[value];
+      } catch (ArrayIndexOutOfBoundsException e) {
+        throw new IllegalArgumentException("Unknown operation value: " + value);
+      }
+    }
   }
 }

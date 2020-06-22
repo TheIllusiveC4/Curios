@@ -17,41 +17,40 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.common.network.server;
+package top.theillusivec4.curios.common.network.client;
 
 import java.util.function.Supplier;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.common.inventory.CuriosContainer;
 
-public class SPacketScrollCurios {
+public class CPacketScroll {
 
   private int windowId;
   private int index;
 
-  public SPacketScrollCurios(int windowId, int index) {
+  public CPacketScroll(int windowId, int index) {
     this.windowId = windowId;
     this.index = index;
   }
 
-  public static void encode(SPacketScrollCurios msg, PacketBuffer buf) {
+  public static void encode(CPacketScroll msg, PacketBuffer buf) {
     buf.writeInt(msg.windowId);
     buf.writeInt(msg.index);
   }
 
-  public static SPacketScrollCurios decode(PacketBuffer buf) {
-    return new SPacketScrollCurios(buf.readInt(), buf.readInt());
+  public static CPacketScroll decode(PacketBuffer buf) {
+    return new CPacketScroll(buf.readInt(), buf.readInt());
   }
 
-  public static void handle(SPacketScrollCurios msg, Supplier<NetworkEvent.Context> ctx) {
+  public static void handle(CPacketScroll msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      ClientPlayerEntity clientPlayer = Minecraft.getInstance().player;
+      ServerPlayerEntity sender = ctx.get().getSender();
 
-      if (clientPlayer != null) {
-        Container container = clientPlayer.openContainer;
+      if (sender != null) {
+        Container container = sender.openContainer;
 
         if (container instanceof CuriosContainer && container.windowId == msg.windowId) {
           ((CuriosContainer) container).scrollToIndex(msg.index);

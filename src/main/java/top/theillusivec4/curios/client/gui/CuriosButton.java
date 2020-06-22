@@ -34,19 +34,19 @@ import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 
-public class GuiButtonCurios extends ImageButton {
+public class CuriosButton extends ImageButton {
 
-  private final ContainerScreen parentGui;
+  private final ContainerScreen<?> parentGui;
   private boolean isRecipeBookVisible = false;
 
-  GuiButtonCurios(ContainerScreen parentGui, int xIn, int yIn, int widthIn, int heightIn,
+  CuriosButton(ContainerScreen<?> parentGui, int xIn, int yIn, int widthIn, int heightIn,
       int textureOffsetX, int textureOffsetY, int yDiffText, ResourceLocation resource) {
 
     super(xIn, yIn, widthIn, heightIn, textureOffsetX, textureOffsetY, yDiffText, resource,
         (button) -> {
           Minecraft mc = Minecraft.getInstance();
 
-          if (parentGui instanceof CuriosScreen) {
+          if (parentGui instanceof CuriosScreen && mc.player != null) {
             InventoryScreen inventory = new InventoryScreen(mc.player);
             ItemStack stack = mc.player.inventory.getItemStack();
             mc.player.inventory.setItemStack(ItemStack.EMPTY);

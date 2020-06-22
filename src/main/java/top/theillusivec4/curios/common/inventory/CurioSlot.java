@@ -17,7 +17,7 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.api.inventory;
+package top.theillusivec4.curios.common.inventory;
 
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -42,7 +42,7 @@ public final class CurioSlot extends SlotItemHandler {
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;
     this.player = player;
-    setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE, CuriosApi.getIcon(identifier));
+    this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE, CuriosApi.getIcon(identifier));
   }
 
   @OnlyIn(Dist.CLIENT)

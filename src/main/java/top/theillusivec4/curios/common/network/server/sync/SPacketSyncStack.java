@@ -30,54 +30,78 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 
-public class SPacketSyncContentsWithTag {
+public class SPacketSyncStack {
 
   private int entityId;
   private int slotId;
   private String curioId;
   private ItemStack stack;
+  private int handlerType;
   private CompoundNBT compound;
 
-  public SPacketSyncContentsWithTag(int entityId, String curioId, int slotId, ItemStack stack,
-      CompoundNBT compound) {
+  public SPacketSyncStack(int entityId, String curioId, int slotId, ItemStack stack,
+      HandlerType handlerType, CompoundNBT data) {
     this.entityId = entityId;
     this.slotId = slotId;
     this.stack = stack.copy();
     this.curioId = curioId;
-    this.compound = compound;
+    this.handlerType = handlerType.ordinal();
+    this.compound = data;
   }
 
-  public static void encode(SPacketSyncContentsWithTag msg, PacketBuffer buf) {
+  public static void encode(SPacketSyncStack msg, PacketBuffer buf) {
     buf.writeInt(msg.entityId);
     buf.writeString(msg.curioId);
     buf.writeInt(msg.slotId);
     buf.writeItemStack(msg.stack);
+    buf.writeInt(msg.handlerType);
     buf.writeCompoundTag(msg.compound);
   }
 
-  public static SPacketSyncContentsWithTag decode(PacketBuffer buf) {
-    return new SPacketSyncContentsWithTag(buf.readInt(), buf.readString(25), buf.readInt(),
-        buf.readItemStack(), buf.readCompoundTag());
+  public static SPacketSyncStack decode(PacketBuffer buf) {
+    return new SPacketSyncStack(buf.readInt(), buf.readString(25), buf.readInt(),
+        buf.readItemStack(), HandlerType.fromValue(buf.readInt()), buf.readCompoundTag());
   }
 
-  public static void handle(SPacketSyncContentsWithTag msg, Supplier<NetworkEvent.Context> ctx) {
-
+  public static void handle(SPacketSyncStack msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
       ClientWorld world = Minecraft.getInstance().world;
 
       if (world != null) {
-        Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+        Entity entity = world.getEntityByID(msg.entityId);
 
         if (entity instanceof LivingEntity) {
           CuriosApi.getCuriosHandler((LivingEntity) entity).ifPresent(
               handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacksHandler -> {
                 ItemStack stack = msg.stack;
-                CuriosApi.getCurio(stack).ifPresent(curio -> curio.readSyncData(msg.compound));
-                stacksHandler.getStacks().setStackInSlot(msg.slotId, stack);
+                CompoundNBT compoundNBT = msg.compound;
+                int slot = msg.slotId;
+
+                if (!compoundNBT.isEmpty()) {
+                  CuriosApi.getCurio(stack).ifPresent(curio -> curio.readSyncData(compoundNBT));
+                }
+
+                if (HandlerType.fromValue(msg.handlerType) == HandlerType.COSMETIC) {
+                  stacksHandler.getCosmeticStacks().setStackInSlot(slot, stack);
+                } else {
+                  stacksHandler.getStacks().setStackInSlot(slot, stack);
+                }
               }));
         }
       }
     });
     ctx.get().setPacketHandled(true);
+  }
+
+  public enum HandlerType {
+    EQUIPMENT, COSMETIC;
+
+    public static HandlerType fromValue(int value) {
+      try {
+        return HandlerType.values()[value];
+      } catch (ArrayIndexOutOfBoundsException e) {
+        throw new IllegalArgumentException("Unknown handler value: " + value);
+      }
+    }
   }
 }

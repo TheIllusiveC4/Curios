@@ -42,9 +42,8 @@ public class KnucklesModel extends BipedModel<LivingEntity> {
   }
 
   @Override
-  public void render(@Nonnull MatrixStack matrixStack,
-      @Nonnull IVertexBuilder vertexBuilder, int light, int overlay, float red, float green,
-      float blue, float alpha) {
+  public void render(@Nonnull MatrixStack matrixStack, @Nonnull IVertexBuilder vertexBuilder,
+      int light, int overlay, float red, float green, float blue, float alpha) {
     this.bipedRightArm.render(matrixStack, vertexBuilder, light, overlay);
     this.bipedLeftArm.render(matrixStack, vertexBuilder, light, overlay);
   }

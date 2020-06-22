@@ -17,12 +17,13 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.api.capability;
+package top.theillusivec4.curios.api;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.ICurio;
+import top.theillusivec4.curios.api.type.ICurioItemHandler;
 
 public class CuriosCapability {
 

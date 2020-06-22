@@ -9,14 +9,14 @@ import top.theillusivec4.curios.Curios;
 
 public class CuriosClientConfig {
 
-  public static final ForgeConfigSpec clientSpec;
+  public static final ForgeConfigSpec CLIENT_SPEC;
   public static final Client CLIENT;
   private static final String CONFIG_PREFIX = "gui." + Curios.MODID + ".config.";
 
   static {
     final Pair<Client, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder()
         .configure(Client::new);
-    clientSpec = specPair.getRight();
+    CLIENT_SPEC = specPair.getRight();
     CLIENT = specPair.getLeft();
   }
 
@@ -55,10 +55,8 @@ public class CuriosClientConfig {
     }
 
     public enum ButtonCorner {
-      TOP_LEFT(26, -75, 73, -62),
-      TOP_RIGHT(61, -75, 95, -62),
-      BOTTOM_LEFT(26, -20, 73, -29),
-      BOTTOM_RIGHT(61, -20, 95, -29);
+      TOP_LEFT(26, -75, 73, -62), TOP_RIGHT(61, -75, 95, -62), BOTTOM_LEFT(26, -20, 73,
+          -29), BOTTOM_RIGHT(61, -20, 95, -29);
 
       final int xoffset;
       final int yoffset;

@@ -37,7 +37,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.curios.api.type.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
 public class RingItem extends Item {

@@ -27,16 +27,16 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
 
-public class CPacketDestroyCurios {
+public class CPacketDestroy {
 
-  public static void encode(CPacketDestroyCurios msg, PacketBuffer buf) {
+  public static void encode(CPacketDestroy msg, PacketBuffer buf) {
   }
 
-  public static CPacketDestroyCurios decode(PacketBuffer buf) {
-    return new CPacketDestroyCurios();
+  public static CPacketDestroy decode(PacketBuffer buf) {
+    return new CPacketDestroy();
   }
 
-  public static void handle(CPacketDestroyCurios msg, Supplier<NetworkEvent.Context> ctx) {
+  public static void handle(CPacketDestroy msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
       ServerPlayerEntity sender = ctx.get().getSender();
 
