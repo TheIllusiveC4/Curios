@@ -51,17 +51,16 @@ import net.minecraftforge.event.entity.player.PlayerXpEvent.PickupXp;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.type.ICurio;
-import top.theillusivec4.curios.api.type.ICurio.DropRule;
-import top.theillusivec4.curios.api.type.ICurioItemHandler;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 import top.theillusivec4.curios.api.event.CurioDropsEvent;
 import top.theillusivec4.curios.api.event.DropRulesEvent;
-import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
-import top.theillusivec4.curios.api.inventory.DynamicStackHandler;
+import top.theillusivec4.curios.api.type.ICurio;
+import top.theillusivec4.curios.api.type.ICurio.DropRule;
+import top.theillusivec4.curios.api.type.ICurioItemHandler;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
@@ -71,7 +70,7 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.Hand
 public class CuriosEventHandler {
 
   private static void handleDrops(LivingEntity livingEntity,
-      List<Tuple<Predicate<ItemStack>, DropRule>> dropRules, ItemStackHandler stacks,
+      List<Tuple<Predicate<ItemStack>, DropRule>> dropRules, IDynamicStackHandler stacks,
       Collection<ItemEntity> drops, boolean keepInventory) {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
@@ -113,7 +112,8 @@ public class CuriosEventHandler {
     return entityitem;
   }
 
-  private static boolean handleMending(PlayerEntity player, ItemStackHandler stacks, PickupXp evt) {
+  private static boolean handleMending(PlayerEntity player, IDynamicStackHandler stacks,
+      PickupXp evt) {
 
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
@@ -193,7 +193,7 @@ public class CuriosEventHandler {
       newCurios.setCurios(new LinkedHashMap<>(oldCurios.getCurios()));
 
       oldCurios.getCurios().forEach((identifier, stacksHandler) -> {
-        ItemStackHandler stackHandler = stacksHandler.getStacks();
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
@@ -216,7 +216,7 @@ public class CuriosEventHandler {
       CuriosApi.getCuriosHandler(livingEntity).ifPresent(handler -> {
         Collection<ItemEntity> drops = evt.getDrops();
         Collection<ItemEntity> curioDrops = new ArrayList<>();
-        Map<String, CurioStacksHandler> curios = handler.getCurios();
+        Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
         DropRulesEvent dropRulesEvent = new DropRulesEvent(livingEntity, handler, evt.getSource(),
             evt.getLootingLevel(), evt.isRecentlyHit());
@@ -248,8 +248,8 @@ public class CuriosEventHandler {
 
     if (!player.world.isRemote) {
       CuriosApi.getCuriosHandler(player).ifPresent(handler -> {
-        Map<String, CurioStacksHandler> curios = handler.getCurios();
-        for (CurioStacksHandler stacksHandler : curios.values()) {
+        Map<String, ICurioStacksHandler> curios = handler.getCurios();
+        for (ICurioStacksHandler stacksHandler : curios.values()) {
 
           if (handleMending(player, stacksHandler.getStacks(), evt) || handleMending(player,
               stacksHandler.getCosmeticStacks(), evt)) {
@@ -270,10 +270,10 @@ public class CuriosEventHandler {
         CuriosApi.getCuriosHandler(player).ifPresent(handler -> {
 
           if (!player.world.isRemote) {
-            Map<String, CurioStacksHandler> curios = handler.getCurios();
+            Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
-            for (Map.Entry<String, CurioStacksHandler> entry : curios.entrySet()) {
-              ItemStackHandler stackHandler = entry.getValue().getStacks();
+            for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
+              IDynamicStackHandler stackHandler = entry.getValue().getStacks();
 
               for (int i = 0; i < stackHandler.getSlots(); i++) {
                 ItemStack present = stackHandler.getStackInSlot(i);
@@ -305,13 +305,13 @@ public class CuriosEventHandler {
   public void tick(LivingEvent.LivingUpdateEvent evt) {
     LivingEntity livingEntity = evt.getEntityLiving();
     CuriosApi.getCuriosHandler(livingEntity).ifPresent(handler -> {
-      Map<String, CurioStacksHandler> curios = handler.getCurios();
+      Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
-      for (Map.Entry<String, CurioStacksHandler> entry : curios.entrySet()) {
-        CurioStacksHandler stacksHandler = entry.getValue();
+      for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
+        ICurioStacksHandler stacksHandler = entry.getValue();
         String identifier = entry.getKey();
-        DynamicStackHandler stackHandler = stacksHandler.getStacks();
-        DynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+        IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);

@@ -33,7 +33,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 
@@ -157,7 +157,7 @@ public class CuriosCommand {
       String slot) {
 
     CuriosApi.getCuriosHandler(playerMP).ifPresent(handler -> {
-      Map<String, CurioStacksHandler> curios = handler.getCurios();
+      Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
       if (!slot.isEmpty() && curios.get(slot) != null) {
         clear(curios.get(slot));
@@ -191,7 +191,7 @@ public class CuriosCommand {
     return Command.SINGLE_SUCCESS;
   }
 
-  private static void clear(CurioStacksHandler stacksHandler) {
+  private static void clear(ICurioStacksHandler stacksHandler) {
 
     for (int i = 0; i < stacksHandler.getSlots(); i++) {
       stacksHandler.getStacks().setStackInSlot(i, ItemStack.EMPTY);

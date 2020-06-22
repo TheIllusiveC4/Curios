@@ -23,27 +23,26 @@ import java.util.Map;
 import java.util.Optional;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
-import top.theillusivec4.curios.common.SlotType;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
 public interface ICurioItemHandler {
 
   /**
-   * A map of the current curios, keyed by the {@link SlotType} identifier.
+   * A map of the current curios, keyed by the {@link ISlotType} identifier.
    *
    * @return The current curios equipped
    */
-  Map<String, CurioStacksHandler> getCurios();
+  Map<String, ICurioStacksHandler> getCurios();
 
   /**
    * Sets the current curios map to the one passed in.
    *
    * @param map The curios collection that will replace the current one
    */
-  void setCurios(Map<String, CurioStacksHandler> map);
+  void setCurios(Map<String, ICurioStacksHandler> map);
 
   /**
-   * Gets the number of slots across all {@link SlotType} identifiers.
+   * Gets the number of slots across all {@link ISlotType} identifiers.
    *
    * @return The number of slots
    */
@@ -55,46 +54,46 @@ public interface ICurioItemHandler {
   void reset();
 
   /**
-   * Gets the an Optional {@link CurioStacksHandler} associated with the given {@link SlotType}
+   * Gets the an Optional {@link ICurioStacksHandler} associated with the given {@link ISlotType}
    * identifier or Optional.empty() if it doesn't exist.
    *
-   * @param identifier The identifier for the {@link SlotType}
+   * @param identifier The identifier for the {@link ISlotType}
    * @return The stack handler
    */
-  Optional<CurioStacksHandler> getStacksHandler(String identifier);
+  Optional<ICurioStacksHandler> getStacksHandler(String identifier);
 
   /**
-   * Enables the {@link SlotType} for a given identifier, adding the default settings to the curio
+   * Enables the {@link ISlotType} for a given identifier, adding the default settings to the curio
    * map.
    *
-   * @param identifier The identifier for the {@link SlotType}
+   * @param identifier The identifier for the {@link ISlotType}
    */
   void unlockSlotType(String identifier);
 
   /**
-   * Disables the {@link SlotType} for a given identifier, removing it from the curio map. Note that
-   * the default implementation handles catching and returning ItemStacks that are found in these
-   * slots.
+   * Disables the {@link ISlotType} for a given identifier, removing it from the curio map. Note
+   * that the default implementation handles catching and returning ItemStacks that are found in
+   * these slots.
    *
-   * @param identifier The identifier for the {@link SlotType}
+   * @param identifier The identifier for the {@link ISlotType}
    */
   void lockSlotType(String identifier);
 
   /**
-   * Adds an amount of slots to the {@link CurioStacksHandler} of a {@link SlotType} associated with
-   * the identifier.
+   * Adds an amount of slots to the {@link ICurioStacksHandler} of a {@link ISlotType} associated
+   * with the identifier.
    *
-   * @param identifier The identifier for the {@link SlotType}
+   * @param identifier The identifier for the {@link ISlotType}
    * @param amount     The number of slots to add, must be non-negative
    */
   void growSlotType(String identifier, int amount);
 
   /**
-   * Removes an amount of slots from the {@link CurioStacksHandler} of a {@link SlotType} associated
-   * with the identifier. Note that the default implementation handles catching and returning
-   * ItemStacks that are found in these slots.
+   * Removes an amount of slots from the {@link ICurioStacksHandler} of a {@link ISlotType}
+   * associated with the identifier. Note that the default implementation handles catching and
+   * returning ItemStacks that are found in these slots.
    *
-   * @param identifier The identifier for the {@link SlotType}
+   * @param identifier The identifier for the {@link ISlotType}
    * @param amount     The number of slots to remove, must be non-negative
    */
   void shrinkSlotType(String identifier, int amount);

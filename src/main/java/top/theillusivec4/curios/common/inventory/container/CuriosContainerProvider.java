@@ -17,7 +17,7 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.common.inventory;
+package top.theillusivec4.curios.common.inventory.container;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

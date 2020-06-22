@@ -27,7 +27,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.common.inventory.CuriosContainer;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 import top.theillusivec4.curios.common.item.AmuletItem;
 import top.theillusivec4.curios.common.item.CrownItem;
 import top.theillusivec4.curios.common.item.KnucklesItem;

@@ -30,15 +30,16 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 
 public class SPacketSyncCurios {
 
   private int entityId;
   private int entrySize;
-  private Map<String, CurioStacksHandler> map;
+  private Map<String, ICurioStacksHandler> map;
 
-  public SPacketSyncCurios(int entityId, Map<String, CurioStacksHandler> map) {
+  public SPacketSyncCurios(int entityId, Map<String, ICurioStacksHandler> map) {
     this.entityId = entityId;
     this.entrySize = map.size();
     this.map = map;
@@ -48,7 +49,7 @@ public class SPacketSyncCurios {
     buf.writeInt(msg.entityId);
     buf.writeInt(msg.entrySize);
 
-    for (Map.Entry<String, CurioStacksHandler> entry : msg.map.entrySet()) {
+    for (Map.Entry<String, ICurioStacksHandler> entry : msg.map.entrySet()) {
       buf.writeString(entry.getKey());
       buf.writeCompoundTag(entry.getValue().serializeNBT());
     }
@@ -57,7 +58,7 @@ public class SPacketSyncCurios {
   public static SPacketSyncCurios decode(PacketBuffer buf) {
     int entityId = buf.readInt();
     int entrySize = buf.readInt();
-    Map<String, CurioStacksHandler> map = new LinkedHashMap<>();
+    Map<String, ICurioStacksHandler> map = new LinkedHashMap<>();
 
     for (int i = 0; i < entrySize; i++) {
       String key = buf.readString(25);

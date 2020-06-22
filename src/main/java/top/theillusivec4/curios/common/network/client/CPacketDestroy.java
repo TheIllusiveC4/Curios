@@ -26,6 +26,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CPacketDestroy {
 
@@ -43,8 +44,8 @@ public class CPacketDestroy {
       if (sender != null) {
         CuriosApi.getCuriosHandler(sender)
             .ifPresent(handler -> handler.getCurios().values().forEach(stacksHandler -> {
-              ItemStackHandler stackHandler = stacksHandler.getStacks();
-              ItemStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
+              IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+              IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
 
               for (int i = 0; i < stackHandler.getSlots(); i++) {
                 stackHandler.setStackInSlot(i, ItemStack.EMPTY);

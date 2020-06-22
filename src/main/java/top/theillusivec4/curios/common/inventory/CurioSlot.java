@@ -28,6 +28,7 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -37,7 +38,7 @@ public final class CurioSlot extends SlotItemHandler {
   private final String identifier;
   private final PlayerEntity player;
 
-  public CurioSlot(PlayerEntity player, ItemStackHandler handler, int index, String identifier,
+  public CurioSlot(PlayerEntity player, IItemHandler handler, int index, String identifier,
       int xPosition, int yPosition) {
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;

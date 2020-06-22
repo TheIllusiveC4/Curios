@@ -44,7 +44,7 @@ import top.theillusivec4.curios.client.CuriosClientConfig.Client;
 import top.theillusivec4.curios.client.CuriosClientConfig.Client.ButtonCorner;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
-import top.theillusivec4.curios.common.inventory.CuriosContainer;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IRecipeShownListener {
 

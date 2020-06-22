@@ -18,10 +18,6 @@ public enum SlotTypePreset {
     return this.id;
   }
 
-  public int getPriority() {
-    return this.priority;
-  }
-
   public Builder getMessageBuilder() {
     return new Builder(this.id).priority(this.priority);
   }

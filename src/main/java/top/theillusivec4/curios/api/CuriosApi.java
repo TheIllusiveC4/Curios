@@ -40,14 +40,14 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.ItemStackHandler;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
+import top.theillusivec4.curios.api.imc.CurioImcMessage;
 import top.theillusivec4.curios.api.type.ICurio;
 import top.theillusivec4.curios.api.type.ICurioItemHandler;
-import top.theillusivec4.curios.api.imc.CurioImcMessage;
-import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
 import top.theillusivec4.curios.api.type.ISlotType;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.SlotType;
 
 public final class CuriosApi {
@@ -137,8 +137,8 @@ public final class CuriosApi {
    */
   public static int getSlotsForType(@Nonnull final LivingEntity livingEntity, String identifier) {
     return CuriosApi.getCuriosHandler(livingEntity).map(
-        handler -> handler.getStacksHandler(identifier).map(CurioStacksHandler::getSlots).orElse(0))
-        .orElse(0);
+        handler -> handler.getStacksHandler(identifier).map(ICurioStacksHandler::getSlots)
+            .orElse(0)).orElse(0);
   }
 
   /**
@@ -185,11 +185,11 @@ public final class CuriosApi {
 
     ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(livingEntity)
         .map(handler -> {
-          Map<String, CurioStacksHandler> curios = handler.getCurios();
+          Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
           for (String id : curios.keySet()) {
-            CurioStacksHandler stacksHandler = curios.get(id);
-            ItemStackHandler stackHandler = stacksHandler.getStacks();
+            ICurioStacksHandler stacksHandler = curios.get(id);
+            IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
             for (int i = 0; i < stackHandler.getSlots(); i++) {
               ItemStack stack = stackHandler.getStackInSlot(i);

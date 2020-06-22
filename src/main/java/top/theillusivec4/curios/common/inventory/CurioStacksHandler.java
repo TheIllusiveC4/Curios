@@ -1,14 +1,16 @@
-package top.theillusivec4.curios.api.inventory;
+package top.theillusivec4.curios.common.inventory;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
-public class CurioStacksHandler {
+public class CurioStacksHandler implements ICurioStacksHandler {
 
-  private DynamicStackHandler stackHandler;
-  private DynamicStackHandler cosmeticStackHandler;
+  private IDynamicStackHandler stackHandler;
+  private IDynamicStackHandler cosmeticStackHandler;
   private int sizeShift = 0;
 
   private NonNullList<Boolean> renderHandler;
@@ -28,26 +30,32 @@ public class CurioStacksHandler {
     this.sizeShift = 0;
   }
 
-  public DynamicStackHandler getStacks() {
+  @Override
+  public IDynamicStackHandler getStacks() {
     return this.stackHandler;
   }
 
-  public DynamicStackHandler getCosmeticStacks() {
+  @Override
+  public IDynamicStackHandler getCosmeticStacks() {
     return this.cosmeticStackHandler;
   }
 
+  @Override
   public NonNullList<Boolean> getRenders() {
     return this.renderHandler;
   }
 
+  @Override
   public int getSlots() {
     return this.stackHandler.getSlots();
   }
 
+  @Override
   public int getSizeShift() {
     return this.sizeShift;
   }
 
+  @Override
   public void grow(int amount) {
     this.validateSizeChange(amount);
     this.stackHandler.grow(amount);
@@ -59,6 +67,7 @@ public class CurioStacksHandler {
     this.sizeShift += amount;
   }
 
+  @Override
   public void shrink(int amount) {
     this.validateSizeChange(amount);
     amount = Math.min(this.stackHandler.getSlots() - 1, amount);
@@ -78,6 +87,7 @@ public class CurioStacksHandler {
     }
   }
 
+  @Override
   public CompoundNBT serializeNBT() {
     CompoundNBT compoundNBT = new CompoundNBT();
     compoundNBT.put("Stacks", this.stackHandler.serializeNBT());
@@ -99,6 +109,7 @@ public class CurioStacksHandler {
     return compoundNBT;
   }
 
+  @Override
   public void deserializeNBT(CompoundNBT nbt) {
 
     if (nbt.contains("Stacks")) {

@@ -25,7 +25,7 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
-import top.theillusivec4.curios.common.inventory.CuriosContainer;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 public class SPacketScroll {
 

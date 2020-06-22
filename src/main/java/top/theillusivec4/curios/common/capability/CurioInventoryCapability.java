@@ -49,12 +49,13 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
 import top.theillusivec4.curios.api.type.ICurioItemHandler;
 import top.theillusivec4.curios.api.type.ISlotType;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation.Operation;
@@ -86,7 +87,7 @@ public class CurioInventoryCapability {
 
             if (!tagList.isEmpty()) {
               instance.reset();
-              Map<String, CurioStacksHandler> curios = instance.getCurios();
+              Map<String, ICurioStacksHandler> curios = instance.getCurios();
 
               for (int i = 0; i < tagList.size(); i++) {
                 CompoundNBT tag = tagList.getCompound(i);
@@ -119,8 +120,8 @@ public class CurioInventoryCapability {
                 });
 
                 if (!optionalType.isPresent()) {
-                  ItemStackHandler stackHandler = prevStacksHandler.getStacks();
-                  ItemStackHandler cosmeticStackHandler = prevStacksHandler.getCosmeticStacks();
+                  IDynamicStackHandler stackHandler = prevStacksHandler.getStacks();
+                  IDynamicStackHandler cosmeticStackHandler = prevStacksHandler.getCosmeticStacks();
 
                   for (int j = 0; j < stackHandler.getSlots(); j++) {
                     ItemStack stack = stackHandler.getStackInSlot(j);
@@ -149,7 +150,7 @@ public class CurioInventoryCapability {
 
   public static class CurioInventoryWrapper implements ICurioItemHandler {
 
-    Map<String, CurioStacksHandler> curios = new LinkedHashMap<>();
+    Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
     SortedSet<ISlotType> sortedTypes = new TreeSet<>();
     NonNullList<ItemStack> invalidStacks = NonNullList.create();
     PlayerEntity wearer;
@@ -174,21 +175,21 @@ public class CurioInventoryCapability {
 
     @Override
     public int getSlots() {
-      return this.curios.values().stream().mapToInt(CurioStacksHandler::getSlots).sum();
+      return this.curios.values().stream().mapToInt(ICurioStacksHandler::getSlots).sum();
     }
 
     @Override
-    public Optional<CurioStacksHandler> getStacksHandler(String identifier) {
+    public Optional<ICurioStacksHandler> getStacksHandler(String identifier) {
       return Optional.ofNullable(this.curios.get(identifier));
     }
 
     @Override
-    public Map<String, CurioStacksHandler> getCurios() {
+    public Map<String, ICurioStacksHandler> getCurios() {
       return Collections.unmodifiableMap(this.curios);
     }
 
     @Override
-    public void setCurios(Map<String, CurioStacksHandler> curios) {
+    public void setCurios(Map<String, ICurioStacksHandler> curios) {
       this.curios = curios;
       this.sortedTypes.clear();
       curios.keySet()
@@ -280,7 +281,7 @@ public class CurioInventoryCapability {
       }
     }
 
-    private void loseStacks(ItemStackHandler stackHandler, String identifier, int amount) {
+    private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
 
       if (this.wearer != null && !this.wearer.getEntityWorld().isRemote()) {
         List<ItemStack> drops = new ArrayList<>();

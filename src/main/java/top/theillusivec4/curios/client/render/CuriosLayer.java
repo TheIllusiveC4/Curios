@@ -28,8 +28,8 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> extends
     LayerRenderer<T, M> {
@@ -45,8 +45,8 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
     matrixStack.push();
     CuriosApi.getCuriosHandler(livingEntity)
         .ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {
-          ItemStackHandler stackHandler = stacksHandler.getStacks();
-          ItemStackHandler cosmeticStacksHandler = stacksHandler.getCosmeticStacks();
+          IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+          IDynamicStackHandler cosmeticStacksHandler = stacksHandler.getCosmeticStacks();
 
           for (int i = 0; i < stackHandler.getSlots(); i++) {
             ItemStack stack = cosmeticStacksHandler.getStackInSlot(i);

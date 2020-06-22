@@ -17,14 +17,13 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.common.inventory;
+package top.theillusivec4.curios.common.inventory.container;
 
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.SortedMap;
 import javax.annotation.Nonnull;
 import net.minecraft.client.util.RecipeBookCategories;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -56,11 +55,12 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.inventory.CurioStacksHandler;
 import top.theillusivec4.curios.api.type.ICurioItemHandler;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.CuriosRegistry;
+import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScroll;
 import top.theillusivec4.curios.common.network.server.SPacketScroll;
@@ -153,12 +153,12 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
     });
 
     this.curiosHandler.ifPresent(curios -> {
-      Map<String, CurioStacksHandler> curioMap = curios.getCurios();
+      Map<String, ICurioStacksHandler> curioMap = curios.getCurios();
       int slots = 0;
       int yOffset = 12;
 
       for (String identifier : curioMap.keySet()) {
-        ItemStackHandler stackHandler = curioMap.get(identifier).getStacks();
+        IDynamicStackHandler stackHandler = curioMap.get(identifier).getStacks();
 
         for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
           this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset));
@@ -173,7 +173,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
   public void scrollToIndex(int indexIn) {
 
     this.curiosHandler.ifPresent(curios -> {
-      Map<String, CurioStacksHandler> curioMap = curios.getCurios();
+      Map<String, ICurioStacksHandler> curioMap = curios.getCurios();
       int slots = 0;
       int yOffset = 12;
       int index = 0;
@@ -186,7 +186,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
       }
 
       for (String identifier : curioMap.keySet()) {
-        ItemStackHandler stackHandler = curioMap.get(identifier).getStacks();
+        IDynamicStackHandler stackHandler = curioMap.get(identifier).getStacks();
 
         for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
