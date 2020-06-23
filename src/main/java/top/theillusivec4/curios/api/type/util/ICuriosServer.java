@@ -3,8 +3,10 @@ package top.theillusivec4.curios.api.type.util;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedMap;
 import net.minecraft.entity.LivingEntity;
 import top.theillusivec4.curios.api.type.ISlotType;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.slottype.SlotType;
 
 public interface ICuriosServer {
@@ -14,6 +16,8 @@ public interface ICuriosServer {
   Optional<ISlotType> getSlotType(String identifier);
 
   Collection<ISlotType> getSlotTypes();
+
+  SortedMap<ISlotType, ICurioStacksHandler> createSlots();
 
   Set<String> getSlotTypeIds();
 

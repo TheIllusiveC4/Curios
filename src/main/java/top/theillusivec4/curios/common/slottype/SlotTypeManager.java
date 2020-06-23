@@ -30,6 +30,11 @@ public class SlotTypeManager {
 
   public static void buildConfigSlotTypes() {
     List<CuriosSetting> settings = CuriosConfig.curios;
+
+    if (settings == null) {
+      return;
+    }
+
     settings.forEach(setting -> {
       String id = setting.identifier;
 

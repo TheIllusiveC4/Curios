@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.SortedMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.entity.LivingEntity;
@@ -37,6 +37,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.capabilities.Capability;
@@ -45,7 +46,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemHandlerHelper;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
@@ -54,10 +54,6 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
-import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation.Operation;
 
 public class CurioInventoryCapability {
 
@@ -68,6 +64,7 @@ public class CurioInventoryCapability {
           public INBT writeNBT(Capability<ICuriosItemHandler> capability,
               ICuriosItemHandler instance, Direction side) {
             CompoundNBT compound = new CompoundNBT();
+
             ListNBT taglist = new ListNBT();
             instance.getCurios().forEach((key, stacksHandler) -> {
               CompoundNBT tag = new CompoundNBT();
@@ -76,6 +73,13 @@ public class CurioInventoryCapability {
               taglist.add(tag);
             });
             compound.put("Curios", taglist);
+
+            ListNBT taglist1 = new ListNBT();
+
+            for (String identifier : instance.getLockedSlots()) {
+              taglist1.add(StringNBT.valueOf(identifier));
+            }
+            compound.put("Locked", taglist1);
             return compound;
           }
 
@@ -83,16 +87,26 @@ public class CurioInventoryCapability {
           public void readNBT(Capability<ICuriosItemHandler> capability,
               ICuriosItemHandler instance, Direction side, INBT nbt) {
             ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
+            ListNBT lockedList = ((CompoundNBT) nbt).getList("Locked", Constants.NBT.TAG_COMPOUND);
+
+            for (int k = 0; k < lockedList.size(); k++) {
+              instance.lockSlotType(lockedList.getString(k));
+            }
 
             if (!tagList.isEmpty()) {
-              instance.reset();
-              Map<String, ICurioStacksHandler> curios = instance.getCurios();
+              Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
+              SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = CuriosApi.getServerManager()
+                  .createSlots();
 
               for (int i = 0; i < tagList.size(); i++) {
                 CompoundNBT tag = tagList.getCompound(i);
                 String identifier = tag.getString("Identifier");
                 CurioStacksHandler prevStacksHandler = new CurioStacksHandler();
                 prevStacksHandler.deserializeNBT(tag.getCompound("StacksHandler"));
+
+                if (instance.getLockedSlots().contains(identifier)) {
+                  continue;
+                }
 
                 Optional<ISlotType> optionalType = CuriosApi.getServerManager()
                     .getSlotType(identifier);
@@ -116,7 +130,7 @@ public class CurioInventoryCapability {
                         prevStacksHandler.getCosmeticStacks().getStackInSlot(index));
                     index++;
                   }
-                  curios.put(identifier, newStacksHandler);
+                  sortedCurios.put(type, newStacksHandler);
                 });
 
                 if (!optionalType.isPresent()) {
@@ -138,6 +152,8 @@ public class CurioInventoryCapability {
                   }
                 }
               }
+              sortedCurios.forEach(
+                  (slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler));
               instance.setCurios(curios);
             }
           }
@@ -171,19 +187,19 @@ public class CurioInventoryCapability {
         this.locked.clear();
         this.curios.clear();
         this.invalidStacks.clear();
-
-        CuriosApi.getServerManager().getSlotTypes().stream().filter(type -> !type.isLocked())
-            .collect(Collectors.toSet()).forEach(
-            type -> curios.put(type.getIdentifier(), new CurioStacksHandler(type.getSize())));
-        NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
-                new SPacketSyncCurios(wearer.getEntityId(), this.getCurios()));
+        CuriosApi.getServerManager().createSlots().forEach(
+            ((slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler)));
       }
     }
 
     @Override
     public int getSlots() {
       return this.curios.values().stream().mapToInt(ICurioStacksHandler::getSlots).sum();
+    }
+
+    @Override
+    public Set<String> getLockedSlots() {
+      return Collections.unmodifiableSet(this.locked);
     }
 
     @Override
@@ -199,30 +215,6 @@ public class CurioInventoryCapability {
     @Override
     public void setCurios(Map<String, ICurioStacksHandler> curios) {
       this.curios = curios;
-
-      if (!this.wearer.getEntityWorld().isRemote() && wearer instanceof ServerPlayerEntity) {
-        NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
-                new SPacketSyncCurios(wearer.getEntityId(), this.getCurios()));
-      }
-    }
-
-    @Override
-    public void unlockSlotType(String identifier) {
-
-      if (!this.wearer.getEntityWorld().isRemote()) {
-        CuriosApi.getServerManager().getSlotType(identifier).ifPresent(type -> {
-          this.curios.putIfAbsent(identifier, new CurioStacksHandler(type.getSize()));
-          this.locked.remove(identifier);
-
-          if (!wearer.getEntityWorld().isRemote() && wearer instanceof ServerPlayerEntity) {
-            NetworkHandler.INSTANCE
-                .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
-                    new SPacketSyncOperation(wearer.getEntityId(), identifier, Operation.UNLOCK,
-                        type.getSize()));
-          }
-        });
-      }
     }
 
     @Override
@@ -236,13 +228,7 @@ public class CurioInventoryCapability {
       this.getStacksHandler(identifier).ifPresent(stackHandler -> {
         this.curios.remove(identifier);
         this.locked.add(identifier);
-
-        if (!wearer.getEntityWorld().isRemote() && wearer instanceof ServerPlayerEntity) {
-          this.loseStacks(stackHandler.getStacks(), identifier, stackHandler.getSlots());
-          NetworkHandler.INSTANCE
-              .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
-                  new SPacketSyncOperation(wearer.getEntityId(), identifier, Operation.LOCK));
-        }
+        this.loseStacks(stackHandler.getStacks(), identifier, stackHandler.getSlots());
       });
     }
 
@@ -250,16 +236,7 @@ public class CurioInventoryCapability {
     public void growSlotType(String identifier, int amount) {
 
       if (amount > 0) {
-        this.getStacksHandler(identifier).ifPresent(stackHandler -> {
-          stackHandler.grow(amount);
-
-          if (!wearer.getEntityWorld().isRemote() && wearer instanceof ServerPlayerEntity) {
-            NetworkHandler.INSTANCE
-                .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
-                    new SPacketSyncOperation(wearer.getEntityId(), identifier, Operation.GROW,
-                        amount));
-          }
-        });
+        this.getStacksHandler(identifier).ifPresent(stackHandler -> stackHandler.grow(amount));
       }
     }
 
@@ -269,14 +246,7 @@ public class CurioInventoryCapability {
       if (amount > 0) {
         this.getStacksHandler(identifier).ifPresent(stackHandler -> {
           int toShrink = Math.min(stackHandler.getSlots() - 1, amount);
-
-          if (!wearer.getEntityWorld().isRemote() && wearer instanceof ServerPlayerEntity) {
-            this.loseStacks(stackHandler.getStacks(), identifier, toShrink);
-            NetworkHandler.INSTANCE
-                .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) wearer),
-                    new SPacketSyncOperation(wearer.getEntityId(), identifier, Operation.SHRINK,
-                        amount));
-          }
+          this.loseStacks(stackHandler.getStacks(), identifier, toShrink);
           stackHandler.shrink(amount);
         });
       }

@@ -21,6 +21,7 @@ package top.theillusivec4.curios.api.type.capability;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.type.ISlotType;
@@ -49,6 +50,8 @@ public interface ICuriosItemHandler {
    */
   int getSlots();
 
+  Set<String> getLockedSlots();
+
   /**
    * Resets the current curios map.
    */
@@ -62,14 +65,6 @@ public interface ICuriosItemHandler {
    * @return The stack handler
    */
   Optional<ICurioStacksHandler> getStacksHandler(String identifier);
-
-  /**
-   * Enables the {@link ISlotType} for a given identifier, adding the default settings to the curio
-   * map.
-   *
-   * @param identifier The identifier for the {@link ISlotType}
-   */
-  void unlockSlotType(String identifier);
 
   /**
    * Enables the {@link ISlotType} for a given identifier, adding the default settings to the curio
