@@ -4,9 +4,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import net.minecraft.entity.LivingEntity;
-import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
-import top.theillusivec4.curios.common.SlotType;
+import top.theillusivec4.curios.common.slottype.SlotType;
 
 public interface ICuriosServer {
 

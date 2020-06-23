@@ -96,7 +96,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (this.minecraft != null) {
 
       if (this.minecraft.player != null) {
-        hasScrollBar = CuriosApi.getCuriosHelper().getCuriosItemHandler(this.minecraft.player)
+        hasScrollBar = CuriosApi.getCuriosHelper().getCuriosHandler(this.minecraft.player)
             .map(handler -> handler.getSlots() > 8).orElse(false);
 
         if (hasScrollBar) {
@@ -222,7 +222,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       this.blit(i, j, 0, 0, this.xSize, this.ySize);
       InventoryScreen.drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - mouseX,
           (float) (j + 75 - 50) - mouseY, this.minecraft.player);
-      CuriosApi.getCuriosHelper().getCuriosItemHandler(this.minecraft.player).ifPresent(handler -> {
+      CuriosApi.getCuriosHelper().getCuriosHandler(this.minecraft.player).ifPresent(handler -> {
         int slotCount = handler.getSlots();
         int upperHeight = 7 + slotCount * 18;
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);

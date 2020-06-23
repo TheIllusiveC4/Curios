@@ -157,7 +157,7 @@ public class CuriosCommand {
   private static int clearSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
 
-    CuriosApi.getCuriosHelper().getCuriosItemHandler(playerMP).ifPresent(handler -> {
+    CuriosApi.getCuriosHelper().getCuriosHandler(playerMP).ifPresent(handler -> {
       Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
       if (!slot.isEmpty() && curios.get(slot) != null) {
@@ -181,7 +181,7 @@ public class CuriosCommand {
   }
 
   private static int resetSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP) {
-    CuriosApi.getCuriosHelper().getCuriosItemHandler(playerMP).ifPresent(handler -> {
+    CuriosApi.getCuriosHelper().getCuriosHandler(playerMP).ifPresent(handler -> {
       handler.reset();
       NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> playerMP),
           new SPacketSyncCurios(playerMP.getEntityId(), handler.getCurios()));

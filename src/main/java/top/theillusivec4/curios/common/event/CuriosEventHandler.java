@@ -21,6 +21,7 @@ package top.theillusivec4.curios.common.event;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
@@ -57,6 +59,7 @@ import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 import top.theillusivec4.curios.api.event.CurioDropsEvent;
 import top.theillusivec4.curios.api.event.DropRulesEvent;
+import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -64,6 +67,7 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
@@ -141,7 +145,16 @@ public class CuriosEventHandler {
 
   @SubscribeEvent
   public void playerLoggedIn(PlayerLoggedInEvent evt) {
+    PlayerEntity playerEntity = evt.getPlayer();
 
+    if (playerEntity instanceof ServerPlayerEntity) {
+      Collection<ISlotType> slotTypes = CuriosApi.getServerManager().getSlotTypes();
+      Map<String, ResourceLocation> icons = new HashMap<>();
+      slotTypes.forEach(type -> icons.put(type.getIdentifier(), type.getIcon()));
+      NetworkHandler.INSTANCE
+          .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) playerEntity),
+              new SPacketSetIcons(icons));
+    }
   }
 
   @SubscribeEvent
@@ -160,7 +173,7 @@ public class CuriosEventHandler {
 
     if (entity instanceof LivingEntity) {
       LivingEntity livingBase = (LivingEntity) evt.getEntity();
-      CuriosApi.getCuriosHelper().getCuriosItemHandler(livingBase).ifPresent(handler -> {
+      CuriosApi.getCuriosHelper().getCuriosHandler(livingBase).ifPresent(handler -> {
         handler.handleInvalidStacks();
 
         if (entity instanceof ServerPlayerEntity) {
@@ -180,7 +193,7 @@ public class CuriosEventHandler {
 
     if (player instanceof ServerPlayerEntity && target instanceof LivingEntity) {
       LivingEntity livingBase = (LivingEntity) target;
-      CuriosApi.getCuriosHelper().getCuriosItemHandler(livingBase).ifPresent(
+      CuriosApi.getCuriosHelper().getCuriosHandler(livingBase).ifPresent(
           handler -> NetworkHandler.INSTANCE
               .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
                   new SPacketSyncCurios(target.getEntityId(), handler.getCurios())));
@@ -194,9 +207,9 @@ public class CuriosEventHandler {
     PlayerEntity oldPlayer = evt.getOriginal();
     oldPlayer.revive();
     LazyOptional<ICuriosItemHandler> oldHandler = CuriosApi.getCuriosHelper()
-        .getCuriosItemHandler(oldPlayer);
+        .getCuriosHandler(oldPlayer);
     LazyOptional<ICuriosItemHandler> newHandler = CuriosApi.getCuriosHelper()
-        .getCuriosItemHandler(player);
+        .getCuriosHandler(player);
 
     oldHandler.ifPresent(oldCurios -> newHandler.ifPresent(newCurios -> {
       newCurios.setCurios(new LinkedHashMap<>(oldCurios.getCurios()));
@@ -223,7 +236,7 @@ public class CuriosEventHandler {
 
     if (!livingEntity.isSpectator()) {
 
-      CuriosApi.getCuriosHelper().getCuriosItemHandler(livingEntity).ifPresent(handler -> {
+      CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
         Collection<ItemEntity> drops = evt.getDrops();
         Collection<ItemEntity> curioDrops = new ArrayList<>();
         Map<String, ICurioStacksHandler> curios = handler.getCurios();
@@ -257,7 +270,7 @@ public class CuriosEventHandler {
     PlayerEntity player = evt.getPlayer();
 
     if (!player.world.isRemote) {
-      CuriosApi.getCuriosHelper().getCuriosItemHandler(player).ifPresent(handler -> {
+      CuriosApi.getCuriosHelper().getCuriosHandler(player).ifPresent(handler -> {
         Map<String, ICurioStacksHandler> curios = handler.getCurios();
         for (ICurioStacksHandler stacksHandler : curios.values()) {
 
@@ -277,7 +290,7 @@ public class CuriosEventHandler {
     CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> {
 
       if (curio.canRightClickEquip()) {
-        CuriosApi.getCuriosHelper().getCuriosItemHandler(player).ifPresent(handler -> {
+        CuriosApi.getCuriosHelper().getCuriosHandler(player).ifPresent(handler -> {
 
           if (!player.world.isRemote) {
             Map<String, ICurioStacksHandler> curios = handler.getCurios();
@@ -314,7 +327,7 @@ public class CuriosEventHandler {
   @SubscribeEvent
   public void tick(LivingEvent.LivingUpdateEvent evt) {
     LivingEntity livingEntity = evt.getEntityLiving();
-    CuriosApi.getCuriosHelper().getCuriosItemHandler(livingEntity).ifPresent(handler -> {
+    CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
       Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {

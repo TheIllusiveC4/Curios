@@ -45,7 +45,7 @@ public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen
     ClientPlayerEntity player = containerScreen.getMinecraft().player;
 
     if (player != null) {
-      return CuriosApi.getCuriosHelper().getCuriosItemHandler(containerScreen.getMinecraft().player)
+      return CuriosApi.getCuriosHelper().getCuriosHandler(containerScreen.getMinecraft().player)
           .map(handler -> {
             List<Rectangle2d> areas = new ArrayList<>();
             int slotCount = handler.getSlots();

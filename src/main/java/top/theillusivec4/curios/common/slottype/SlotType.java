@@ -17,7 +17,7 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.common;
+package top.theillusivec4.curios.common.slottype;
 
 import java.util.Objects;
 import net.minecraft.util.ResourceLocation;

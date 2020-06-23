@@ -71,7 +71,7 @@ public class SPacketSyncStack {
         Entity entity = world.getEntityByID(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosItemHandler((LivingEntity) entity).ifPresent(
+          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity).ifPresent(
               handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacksHandler -> {
                 ItemStack stack = msg.stack;
                 CompoundNBT compoundNBT = msg.compound;

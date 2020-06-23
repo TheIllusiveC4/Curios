@@ -63,7 +63,7 @@ public class SPacketBreak {
         if (entity instanceof LivingEntity) {
           LivingEntity livingEntity = (LivingEntity) entity;
 
-          CuriosApi.getCuriosHelper().getCuriosItemHandler(livingEntity).ifPresent(handler -> {
+          CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
             ItemStack stack = handler.getStacksHandler(msg.curioId)
                 .map(stacksHandler -> stacksHandler.getStacks().getStackInSlot(msg.slotId))
                 .orElse(ItemStack.EMPTY);

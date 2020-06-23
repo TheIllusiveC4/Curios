@@ -25,7 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
-import top.theillusivec4.curios.common.SlotType;
+import top.theillusivec4.curios.common.slottype.SlotType;
 
 /**
  * {@link CurioChangeEvent} is fired when the Curio of a LivingEntity changes. <br> This event is

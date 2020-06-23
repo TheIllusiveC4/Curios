@@ -37,7 +37,7 @@ public class CuriosHelper implements ICuriosHelper {
   }
 
   @Override
-  public LazyOptional<ICuriosItemHandler> getCuriosItemHandler(
+  public LazyOptional<ICuriosItemHandler> getCuriosHandler(
       @Nonnull final LivingEntity livingEntity) {
     return livingEntity.getCapability(CuriosCapability.INVENTORY);
   }
@@ -49,17 +49,17 @@ public class CuriosHelper implements ICuriosHelper {
   }
 
   @Override
-  public Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(Item item,
+  public Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(Item item,
       @Nonnull final LivingEntity livingEntity) {
-    return getCurioEquipped((stack) -> stack.getItem() == item, livingEntity);
+    return findEquippedCurio((stack) -> stack.getItem() == item, livingEntity);
   }
 
   @Nonnull
   @Override
-  public Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(
+  public Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(
       Predicate<ItemStack> filter, @Nonnull final LivingEntity livingEntity) {
 
-    ImmutableTriple<String, Integer, ItemStack> result = getCuriosItemHandler(livingEntity)
+    ImmutableTriple<String, Integer, ItemStack> result = getCuriosHandler(livingEntity)
         .map(handler -> {
           Map<String, ICurioStacksHandler> curios = handler.getCurios();
 

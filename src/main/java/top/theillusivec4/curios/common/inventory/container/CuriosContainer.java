@@ -91,7 +91,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
     super(CuriosRegistry.CONTAINER_TYPE, windowId);
     this.player = playerInventory.player;
     this.isLocalWorld = player.world.isRemote;
-    this.curiosHandler = CuriosApi.getCuriosHelper().getCuriosItemHandler(player);
+    this.curiosHandler = CuriosApi.getCuriosHelper().getCuriosHandler(player);
     this.addSlot(
         new CraftingResultSlot(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154,
             28));

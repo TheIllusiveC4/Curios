@@ -67,7 +67,7 @@ public class SPacketSyncOperation {
         Entity entity = world.getEntityByID(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosItemHandler((LivingEntity) entity)
+          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity)
               .ifPresent(handler -> {
                 Operation op = Operation.fromValue(msg.operation);
                 String id = msg.curioId;

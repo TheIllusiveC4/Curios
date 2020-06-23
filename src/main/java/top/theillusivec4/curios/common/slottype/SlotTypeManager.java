@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.common;
+package top.theillusivec4.curios.common.slottype;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,8 +13,9 @@ import net.minecraftforge.fml.InterModComms.IMCMessage;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.imc.CurioImcMessage;
+import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosConfig.CuriosSettings.CuriosSetting;
-import top.theillusivec4.curios.common.SlotType.Builder;
+import top.theillusivec4.curios.common.slottype.SlotType.Builder;
 
 public class SlotTypeManager {
 

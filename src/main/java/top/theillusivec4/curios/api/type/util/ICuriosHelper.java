@@ -32,7 +32,7 @@ public interface ICuriosHelper {
    * @param livingEntity The ItemStack to get the curio inventory capability from
    * @return LazyOptional of the curio inventory capability
    */
-  LazyOptional<ICuriosItemHandler> getCuriosItemHandler(LivingEntity livingEntity);
+  LazyOptional<ICuriosItemHandler> getCuriosHandler(LivingEntity livingEntity);
 
   /**
    * Retrieves a set of string identifiers from the curio tags associated with the given item.
@@ -43,26 +43,26 @@ public interface ICuriosHelper {
   Set<String> getCurioTags(Item item);
 
   /**
-   * Gets the first found ItemStack of the item type equipped in a curio slot, or null if no matches
-   * were found.
+   * Gets the first found ItemStack of the item type equipped in a curio slot, or empty if no
+   * matches were found.
    *
    * @param item         The item to find
    * @param livingEntity The wearer of the item to be found
    * @return An Optional wrapper of the found triplet, or Optional.empty() is nothing was found.
    */
-  Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(Item item,
+  Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(Item item,
       @Nonnull final LivingEntity livingEntity);
 
   /**
    * Gets the first found ItemStack of the item type equipped in a curio slot that matches the
-   * filter, or null if no matches were found.
+   * filter, or empty if no matches were found.
    *
    * @param filter       The filter to test the ItemStack against
    * @param livingEntity The wearer of the item to be found
    * @return An Optional wrapper of the found triplet, or Optional.empty() is nothing was found.
    */
   @Nonnull
-  Optional<ImmutableTriple<String, Integer, ItemStack>> getCurioEquipped(
+  Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(
       Predicate<ItemStack> filter, @Nonnull final LivingEntity livingEntity);
 
   Multimap<String, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack);

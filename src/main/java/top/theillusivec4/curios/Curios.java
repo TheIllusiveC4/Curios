@@ -62,7 +62,7 @@ import top.theillusivec4.curios.client.render.CuriosLayer;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.CuriosRegistry;
-import top.theillusivec4.curios.common.SlotTypeManager;
+import top.theillusivec4.curios.common.slottype.SlotTypeManager;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
