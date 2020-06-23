@@ -59,18 +59,9 @@ public class CrownItem extends Item {
 
         if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 20 == 0) {
           livingEntity
-              .addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, 44, true, true));
+              .addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, -1, true, true));
           stack.damageItem(1, livingEntity,
               damager -> CuriosApi.getCuriosHelper().onBrokenCurio(identifier, index, damager));
-        }
-      }
-
-      @Override
-      public void onUnequip(String identifier, int index, LivingEntity livingEntity) {
-        EffectInstance effect = livingEntity.getActivePotionEffect(Effects.NIGHT_VISION);
-
-        if (effect != null && effect.getAmplifier() == 44) {
-          livingEntity.removePotionEffect(Effects.NIGHT_VISION);
         }
       }
 

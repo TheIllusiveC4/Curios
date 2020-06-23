@@ -12,7 +12,7 @@ import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.InterModComms.IMCMessage;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.imc.CurioImcMessage;
+import top.theillusivec4.curios.api.CurioImcMessage;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosConfig.CuriosSettings.CuriosSetting;
 import top.theillusivec4.curios.common.slottype.SlotType.Builder;
@@ -79,7 +79,8 @@ public class SlotTypeManager {
   }
 
   public static void buildSlotTypes() {
-    configBuilders.values()
+    Map<String, Builder> builders = !configBuilders.isEmpty() ? configBuilders : imcBuilders;
+    builders.values()
         .forEach(builder -> CuriosApi.getServerManager().addSlotType(builder.build()));
   }
 

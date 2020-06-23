@@ -34,6 +34,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -43,15 +44,16 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import top.theillusivec4.curios.api.CurioImcMessage;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotTypePreset;
-import top.theillusivec4.curios.api.imc.CurioImcMessage;
 import top.theillusivec4.curios.client.ClientEventHandler;
 import top.theillusivec4.curios.client.CuriosClient;
 import top.theillusivec4.curios.client.CuriosClientConfig;
@@ -62,11 +64,11 @@ import top.theillusivec4.curios.client.render.CuriosLayer;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.CuriosRegistry;
-import top.theillusivec4.curios.common.slottype.SlotTypeManager;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.slottype.SlotTypeManager;
 import top.theillusivec4.curios.server.CuriosServer;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
@@ -77,11 +79,14 @@ public class Curios {
   public static final String MODID = CuriosApi.MODID;
   public static final Logger LOGGER = LogManager.getLogger();
 
+  private static final boolean DEBUG = true;
+
   public Curios() {
     final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::setup);
     eventBus.addListener(this::config);
     eventBus.addListener(this::enqueue);
+    eventBus.addListener(this::process);
     MinecraftForge.EVENT_BUS.addListener(this::serverStarting);
     MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
     MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
@@ -100,12 +105,24 @@ public class Curios {
   }
 
   private void enqueue(InterModEnqueueEvent evt) {
+
+    for (SlotTypePreset preset : SlotTypePreset.values()) {
+
+      if (DEBUG) {
+        InterModComms
+            .sendTo(MODID, CurioImcMessage.REGISTER_TYPE, () -> preset.getMessageBuilder().build());
+      }
+    }
+  }
+
+  private void process(InterModProcessEvent evt) {
     SlotTypeManager.buildImcSlotTypes(evt.getIMCStream(CurioImcMessage.REGISTER_TYPE::equals),
         evt.getIMCStream(CurioImcMessage.MODIFY_TYPE::equals));
   }
 
   private void serverAboutToStart(FMLServerAboutToStartEvent evt) {
     CuriosApi.setServerManager(new CuriosServer());
+    SlotTypeManager.buildSlotTypes();
   }
 
   private void serverStopped(FMLServerStoppedEvent evt) {
@@ -127,7 +144,6 @@ public class Curios {
         if (spec == CuriosConfig.SERVER_SPEC) {
           CuriosConfig.transformCurios(commentedConfig);
           SlotTypeManager.buildConfigSlotTypes();
-          SlotTypeManager.buildSlotTypes();
         }
       }
     }

@@ -17,7 +17,7 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.api.imc;
+package top.theillusivec4.curios.api;
 
 import net.minecraft.util.ResourceLocation;
 
@@ -27,7 +27,7 @@ public final class CurioImcMessage {
   public static final String MODIFY_TYPE = "modify_type";
 
   private final String identifier;
-  private final int priority;
+  private final Integer priority;
   private final int size;
   private final boolean locked;
   private final boolean visible;
@@ -52,7 +52,7 @@ public final class CurioImcMessage {
     return this.icon;
   }
 
-  public int getPriority() {
+  public Integer getPriority() {
     return this.priority;
   }
 
@@ -75,7 +75,7 @@ public final class CurioImcMessage {
   public static class Builder {
 
     private final String identifier;
-    private int priority;
+    private Integer priority;
     private int size = 1;
     private boolean locked = false;
     private boolean visible = true;

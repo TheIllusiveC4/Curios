@@ -123,7 +123,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     if (nbt.contains("Renders")) {
       CompoundNBT tag = nbt.getCompound("Renders");
       this.renderHandler = NonNullList.withSize(
-          tag.contains("Size", Constants.NBT.TAG_INT) ? nbt.getInt("Size")
+          nbt.contains("Size", Constants.NBT.TAG_INT) ? nbt.getInt("Size")
               : this.stackHandler.getSlots(), true);
       ListNBT tagList = tag.getList("Renders", Constants.NBT.TAG_COMPOUND);
 

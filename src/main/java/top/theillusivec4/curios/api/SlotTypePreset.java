@@ -1,6 +1,7 @@
 package top.theillusivec4.curios.api;
 
-import top.theillusivec4.curios.api.imc.CurioImcMessage.Builder;
+import net.minecraft.util.ResourceLocation;
+import top.theillusivec4.curios.api.CurioImcMessage.Builder;
 
 public enum SlotTypePreset {
   HEAD("head", 40), NECKLACE("necklace", 60), BACK("back", 80), BODY("body", 100), HANDS("hands",
@@ -19,6 +20,7 @@ public enum SlotTypePreset {
   }
 
   public Builder getMessageBuilder() {
-    return new Builder(this.id).priority(this.priority);
+    return new Builder(this.id).priority(this.priority).icon(
+        new ResourceLocation(CuriosApi.MODID, "item/empty_" + this.getIdentifier() + "_slot"));
   }
 }
