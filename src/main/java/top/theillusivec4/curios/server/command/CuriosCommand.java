@@ -115,15 +115,16 @@ public class CuriosCommand {
 
   private static int setSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot, int amount) {
-    CuriosApi.setSlotsForType(slot, playerMP, amount);
+    CuriosApi.getServerManager().setSlotsForType(slot, playerMP, amount);
     source.sendFeedback(new TranslationTextComponent("commands.curios.set.success", slot,
-        CuriosApi.getSlotsForType(playerMP, slot), playerMP.getDisplayName()), true);
+            CuriosApi.getServerManager().getSlotsForType(playerMP, slot), playerMP.getDisplayName()),
+        true);
     return Command.SINGLE_SUCCESS;
   }
 
   private static int growSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot, int amount) {
-    CuriosApi.growSlotType(slot, amount, playerMP);
+    CuriosApi.getServerManager().growSlotType(slot, amount, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.add.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
@@ -131,7 +132,7 @@ public class CuriosCommand {
 
   private static int shrinkSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot, int amount) {
-    CuriosApi.shrinkSlotType(slot, amount, playerMP);
+    CuriosApi.getServerManager().shrinkSlotType(slot, amount, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.remove.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
@@ -139,7 +140,7 @@ public class CuriosCommand {
 
   private static int unlockSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
-    CuriosApi.unlockSlotType(slot, playerMP);
+    CuriosApi.getServerManager().unlockSlotType(slot, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.enable.success", slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
@@ -147,7 +148,7 @@ public class CuriosCommand {
 
   private static int lockSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
-    CuriosApi.lockSlotType(slot, playerMP);
+    CuriosApi.getServerManager().lockSlotType(slot, playerMP);
     source.sendFeedback(new TranslationTextComponent("commands.curios.disable.success", slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
@@ -156,7 +157,7 @@ public class CuriosCommand {
   private static int clearSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
 
-    CuriosApi.getCuriosHandler(playerMP).ifPresent(handler -> {
+    CuriosApi.getCuriosHelper().getCuriosItemHandler(playerMP).ifPresent(handler -> {
       Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
       if (!slot.isEmpty() && curios.get(slot) != null) {
@@ -180,7 +181,7 @@ public class CuriosCommand {
   }
 
   private static int resetSlotsForPlayer(CommandSource source, ServerPlayerEntity playerMP) {
-    CuriosApi.getCuriosHandler(playerMP).ifPresent(handler -> {
+    CuriosApi.getCuriosHelper().getCuriosItemHandler(playerMP).ifPresent(handler -> {
       handler.reset();
       NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> playerMP),
           new SPacketSyncCurios(playerMP.getEntityId(), handler.getCurios()));

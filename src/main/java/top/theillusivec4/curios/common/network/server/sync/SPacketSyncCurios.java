@@ -81,7 +81,7 @@ public class SPacketSyncCurios {
         Entity entity = world.getEntityByID(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHandler((LivingEntity) entity)
+          CuriosApi.getCuriosHelper().getCuriosItemHandler((LivingEntity) entity)
               .ifPresent(handler -> handler.setCurios(msg.map));
         }
       }

@@ -26,7 +26,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
-import top.theillusivec4.curios.api.type.ICurioItemHandler;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 /**
  * LivingCurioDropsEvent is fired when an Entity's death causes dropped curios to appear.<br> This
@@ -53,9 +53,9 @@ public class CurioDropsEvent extends LivingEvent {
   private final Collection<ItemEntity> drops;
   private final int lootingLevel;
   private final boolean recentlyHit;
-  private final ICurioItemHandler curioHandler; // Curio handler for the entity
+  private final ICuriosItemHandler curioHandler; // Curio handler for the entity
 
-  public CurioDropsEvent(LivingEntity entity, ICurioItemHandler handler, DamageSource source,
+  public CurioDropsEvent(LivingEntity entity, ICuriosItemHandler handler, DamageSource source,
       Collection<ItemEntity> drops, int lootingLevel, boolean recentlyHit) {
     super(entity);
     this.source = source;
@@ -65,7 +65,7 @@ public class CurioDropsEvent extends LivingEvent {
     this.curioHandler = handler;
   }
 
-  public ICurioItemHandler getCurioHandler() {
+  public ICuriosItemHandler getCurioHandler() {
     return curioHandler;
   }
 

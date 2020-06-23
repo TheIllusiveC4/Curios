@@ -22,13 +22,13 @@ package top.theillusivec4.curios.api;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import top.theillusivec4.curios.api.type.ICurio;
-import top.theillusivec4.curios.api.type.ICurioItemHandler;
+import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 public class CuriosCapability {
 
-  @CapabilityInject(ICurioItemHandler.class)
-  public static final Capability<ICurioItemHandler> INVENTORY;
+  @CapabilityInject(ICuriosItemHandler.class)
+  public static final Capability<ICuriosItemHandler> INVENTORY;
 
   @CapabilityInject(ICurio.class)
   public static final Capability<ICurio> ITEM;

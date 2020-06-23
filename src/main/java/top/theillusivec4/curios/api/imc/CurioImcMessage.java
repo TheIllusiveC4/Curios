@@ -23,6 +23,9 @@ import net.minecraft.util.ResourceLocation;
 
 public final class CurioImcMessage {
 
+  public static final String REGISTER_TYPE = "register_type";
+  public static final String MODIFY_TYPE = "modify_type";
+
   private final String identifier;
   private final int priority;
   private final int size;

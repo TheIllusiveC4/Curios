@@ -36,32 +36,38 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosApi.Imc;
 import top.theillusivec4.curios.api.SlotTypePreset;
-import top.theillusivec4.curios.client.CuriosClientConfig;
+import top.theillusivec4.curios.api.imc.CurioImcMessage;
 import top.theillusivec4.curios.client.ClientEventHandler;
+import top.theillusivec4.curios.client.CuriosClient;
+import top.theillusivec4.curios.client.CuriosClientConfig;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.client.gui.GuiEventHandler;
 import top.theillusivec4.curios.client.render.CuriosLayer;
 import top.theillusivec4.curios.common.CuriosConfig;
+import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.SlotTypeManager;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.server.CuriosServer;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
 
@@ -76,12 +82,15 @@ public class Curios {
     eventBus.addListener(this::setup);
     eventBus.addListener(this::config);
     eventBus.addListener(this::enqueue);
-    MinecraftForge.EVENT_BUS.addListener(this::onServerStarting);
+    MinecraftForge.EVENT_BUS.addListener(this::serverStarting);
+    MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
+    MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
     ModLoadingContext.get().registerConfig(Type.CLIENT, CuriosClientConfig.CLIENT_SPEC);
     ModLoadingContext.get().registerConfig(Type.SERVER, CuriosConfig.SERVER_SPEC);
   }
 
   private void setup(FMLCommonSetupEvent evt) {
+    CuriosApi.setCuriosHelper(new CuriosHelper());
     CurioInventoryCapability.register();
     CurioItemCapability.register();
     MinecraftForge.EVENT_BUS.register(new CuriosEventHandler());
@@ -91,11 +100,19 @@ public class Curios {
   }
 
   private void enqueue(InterModEnqueueEvent evt) {
-    SlotTypeManager.buildImcSlotTypes(evt.getIMCStream(Imc.REGISTER_TYPE::equals),
-        evt.getIMCStream(Imc.MODIFY_TYPE::equals));
+    SlotTypeManager.buildImcSlotTypes(evt.getIMCStream(CurioImcMessage.REGISTER_TYPE::equals),
+        evt.getIMCStream(CurioImcMessage.MODIFY_TYPE::equals));
   }
 
-  private void onServerStarting(FMLServerStartingEvent evt) {
+  private void serverAboutToStart(FMLServerAboutToStartEvent evt) {
+    CuriosApi.setServerManager(new CuriosServer());
+  }
+
+  private void serverStopped(FMLServerStoppedEvent evt) {
+    CuriosApi.setServerManager(null);
+  }
+
+  private void serverStarting(FMLServerStartingEvent evt) {
     CuriosCommand.register(evt.getCommandDispatcher());
   }
 
@@ -116,7 +133,7 @@ public class Curios {
     }
   }
 
-  @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+  @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Bus.MOD)
   public static class ClientProxy {
 
     @SubscribeEvent
@@ -133,6 +150,7 @@ public class Curios {
 
     @SubscribeEvent
     public static void setupClient(FMLClientSetupEvent evt) {
+      CuriosApi.setClientManager(new CuriosClient());
       MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
       MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
       ScreenManager.registerFactory(CuriosRegistry.CONTAINER_TYPE, CuriosScreen::new);

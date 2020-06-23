@@ -43,7 +43,7 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
       int light, @Nonnull T livingEntity, float limbSwing, float limbSwingAmount,
       float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
     matrixStack.push();
-    CuriosApi.getCuriosHandler(livingEntity)
+    CuriosApi.getCuriosHelper().getCuriosItemHandler(livingEntity)
         .ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {
           IDynamicStackHandler stackHandler = stacksHandler.getStacks();
           IDynamicStackHandler cosmeticStacksHandler = stacksHandler.getCosmeticStacks();
@@ -58,7 +58,7 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
             if (!stack.isEmpty() && stacksHandler.getRenders().get(i)) {
               int index = i;
 
-              CuriosApi.getCurio(stack).ifPresent(curio -> {
+              CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> {
 
                 if (curio.canRender(id, index, livingEntity)) {
                   matrixStack.push();

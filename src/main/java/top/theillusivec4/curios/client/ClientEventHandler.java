@@ -39,11 +39,13 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
@@ -82,7 +84,7 @@ public class ClientEventHandler {
         i = tag.getInt("HideFlags");
       }
 
-      Set<String> curioTags = CuriosApi.getCurioTags(stack.getItem());
+      Set<String> curioTags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
       List<String> slots = new ArrayList<>(curioTags);
 
       if (!slots.isEmpty()) {
@@ -104,7 +106,8 @@ public class ClientEventHandler {
 
         tagTooltips.add(slotsTooltip);
 
-        CuriosApi.getCurio(stack).ifPresent(curio -> {
+        LazyOptional<ICurio> optionalCurio = CuriosApi.getCuriosHelper().getCurio(stack);
+        optionalCurio.ifPresent(curio -> {
           List<ITextComponent> curioTagsTooltip = curio.getTagsTooltip(tagTooltips);
 
           if (!curioTagsTooltip.isEmpty()) {
@@ -112,12 +115,12 @@ public class ClientEventHandler {
           }
         });
 
-        if (!CuriosApi.getCurio(stack).isPresent()) {
+        if (!optionalCurio.isPresent()) {
           tooltip.addAll(1, tagTooltips);
         }
 
         for (String identifier : slots) {
-          Multimap<String, AttributeModifier> multimap = CuriosApi
+          Multimap<String, AttributeModifier> multimap = CuriosApi.getCuriosHelper()
               .getAttributeModifiers(identifier, stack);
 
           if (!multimap.isEmpty() && (i & 2) == 0) {

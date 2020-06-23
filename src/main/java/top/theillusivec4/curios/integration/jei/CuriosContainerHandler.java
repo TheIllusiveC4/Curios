@@ -45,37 +45,38 @@ public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen
     ClientPlayerEntity player = containerScreen.getMinecraft().player;
 
     if (player != null) {
-      return CuriosApi.getCuriosHandler(containerScreen.getMinecraft().player).map(handler -> {
-        List<Rectangle2d> areas = new ArrayList<>();
-        int slotCount = handler.getSlots();
-        int width = slotCount > 8 ? 42 : 26;
-        int height = 7 + slotCount * 18;
-        int left = containerScreen.getGuiLeft() - width;
-        int top = containerScreen.getGuiTop() + 4;
-        areas.add(new Rectangle2d(left, top, width, height));
-        RecipeBookGui guiRecipeBook = containerScreen.getRecipeGui();
+      return CuriosApi.getCuriosHelper().getCuriosItemHandler(containerScreen.getMinecraft().player)
+          .map(handler -> {
+            List<Rectangle2d> areas = new ArrayList<>();
+            int slotCount = handler.getSlots();
+            int width = slotCount > 8 ? 42 : 26;
+            int height = 7 + slotCount * 18;
+            int left = containerScreen.getGuiLeft() - width;
+            int top = containerScreen.getGuiTop() + 4;
+            areas.add(new Rectangle2d(left, top, width, height));
+            RecipeBookGui guiRecipeBook = containerScreen.getRecipeGui();
 
-        if (guiRecipeBook.isVisible()) {
-          int i = (containerScreen.width - 147) / 2 - (containerScreen.widthTooNarrow ? 0 : 86);
-          int j = (containerScreen.height - 166) / 2;
-          areas.add(new Rectangle2d(i, j, 147, 166));
-          try {
-            @SuppressWarnings("unchecked") List<RecipeTabToggleWidget> tabs = (List<RecipeTabToggleWidget>) RECIPE_TABS
-                .get(guiRecipeBook);
+            if (guiRecipeBook.isVisible()) {
+              int i = (containerScreen.width - 147) / 2 - (containerScreen.widthTooNarrow ? 0 : 86);
+              int j = (containerScreen.height - 166) / 2;
+              areas.add(new Rectangle2d(i, j, 147, 166));
+              try {
+                @SuppressWarnings("unchecked") List<RecipeTabToggleWidget> tabs = (List<RecipeTabToggleWidget>) RECIPE_TABS
+                    .get(guiRecipeBook);
 
-            for (RecipeTabToggleWidget tab : tabs) {
+                for (RecipeTabToggleWidget tab : tabs) {
 
-              if (tab.visible) {
-                areas.add(new Rectangle2d(tab.x, tab.y, tab.getWidth(), tab.getHeight()));
+                  if (tab.visible) {
+                    areas.add(new Rectangle2d(tab.x, tab.y, tab.getWidth(), tab.getHeight()));
+                  }
+                }
+              } catch (IllegalAccessException e) {
+                Curios.LOGGER.error("Error accessing recipe tabs!");
               }
+              return areas;
             }
-          } catch (IllegalAccessException e) {
-            Curios.LOGGER.error("Error accessing recipe tabs!");
-          }
-          return areas;
-        }
-        return areas;
-      }).orElse(Collections.emptyList());
+            return areas;
+          }).orElse(Collections.emptyList());
     } else {
       return Collections.emptyList();
     }

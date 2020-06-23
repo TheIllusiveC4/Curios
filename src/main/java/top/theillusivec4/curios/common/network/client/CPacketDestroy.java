@@ -42,7 +42,7 @@ public class CPacketDestroy {
       ServerPlayerEntity sender = ctx.get().getSender();
 
       if (sender != null) {
-        CuriosApi.getCuriosHandler(sender)
+        CuriosApi.getCuriosHelper().getCuriosItemHandler(sender)
             .ifPresent(handler -> handler.getCurios().values().forEach(stacksHandler -> {
               IDynamicStackHandler stackHandler = stacksHandler.getStacks();
               IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();

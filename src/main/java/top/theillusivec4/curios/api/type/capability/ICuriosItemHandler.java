@@ -17,15 +17,16 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.api.type;
+package top.theillusivec4.curios.api.type.capability;
 
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
-public interface ICurioItemHandler {
+public interface ICuriosItemHandler {
 
   /**
    * A map of the current curios, keyed by the {@link ISlotType} identifier.
@@ -69,6 +70,15 @@ public interface ICurioItemHandler {
    * @param identifier The identifier for the {@link ISlotType}
    */
   void unlockSlotType(String identifier);
+
+  /**
+   * Enables the {@link ISlotType} for a given identifier, adding the default settings to the curio
+   * map.
+   *
+   * @param identifier The identifier for the {@link ISlotType}
+   * @param amount     The amount of slots to unlock
+   */
+  void unlockSlotType(String identifier, int amount);
 
   /**
    * Disables the {@link ISlotType} for a given identifier, removing it from the curio map. Note

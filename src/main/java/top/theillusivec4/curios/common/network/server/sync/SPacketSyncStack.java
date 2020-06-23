@@ -71,14 +71,15 @@ public class SPacketSyncStack {
         Entity entity = world.getEntityByID(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHandler((LivingEntity) entity).ifPresent(
+          CuriosApi.getCuriosHelper().getCuriosItemHandler((LivingEntity) entity).ifPresent(
               handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacksHandler -> {
                 ItemStack stack = msg.stack;
                 CompoundNBT compoundNBT = msg.compound;
                 int slot = msg.slotId;
 
                 if (!compoundNBT.isEmpty()) {
-                  CuriosApi.getCurio(stack).ifPresent(curio -> curio.readSyncData(compoundNBT));
+                  CuriosApi.getCuriosHelper().getCurio(stack)
+                      .ifPresent(curio -> curio.readSyncData(compoundNBT));
                 }
 
                 if (HandlerType.fromValue(msg.handlerType) == HandlerType.COSMETIC) {

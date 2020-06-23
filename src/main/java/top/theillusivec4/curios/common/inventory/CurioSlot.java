@@ -26,11 +26,12 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 
 public final class CurioSlot extends SlotItemHandler {
@@ -43,7 +44,9 @@ public final class CurioSlot extends SlotItemHandler {
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;
     this.player = player;
-    this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE, CuriosApi.getIcon(identifier));
+    this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
+        player.getEntityWorld().isRemote() ? CuriosApi.getClientManager().getIcon(identifier)
+            : new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
   }
 
   @OnlyIn(Dist.CLIENT)
@@ -53,8 +56,9 @@ public final class CurioSlot extends SlotItemHandler {
 
   @Override
   public boolean isItemValid(@Nonnull ItemStack stack) {
-    return hasValidTag(CuriosApi.getCurioTags(stack.getItem())) && CuriosApi.getCurio(stack)
-        .map(curio -> curio.canEquip(identifier, player)).orElse(true) && super.isItemValid(stack);
+    return hasValidTag(CuriosApi.getCuriosHelper().getCurioTags(stack.getItem())) && CuriosApi
+        .getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(identifier, player))
+        .orElse(true) && super.isItemValid(stack);
   }
 
   protected boolean hasValidTag(Set<String> tags) {
@@ -65,7 +69,8 @@ public final class CurioSlot extends SlotItemHandler {
   public boolean canTakeStack(PlayerEntity playerIn) {
     ItemStack stack = this.getStack();
     return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
-        && CuriosApi.getCurio(stack).map(curio -> curio.canUnequip(identifier, playerIn))
-        .orElse(true) && super.canTakeStack(playerIn);
+        && CuriosApi.getCuriosHelper().getCurio(stack)
+        .map(curio -> curio.canUnequip(identifier, playerIn)).orElse(true) && super
+        .canTakeStack(playerIn);
   }
 }

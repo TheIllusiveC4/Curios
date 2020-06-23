@@ -13,13 +13,13 @@ import net.minecraftforge.fml.InterModComms.IMCMessage;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.imc.CurioImcMessage;
-import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.common.CuriosConfig.CuriosSettings.CuriosSetting;
 import top.theillusivec4.curios.common.SlotType.Builder;
 
 public class SlotTypeManager {
 
-  private static Map<String, Builder> slotTypeBuilders = new HashMap<>();
+  private static Map<String, Builder> imcBuilders = new HashMap<>();
+  private static Map<String, Builder> configBuilders = new HashMap<>();
 
   public static void buildImcSlotTypes(Stream<InterModComms.IMCMessage> register,
       Stream<IMCMessage> modify) {
@@ -36,12 +36,15 @@ public class SlotTypeManager {
         Curios.LOGGER.error("Missing identifier in curios config, skipping...");
         return;
       }
-      Builder builder = slotTypeBuilders.get(id);
+      Builder builder = imcBuilders.get(id);
       boolean force = setting.override != null ? setting.override : false;
 
       if (builder == null) {
         builder = new Builder(id);
+      } else {
+        builder = new Builder(id).copyFrom(builder);
       }
+      configBuilders.putIfAbsent(id, builder);
 
       if (setting.priority != null) {
         builder.priority(setting.priority, force);
@@ -70,15 +73,8 @@ public class SlotTypeManager {
   }
 
   public static void buildSlotTypes() {
-    Map<String, ISlotType> slotTypes = new HashMap<>();
-    Map<String, ResourceLocation> slotIcons = new HashMap<>();
-    slotTypeBuilders.forEach((id, builder) -> {
-      ISlotType type = builder.build();
-      slotTypes.put(id, type);
-      slotIcons.put(id, type.getIcon());
-    });
-    CuriosApi.idToType = slotTypes;
-    CuriosApi.idToIcon = slotIcons;
+    configBuilders.values()
+        .forEach(builder -> CuriosApi.getServerManager().addSlotType(builder.build()));
   }
 
   private static void processImc(Stream<InterModComms.IMCMessage> messages, boolean create) {
@@ -96,11 +92,11 @@ public class SlotTypeManager {
 
     messageMap.values().forEach(msgList -> msgList.forEach(msg -> {
       String id = msg.getIdentifier();
-      Builder builder = slotTypeBuilders.get(id);
+      Builder builder = imcBuilders.get(id);
 
       if (builder == null && create) {
         builder = new Builder(id);
-        slotTypeBuilders.put(id, builder);
+        imcBuilders.put(id, builder);
       }
 
       if (builder != null) {

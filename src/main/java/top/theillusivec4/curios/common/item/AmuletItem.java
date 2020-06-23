@@ -34,7 +34,7 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.type.ICurio;
+import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.client.render.model.AmuletModel;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 

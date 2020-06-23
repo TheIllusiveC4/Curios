@@ -121,6 +121,16 @@ public final class SlotType implements ISlotType {
       this.identifier = identifier;
     }
 
+    public Builder copyFrom(Builder builder) {
+      this.priority = builder.priority;
+      this.size = builder.size;
+      this.locked = builder.locked;
+      this.visible = builder.visible;
+      this.cosmetic = builder.cosmetic;
+      this.icon = builder.icon;
+      return this;
+    }
+
     public Builder icon(ResourceLocation icon) {
       this.icon = icon;
       return this;

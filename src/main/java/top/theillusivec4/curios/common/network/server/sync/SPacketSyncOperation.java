@@ -67,26 +67,27 @@ public class SPacketSyncOperation {
         Entity entity = world.getEntityByID(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
-            Operation op = Operation.fromValue(msg.operation);
-            String id = msg.curioId;
-            int amount = msg.amount;
+          CuriosApi.getCuriosHelper().getCuriosItemHandler((LivingEntity) entity)
+              .ifPresent(handler -> {
+                Operation op = Operation.fromValue(msg.operation);
+                String id = msg.curioId;
+                int amount = msg.amount;
 
-            switch (op) {
-              case GROW:
-                handler.growSlotType(id, amount);
-                break;
-              case SHRINK:
-                handler.shrinkSlotType(id, amount);
-                break;
-              case LOCK:
-                handler.lockSlotType(id);
-                break;
-              case UNLOCK:
-                handler.unlockSlotType(id);
-                break;
-            }
-          });
+                switch (op) {
+                  case GROW:
+                    handler.growSlotType(id, amount);
+                    break;
+                  case SHRINK:
+                    handler.shrinkSlotType(id, amount);
+                    break;
+                  case LOCK:
+                    handler.lockSlotType(id);
+                    break;
+                  case UNLOCK:
+                    handler.unlockSlotType(id, amount);
+                    break;
+                }
+              });
         }
       }
     });

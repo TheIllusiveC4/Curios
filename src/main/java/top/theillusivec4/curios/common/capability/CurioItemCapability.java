@@ -29,7 +29,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.type.ICurio;
+import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public class CurioItemCapability {
 

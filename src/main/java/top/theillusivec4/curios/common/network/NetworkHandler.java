@@ -36,6 +36,7 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 import top.theillusivec4.curios.common.network.client.CPacketScroll;
 import top.theillusivec4.curios.common.network.server.SPacketBreak;
 import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
+import top.theillusivec4.curios.common.network.server.SPacketIcons;
 import top.theillusivec4.curios.common.network.server.SPacketScroll;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
@@ -77,11 +78,12 @@ public class NetworkHandler {
     register(SPacketBreak.class, SPacketBreak::encode, SPacketBreak::decode, SPacketBreak::handle);
     register(SPacketGrabbedItem.class, SPacketGrabbedItem::encode, SPacketGrabbedItem::decode,
         SPacketGrabbedItem::handle);
+    register(SPacketIcons.class, SPacketIcons::encode, SPacketIcons::decode, SPacketIcons::handle);
 
     // Assignment of curio breaking to the network instance
-    CuriosApi.brokenCurioConsumer = (id, index, livingEntity) -> INSTANCE
+    CuriosApi.getCuriosHelper().setBrokenCurioConsumer((id, index, livingEntity) -> INSTANCE
         .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-            new SPacketBreak(livingEntity.getEntityId(), id, index));
+            new SPacketBreak(livingEntity.getEntityId(), id, index)));
   }
 
   private static <M> void register(Class<M> messageType, BiConsumer<M, PacketBuffer> encoder,

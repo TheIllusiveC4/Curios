@@ -35,7 +35,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.type.ICurio;
+import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.client.render.model.CrownModel;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
@@ -61,7 +61,7 @@ public class CrownItem extends Item {
           livingEntity
               .addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, 44, true, true));
           stack.damageItem(1, livingEntity,
-              damager -> CuriosApi.onBrokenCurio(identifier, index, damager));
+              damager -> CuriosApi.getCuriosHelper().onBrokenCurio(identifier, index, damager));
         }
       }
 
