@@ -26,25 +26,27 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public final class CurioSlot extends SlotItemHandler {
 
   private final String identifier;
   private final PlayerEntity player;
 
-  private boolean enabled = true;
+  private NonNullList<Boolean> renderStatuses;
 
-  public CurioSlot(PlayerEntity player, IItemHandler handler, int index, String identifier,
-      int xPosition, int yPosition) {
+  public CurioSlot(PlayerEntity player, IDynamicStackHandler handler, int index, String identifier,
+      int xPosition, int yPosition, NonNullList<Boolean> renders) {
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;
+    this.renderStatuses = renders;
     this.player = player;
     this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
         player.getEntityWorld().isRemote() ? CuriosApi.getClientManager().getIcon(identifier)
@@ -53,6 +55,10 @@ public final class CurioSlot extends SlotItemHandler {
 
   public String getIdentifier() {
     return this.identifier;
+  }
+
+  public boolean getRenderStatus() {
+    return this.renderStatuses.get(this.getSlotIndex());
   }
 
   @OnlyIn(Dist.CLIENT)

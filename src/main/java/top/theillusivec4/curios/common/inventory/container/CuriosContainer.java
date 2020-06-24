@@ -158,10 +158,12 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
       int yOffset = 12;
 
       for (String identifier : curioMap.keySet()) {
-        IDynamicStackHandler stackHandler = curioMap.get(identifier).getStacks();
+        ICurioStacksHandler stacksHandler = curioMap.get(identifier);
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
         for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
-          this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset));
+          this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset,
+              stacksHandler.getRenders()));
           yOffset += 18;
           slots++;
         }
@@ -186,12 +188,14 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
       }
 
       for (String identifier : curioMap.keySet()) {
-        IDynamicStackHandler stackHandler = curioMap.get(identifier).getStacks();
+        ICurioStacksHandler stacksHandler = curioMap.get(identifier);
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
         for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
           if (index >= indexIn) {
-            this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset));
+            this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset,
+                stacksHandler.getRenders()));
             yOffset += 18;
             slots++;
           }

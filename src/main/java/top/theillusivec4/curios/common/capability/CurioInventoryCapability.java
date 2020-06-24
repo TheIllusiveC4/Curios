@@ -131,6 +131,12 @@ public class CurioInventoryCapability {
                     index++;
                   }
                   sortedCurios.put(type, newStacksHandler);
+
+                  for (int j = 0;
+                      j < newStacksHandler.getRenders().size() && j < prevStacksHandler.getRenders()
+                          .size(); j++) {
+                    newStacksHandler.getRenders().set(j, prevStacksHandler.getRenders().get(j));
+                  }
                 });
 
                 if (!optionalType.isPresent()) {

@@ -34,12 +34,14 @@ import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 import top.theillusivec4.curios.common.network.client.CPacketScroll;
+import top.theillusivec4.curios.common.network.client.CPacketToggleRender;
 import top.theillusivec4.curios.common.network.server.SPacketBreak;
 import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
-import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.SPacketScroll;
+import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncRender;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 
 public class NetworkHandler {
@@ -65,6 +67,8 @@ public class NetworkHandler {
         CPacketScroll::handle);
     register(CPacketDestroy.class, CPacketDestroy::encode, CPacketDestroy::decode,
         CPacketDestroy::handle);
+    register(CPacketToggleRender.class, CPacketToggleRender::encode, CPacketToggleRender::decode,
+        CPacketToggleRender::handle);
 
     // Server Packets
     register(SPacketSyncStack.class, SPacketSyncStack::encode, SPacketSyncStack::decode,
@@ -78,7 +82,10 @@ public class NetworkHandler {
     register(SPacketBreak.class, SPacketBreak::encode, SPacketBreak::decode, SPacketBreak::handle);
     register(SPacketGrabbedItem.class, SPacketGrabbedItem::encode, SPacketGrabbedItem::decode,
         SPacketGrabbedItem::handle);
-    register(SPacketSetIcons.class, SPacketSetIcons::encode, SPacketSetIcons::decode, SPacketSetIcons::handle);
+    register(SPacketSetIcons.class, SPacketSetIcons::encode, SPacketSetIcons::decode,
+        SPacketSetIcons::handle);
+    register(SPacketSyncRender.class, SPacketSyncRender::encode, SPacketSyncRender::decode,
+        SPacketSyncRender::handle);
 
     // Assignment of curio breaking to the network instance
     CuriosApi.getCuriosHelper().setBrokenCurioConsumer((id, index, livingEntity) -> INSTANCE

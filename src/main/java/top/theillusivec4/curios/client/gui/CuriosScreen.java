@@ -38,6 +38,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -47,6 +48,8 @@ import top.theillusivec4.curios.client.CuriosClientConfig.Client.ButtonCorner;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
+import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.network.client.CPacketToggleRender;
 
 public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IRecipeShownListener {
 
@@ -139,11 +142,12 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     for (Slot inventorySlot : this.container.inventorySlots) {
 
       if (inventorySlot instanceof CurioSlot) {
-        this.addButton(new RenderButton(this.guiLeft - 8, this.guiTop + yOffset, 8, 8, 75, 0, 8,
-            CURIO_INVENTORY, (button) -> {
-          Curios.LOGGER.info(
-              inventorySlot.getSlotIndex() + " " + ((CurioSlot) inventorySlot).getIdentifier());
-        }));
+        this.addButton(
+            new RenderButton((CurioSlot) inventorySlot, this.guiLeft - 8, this.guiTop + yOffset, 8,
+                8, 75, 0, 8, CURIO_INVENTORY, (button) -> NetworkHandler.INSTANCE
+                .send(PacketDistributor.SERVER.noArg(),
+                    new CPacketToggleRender(((CurioSlot) inventorySlot).getIdentifier(),
+                        inventorySlot.getSlotIndex()))));
         yOffset += 18;
       }
     }
@@ -194,7 +198,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       for (Widget button : this.buttons) {
 
         if (button instanceof RenderButton) {
-          ((RenderButton) button).renderButtonOverlay(mouseX, mouseY, partialTicks);
+          ((RenderButton) button).renderButtonOverlay();
 
           if (button.isHovered()) {
             isButtonHovered = true;
