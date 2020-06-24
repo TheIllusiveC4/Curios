@@ -22,9 +22,11 @@ package top.theillusivec4.curios.common.network.server;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
+import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 public class SPacketScroll {
@@ -48,7 +50,9 @@ public class SPacketScroll {
 
   public static void handle(SPacketScroll msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      ClientPlayerEntity clientPlayer = Minecraft.getInstance().player;
+      Minecraft mc = Minecraft.getInstance();
+      ClientPlayerEntity clientPlayer = mc.player;
+      Screen screen = mc.currentScreen;
 
       if (clientPlayer != null) {
         Container container = clientPlayer.openContainer;
@@ -56,6 +60,10 @@ public class SPacketScroll {
         if (container instanceof CuriosContainer && container.windowId == msg.windowId) {
           ((CuriosContainer) container).scrollToIndex(msg.index);
         }
+      }
+
+      if (screen instanceof CuriosScreen) {
+        ((CuriosScreen) screen).updateRenderButtons();
       }
     });
     ctx.get().setPacketHandled(true);

@@ -33,5 +33,6 @@
   "curios.modifiers.charm": "When worn as charm:",
   "curios.modifiers.hands": "When on hands:",
   "key.curios.category": "Curios",
-  "key.curios.open.desc": "Open/Close Curios Inventory"
+  "key.curios.open.desc": "Open/Close Curios Inventory",
+  "gui.curios.toggle": "Toggle Visibility"
 }

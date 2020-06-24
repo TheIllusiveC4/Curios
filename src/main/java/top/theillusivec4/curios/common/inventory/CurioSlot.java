@@ -39,6 +39,8 @@ public final class CurioSlot extends SlotItemHandler {
   private final String identifier;
   private final PlayerEntity player;
 
+  private boolean enabled = true;
+
   public CurioSlot(PlayerEntity player, IItemHandler handler, int index, String identifier,
       int xPosition, int yPosition) {
     super(handler, index, xPosition, yPosition);
@@ -47,6 +49,10 @@ public final class CurioSlot extends SlotItemHandler {
     this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
         player.getEntityWorld().isRemote() ? CuriosApi.getClientManager().getIcon(identifier)
             : new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
+  }
+
+  public String getIdentifier() {
+    return this.identifier;
   }
 
   @OnlyIn(Dist.CLIENT)

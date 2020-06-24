@@ -21,11 +21,13 @@ package top.theillusivec4.curios.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import javax.annotation.Nonnull;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.InputMappings;
@@ -66,6 +68,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   private CuriosButton buttonCurios;
   private boolean isScrolling;
   private boolean buttonClicked;
+  private boolean isRenderButtonHovered;
 
   public CuriosScreen(CuriosContainer curiosContainer, PlayerInventory playerInventory,
       ITextComponent title) {
@@ -125,6 +128,24 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
               .setPosition(this.guiLeft + offsets.getA(), this.height / 2 + offsets.getB());
         }));
       }
+      this.updateRenderButtons();
+    }
+  }
+
+  public void updateRenderButtons() {
+    this.buttons.removeIf(widget -> widget instanceof RenderButton);
+    int yOffset = 9;
+
+    for (Slot inventorySlot : this.container.inventorySlots) {
+
+      if (inventorySlot instanceof CurioSlot) {
+        this.addButton(new RenderButton(this.guiLeft - 8, this.guiTop + yOffset, 8, 8, 75, 0, 8,
+            CURIO_INVENTORY, (button) -> {
+          Curios.LOGGER.info(
+              inventorySlot.getSlotIndex() + " " + ((CurioSlot) inventorySlot).getIdentifier());
+        }));
+        yOffset += 18;
+      }
     }
   }
 
@@ -167,8 +188,51 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       this.recipeBookGui.render(mouseX, mouseY, partialTicks);
       super.render(mouseX, mouseY, partialTicks);
       this.recipeBookGui.renderGhostRecipe(this.guiLeft, this.guiTop, true, partialTicks);
+
+      boolean isButtonHovered = false;
+
+      for (Widget button : this.buttons) {
+
+        if (button instanceof RenderButton) {
+          ((RenderButton) button).renderButtonOverlay(mouseX, mouseY, partialTicks);
+
+          if (button.isHovered()) {
+            isButtonHovered = true;
+          }
+        }
+      }
+      this.isRenderButtonHovered = isButtonHovered;
+      ClientPlayerEntity clientPlayer = Minecraft.getInstance().player;
+
+      if (!this.isRenderButtonHovered && clientPlayer != null && clientPlayer.inventory
+          .getItemStack().isEmpty() && this.getSlotUnderMouse() != null) {
+        Slot slot = this.getSlotUnderMouse();
+
+        if (slot instanceof CurioSlot && !slot.getHasStack()) {
+          CurioSlot slotCurio = (CurioSlot) slot;
+          this.renderTooltip(slotCurio.getSlotName(), mouseX, mouseY);
+        }
+      }
     }
     this.renderHoveredToolTip(mouseX, mouseY);
+  }
+
+  @Override
+  protected void renderHoveredToolTip(int mouseX, int mouseY) {
+    Minecraft mc = this.minecraft;
+
+    if (mc != null) {
+      ClientPlayerEntity clientPlayer = mc.player;
+
+      if (clientPlayer != null && clientPlayer.inventory.getItemStack().isEmpty()) {
+
+        if (this.isRenderButtonHovered) {
+          this.renderTooltip(I18n.format("gui.curios.toggle"), mouseX, mouseY);
+        } else if (this.hoveredSlot != null && this.hoveredSlot.getHasStack()) {
+          this.renderTooltip(this.hoveredSlot.getStack(), mouseX, mouseY);
+        }
+      }
+    }
   }
 
   @Override
@@ -196,15 +260,6 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
     if (this.minecraft != null && this.minecraft.player != null) {
       this.minecraft.fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
-
-      if (this.minecraft.player.inventory.getItemStack().isEmpty()
-          && this.getSlotUnderMouse() != null) {
-        Slot slot = this.getSlotUnderMouse();
-        if (slot instanceof CurioSlot && !slot.getHasStack()) {
-          CurioSlot slotCurio = (CurioSlot) slot;
-          this.renderTooltip(slotCurio.getSlotName(), mouseX - this.guiLeft, mouseY - this.guiTop);
-        }
-      }
     }
   }
 
@@ -247,6 +302,10 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   @Override
   protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight,
       double pointX, double pointY) {
+
+    if (isRenderButtonHovered) {
+      return false;
+    }
     return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super
         .isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
   }
