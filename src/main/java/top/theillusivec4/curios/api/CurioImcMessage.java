@@ -79,7 +79,7 @@ public final class CurioImcMessage {
     private int size = 1;
     private boolean locked = false;
     private boolean visible = true;
-    private boolean cosmetic = true;
+    private boolean cosmetic = false;
     private ResourceLocation icon = null;
 
     public Builder(String identifier) {
@@ -111,8 +111,8 @@ public final class CurioImcMessage {
       return this;
     }
 
-    public Builder disableCosmetic() {
-      this.cosmetic = false;
+    public Builder cosmetic() {
+      this.cosmetic = true;
       return this;
     }
 

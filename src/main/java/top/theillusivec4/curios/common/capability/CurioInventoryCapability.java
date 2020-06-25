@@ -112,7 +112,8 @@ public class CurioInventoryCapability {
                     .getSlotType(identifier);
                 optionalType.ifPresent(type -> {
                   int targetSize = type.getSize() + prevStacksHandler.getSizeShift();
-                  CurioStacksHandler newStacksHandler = new CurioStacksHandler(targetSize);
+                  CurioStacksHandler newStacksHandler = new CurioStacksHandler(targetSize,
+                      type.isVisible(), type.hasCosmetic());
                   int index = 0;
 
                   while (index < newStacksHandler.getSlots() && index < prevStacksHandler
@@ -224,8 +225,8 @@ public class CurioInventoryCapability {
     }
 
     @Override
-    public void unlockSlotType(String identifier, int amount) {
-      this.curios.putIfAbsent(identifier, new CurioStacksHandler(amount));
+    public void unlockSlotType(String identifier, int amount, boolean visible, boolean cosmetic) {
+      this.curios.putIfAbsent(identifier, new CurioStacksHandler(amount, visible, cosmetic));
       this.locked.remove(identifier);
     }
 

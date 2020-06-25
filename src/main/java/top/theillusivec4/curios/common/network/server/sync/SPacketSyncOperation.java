@@ -34,16 +34,25 @@ public class SPacketSyncOperation {
   private String curioId;
   private int operation;
   private int amount;
+  private boolean visible;
+  private boolean cosmetic;
 
   public SPacketSyncOperation(int entityId, String curioId, Operation operation) {
     this(entityId, curioId, operation, 0);
   }
 
   public SPacketSyncOperation(int entityId, String curioId, Operation operation, int amount) {
+    this(entityId, curioId, operation, amount, true, false);
+  }
+
+  public SPacketSyncOperation(int entityId, String curioId, Operation operation, int amount,
+      boolean visible, boolean cosmetic) {
     this.entityId = entityId;
     this.curioId = curioId;
     this.amount = amount;
     this.operation = operation.ordinal();
+    this.visible = visible;
+    this.cosmetic = cosmetic;
   }
 
   public static void encode(SPacketSyncOperation msg, PacketBuffer buf) {
@@ -51,11 +60,13 @@ public class SPacketSyncOperation {
     buf.writeString(msg.curioId);
     buf.writeInt(msg.operation);
     buf.writeInt(msg.amount);
+    buf.writeBoolean(msg.visible);
+    buf.writeBoolean(msg.cosmetic);
   }
 
   public static SPacketSyncOperation decode(PacketBuffer buf) {
     return new SPacketSyncOperation(buf.readInt(), buf.readString(25),
-        Operation.fromValue(buf.readInt()), buf.readInt());
+        Operation.fromValue(buf.readInt()), buf.readInt(), buf.readBoolean(), buf.readBoolean());
   }
 
   public static void handle(SPacketSyncOperation msg, Supplier<NetworkEvent.Context> ctx) {
@@ -67,27 +78,26 @@ public class SPacketSyncOperation {
         Entity entity = world.getEntityByID(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity)
-              .ifPresent(handler -> {
-                Operation op = Operation.fromValue(msg.operation);
-                String id = msg.curioId;
-                int amount = msg.amount;
+          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
+            Operation op = Operation.fromValue(msg.operation);
+            String id = msg.curioId;
+            int amount = msg.amount;
 
-                switch (op) {
-                  case GROW:
-                    handler.growSlotType(id, amount);
-                    break;
-                  case SHRINK:
-                    handler.shrinkSlotType(id, amount);
-                    break;
-                  case LOCK:
-                    handler.lockSlotType(id);
-                    break;
-                  case UNLOCK:
-                    handler.unlockSlotType(id, amount);
-                    break;
-                }
-              });
+            switch (op) {
+              case GROW:
+                handler.growSlotType(id, amount);
+                break;
+              case SHRINK:
+                handler.shrinkSlotType(id, amount);
+                break;
+              case LOCK:
+                handler.lockSlotType(id);
+                break;
+              case UNLOCK:
+                handler.unlockSlotType(id, amount, msg.visible, msg.cosmetic);
+                break;
+            }
+          });
         }
       }
     });

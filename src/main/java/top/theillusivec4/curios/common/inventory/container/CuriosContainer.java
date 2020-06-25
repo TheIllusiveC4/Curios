@@ -60,6 +60,7 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.CuriosRegistry;
+import top.theillusivec4.curios.common.inventory.CosmeticCurioSlot;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScroll;
@@ -82,6 +83,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
   private CraftingInventory craftMatrix = new CraftingInventory(this, 2, 2);
   private CraftResultInventory craftResult = new CraftResultInventory();
   private int lastScrollIndex;
+  private boolean cosmeticColumn;
 
   public CuriosContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packetBuffer) {
     this(windowId, playerInventory);
@@ -161,15 +163,29 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
         ICurioStacksHandler stacksHandler = curioMap.get(identifier);
         IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
-        for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
-          this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset,
-              stacksHandler.getRenders()));
-          yOffset += 18;
-          slots++;
+        if (stacksHandler.isVisible()) {
+
+          for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+            this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset,
+                stacksHandler.getRenders()));
+
+            if (stacksHandler.hasCosmetic()) {
+              IDynamicStackHandler cosmeticHandler = stacksHandler.getCosmeticStacks();
+              this.cosmeticColumn = true;
+              this.addSlot(
+                  new CosmeticCurioSlot(player, cosmeticHandler, i, identifier, -37, yOffset));
+            }
+            yOffset += 18;
+            slots++;
+          }
         }
       }
     });
     this.scrollToIndex(0);
+  }
+
+  public boolean hasCosmeticColumn() {
+    return this.cosmeticColumn;
   }
 
   public void scrollToIndex(int indexIn) {
@@ -191,15 +207,25 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
         ICurioStacksHandler stacksHandler = curioMap.get(identifier);
         IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
-        for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+        if (stacksHandler.isVisible()) {
 
-          if (index >= indexIn) {
-            this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset,
-                stacksHandler.getRenders()));
-            yOffset += 18;
-            slots++;
+          for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+
+            if (index >= indexIn) {
+              this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset,
+                  stacksHandler.getRenders()));
+
+              if (stacksHandler.hasCosmetic()) {
+                IDynamicStackHandler cosmeticHandler = stacksHandler.getCosmeticStacks();
+                this.cosmeticColumn = true;
+                this.addSlot(
+                    new CosmeticCurioSlot(player, cosmeticHandler, i, identifier, -37, yOffset));
+              }
+              yOffset += 18;
+              slots++;
+            }
+            index++;
           }
-          index++;
         }
       }
 

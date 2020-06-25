@@ -35,7 +35,7 @@ import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
-public final class CurioSlot extends SlotItemHandler {
+public class CurioSlot extends SlotItemHandler {
 
   private final String identifier;
   private final PlayerEntity player;

@@ -73,7 +73,7 @@ public interface ICuriosItemHandler {
    * @param identifier The identifier for the {@link ISlotType}
    * @param amount     The amount of slots to unlock
    */
-  void unlockSlotType(String identifier, int amount);
+  void unlockSlotType(String identifier, int amount, boolean visible, boolean cosmetic);
 
   /**
    * Disables the {@link ISlotType} for a given identifier, removing it from the curio map. Note

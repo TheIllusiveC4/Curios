@@ -110,7 +110,7 @@ public class Curios {
 
       if (DEBUG) {
         InterModComms
-            .sendTo(MODID, CurioImcMessage.REGISTER_TYPE, () -> preset.getMessageBuilder().build());
+            .sendTo(MODID, CurioImcMessage.REGISTER_TYPE, () -> preset.getMessageBuilder().cosmetic().build());
       }
     }
   }
@@ -161,6 +161,7 @@ public class Curios {
           evt.addSprite(
               new ResourceLocation(MODID, "item/empty_" + preset.getIdentifier() + "_slot"));
         }
+        evt.addSprite(new ResourceLocation(MODID, "item/empty_cosmetic_slot"));
       }
     }
 

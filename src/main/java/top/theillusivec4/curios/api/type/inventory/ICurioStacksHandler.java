@@ -15,6 +15,10 @@ public interface ICurioStacksHandler {
 
   int getSizeShift();
 
+  boolean isVisible();
+
+  boolean hasCosmetic();
+
   void grow(int amount);
 
   void shrink(int amount);

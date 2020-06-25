@@ -46,6 +46,7 @@ import top.theillusivec4.curios.client.CuriosClientConfig;
 import top.theillusivec4.curios.client.CuriosClientConfig.Client;
 import top.theillusivec4.curios.client.CuriosClientConfig.Client.ButtonCorner;
 import top.theillusivec4.curios.client.KeyRegistry;
+import top.theillusivec4.curios.common.inventory.CosmeticCurioSlot;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -141,7 +142,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
     for (Slot inventorySlot : this.container.inventorySlots) {
 
-      if (inventorySlot instanceof CurioSlot) {
+      if (inventorySlot instanceof CurioSlot && !(inventorySlot instanceof CosmeticCurioSlot)) {
         this.addButton(
             new RenderButton((CurioSlot) inventorySlot, this.guiLeft - 8, this.guiTop + yOffset, 8,
                 8, 75, 0, 8, CURIO_INVENTORY, (button) -> NetworkHandler.INSTANCE
@@ -177,6 +178,10 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     int l = j + 12;
     int i1 = k + 14;
     int j1 = l + 139;
+
+    if (this.container.hasCosmeticColumn()) {
+      i1 -= 19;
+    }
     return mouseX >= (double) k && mouseY >= (double) l && mouseX < (double) i1
         && mouseY < (double) j1;
   }
@@ -286,12 +291,21 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
         int upperHeight = 7 + slotCount * 18;
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
-        this.blit(i - 26, j + 4, 0, 0, 27, upperHeight);
+        int xTexOffset = 0;
+        int width = 27;
+        int xOffset = -26;
+
+        if (this.container.hasCosmeticColumn()) {
+          xTexOffset = 92;
+          width = 46;
+          xOffset -= 19;
+        }
+        this.blit(i + xOffset, j + 4, xTexOffset, 0, width, upperHeight);
 
         if (slotCount <= 8) {
-          this.blit(i - 26, j + 4 + upperHeight, 0, 151, 27, 7);
+          this.blit(i + xOffset, j + 4 + upperHeight, xTexOffset, 151, width, 7);
         } else {
-          this.blit(i - 42, j + 4, 27, 0, 23, 158);
+          this.blit(i - 42, j + 4, 27, xTexOffset, 23, 158);
           this.getMinecraft().getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
           this.blit(i - 34, j + 12 + (int) (127f * currentScroll), 232, 0, 12, 15);
         }

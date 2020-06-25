@@ -12,15 +12,18 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   private IDynamicStackHandler stackHandler;
   private IDynamicStackHandler cosmeticStackHandler;
   private int sizeShift = 0;
-
+  private boolean visible;
+  private boolean cosmetic;
   private NonNullList<Boolean> renderHandler;
 
   public CurioStacksHandler() {
-    this(1);
+    this(1, true, false);
   }
 
-  public CurioStacksHandler(int size) {
+  public CurioStacksHandler(int size, boolean visible, boolean cosmetic) {
     this.setSize(size);
+    this.visible = visible;
+    this.cosmetic = cosmetic;
   }
 
   public void setSize(int size) {
@@ -53,6 +56,16 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   @Override
   public int getSizeShift() {
     return this.sizeShift;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return this.visible;
+  }
+
+  @Override
+  public boolean hasCosmetic() {
+    return this.cosmetic;
   }
 
   @Override
@@ -106,6 +119,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     nbt.putInt("Size", this.renderHandler.size());
     compoundNBT.put("Renders", nbt);
     compoundNBT.putInt("SizeShift", this.sizeShift);
+    compoundNBT.putBoolean("HasCosmetic", this.cosmetic);
+    compoundNBT.putBoolean("Visible", this.visible);
     return compoundNBT;
   }
 
@@ -140,5 +155,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     if (nbt.contains("SizeShift")) {
       this.sizeShift = nbt.getInt("SizeShift");
     }
+    this.cosmetic = nbt.contains("HasCosmetic") ? nbt.getBoolean("HasCosmetic") : this.cosmetic;
+    this.visible = nbt.contains("Visible") ? nbt.getBoolean("Visible") : this.visible;
   }
 }

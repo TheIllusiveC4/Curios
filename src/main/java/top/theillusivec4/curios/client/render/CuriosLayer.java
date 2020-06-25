@@ -51,11 +51,11 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
           for (int i = 0; i < stackHandler.getSlots(); i++) {
             ItemStack stack = cosmeticStacksHandler.getStackInSlot(i);
 
-            if (stack.isEmpty()) {
+            if (stack.isEmpty() && stacksHandler.getRenders().get(i)) {
               stack = stackHandler.getStackInSlot(i);
             }
 
-            if (!stack.isEmpty() && stacksHandler.getRenders().get(i)) {
+            if (!stack.isEmpty()) {
               int index = i;
 
               CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> {

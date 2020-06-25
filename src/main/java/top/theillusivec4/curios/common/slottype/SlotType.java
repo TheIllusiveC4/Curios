@@ -114,7 +114,7 @@ public final class SlotType implements ISlotType {
     private int size = 1;
     private boolean locked = false;
     private boolean visible = true;
-    private boolean cosmetic = true;
+    private boolean cosmetic = false;
     private ResourceLocation icon = null;
 
     public Builder(String identifier) {
@@ -185,7 +185,7 @@ public final class SlotType implements ISlotType {
     }
 
     public Builder hasCosmetic(boolean cosmetic, boolean force) {
-      this.cosmetic = force ? cosmetic : this.cosmetic && cosmetic;
+      this.cosmetic = force ? cosmetic : this.cosmetic || cosmetic;
       return this;
     }
 
