@@ -46,7 +46,7 @@ public class CuriosServer implements ICuriosServer {
     SortedMap<ISlotType, ICurioStacksHandler> curios = new TreeMap<>();
     this.getSlotTypes().stream().filter(type -> !type.isLocked()).collect(Collectors.toSet())
         .forEach(type -> curios.put(type,
-            new CurioStacksHandler(type.getSize(), type.isVisible(), type.hasCosmetic())));
+            new CurioStacksHandler(type.getSize(), 0, type.isVisible(), type.hasCosmetic())));
     return curios;
   }
 

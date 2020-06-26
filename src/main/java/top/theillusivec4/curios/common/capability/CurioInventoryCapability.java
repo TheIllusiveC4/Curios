@@ -44,7 +44,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -86,12 +86,8 @@ public class CurioInventoryCapability {
           @Override
           public void readNBT(Capability<ICuriosItemHandler> capability,
               ICuriosItemHandler instance, Direction side, INBT nbt) {
-            ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", Constants.NBT.TAG_COMPOUND);
-            ListNBT lockedList = ((CompoundNBT) nbt).getList("Locked", Constants.NBT.TAG_COMPOUND);
-
-            for (int k = 0; k < lockedList.size(); k++) {
-              instance.lockSlotType(lockedList.getString(k));
-            }
+            ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", NBT.TAG_COMPOUND);
+            ListNBT lockedList = ((CompoundNBT) nbt).getList("Locked", NBT.TAG_STRING);
 
             if (!tagList.isEmpty()) {
               Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
@@ -104,16 +100,11 @@ public class CurioInventoryCapability {
                 CurioStacksHandler prevStacksHandler = new CurioStacksHandler();
                 prevStacksHandler.deserializeNBT(tag.getCompound("StacksHandler"));
 
-                if (instance.getLockedSlots().contains(identifier)) {
-                  continue;
-                }
-
                 Optional<ISlotType> optionalType = CuriosApi.getServerManager()
                     .getSlotType(identifier);
                 optionalType.ifPresent(type -> {
-                  int targetSize = type.getSize() + prevStacksHandler.getSizeShift();
-                  CurioStacksHandler newStacksHandler = new CurioStacksHandler(targetSize,
-                      type.isVisible(), type.hasCosmetic());
+                  CurioStacksHandler newStacksHandler = new CurioStacksHandler(type.getSize(),
+                      prevStacksHandler.getSizeShift(), type.isVisible(), type.hasCosmetic());
                   int index = 0;
 
                   while (index < newStacksHandler.getSlots() && index < prevStacksHandler
@@ -162,6 +153,10 @@ public class CurioInventoryCapability {
               sortedCurios.forEach(
                   (slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler));
               instance.setCurios(curios);
+
+              for (int k = 0; k < lockedList.size(); k++) {
+                instance.lockSlotType(lockedList.getString(k));
+              }
             }
           }
         }, CurioInventoryWrapper::new);
@@ -226,7 +221,7 @@ public class CurioInventoryCapability {
 
     @Override
     public void unlockSlotType(String identifier, int amount, boolean visible, boolean cosmetic) {
-      this.curios.putIfAbsent(identifier, new CurioStacksHandler(amount, visible, cosmetic));
+      this.curios.putIfAbsent(identifier, new CurioStacksHandler(amount, 0, visible, cosmetic));
       this.locked.remove(identifier);
     }
 

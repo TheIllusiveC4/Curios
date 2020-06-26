@@ -36,18 +36,22 @@ public class DynamicStackHandler extends ItemStackHandler implements IDynamicSta
 
   @Override
   public void grow(int amount) {
-
-    for (int i = 0; i < amount; i++) {
-      this.stacks.add(ItemStack.EMPTY);
-    }
+    this.stacks = getResizedList(this.stacks.size() + amount, this.stacks);
+    this.previousStacks = getResizedList(this.previousStacks.size() + amount, this.previousStacks);
   }
 
   @Override
   public void shrink(int amount) {
-    int targetSize = this.stacks.size() - amount;
+    this.stacks = getResizedList(this.stacks.size() - amount, this.stacks);
+    this.previousStacks = getResizedList(this.previousStacks.size() - amount, this.previousStacks);
+  }
 
-    while (this.stacks.size() > targetSize) {
-      this.stacks.remove(this.stacks.size() - 1);
+  private static NonNullList<ItemStack> getResizedList(int size, NonNullList<ItemStack> stacks) {
+    NonNullList<ItemStack> newList = NonNullList.withSize(size, ItemStack.EMPTY);
+
+    for (int i = 0; i < newList.size() && i < stacks.size(); i++) {
+      newList.set(i, stacks.get(i));
     }
+    return newList;
   }
 }

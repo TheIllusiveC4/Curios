@@ -31,7 +31,7 @@ public class CuriosConfig {
     public CuriosSettings curiosSettings;
 
     public Server(ForgeConfigSpec.Builder builder) {
-      builder.comment("List of curio slot type settings").define("curios", new ArrayList<>());
+      builder.comment("List of curio slot type settings").define("curiosSettings", new ArrayList<>());
       builder.build();
     }
   }

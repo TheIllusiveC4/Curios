@@ -11,17 +11,18 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   private IDynamicStackHandler stackHandler;
   private IDynamicStackHandler cosmeticStackHandler;
-  private int sizeShift = 0;
+  private int sizeShift;
   private boolean visible;
   private boolean cosmetic;
   private NonNullList<Boolean> renderHandler;
 
   public CurioStacksHandler() {
-    this(1, true, false);
+    this(1, 0, true, false);
   }
 
-  public CurioStacksHandler(int size, boolean visible, boolean cosmetic) {
-    this.setSize(size);
+  public CurioStacksHandler(int size, int shift, boolean visible, boolean cosmetic) {
+    this.setSize(size + shift);
+    this.sizeShift = shift;
     this.visible = visible;
     this.cosmetic = cosmetic;
   }
@@ -73,10 +74,12 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     this.validateSizeChange(amount);
     this.stackHandler.grow(amount);
     this.cosmeticStackHandler.grow(amount);
+    NonNullList<Boolean> newList = NonNullList.withSize(this.renderHandler.size() + amount, true);
 
-    for (int i = 0; i < amount; i++) {
-      this.renderHandler.add(true);
+    for (int i = 0; i < newList.size() && i < this.renderHandler.size(); i++) {
+      newList.set(i, renderHandler.get(i));
     }
+    this.renderHandler = newList;
     this.sizeShift += amount;
   }
 
@@ -86,10 +89,12 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     amount = Math.min(this.stackHandler.getSlots() - 1, amount);
     this.stackHandler.shrink(amount);
     this.cosmeticStackHandler.shrink(amount);
+    NonNullList<Boolean> newList = NonNullList.withSize(this.renderHandler.size() - amount, true);
 
-    for (int i = 0; i < amount; i++) {
-      this.renderHandler.remove(this.renderHandler.size() - 1);
+    for (int i = 0; i < newList.size() && i < this.renderHandler.size(); i++) {
+      newList.set(i, renderHandler.get(i));
     }
+    this.renderHandler = newList;
     this.sizeShift -= amount;
   }
 

@@ -11,8 +11,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.InterModComms.IMCMessage;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CurioImcMessage;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosConfig.CuriosSettings.CuriosSetting;
 import top.theillusivec4.curios.common.slottype.SlotType.Builder;
@@ -38,7 +39,7 @@ public class SlotTypeManager {
     settings.forEach(setting -> {
       String id = setting.identifier;
 
-      if (id != null && id.isEmpty()) {
+      if (id == null || id.isEmpty()) {
         Curios.LOGGER.error("Missing identifier in curios config, skipping...");
         return;
       }
@@ -47,6 +48,14 @@ public class SlotTypeManager {
 
       if (builder == null) {
         builder = new Builder(id);
+        CurioImcMessage.Builder preset = SlotTypePreset.findPreset(id)
+            .map(SlotTypePreset::getMessageBuilder).orElse(null);
+
+        if (preset != null) {
+          CurioImcMessage msg = preset.build();
+          builder.icon(msg.getIcon()).priority(msg.getPriority()).size(msg.getSize())
+              .locked(msg.isLocked()).visible(msg.isVisible()).hasCosmetic(msg.hasCosmetic());
+        }
       } else {
         builder = new Builder(id).copyFrom(builder);
       }
@@ -80,8 +89,7 @@ public class SlotTypeManager {
 
   public static void buildSlotTypes() {
     Map<String, Builder> builders = !configBuilders.isEmpty() ? configBuilders : imcBuilders;
-    builders.values()
-        .forEach(builder -> CuriosApi.getServerManager().addSlotType(builder.build()));
+    builders.values().forEach(builder -> CuriosApi.getServerManager().addSlotType(builder.build()));
   }
 
   private static void processImc(Stream<InterModComms.IMCMessage> messages, boolean create) {
