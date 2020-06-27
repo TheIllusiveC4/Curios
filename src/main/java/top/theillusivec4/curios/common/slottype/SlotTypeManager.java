@@ -25,11 +25,13 @@ public class SlotTypeManager {
 
   public static void buildImcSlotTypes(Stream<InterModComms.IMCMessage> register,
       Stream<IMCMessage> modify) {
+    imcBuilders.clear();
     processImc(register, true);
     processImc(modify, false);
   }
 
   public static void buildConfigSlotTypes() {
+    configBuilders.clear();
     List<CuriosSetting> settings = CuriosConfig.curios;
 
     if (settings == null) {
@@ -85,6 +87,7 @@ public class SlotTypeManager {
         builder.hasCosmetic(setting.hasCosmetic, force);
       }
     });
+    imcBuilders.forEach((key, builder) -> configBuilders.putIfAbsent(key, builder));
   }
 
   public static void buildSlotTypes() {

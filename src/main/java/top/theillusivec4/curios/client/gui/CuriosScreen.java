@@ -42,6 +42,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.client.CuriosClientConfig;
 import top.theillusivec4.curios.client.CuriosClientConfig.Client;
 import top.theillusivec4.curios.client.CuriosClientConfig.Client.ButtonCorner;
@@ -181,6 +182,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
     if (this.container.hasCosmeticColumn()) {
       i1 -= 19;
+      k -= 19;
     }
     return mouseX >= (double) k && mouseY >= (double) l && mouseX < (double) i1
         && mouseY < (double) j1;
@@ -305,11 +307,23 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
         if (slotCount <= 8) {
           this.blit(i + xOffset, j + 4 + upperHeight, xTexOffset, 151, width, 7);
         } else {
-          this.blit(i - 42, j + 4, 27, xTexOffset, 23, 158);
+          this.blit(i + xOffset - 16, j + 4, 27, 0, 23, 158);
           this.getMinecraft().getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
-          this.blit(i - 34, j + 12 + (int) (127f * currentScroll), 232, 0, 12, 15);
+          this.blit(i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 232, 0, 12, 15);
+        }
+
+        for (Slot slot : this.container.inventorySlots) {
+
+          if (slot instanceof CosmeticCurioSlot) {
+            int x = this.guiLeft + slot.xPos - 1;
+            int y = this.guiTop + slot.yPos - 1;
+            this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
+            this.blit(x, y, 138, 0, 18, 18);
+          }
         }
       });
+
+
     }
   }
 

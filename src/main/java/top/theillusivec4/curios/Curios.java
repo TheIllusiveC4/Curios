@@ -79,7 +79,7 @@ public class Curios {
   public static final String MODID = CuriosApi.MODID;
   public static final Logger LOGGER = LogManager.getLogger();
 
-  private static final boolean DEBUG = false;
+  private static final boolean DEBUG = true;
 
   public Curios() {
     final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -110,7 +110,7 @@ public class Curios {
 
       if (DEBUG) {
         InterModComms
-            .sendTo(MODID, CurioImcMessage.REGISTER_TYPE, () -> preset.getMessageBuilder().cosmetic().build());
+            .sendTo(MODID, CurioImcMessage.REGISTER_TYPE, () -> preset.getMessageBuilder().build());
       }
     }
   }
