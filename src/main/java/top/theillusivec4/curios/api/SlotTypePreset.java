@@ -5,8 +5,9 @@ import net.minecraft.util.ResourceLocation;
 import top.theillusivec4.curios.api.CurioImcMessage.Builder;
 
 public enum SlotTypePreset {
-  HEAD("head", 40), NECKLACE("necklace", 60), BACK("back", 80), BODY("body", 100), HANDS("hands",
-      120), RING("ring", 140), BELT("belt", 160), CHARM("charm", 180);
+  HEAD("head", 40), NECKLACE("necklace", 60), BACK("back", 80), BODY("body", 100), BRACELET(
+      "bracelet", 120), HANDS("hands", 140), RING("ring", 160), BELT("belt", 180), CHARM("charm",
+      200);
 
   final String id;
   final int priority;
