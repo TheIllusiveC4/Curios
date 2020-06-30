@@ -128,7 +128,7 @@ public class ClientEventHandler {
 
           if (!multimap.isEmpty() && (i & 2) == 0) {
             PlayerEntity player = evt.getPlayer();
-            tooltip.add(new StringTextComponent(""));
+            tooltip.add(StringTextComponent.field_240750_d_);
             tooltip.add(new TranslationTextComponent("curios.modifiers." + identifier)
                 .func_240699_a_(TextFormatting.GOLD));
 
@@ -172,20 +172,20 @@ public class ClientEventHandler {
                       new TranslationTextComponent(
                           "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
                           DECIMALFORMAT.format(d1),
-                          new TranslationTextComponent("attribute.name." + entry.getKey())))
+                          new TranslationTextComponent(entry.getKey().func_233754_c_())))
                       .func_240699_a_(TextFormatting.DARK_GREEN));
                 } else if (amount > 0.0D) {
                   tooltip.add((new TranslationTextComponent(
                       "attribute.modifier.plus." + attributemodifier.getOperation().getId(),
                       DECIMALFORMAT.format(d1),
-                      new TranslationTextComponent("attribute.name." + entry.getKey())))
+                      new TranslationTextComponent(entry.getKey().func_233754_c_())))
                       .func_240699_a_(TextFormatting.BLUE));
                 } else if (amount < 0.0D) {
                   d1 = d1 * -1.0D;
                   tooltip.add((new TranslationTextComponent(
                       "attribute.modifier.take." + attributemodifier.getOperation().getId(),
                       DECIMALFORMAT.format(d1),
-                      new TranslationTextComponent("attribute.name." + entry.getKey())))
+                      new TranslationTextComponent(entry.getKey().func_233754_c_())))
                       .func_240699_a_(TextFormatting.RED));
                 }
               }

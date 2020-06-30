@@ -33,7 +33,7 @@ public class CuriosContainerProvider implements INamedContainerProvider {
   @Nonnull
   @Override
   public ITextComponent getDisplayName() {
-    return new TranslationTextComponent("curios.name");
+    return new TranslationTextComponent("container.crafting");
   }
 
   @Nullable

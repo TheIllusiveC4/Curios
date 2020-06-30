@@ -30,7 +30,6 @@ import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.ImageButton;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ClickType;
@@ -268,7 +267,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       }
       return true;
     } else {
-      return super.func_231044_a_(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+      return super.func_231046_a_(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
     }
   }
 
@@ -276,8 +275,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   protected void func_230451_b_(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY) {
 
     if (this.field_230706_i_ != null && this.field_230706_i_.player != null) {
-      this.field_230706_i_.fontRenderer
-          .func_238405_a_(matrixStack, I18n.format("container.crafting"), 97, 8, 4210752);
+      this.field_230712_o_.func_238422_b_(matrixStack, this.field_230704_d_, 97, 6, 4210752);
     }
   }
 
