@@ -50,6 +50,10 @@ public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen
             List<Rectangle2d> areas = new ArrayList<>();
             int slotCount = handler.getSlots();
             int width = slotCount > 8 ? 42 : 26;
+
+            if (containerScreen.getContainer().hasCosmeticColumn()) {
+              width += 18;
+            }
             int height = 7 + slotCount * 18;
             int left = containerScreen.getGuiLeft() - width;
             int top = containerScreen.getGuiTop() + 4;
