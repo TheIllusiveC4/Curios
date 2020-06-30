@@ -41,7 +41,7 @@ public class CPacketToggleRender {
               if (renderStatuses.size() > msg.index) {
                 boolean value = !renderStatuses.get(msg.index);
                 renderStatuses.set(msg.index, value);
-                NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sender),
+                NetworkHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sender),
                     new SPacketSyncRender(sender.getEntityId(), msg.id, msg.index, value));
               }
             }));

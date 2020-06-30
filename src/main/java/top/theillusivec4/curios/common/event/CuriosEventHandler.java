@@ -357,19 +357,8 @@ public class CuriosEventHandler {
 
             if (!ItemStack.areItemStacksEqual(stack, prevStack)) {
               LazyOptional<ICurio> prevCurio = CuriosApi.getCuriosHelper().getCurio(prevStack);
-              boolean syncable =
-                  currentCurio.map(curio -> curio.canSync(identifier, index, livingEntity))
-                      .orElse(false) || prevCurio
-                      .map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false);
-
-              if (syncable) {
-                CompoundNBT syncTag = currentCurio.map(ICurio::writeSyncData)
-                    .orElse(new CompoundNBT());
-                NetworkHandler.INSTANCE
-                    .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-                        new SPacketSyncStack(livingEntity.getEntityId(), identifier, i, stack,
-                            HandlerType.EQUIPMENT, syncTag));
-              }
+              syncCurios(livingEntity, stack, currentCurio, prevCurio, identifier, index,
+                  HandlerType.EQUIPMENT);
               MinecraftForge.EVENT_BUS
                   .post(new CurioChangeEvent(livingEntity, identifier, i, prevStack, stack));
               livingEntity.func_233645_dx_().func_233785_a_(
@@ -384,27 +373,32 @@ public class CuriosEventHandler {
             ItemStack cosmeticStack = cosmeticStackHandler.getStackInSlot(i);
             ItemStack prevCosmeticStack = cosmeticStackHandler.getPreviousStackInSlot(i);
 
-            if (ItemStack.areItemStacksEqual(cosmeticStack, prevCosmeticStack)) {
-              currentCurio = CuriosApi.getCuriosHelper().getCurio(cosmeticStack);
-              LazyOptional<ICurio> prevCurio = CuriosApi.getCuriosHelper()
-                  .getCurio(prevCosmeticStack);
-              boolean syncable =
-                  currentCurio.map(curio -> curio.canSync(identifier, index, livingEntity))
-                      .orElse(false) || prevCurio
-                      .map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false);
-
-              if (syncable) {
-                CompoundNBT syncTag = currentCurio.map(ICurio::writeSyncData)
-                    .orElse(new CompoundNBT());
-                NetworkHandler.INSTANCE
-                    .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-                        new SPacketSyncStack(livingEntity.getEntityId(), identifier, i, stack,
-                            HandlerType.COSMETIC, syncTag));
-              }
+            if (!ItemStack.areItemStacksEqual(cosmeticStack, prevCosmeticStack)) {
+              syncCurios(livingEntity, cosmeticStack,
+                  CuriosApi.getCuriosHelper().getCurio(cosmeticStack),
+                  CuriosApi.getCuriosHelper().getCurio(prevCosmeticStack), identifier, index,
+                  HandlerType.COSMETIC);
+              cosmeticStackHandler.setPreviousStackInSlot(index,
+                  cosmeticStack.isEmpty() ? ItemStack.EMPTY : cosmeticStack.copy());
             }
           }
         }
       }
     });
+  }
+
+  private static void syncCurios(LivingEntity livingEntity, ItemStack stack,
+      LazyOptional<ICurio> currentCurio, LazyOptional<ICurio> prevCurio, String identifier,
+      int index, HandlerType type) {
+    boolean syncable =
+        currentCurio.map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false)
+            || prevCurio.map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false);
+    CompoundNBT syncTag =
+        syncable ? currentCurio.map(ICurio::writeSyncData).orElse(new CompoundNBT())
+            : new CompoundNBT();
+    NetworkHandler.INSTANCE
+        .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
+            new SPacketSyncStack(livingEntity.getEntityId(), identifier, index, stack, type,
+                syncTag));
   }
 }
