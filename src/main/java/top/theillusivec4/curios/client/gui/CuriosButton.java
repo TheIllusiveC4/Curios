@@ -19,6 +19,8 @@
 
 package top.theillusivec4.curios.client.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -71,7 +73,8 @@ public class CuriosButton extends ImageButton {
   }
 
   @Override
-  public void render(int mouseX, int mouseY, float partialTicks) {
+  public void func_230431_b_(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY,
+      float partialTicks) {
 
     if (parentGui instanceof InventoryScreen) {
       boolean lastVisible = isRecipeBookVisible;
@@ -80,14 +83,14 @@ public class CuriosButton extends ImageButton {
       if (lastVisible != isRecipeBookVisible) {
         Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset(false);
         this.setPosition(parentGui.getGuiLeft() + offsets.getA(),
-            parentGui.height / 2 + offsets.getB());
+            parentGui.field_230709_l_ / 2 + offsets.getB());
       }
     } else if (parentGui instanceof CreativeScreen) {
       CreativeScreen gui = (CreativeScreen) parentGui;
       boolean isInventoryTab = gui.getSelectedTabIndex() == ItemGroup.INVENTORY.getIndex();
-      this.active = isInventoryTab;
-      this.visible = isInventoryTab;
+      this.field_230693_o_ = isInventoryTab;
+      this.field_230694_p_ = isInventoryTab;
     }
-    super.render(mouseX, mouseY, partialTicks);
+    super.func_230431_b_(matrixStack, mouseX, mouseY, partialTicks);
   }
 }

@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -65,7 +66,7 @@ public interface ICuriosHelper {
   Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(
       Predicate<ItemStack> filter, @Nonnull final LivingEntity livingEntity);
 
-  Multimap<String, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack);
+  Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack);
 
   /**
    * Passes three inputs into an internal triple-input consumer that should be used from the

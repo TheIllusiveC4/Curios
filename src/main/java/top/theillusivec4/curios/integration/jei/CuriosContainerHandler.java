@@ -57,8 +57,10 @@ public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen
             RecipeBookGui guiRecipeBook = containerScreen.getRecipeGui();
 
             if (guiRecipeBook.isVisible()) {
-              int i = (containerScreen.width - 147) / 2 - (containerScreen.widthTooNarrow ? 0 : 86);
-              int j = (containerScreen.height - 166) / 2;
+              int i =
+                  (containerScreen.field_230708_k_ - 147) / 2 - (containerScreen.widthTooNarrow ? 0
+                      : 86);
+              int j = (containerScreen.field_230709_l_ - 166) / 2;
               areas.add(new Rectangle2d(i, j, 147, 166));
               try {
                 @SuppressWarnings("unchecked") List<RecipeTabToggleWidget> tabs = (List<RecipeTabToggleWidget>) RECIPE_TABS
@@ -66,8 +68,9 @@ public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen
 
                 for (RecipeTabToggleWidget tab : tabs) {
 
-                  if (tab.visible) {
-                    areas.add(new Rectangle2d(tab.x, tab.y, tab.getWidth(), tab.getHeight()));
+                  if (tab.field_230694_p_) {
+                    areas.add(new Rectangle2d(tab.field_230690_l_, tab.field_230691_m_,
+                        tab.func_230998_h_(), tab.getHeight()));
                   }
                 }
               } catch (IllegalAccessException e) {

@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -82,9 +83,9 @@ public class CuriosHelper implements ICuriosHelper {
   }
 
   @Override
-  public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier,
+  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier,
       ItemStack stack) {
-    Multimap<String, AttributeModifier> multimap;
+    Multimap<Attribute, AttributeModifier> multimap;
 
     if (stack.getTag() != null && stack.getTag().contains("CurioAttributeModifiers", 9)) {
       multimap = HashMultimap.create();
@@ -92,14 +93,20 @@ public class CuriosHelper implements ICuriosHelper {
 
       for (int i = 0; i < listnbt.size(); ++i) {
         CompoundNBT compoundnbt = listnbt.getCompound(i);
-        AttributeModifier attributemodifier = SharedMonsterAttributes
-            .readAttributeModifier(compoundnbt);
 
-        if (attributemodifier != null && (!compoundnbt.contains("Slot", 8) || compoundnbt
-            .getString("Slot").equals(identifier))
-            && attributemodifier.getID().getLeastSignificantBits() != 0L
-            && attributemodifier.getID().getMostSignificantBits() != 0L) {
-          multimap.put(compoundnbt.getString("AttributeName"), attributemodifier);
+        if (!compoundnbt.contains("Slot", 8) || compoundnbt.getString("Slot").equals(identifier)) {
+          Attribute attribute = ForgeRegistries.ATTRIBUTES
+              .getValue(ResourceLocation.tryCreate(compoundnbt.getString("AttributeName")));
+
+          if (attribute != null) {
+            AttributeModifier attributemodifier = AttributeModifier.func_233800_a_(compoundnbt);
+
+            if (attributemodifier != null
+                && attributemodifier.getID().getLeastSignificantBits() != 0L
+                && attributemodifier.getID().getMostSignificantBits() != 0L) {
+              multimap.put(attribute, attributemodifier);
+            }
+          }
         }
       }
       return multimap;

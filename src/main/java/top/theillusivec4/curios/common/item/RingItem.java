@@ -24,8 +24,9 @@ import com.google.common.collect.Multimap;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -34,6 +35,7 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -64,22 +66,19 @@ public class RingItem extends Item {
 
       @Override
       public void playRightClickEquipSound(LivingEntity livingEntity) {
-        livingEntity.world
-            .playSound(null, livingEntity.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GOLD,
-                SoundCategory.NEUTRAL, 1.0f, 1.0f);
+        livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
+            SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL, 1.0f, 1.0f);
       }
 
       @Override
-      public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
-        Multimap<String, AttributeModifier> atts = HashMultimap.create();
+      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
+        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
         if (CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).contains(identifier)) {
-          atts.put(SharedMonsterAttributes.MOVEMENT_SPEED.getName(),
-              new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
-                  AttributeModifier.Operation.MULTIPLY_TOTAL));
-          atts.put(SharedMonsterAttributes.ARMOR.getName(),
-              new AttributeModifier(ARMOR_UUID, "Armor bonus", 2,
-                  AttributeModifier.Operation.ADDITION));
+          atts.put(Attributes.field_233821_d_, new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
+              AttributeModifier.Operation.MULTIPLY_TOTAL));
+          atts.put(Attributes.field_233826_i_, new AttributeModifier(ARMOR_UUID, "Armor bonus", 2,
+              AttributeModifier.Operation.ADDITION));
         }
         return atts;
       }

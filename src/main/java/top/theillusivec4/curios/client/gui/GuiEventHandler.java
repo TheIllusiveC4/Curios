@@ -55,8 +55,9 @@ public class GuiEventHandler {
       int y = offsets.getB();
       int size = isCreative ? 10 : 14;
       int textureOffsetX = isCreative ? 64 : 50;
-      evt.addWidget(new CuriosButton(gui, gui.getGuiLeft() + x, gui.height / 2 + y, size, size,
-          textureOffsetX, 0, size, CuriosScreen.CURIO_INVENTORY));
+      evt.addWidget(
+          new CuriosButton(gui, gui.getGuiLeft() + x, gui.field_230709_l_ / 2 + y, size, size,
+              textureOffsetX, 0, size, CuriosScreen.CURIO_INVENTORY));
     }
   }
 

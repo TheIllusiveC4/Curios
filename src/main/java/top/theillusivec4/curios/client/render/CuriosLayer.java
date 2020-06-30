@@ -20,7 +20,6 @@
 package top.theillusivec4.curios.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
@@ -62,7 +61,6 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
 
                 if (curio.canRender(id, index, livingEntity)) {
                   matrixStack.push();
-                  RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
                   curio.render(id, index, matrixStack, renderTypeBuffer, light, livingEntity,
                       limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
                   matrixStack.pop();

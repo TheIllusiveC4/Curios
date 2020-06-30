@@ -28,8 +28,9 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -59,11 +60,11 @@ public class KnucklesItem extends Item {
       private Object model;
 
       @Override
-      public Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
-        Multimap<String, AttributeModifier> atts = HashMultimap.create();
+      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
+        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
         if (CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).contains(identifier)) {
-          atts.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
+          atts.put(Attributes.field_233823_f_,
               new AttributeModifier(AD_UUID, "Attack damage bonus", 4,
                   AttributeModifier.Operation.ADDITION));
         }

@@ -284,7 +284,7 @@ public class CurioInventoryCapability {
           drops.add(stackHandler.getStackInSlot(i));
 
           if (!stack.isEmpty()) {
-            wearer.getAttributes().removeAttributeModifiers(
+            wearer.func_233645_dx_().func_233785_a_(
                 CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
             int index = i;
             CuriosApi.getCuriosHelper().getCurio(stack)

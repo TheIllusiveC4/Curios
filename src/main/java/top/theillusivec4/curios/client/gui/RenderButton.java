@@ -1,6 +1,8 @@
 package top.theillusivec4.curios.client.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.ImageButton;
@@ -11,7 +13,6 @@ public class RenderButton extends ImageButton {
 
   private final ResourceLocation resourceLocation;
   private final int yTexStart;
-  private final int yDiffText;
   private final int xTexStart;
   private final CurioSlot slot;
 
@@ -22,17 +23,18 @@ public class RenderButton extends ImageButton {
         256, 256, onPressIn);
     this.resourceLocation = resourceLocationIn;
     this.yTexStart = yTexStartIn;
-    this.yDiffText = yDiffTextIn;
     this.xTexStart = xTexStartIn;
     this.slot = slot;
   }
 
   @Override
-  public void renderButton(int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_) {
+  public void func_230431_b_(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY,
+      float partialTicks) {
     // NO-OP
   }
 
-  public void renderButtonOverlay() {
+  public void renderButtonOverlay(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY,
+      float partialTicks) {
     Minecraft minecraft = Minecraft.getInstance();
     minecraft.getTextureManager().bindTexture(this.resourceLocation);
     RenderSystem.disableDepthTest();
@@ -41,7 +43,8 @@ public class RenderButton extends ImageButton {
     if (!slot.getRenderStatus()) {
       j += 8;
     }
-    blit(this.x, this.y, (float) j, (float) this.yTexStart, this.width, this.height, 256, 256);
+    func_238463_a_(matrixStack, this.field_230690_l_, this.field_230691_m_, (float) j,
+        (float) this.yTexStart, this.field_230688_j_, this.field_230689_k_, 256, 256);
     RenderSystem.enableDepthTest();
   }
 }

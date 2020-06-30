@@ -26,13 +26,13 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -40,7 +40,9 @@ import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import top.theillusivec4.curios.api.type.ISlotType;
 
@@ -58,14 +60,14 @@ public interface ICurio {
       }
 
       for (int i = 0; i < 5; ++i) {
-        Vec3d vec3d = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
+        Vector3d vec3d = new Vector3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
             Math.random() * 0.1D + 0.1D, 0.0D);
         vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
         double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
 
-        Vec3d vec3d1 = new Vec3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D, d0,
-            0.6D);
+        Vector3d vec3d1 = new Vector3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D,
+            d0, 0.6D);
         vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
         vec3d1 = vec3d1.add(livingEntity.getPosX(),
@@ -164,7 +166,7 @@ public interface ICurio {
    * @param identifier The CurioType identifier for the context
    * @return A map of attribute modifiers to apply
    */
-  default Multimap<String, AttributeModifier> getAttributeModifiers(String identifier) {
+  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
     return HashMultimap.create();
   }
 
@@ -176,9 +178,8 @@ public interface ICurio {
    * @param livingEntity The wearer of the ItemStack
    */
   default void playRightClickEquipSound(LivingEntity livingEntity) {
-    livingEntity.world
-        .playSound(null, livingEntity.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
-            SoundCategory.NEUTRAL, 1.0f, 1.0f);
+    livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
+        SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.NEUTRAL, 1.0f, 1.0f);
   }
 
   /**
