@@ -49,7 +49,7 @@ public class CurioSlot extends SlotItemHandler {
     this.renderStatuses = renders;
     this.player = player;
     this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
-        player.getEntityWorld().isRemote() ? CuriosApi.getClientManager().getIcon(identifier)
+        player.getEntityWorld().isRemote() ? CuriosApi.getIconHelper().getIcon(identifier)
             : new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
   }
 

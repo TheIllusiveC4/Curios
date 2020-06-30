@@ -3,9 +3,9 @@ package top.theillusivec4.curios.client;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.util.ResourceLocation;
-import top.theillusivec4.curios.api.type.util.ICuriosClient;
+import top.theillusivec4.curios.api.type.util.IIconHelper;
 
-public class CuriosClient implements ICuriosClient {
+public class IconHelper implements IIconHelper {
 
   private Map<String, ResourceLocation> idToIcon = new HashMap<>();
 

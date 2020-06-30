@@ -51,11 +51,11 @@ import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import top.theillusivec4.curios.api.CurioImcMessage;
+import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.client.ClientEventHandler;
-import top.theillusivec4.curios.client.CuriosClient;
+import top.theillusivec4.curios.client.IconHelper;
 import top.theillusivec4.curios.client.CuriosClientConfig;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
@@ -69,7 +69,7 @@ import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.slottype.SlotTypeManager;
-import top.theillusivec4.curios.server.CuriosServer;
+import top.theillusivec4.curios.server.SlotHelper;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
 
@@ -110,23 +110,23 @@ public class Curios {
 
       if (DEBUG) {
         InterModComms
-            .sendTo(MODID, CurioImcMessage.REGISTER_TYPE, () -> preset.getMessageBuilder().build());
+            .sendTo(MODID, SlotTypeMessage.REGISTER_TYPE, () -> preset.getMessageBuilder().cosmetic().build());
       }
     }
   }
 
   private void process(InterModProcessEvent evt) {
-    SlotTypeManager.buildImcSlotTypes(evt.getIMCStream(CurioImcMessage.REGISTER_TYPE::equals),
-        evt.getIMCStream(CurioImcMessage.MODIFY_TYPE::equals));
+    SlotTypeManager.buildImcSlotTypes(evt.getIMCStream(SlotTypeMessage.REGISTER_TYPE::equals),
+        evt.getIMCStream(SlotTypeMessage.MODIFY_TYPE::equals));
   }
 
   private void serverAboutToStart(FMLServerAboutToStartEvent evt) {
-    CuriosApi.setServerManager(new CuriosServer());
+    CuriosApi.setSlotHelper(new SlotHelper());
     SlotTypeManager.buildSlotTypes();
   }
 
   private void serverStopped(FMLServerStoppedEvent evt) {
-    CuriosApi.setServerManager(null);
+    CuriosApi.setSlotHelper(null);
   }
 
   private void serverStarting(FMLServerStartingEvent evt) {
@@ -167,7 +167,7 @@ public class Curios {
 
     @SubscribeEvent
     public static void setupClient(FMLClientSetupEvent evt) {
-      CuriosApi.setClientManager(new CuriosClient());
+      CuriosApi.setIconHelper(new IconHelper());
       MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
       MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
       ScreenManager.registerFactory(CuriosRegistry.CONTAINER_TYPE, CuriosScreen::new);

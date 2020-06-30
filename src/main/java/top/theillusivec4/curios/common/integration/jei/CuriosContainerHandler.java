@@ -17,7 +17,7 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.integration.jei;
+package top.theillusivec4.curios.common.integration.jei;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

@@ -51,7 +51,7 @@ public class CurioArgumentType implements ArgumentType<String> {
   @Override
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
       SuggestionsBuilder builder) {
-    return ISuggestionProvider.suggest(CuriosApi.getServerManager().getSlotTypeIds(), builder);
+    return ISuggestionProvider.suggest(CuriosApi.getSlotHelper().getSlotTypeIds(), builder);
   }
 
   @Override
@@ -63,7 +63,7 @@ public class CurioArgumentType implements ArgumentType<String> {
   public String parse(StringReader reader) throws CommandSyntaxException {
     String s = reader.readUnquotedString();
 
-    if (!CuriosApi.getServerManager().getSlotTypeIds().contains(s)) {
+    if (!CuriosApi.getSlotHelper().getSlotTypeIds().contains(s)) {
       throw UNKNOWN_TYPE.create(s);
     } else {
       return s;

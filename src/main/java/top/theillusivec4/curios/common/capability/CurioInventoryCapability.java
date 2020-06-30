@@ -91,7 +91,7 @@ public class CurioInventoryCapability {
 
             if (!tagList.isEmpty()) {
               Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
-              SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = CuriosApi.getServerManager()
+              SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = CuriosApi.getSlotHelper()
                   .createSlots();
 
               for (int i = 0; i < tagList.size(); i++) {
@@ -100,7 +100,7 @@ public class CurioInventoryCapability {
                 CurioStacksHandler prevStacksHandler = new CurioStacksHandler();
                 prevStacksHandler.deserializeNBT(tag.getCompound("StacksHandler"));
 
-                Optional<ISlotType> optionalType = CuriosApi.getServerManager()
+                Optional<ISlotType> optionalType = CuriosApi.getSlotHelper()
                     .getSlotType(identifier);
                 optionalType.ifPresent(type -> {
                   CurioStacksHandler newStacksHandler = new CurioStacksHandler(type.getSize(),
@@ -189,7 +189,7 @@ public class CurioInventoryCapability {
         this.locked.clear();
         this.curios.clear();
         this.invalidStacks.clear();
-        CuriosApi.getServerManager().createSlots().forEach(
+        CuriosApi.getSlotHelper().createSlots().forEach(
             ((slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler)));
       }
     }

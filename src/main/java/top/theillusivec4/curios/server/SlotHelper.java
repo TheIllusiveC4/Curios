@@ -16,13 +16,13 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
-import top.theillusivec4.curios.api.type.util.ICuriosServer;
+import top.theillusivec4.curios.api.type.util.ISlotHelper;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation.Operation;
 
-public class CuriosServer implements ICuriosServer {
+public class SlotHelper implements ISlotHelper {
 
   private Map<String, ISlotType> idToType = new HashMap<>();
 

@@ -2,7 +2,7 @@ package top.theillusivec4.curios.api;
 
 import java.util.Optional;
 import net.minecraft.util.ResourceLocation;
-import top.theillusivec4.curios.api.CurioImcMessage.Builder;
+import top.theillusivec4.curios.api.SlotTypeMessage.Builder;
 
 public enum SlotTypePreset {
   HEAD("head", 40), NECKLACE("necklace", 60), BACK("back", 80), BODY("body", 100), BRACELET(

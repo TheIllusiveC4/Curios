@@ -9,7 +9,7 @@ import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.slottype.SlotType;
 
-public interface ICuriosServer {
+public interface ISlotHelper {
 
   void addSlotType(ISlotType slotType);
 
@@ -43,7 +43,7 @@ public interface ICuriosServer {
    * /** Adds a single slot to the {@link SlotType} with the associated identifier. If the slot to
    * be added is for a type that is not enabled on the entity, it will not be added. For adding
    * slot(s) for types that are not yet available, there must first be a call to {@link
-   * ICuriosServer#unlockSlotType(String, LivingEntity)}
+   * ISlotHelper#unlockSlotType(String, LivingEntity)}
    *
    * @param id           The identifier of the CurioType
    * @param livingEntity The holder of the slot(s)
@@ -54,7 +54,7 @@ public interface ICuriosServer {
    * Adds multiple slots to the {@link SlotType} with the associated identifier. If the slot to be
    * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
    * for types that are not yet available, there must first be a call to {@link
-   * ICuriosServer#unlockSlotType(String, LivingEntity)}
+   * ISlotHelper#unlockSlotType(String, LivingEntity)}
    *
    * @param id           The identifier of the CurioType
    * @param amount       The number of slots to add
@@ -65,7 +65,7 @@ public interface ICuriosServer {
   /**
    * Removes a single slot to the {@link SlotType} with the associated identifier. If the slot to be
    * removed is the last slot available, it will not be removed. For the removal of the last slot,
-   * please see {@link ICuriosServer#lockSlotType(String, LivingEntity)}
+   * please see {@link ISlotHelper#lockSlotType(String, LivingEntity)}
    *
    * @param id           The identifier of the CurioType
    * @param livingEntity The holder of the slot(s)
@@ -75,7 +75,7 @@ public interface ICuriosServer {
   /**
    * Removes multiple slots to the {@link SlotType} with the associated identifier. If the slot to
    * be removed is the last slot available, it will not be removed. For the removal of the last
-   * slot, please see {@link ICuriosServer#lockSlotType(String, LivingEntity)}
+   * slot, please see {@link ISlotHelper#lockSlotType(String, LivingEntity)}
    *
    * @param id           The identifier of the CurioType
    * @param livingEntity The holder of the slot(s)

@@ -44,10 +44,10 @@ public class SPacketSetIcons {
       ClientWorld world = Minecraft.getInstance().world;
 
       if (world != null) {
-        CuriosApi.getClientManager().clearIcons();
+        CuriosApi.getIconHelper().clearIcons();
 
         for (Map.Entry<String, ResourceLocation> entry : msg.map.entrySet()) {
-          CuriosApi.getClientManager().addIcon(entry.getKey(), entry.getValue());
+          CuriosApi.getIconHelper().addIcon(entry.getKey(), entry.getValue());
         }
       }
     });

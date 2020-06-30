@@ -19,35 +19,35 @@
 
 package top.theillusivec4.curios.api;
 
-import top.theillusivec4.curios.api.type.util.ICuriosClient;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
-import top.theillusivec4.curios.api.type.util.ICuriosServer;
+import top.theillusivec4.curios.api.type.util.IIconHelper;
+import top.theillusivec4.curios.api.type.util.ISlotHelper;
 
 public final class CuriosApi {
 
   public static final String MODID = "curios";
 
-  private static ICuriosClient clientManager;
-  private static ICuriosServer serverManager;
+  private static IIconHelper iconHelper;
+  private static ISlotHelper slotHelper;
   private static ICuriosHelper curiosHelper;
 
-  public static ICuriosClient getClientManager() {
-    return clientManager;
+  public static IIconHelper getIconHelper() {
+    return iconHelper;
   }
 
-  public static void setClientManager(ICuriosClient manager) {
+  public static void setIconHelper(IIconHelper helper) {
 
-    if (clientManager == null) {
-      clientManager = manager;
+    if (iconHelper == null) {
+      iconHelper = helper;
     }
   }
 
-  public static ICuriosServer getServerManager() {
-    return serverManager;
+  public static ISlotHelper getSlotHelper() {
+    return slotHelper;
   }
 
-  public static void setServerManager(ICuriosServer manager) {
-    serverManager = manager;
+  public static void setSlotHelper(ISlotHelper helper) {
+    slotHelper = helper;
   }
 
   public static ICuriosHelper getCuriosHelper() {

@@ -21,7 +21,7 @@ package top.theillusivec4.curios.api;
 
 import net.minecraft.util.ResourceLocation;
 
-public final class CurioImcMessage {
+public final class SlotTypeMessage {
 
   public static final String REGISTER_TYPE = "register_type";
   public static final String MODIFY_TYPE = "modify_type";
@@ -34,7 +34,7 @@ public final class CurioImcMessage {
   private final boolean cosmetic;
   private final ResourceLocation icon;
 
-  private CurioImcMessage(Builder builder) {
+  private SlotTypeMessage(Builder builder) {
     this.identifier = builder.identifier;
     this.priority = builder.priority;
     this.size = builder.size;
@@ -116,8 +116,8 @@ public final class CurioImcMessage {
       return this;
     }
 
-    public CurioImcMessage build() {
-      return new CurioImcMessage(this);
+    public SlotTypeMessage build() {
+      return new SlotTypeMessage(this);
     }
   }
 }

@@ -148,7 +148,7 @@ public class CuriosEventHandler {
     PlayerEntity playerEntity = evt.getPlayer();
 
     if (playerEntity instanceof ServerPlayerEntity) {
-      Collection<ISlotType> slotTypes = CuriosApi.getServerManager().getSlotTypes();
+      Collection<ISlotType> slotTypes = CuriosApi.getSlotHelper().getSlotTypes();
       Map<String, ResourceLocation> icons = new HashMap<>();
       slotTypes.forEach(type -> icons.put(type.getIdentifier(), type.getIcon()));
       NetworkHandler.INSTANCE

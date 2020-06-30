@@ -2,7 +2,7 @@ package top.theillusivec4.curios.api.type.util;
 
 import net.minecraft.util.ResourceLocation;
 
-public interface ICuriosClient {
+public interface IIconHelper {
 
   void clearIcons();
 

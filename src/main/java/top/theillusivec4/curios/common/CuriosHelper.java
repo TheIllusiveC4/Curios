@@ -30,7 +30,7 @@ import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 
 public class CuriosHelper implements ICuriosHelper {
 
-  public TriConsumer<String, Integer, LivingEntity> brokenCurioConsumer;
+  private static TriConsumer<String, Integer, LivingEntity> brokenCurioConsumer;
 
   @Override
   public LazyOptional<ICurio> getCurio(ItemStack stack) {
@@ -117,11 +117,14 @@ public class CuriosHelper implements ICuriosHelper {
 
   @Override
   public void onBrokenCurio(String id, int index, LivingEntity damager) {
-    this.brokenCurioConsumer.accept(id, index, damager);
+    brokenCurioConsumer.accept(id, index, damager);
   }
 
   @Override
   public void setBrokenCurioConsumer(TriConsumer<String, Integer, LivingEntity> consumer) {
-    this.brokenCurioConsumer = consumer;
+
+    if (brokenCurioConsumer == null) {
+      brokenCurioConsumer = consumer;
+    }
   }
 }
