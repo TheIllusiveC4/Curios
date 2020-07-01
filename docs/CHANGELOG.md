@@ -4,47 +4,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
-## [2.0.2.4] - 2020.06.03
-### Changed
-- Curios scroll bar has more precise scrolling and the scroll position now persists during a session
-
-## [2.0.2.3] - 2020.05.31
-### Fixed
-- Fixed empty item states being ticked while in Curio slots [#50](https://github.com/TheIllusiveC4/Curios/issues/50)
-
-## [2.0.2.2] - 2020.04.19
-### Changed
-- Changed Recipe Book to dedicated implementation [#48](https://github.com/TheIllusiveC4/Curios/issues/48)
-- Compressed texture files (thanks Darkhax!) [#49](https://github.com/TheIllusiveC4/Curios/pull/49)
-
-## [2.0.2.1] - 2020.03.26
+## [3.0-beta1] - 2020.07.01
 ### Added
-- Added Chinese localization (thank you EnterFor!)
-
-## [2.0.2] - 2020.03.21
-### Added
-- Added support for curio attribute modifiers using NBT tags, simply replace "AttributeModifiers" with "CurioAttributeModifiers"
-
-## [2.0.1] - 2020.03.08
-### Added
-- [API] ICurio#onCurioAnimate - Called every tick client-side only while curio is equipped
-
-## [2.0] - 2020.02.24
-### Fixed
-- Fixed compatibility issue with Ensorcellation's Soulbound enchantment [#41](https://github.com/TheIllusiveC4/Curios/issues/41)
-
-## [2.0-beta2] - 2020.01.26
+- Opt-in cosmetic slots for slot types
+- Toggleable rendering for equipped curio items
+- "Bracelet" has been added as a potential preset slot type
 ### Changed
-- Updated to 1.15.2
-### Added
-- Re-added JEI integration
-- Added Japanese localization (thanks MORIMORI0317!)
-### Fixed
-- Fixed generic curio slot icon showing missing texture
+- Ported to 1.16.1 Forge
+- Slot types are now handled server-side, allowing for per-world slot configurations
+- Icon registration is now done alongside slot registration without needing a separate IMC message
+- Names:
+    - LivingCurioChangeEvent -> CurioChangeEvent
+    - LivingCurioDropRulesEvent -> DropRulesEvent
+    - LivingCurioDropsEvent -> CurioDropsEvent
+    - CurioIMCMessage -> SlotTypeMessage
+    - CuriosAPI -> CuriosApi
+    - ICurioItemHandler -> ICuriosItemHandler:
+        - getCurioMap -> getCurios
+        - setCurioMap -> setCurios
+        - getStackHandler -> getStacksHandler
+        - enableCurio -> unlockSlotType
+        - disableCurio -> lockSlotType
+        - addCurioSlot -> growSlotType
+        - removeCurioSlot -> shrinkSlotType
+        - getDisabled -> getLockedSlots
+        - addInvalid -> loseInvalidStack
+        - dropInvalidCache -> handleInvalidStacks
+    - ICurio:
+        - onCurioTick -> curioTick
+        - onCurioAnimate -> curioAnimate
+        - onEquipped -> onEquip
+        - onUnequipped -> onUnequip
+        - playRightClickEquipSound -> playEquipSound
+        - onCurioBreak -> curioBreak
+        - shouldSyncToTracking -> canSync
+        - getSyncTag -> writeSyncData
+        - readSyncTag -> readSyncData
+        - hasRender -> canRender
+    - Commands:
+        - enable -> unlock
+        - disable -> lock
+- Abstraction:
+    - CurioType abstracted to ISlotType
+    - CurioStackHandler abstracted to ICurioStacksHandler
+    - CuriosApi split into three helper interfaces (IIconHelper on the client, ISlotHelper on the server, ICuriosHelper for both)
+- CurioTags functionality refactored into SlotTypePresets
+- The above changes are only for the API, the rest of the classes have also had extensive changes
 
-## [2.0-beta] - 2019.12.30
-### Changed
-- Ported to 1.15.1
-- [API] ICurio#doRender -> ICurio#render
-- Curio rendering no longer automatically applies sneaking translations
-- Curio slot icons need to be manually stitched into the block texture atlas
+    

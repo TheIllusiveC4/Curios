@@ -51,12 +51,12 @@ import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.client.ClientEventHandler;
-import top.theillusivec4.curios.client.IconHelper;
 import top.theillusivec4.curios.client.CuriosClientConfig;
+import top.theillusivec4.curios.client.IconHelper;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.client.gui.GuiEventHandler;
@@ -106,9 +106,9 @@ public class Curios {
 
   private void enqueue(InterModEnqueueEvent evt) {
 
-    for (SlotTypePreset preset : SlotTypePreset.values()) {
+    if (DEBUG) {
 
-      if (DEBUG) {
+      for (SlotTypePreset preset : SlotTypePreset.values()) {
         InterModComms
             .sendTo(MODID, SlotTypeMessage.REGISTER_TYPE, () -> preset.getMessageBuilder().build());
       }
