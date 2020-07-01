@@ -25,7 +25,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
-import top.theillusivec4.curios.common.slottype.SlotType;
 
 /**
  * {@link CurioChangeEvent} is fired when the Curio of a LivingEntity changes. <br> This event is
@@ -34,8 +33,8 @@ import top.theillusivec4.curios.common.slottype.SlotType;
  * <br> This also includes entities joining the World, as well as being cloned. <br> This event is
  * fired on server-side only. <br>
  * <br>
- * {@link #type} contains the affected {@link SlotType}. <br> {@link #from} contains the {@link
- * ItemStack} that was equipped previously.
+ * {@link #type} contains the affected {@link top.theillusivec4.curios.api.type.ISlotType}. <br>
+ * {@link #from} contains the {@link ItemStack} that was equipped previously.
  * <br>
  * {@link #to} contains the {@link ItemStack} that is equipped now. <br> {@link #index} contains the
  * index of the curio slot

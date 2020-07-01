@@ -20,47 +20,49 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 public interface ICuriosHelper {
 
   /**
-   * Gets the LazyOptional of the curio capability attached to the ItemStack.
+   * Gets the {@link LazyOptional} of the curio capability attached to the {@link ItemStack}.
    *
-   * @param stack The ItemStack to get the curio capability from
-   * @return LazyOptional of the curio capability
+   * @param stack The {@link ItemStack} to get the curio capability from
+   * @return {@link LazyOptional} of the curio capability
    */
   LazyOptional<ICurio> getCurio(ItemStack stack);
 
   /**
-   * Gets the LazyOptional of the curio inventory capability attached to the entity.
+   * Gets the {@link LazyOptional} of the curio inventory capability attached to the entity.
    *
-   * @param livingEntity The ItemStack to get the curio inventory capability from
-   * @return LazyOptional of the curio inventory capability
+   * @param livingEntity The {@link LivingEntity} to get the curio inventory capability from
+   * @return {@link LazyOptional} of the curio inventory capability
    */
   LazyOptional<ICuriosItemHandler> getCuriosHandler(LivingEntity livingEntity);
 
   /**
    * Retrieves a set of string identifiers from the curio tags associated with the given item.
    *
-   * @param item The item to retrieve curio tags for
-   * @return Unmodifiable list of unique curio identifiers associated with the item
+   * @param item The {@link Item} to retrieve curio tags for
+   * @return Set of unique curio identifiers associated with the item
    */
   Set<String> getCurioTags(Item item);
 
   /**
-   * Gets the first found ItemStack of the item type equipped in a curio slot, or empty if no
-   * matches were found.
+   * Gets the first found {@link ItemStack} of the {@link Item} type equipped in a curio slot, or
+   * {@link Optional#empty()} if no matches were found.
    *
-   * @param item         The item to find
-   * @param livingEntity The wearer of the item to be found
-   * @return An Optional wrapper of the found triplet, or Optional.empty() is nothing was found.
+   * @param item         The {@link Item} to find
+   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
+   * @return An {@link Optional} wrapper of the found triplet, or {@link Optional#empty()} is
+   * nothing was found.
    */
   Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(Item item,
       @Nonnull final LivingEntity livingEntity);
 
   /**
-   * Gets the first found ItemStack of the item type equipped in a curio slot that matches the
-   * filter, or empty if no matches were found.
+   * Gets the first found {@link ItemStack} of the item type equipped in a curio slot that matches
+   * the filter, or {@link Optional#empty()} if no matches were found.
    *
-   * @param filter       The filter to test the ItemStack against
-   * @param livingEntity The wearer of the item to be found
-   * @return An Optional wrapper of the found triplet, or Optional.empty() is nothing was found.
+   * @param filter       The filter to test against
+   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
+   * @return An {@link Optional#empty()} wrapper of the found triplet, or {@link Optional#empty()}
+   * is nothing was found.
    */
   @Nonnull
   Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(
@@ -83,5 +85,12 @@ public interface ICuriosHelper {
    */
   void onBrokenCurio(String id, int index, LivingEntity damager);
 
+  /**
+   * Sets the {@link TriConsumer} that should be used with {@link ItemStack#damageItem(int,
+   * LivingEntity, Consumer)} when triggering break animations in curio slots
+   *
+   * @param consumer The {@link TriConsumer} taking an {@link top.theillusivec4.curios.api.type.ISlotType}
+   *                 identifier, a slot index, and the wearer as a {@link LivingEntity}
+   */
   void setBrokenCurioConsumer(TriConsumer<String, Integer, LivingEntity> consumer);
 }

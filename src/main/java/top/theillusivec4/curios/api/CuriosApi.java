@@ -35,6 +35,14 @@ public final class CuriosApi {
     return iconHelper;
   }
 
+  public static ISlotHelper getSlotHelper() {
+    return slotHelper;
+  }
+
+  public static ICuriosHelper getCuriosHelper() {
+    return curiosHelper;
+  }
+
   public static void setIconHelper(IIconHelper helper) {
 
     if (iconHelper == null) {
@@ -42,16 +50,8 @@ public final class CuriosApi {
     }
   }
 
-  public static ISlotHelper getSlotHelper() {
-    return slotHelper;
-  }
-
   public static void setSlotHelper(ISlotHelper helper) {
     slotHelper = helper;
-  }
-
-  public static ICuriosHelper getCuriosHelper() {
-    return curiosHelper;
   }
 
   public static void setCuriosHelper(ICuriosHelper helper) {

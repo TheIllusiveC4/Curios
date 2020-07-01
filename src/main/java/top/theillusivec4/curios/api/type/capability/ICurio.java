@@ -48,7 +48,10 @@ import top.theillusivec4.curios.api.type.ISlotType;
 
 public interface ICurio {
 
-  static void breakItem(ItemStack stack, LivingEntity livingEntity) {
+  /*
+   * Copy of vanilla implementation for breaking items client-side
+   */
+  static void playBreakAnimation(ItemStack stack, LivingEntity livingEntity) {
 
     if (!stack.isEmpty()) {
 
@@ -200,7 +203,7 @@ public interface ICurio {
    * @param livingEntity The entity that broke the curio
    */
   default void curioBreak(ItemStack stack, LivingEntity livingEntity) {
-    breakItem(stack, livingEntity);
+    playBreakAnimation(stack, livingEntity);
   }
 
   /**

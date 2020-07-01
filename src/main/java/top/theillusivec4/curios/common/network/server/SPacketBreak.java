@@ -71,7 +71,7 @@ public class SPacketBreak {
             possibleCurio.ifPresent(curio -> curio.curioBreak(stack, livingEntity));
 
             if (!possibleCurio.isPresent()) {
-              ICurio.breakItem(stack, livingEntity);
+              ICurio.playBreakAnimation(stack, livingEntity);
             }
           });
         }

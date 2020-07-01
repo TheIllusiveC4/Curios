@@ -50,10 +50,15 @@ public interface ICuriosItemHandler {
    */
   int getSlots();
 
+  /**
+   * Gets the identifiers of slot types locked for this handler.
+   *
+   * @return A set of {@link ISlotType} identifiers
+   */
   Set<String> getLockedSlots();
 
   /**
-   * Resets the current curios map.
+   * Resets the current curios map to default values.
    */
   void reset();
 
@@ -76,9 +81,7 @@ public interface ICuriosItemHandler {
   void unlockSlotType(String identifier, int amount, boolean visible, boolean cosmetic);
 
   /**
-   * Disables the {@link ISlotType} for a given identifier, removing it from the curio map. Note
-   * that the default implementation handles catching and returning ItemStacks that are found in
-   * these slots.
+   * Disables the {@link ISlotType} for a given identifier, removing it from the curio map.
    *
    * @param identifier The identifier for the {@link ISlotType}
    */
@@ -95,8 +98,7 @@ public interface ICuriosItemHandler {
 
   /**
    * Removes an amount of slots from the {@link ICurioStacksHandler} of a {@link ISlotType}
-   * associated with the identifier. Note that the default implementation handles catching and
-   * returning ItemStacks that are found in these slots.
+   * associated with the identifier.
    *
    * @param identifier The identifier for the {@link ISlotType}
    * @param amount     The number of slots to remove, must be non-negative
