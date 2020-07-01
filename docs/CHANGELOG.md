@@ -13,6 +13,7 @@ This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 - Ported to 1.16.1 Forge
 - Slot types are now handled server-side, allowing for per-world slot configurations
 - Icon registration is now done alongside slot registration without needing a separate IMC message
+- ItemStacks with different durabilities will trigger curio change events
 - Names:
     - LivingCurioChangeEvent -> CurioChangeEvent
     - LivingCurioDropRulesEvent -> DropRulesEvent
