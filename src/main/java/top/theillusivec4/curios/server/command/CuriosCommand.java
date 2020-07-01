@@ -82,14 +82,14 @@ public class CuriosCommand {
                         CurioArgumentType.getSlot(context, "slot"),
                         IntegerArgumentType.getInteger(context, "amount")))))));
 
-    curiosCommand.then(Commands.literal("enable").then(
+    curiosCommand.then(Commands.literal("unlock").then(
         Commands.argument("slot", CurioArgumentType.slot()).then(
             Commands.argument("player", EntityArgument.player()).executes(
                 context -> unlockSlotForPlayer(context.getSource(),
                     EntityArgument.getPlayer(context, "player"),
                     CurioArgumentType.getSlot(context, "slot"))))));
 
-    curiosCommand.then(Commands.literal("disable").then(
+    curiosCommand.then(Commands.literal("lock").then(
         Commands.argument("slot", CurioArgumentType.slot()).then(
             Commands.argument("player", EntityArgument.player()).executes(
                 context -> lockSlotForPlayer(context.getSource(),
@@ -141,7 +141,7 @@ public class CuriosCommand {
   private static int unlockSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
     CuriosApi.getSlotHelper().unlockSlotType(slot, playerMP);
-    source.sendFeedback(new TranslationTextComponent("commands.curios.enable.success", slot,
+    source.sendFeedback(new TranslationTextComponent("commands.curios.unlock.success", slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
@@ -149,7 +149,7 @@ public class CuriosCommand {
   private static int lockSlotForPlayer(CommandSource source, ServerPlayerEntity playerMP,
       String slot) {
     CuriosApi.getSlotHelper().lockSlotType(slot, playerMP);
-    source.sendFeedback(new TranslationTextComponent("commands.curios.disable.success", slot,
+    source.sendFeedback(new TranslationTextComponent("commands.curios.lock.success", slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
