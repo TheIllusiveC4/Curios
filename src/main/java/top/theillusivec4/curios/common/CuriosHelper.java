@@ -36,6 +36,8 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -66,6 +68,24 @@ public class CuriosHelper implements ICuriosHelper {
   public Set<String> getCurioTags(Item item) {
     return item.getTags().stream().filter(tag -> tag.getNamespace().equals(CuriosApi.MODID))
         .map(ResourceLocation::getPath).collect(Collectors.toSet());
+  }
+
+  @Override
+  public LazyOptional<IItemHandlerModifiable> getEquippedCurios(LivingEntity livingEntity) {
+    return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).map(handler -> {
+      Map<String, ICurioStacksHandler> curios = handler.getCurios();
+      IItemHandlerModifiable[] itemHandlers = new IItemHandlerModifiable[curios.size()];
+      int index = 0;
+
+      for (ICurioStacksHandler stacksHandler : curios.values()) {
+
+        if (index < itemHandlers.length) {
+          itemHandlers[index] = stacksHandler.getStacks();
+          index++;
+        }
+      }
+      return new CombinedInvWrapper(itemHandlers);
+    });
   }
 
   @Override
