@@ -30,8 +30,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.InterModComms.IMCMessage;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosConfig.CuriosSettings.CuriosSetting;
@@ -137,8 +137,23 @@ public class SlotTypeManager {
       }
 
       if (builder != null) {
-        builder.icon(msg.getIcon()).priority(msg.getPriority()).size(msg.getSize())
-            .locked(msg.isLocked()).visible(msg.isVisible()).hasCosmetic(msg.hasCosmetic());
+        builder.size(msg.getSize()).locked(msg.isLocked()).visible(msg.isVisible())
+            .hasCosmetic(msg.hasCosmetic());
+        SlotTypeMessage.Builder preset = SlotTypePreset.findPreset(id)
+            .map(SlotTypePreset::getMessageBuilder).orElse(null);
+        SlotTypeMessage presetMsg = preset != null ? preset.build() : null;
+
+        if (msg.getIcon() == null && presetMsg != null) {
+          builder.icon(presetMsg.getIcon());
+        } else {
+          builder.icon(msg.getIcon());
+        }
+
+        if (msg.getPriority() == null && presetMsg != null) {
+          builder.priority(presetMsg.getPriority());
+        } else {
+          builder.priority(msg.getPriority());
+        }
       }
     }));
   }

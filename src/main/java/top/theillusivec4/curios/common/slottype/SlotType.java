@@ -21,6 +21,7 @@ package top.theillusivec4.curios.common.slottype;
 
 import java.util.Objects;
 import net.minecraft.util.ResourceLocation;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
 
 public final class SlotType implements ISlotType {
@@ -40,7 +41,8 @@ public final class SlotType implements ISlotType {
     this.locked = builder.locked;
     this.visible = builder.visible;
     this.cosmetic = builder.cosmetic;
-    this.icon = builder.icon;
+    this.icon = builder.icon != null ? builder.icon
+        : new ResourceLocation(CuriosApi.MODID, "item/empty_curio_slot");
   }
 
   @Override
