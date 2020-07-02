@@ -22,9 +22,9 @@ package top.theillusivec4.curios.api.type.inventory;
 import javax.annotation.Nonnull;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
-public interface IDynamicStackHandler extends IItemHandler {
+public interface IDynamicStackHandler extends IItemHandlerModifiable {
 
   /**
    * Sets a {@link ItemStack} to the given slot index as the current stack.
