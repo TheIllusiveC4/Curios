@@ -162,6 +162,7 @@ public class Curios {
               new ResourceLocation(MODID, "item/empty_" + preset.getIdentifier() + "_slot"));
         }
         evt.addSprite(new ResourceLocation(MODID, "item/empty_cosmetic_slot"));
+        evt.addSprite(new ResourceLocation(MODID, "item/empty_curio_slot"));
       }
     }
 
