@@ -10,5 +10,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface IScreenHandlerAccessor {
 
   @Accessor
-  DefaultedList<ItemStack> getStacks();
+  DefaultedList<ItemStack> getTrackedStacks();
 }

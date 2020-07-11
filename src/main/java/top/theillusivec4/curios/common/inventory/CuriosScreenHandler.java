@@ -77,7 +77,7 @@ public class CuriosScreenHandler extends PlayerScreenHandler {
       int yOffset = 12;
       int index = 0;
       this.slots.subList(46, this.slots.size()).clear();
-      DefaultedList<ItemStack> stacks = ((IScreenHandlerAccessor) this).getStacks();
+      DefaultedList<ItemStack> stacks = ((IScreenHandlerAccessor) this).getTrackedStacks();
 
       if (stacks != null) {
         stacks.subList(46, stacks.size()).clear();

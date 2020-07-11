@@ -10,6 +10,7 @@ public class NetworkPackets {
 
   public static final Identifier OPEN_CURIOS = new Identifier(CuriosApi.MODID, "open_curios");
   public static final Identifier SCROLL = new Identifier(CuriosApi.MODID, "scroll");
+  public static final Identifier OPEN_VANILLA = new Identifier(CuriosApi.MODID, "open_vanilla");
 
   public static void init() {
     ServerSidePacketRegistry.INSTANCE.register(OPEN_CURIOS, ((packetContext, packetByteBuf) -> {
