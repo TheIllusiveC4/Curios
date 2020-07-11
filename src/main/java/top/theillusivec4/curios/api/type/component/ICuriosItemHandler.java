@@ -22,10 +22,12 @@ package top.theillusivec4.curios.api.type.component;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
@@ -127,4 +129,9 @@ public interface ICuriosItemHandler extends EntitySyncedComponent {
    * disabling/removing slots.
    */
   void handleInvalidStacks();
+
+  @Override
+  default ComponentType<ICuriosItemHandler> getComponentType() {
+    return CuriosComponent.INVENTORY;
+  }
 }

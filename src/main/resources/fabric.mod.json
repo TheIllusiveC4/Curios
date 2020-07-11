@@ -4,7 +4,9 @@
   "version": "${version}",
   "name": "Curios API",
   "description": "A flexible and expandable accessory/equipment API for users and developers.",
-  "authors": ["C4"],
+  "authors": [
+    "C4"
+  ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/curios",
     "sources": "https://github.com/TheIllusiveC4/Curios",
@@ -19,12 +21,11 @@
     ],
     "client": [
       "top.theillusivec4.curios.client.CuriosClient"
-    ],
-    "server": [
-      "top.theillusivec4.curios.server.CuriosServer"
     ]
   },
-  "mixins": [],
+  "mixins": [
+    "curios.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=0.7.4",
     "minecraft": "1.16.x"

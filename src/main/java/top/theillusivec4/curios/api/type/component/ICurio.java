@@ -23,15 +23,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.List;
 import nerdhub.cardinal.components.api.component.Component;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -45,7 +37,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import top.theillusivec4.curios.api.type.ISlotType;
 
-public interface ICurio extends Component {
+public interface ICurio extends CopyableComponent<ICurio> {
 
   /*
    * Copy of vanilla implementation for breaking items client-side
@@ -207,40 +199,6 @@ public interface ICurio extends Component {
   }
 
   /**
-   * Compares the current ItemStack and the previous ItemStack in the slot to detect any changes and
-   * returns true if the change should be synced to all tracking clients. Note that this check
-   * occurs every tick so implementations need to code their own timers for other intervals.
-   *
-   * @param identifier   The identifier of the {@link ISlotType} of the slot
-   * @param index        The index of the slot
-   * @param livingEntity The LivingEntity that is wearing the ItemStack
-   * @return True to sync the ItemStack change to all tracking clients, false to do nothing
-   */
-  default boolean canSync(String identifier, int index, LivingEntity livingEntity) {
-    return false;
-  }
-
-  /**
-   * Gets a tag that is used to sync extra curio data from the server to the client. Only used when
-   * {@link ICurio#canSync(String, int, LivingEntity)} returns true.
-   *
-   * @return Data to be sent to the client
-   */
-  default CompoundTag writeSyncData() {
-    return new CompoundTag();
-  }
-
-  /**
-   * Used client-side to read data tags created by {@link ICurio#writeSyncData()} received from the
-   * server.
-   *
-   * @param compound Data received from the server
-   */
-  default void readSyncData(CompoundTag compound) {
-
-  }
-
-  /**
    * Determines if the ItemStack should drop on death and persist through respawn. This will persist
    * the ItemStack in the curio slot to the respawned player if applicable.
    *
@@ -264,5 +222,15 @@ public interface ICurio extends Component {
    */
   enum DropRule {
     DEFAULT, ALWAYS_DROP, ALWAYS_KEEP, DESTROY
+  }
+
+  @Override
+  default void fromTag(CompoundTag var1) {
+
+  }
+
+  @Override
+  default CompoundTag toTag(CompoundTag var1) {
+    return new CompoundTag();
   }
 }

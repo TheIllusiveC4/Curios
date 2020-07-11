@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "top.theillusivec4.curios.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "ItemStackMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

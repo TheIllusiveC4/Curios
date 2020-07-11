@@ -12,6 +12,12 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
 public class CurioInventoryComponent implements ICuriosItemHandler {
 
+  LivingEntity wearer;
+
+  public CurioInventoryComponent(LivingEntity livingEntity) {
+    this.wearer = livingEntity;
+  }
+
   @Override
   public Map<String, ICurioStacksHandler> getCurios() {
     return null;
@@ -64,7 +70,7 @@ public class CurioInventoryComponent implements ICuriosItemHandler {
 
   @Override
   public LivingEntity getWearer() {
-    return null;
+    return this.wearer;
   }
 
   @Override
@@ -79,7 +85,7 @@ public class CurioInventoryComponent implements ICuriosItemHandler {
 
   @Override
   public Entity getEntity() {
-    return null;
+    return this.wearer;
   }
 
   @Override
@@ -89,6 +95,6 @@ public class CurioInventoryComponent implements ICuriosItemHandler {
 
   @Override
   public CompoundTag toTag(CompoundTag compoundTag) {
-    return null;
+    return new CompoundTag();
   }
 }

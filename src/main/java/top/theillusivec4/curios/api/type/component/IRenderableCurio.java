@@ -11,6 +11,7 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
 import top.theillusivec4.curios.api.type.ISlotType;
 
 public interface IRenderableCurio extends Component {
@@ -27,6 +28,16 @@ public interface IRenderableCurio extends Component {
       float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
       float netHeadYaw, float headPitch) {
 
+  }
+
+  @Override
+  default void fromTag(CompoundTag var1) {
+
+  }
+
+  @Override
+  default CompoundTag toTag(CompoundTag var1) {
+    return new CompoundTag();
   }
 
   /**

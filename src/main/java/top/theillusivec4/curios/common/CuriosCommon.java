@@ -41,8 +41,10 @@ public class CuriosCommon implements ModInitializer {
     CuriosApi.setCuriosHelper(new CuriosHelper());
     EntityComponentCallback.event(PlayerEntity.class).register(
         (playerEntity, componentContainer) -> componentContainer
-            .put(CuriosComponent.INVENTORY, new CurioInventoryComponent()));
+            .put(CuriosComponent.INVENTORY, new CurioInventoryComponent(playerEntity)));
     EntityComponents
         .setRespawnCopyStrategy(CuriosComponent.INVENTORY, RespawnCopyStrategy.INVENTORY);
+
+    CuriosRegistry.registerItems();
   }
 }
