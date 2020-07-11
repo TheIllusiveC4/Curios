@@ -20,7 +20,7 @@
 package top.theillusivec4.curios.api;
 
 import java.util.Optional;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import top.theillusivec4.curios.api.SlotTypeMessage.Builder;
 
 /**
@@ -60,7 +60,7 @@ public enum SlotTypePreset {
   }
 
   public Builder getMessageBuilder() {
-    return new Builder(this.id).priority(this.priority).icon(
-        new ResourceLocation(CuriosApi.MODID, "item/empty_" + this.getIdentifier() + "_slot"));
+    return new Builder(this.id).priority(this.priority)
+        .icon(new Identifier(CuriosApi.MODID, "item/empty_" + this.getIdentifier() + "_slot"));
   }
 }

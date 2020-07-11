@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.api.type;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 
 public interface ISlotType extends Comparable<ISlotType> {
 
@@ -29,9 +29,9 @@ public interface ISlotType extends Comparable<ISlotType> {
   String getIdentifier();
 
   /**
-   * @return The {@link ResourceLocation} for the icon associated with this slot type
+   * @return The {@link Identifier} for the icon associated with this slot type
    */
-  ResourceLocation getIcon();
+  Identifier getIcon();
 
   /**
    * @return The priority of this slot type for ordering

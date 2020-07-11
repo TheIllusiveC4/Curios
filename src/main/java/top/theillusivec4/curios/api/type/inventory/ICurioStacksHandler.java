@@ -19,8 +19,8 @@
 
 package top.theillusivec4.curios.api.type.inventory;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.collection.DefaultedList;
 
 public interface ICurioStacksHandler {
 
@@ -48,7 +48,7 @@ public interface ICurioStacksHandler {
    *
    * @return A list of boolean values for render states
    */
-  NonNullList<Boolean> getRenders();
+  DefaultedList<Boolean> getRenders();
 
   /**
    * Gets the number of slots for equipped curio stacks.
@@ -101,14 +101,14 @@ public interface ICurioStacksHandler {
   /**
    * Writes the data for this handler.
    *
-   * @return A {@link CompoundNBT} representing the serialized data
+   * @return A {@link CompoundTag} representing the serialized data
    */
-  CompoundNBT serializeNBT();
+  CompoundTag serializeNBT();
 
   /**
    * Reads the data into this handler.
    *
-   * @param nbt A {@link CompoundNBT} representing the serialized data
+   * @param nbt A {@link CompoundTag} representing the serialized data
    */
-  void deserializeNBT(CompoundNBT nbt);
+  void deserializeNBT(CompoundTag nbt);
 }

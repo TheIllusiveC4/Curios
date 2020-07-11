@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "curios",
+  "version": "${version}",
+  "name": "Curios API",
+  "description": "A flexible and expandable accessory/equipment API for users and developers.",
+  "authors": ["C4"],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/curios",
+    "sources": "https://github.com/TheIllusiveC4/Curios",
+    "issues": "https://github.com/TheIllusiveC4/Curios/issues"
+  },
+  "license": "LGPLv3.0",
+  "icon": "assets/curios/curios_icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "top.theillusivec4.curios.Curios"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "minecraft": "1.16.x"
+  }
+}

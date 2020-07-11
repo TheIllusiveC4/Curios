@@ -24,36 +24,33 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
-import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+import top.theillusivec4.curios.api.type.component.ICurio;
+import top.theillusivec4.curios.api.type.component.ICuriosItemHandler;
 
 public interface ICuriosHelper {
 
   /**
-   * Gets a {@link LazyOptional} of the curio capability attached to the {@link ItemStack}.
+   * Gets a {@link Optional} of the curio capability attached to the {@link ItemStack}.
    *
    * @param stack The {@link ItemStack} to get the curio capability from
-   * @return {@link LazyOptional} of the curio capability
+   * @return {@link Optional} of the curio capability
    */
-  LazyOptional<ICurio> getCurio(ItemStack stack);
+  Optional<ICurio> getCurio(ItemStack stack);
 
   /**
-   * Gets a {@link LazyOptional} of the curio inventory capability attached to the entity.
+   * Gets a {@link Optional} of the curio inventory capability attached to the entity.
    *
    * @param livingEntity The {@link LivingEntity} to get the curio inventory capability from
-   * @return {@link LazyOptional} of the curio inventory capability
+   * @return {@link Optional} of the curio inventory capability
    */
-  LazyOptional<ICuriosItemHandler> getCuriosHandler(LivingEntity livingEntity);
+  Optional<ICuriosItemHandler> getCuriosHandler(LivingEntity livingEntity);
 
   /**
    * Retrieves a set of string identifiers from the curio tags associated with the given item.
@@ -62,15 +59,6 @@ public interface ICuriosHelper {
    * @return Set of unique curio identifiers associated with the item
    */
   Set<String> getCurioTags(Item item);
-
-  /**
-   * Gets a {@link LazyOptional} of an {@link IItemHandlerModifiable} that contains all of the
-   * equipped curio stacks (not including cosmetics).
-   *
-   * @param livingEntity The wearer of the curios
-   * @return The equipped curio stacks, or empty if there is no curios handler
-   */
-  LazyOptional<IItemHandlerModifiable> getEquippedCurios(LivingEntity livingEntity);
 
   /**
    * Gets the first found {@link ItemStack} of the {@link Item} type equipped in a curio slot, or
@@ -82,7 +70,7 @@ public interface ICuriosHelper {
    * nothing was found.
    */
   Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(Item item,
-      @Nonnull LivingEntity livingEntity);
+      LivingEntity livingEntity);
 
   /**
    * Gets the first found {@link ItemStack} of the item type equipped in a curio slot that matches
@@ -93,15 +81,15 @@ public interface ICuriosHelper {
    * @return An {@link Optional#empty()} wrapper of the found triplet, or {@link Optional#empty()}
    * is nothing was found.
    */
-  @Nonnull
   Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(
-      Predicate<ItemStack> filter, @Nonnull LivingEntity livingEntity);
+      Predicate<ItemStack> filter, LivingEntity livingEntity);
 
-  Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack);
+  Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(String identifier,
+      ItemStack stack);
 
   /**
    * Passes three inputs into an internal triple-input consumer that should be used from the
-   * single-input consumer in {@link ItemStack#damageItem(int, LivingEntity, Consumer)}
+   * single-input consumer in {@link ItemStack#damage(int, LivingEntity, Consumer)}
    * <br>
    * This will be necessary in order to trigger break animations in curio slots
    * <br>
@@ -115,7 +103,7 @@ public interface ICuriosHelper {
   void onBrokenCurio(String id, int index, LivingEntity damager);
 
   /**
-   * Sets the {@link TriConsumer} that should be used with {@link ItemStack#damageItem(int,
+   * Sets the {@link TriConsumer} that should be used with {@link ItemStack#damage(int,
    * LivingEntity, Consumer)} when triggering break animations in curio slots
    *
    * @param consumer The {@link TriConsumer} taking an {@link top.theillusivec4.curios.api.type.ISlotType}

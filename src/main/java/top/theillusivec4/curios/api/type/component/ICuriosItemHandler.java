@@ -17,7 +17,7 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.api.type.capability;
+package top.theillusivec4.curios.api.type.component;
 
 import java.util.Map;
 import java.util.Optional;

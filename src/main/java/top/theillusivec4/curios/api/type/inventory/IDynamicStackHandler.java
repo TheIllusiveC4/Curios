@@ -19,12 +19,11 @@
 
 package top.theillusivec4.curios.api.type.inventory;
 
-import javax.annotation.Nonnull;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraft.nbt.CompoundTag;
 
-public interface IDynamicStackHandler extends IItemHandlerModifiable {
+public interface IDynamicStackHandler extends Inventory {
 
   /**
    * Sets a {@link ItemStack} to the given slot index as the current stack.
@@ -32,7 +31,7 @@ public interface IDynamicStackHandler extends IItemHandlerModifiable {
    * @param slot  The slot index
    * @param stack The {@link ItemStack} to assign as the current stack
    */
-  void setStackInSlot(int slot, @Nonnull ItemStack stack);
+  void setStackInSlot(int slot, ItemStack stack);
 
   /**
    * Gets the {@link ItemStack} assigned as the current stack in the given slot index
@@ -40,7 +39,6 @@ public interface IDynamicStackHandler extends IItemHandlerModifiable {
    * @param slot The slot index
    * @return The {@link ItemStack} assigned as the current stack
    */
-  @Nonnull
   ItemStack getStackInSlot(int slot);
 
   /**
@@ -50,7 +48,7 @@ public interface IDynamicStackHandler extends IItemHandlerModifiable {
    * @param slot  The slot index
    * @param stack The {@link ItemStack} to assign as the previous stack
    */
-  void setPreviousStackInSlot(int slot, @Nonnull ItemStack stack);
+  void setPreviousStackInSlot(int slot, ItemStack stack);
 
   /**
    * Gets the {@link ItemStack} assigned as the previous stack in the given slot index
@@ -82,14 +80,14 @@ public interface IDynamicStackHandler extends IItemHandlerModifiable {
   /**
    * Writes the data for this handler.
    *
-   * @return A {@link CompoundNBT} representing the serialized data
+   * @return A {@link CompoundTag} representing the serialized data
    */
-  CompoundNBT serializeNBT();
+  CompoundTag serializeNBT();
 
   /**
    * Reads the data into this handler.
    *
-   * @param nbt A {@link CompoundNBT} representing the serialized data
+   * @param tag A {@link CompoundTag} representing the serialized data
    */
-  void deserializeNBT(CompoundNBT nbt);
+  void deserializeNBT(CompoundTag tag);
 }

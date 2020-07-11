@@ -1,0 +1,11 @@
+pluginManagement {
+    repositories {
+        jcenter()
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        gradlePluginPortal()
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+}

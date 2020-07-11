@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.api;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 
 public final class SlotTypeMessage {
 
@@ -32,7 +32,7 @@ public final class SlotTypeMessage {
   private final boolean locked;
   private final boolean visible;
   private final boolean cosmetic;
-  private final ResourceLocation icon;
+  private final Identifier icon;
 
   private SlotTypeMessage(Builder builder) {
     this.identifier = builder.identifier;
@@ -48,7 +48,7 @@ public final class SlotTypeMessage {
     return this.identifier;
   }
 
-  public ResourceLocation getIcon() {
+  public Identifier getIcon() {
     return this.icon;
   }
 
@@ -80,13 +80,13 @@ public final class SlotTypeMessage {
     private boolean locked = false;
     private boolean visible = true;
     private boolean cosmetic = false;
-    private ResourceLocation icon = null;
+    private Identifier icon = null;
 
     public Builder(String identifier) {
       this.identifier = identifier;
     }
 
-    public Builder icon(ResourceLocation icon) {
+    public Builder icon(Identifier icon) {
       this.icon = icon;
       return this;
     }

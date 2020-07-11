@@ -17,33 +17,31 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.api.type.capability;
+package top.theillusivec4.curios.api.type.component;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.List;
-import javax.annotation.Nonnull;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.LivingRenderer;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.client.render.entity.model.BipedEntityModel;
+import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.ItemParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.particle.ItemStackParticleEffect;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import top.theillusivec4.curios.api.type.ISlotType;
 
 public interface ICurio {
@@ -56,28 +54,27 @@ public interface ICurio {
     if (!stack.isEmpty()) {
 
       if (!livingEntity.isSilent()) {
-        livingEntity.world
-            .playSound(livingEntity.getPosX(), livingEntity.getPosY(), livingEntity.getPosZ(),
-                SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(), 0.8F,
-                0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
+        livingEntity.world.playSound(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(),
+            SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(), 0.8F,
+            0.8F + livingEntity.world.random.nextFloat() * 0.4F, false);
       }
 
       for (int i = 0; i < 5; ++i) {
-        Vector3d vec3d = new Vector3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
+        Vec3d vec3d = new Vec3d(((double) livingEntity.getRandom().nextFloat() - 0.5D) * 0.1D,
             Math.random() * 0.1D + 0.1D, 0.0D);
-        vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
-        vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
+        vec3d = vec3d.rotateX(-livingEntity.pitch * ((float) Math.PI / 180F));
+        vec3d = vec3d.rotateY(-livingEntity.yaw * ((float) Math.PI / 180F));
+        double d0 = (double) (-livingEntity.getRandom().nextFloat()) * 0.6D - 0.3D;
 
-        Vector3d vec3d1 = new Vector3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D,
-            d0, 0.6D);
-        vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
-        vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        vec3d1 = vec3d1.add(livingEntity.getPosX(),
-            livingEntity.getPosY() + (double) livingEntity.getEyeHeight(), livingEntity.getPosZ());
+        Vec3d vec3d1 = new Vec3d(((double) livingEntity.getRandom().nextFloat() - 0.5D) * 0.3D, d0,
+            0.6D);
+        vec3d1 = vec3d1.rotateX(-livingEntity.pitch * ((float) Math.PI / 180F));
+        vec3d1 = vec3d1.rotateY(-livingEntity.yaw * ((float) Math.PI / 180F));
+        vec3d1 = vec3d1.add(livingEntity.getX(), livingEntity.getY() + livingEntity.getEyeY(),
+            livingEntity.getZ());
 
         livingEntity.world
-            .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
+            .addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
                 vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
       }
     }
@@ -156,10 +153,10 @@ public interface ICurio {
    * If overriding, make sure the user has some indication which tags are associated with the
    * curio.
    *
-   * @param tagTooltips A list of {@link ITextComponent} with every curio tag
+   * @param tagTooltips A list of {@link Text} with every curio tag
    * @return A list of ITextComponent to display as curio tag information
    */
-  default List<ITextComponent> getTagsTooltip(List<ITextComponent> tagTooltips) {
+  default List<Text> getTagsTooltip(List<Text> tagTooltips) {
     return tagTooltips;
   }
 
@@ -169,7 +166,8 @@ public interface ICurio {
    * @param identifier The CurioType identifier for the context
    * @return A map of attribute modifiers to apply
    */
-  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
+  default Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(
+      String identifier) {
     return HashMultimap.create();
   }
 
@@ -181,8 +179,9 @@ public interface ICurio {
    * @param livingEntity The wearer of the ItemStack
    */
   default void playRightClickEquipSound(LivingEntity livingEntity) {
-    livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
-        SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+    livingEntity.world
+        .playSound(null, livingEntity.getBlockPos(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
+            SoundCategory.NEUTRAL, 1.0f, 1.0f);
   }
 
   /**
@@ -226,9 +225,8 @@ public interface ICurio {
    *
    * @return Data to be sent to the client
    */
-  @Nonnull
-  default CompoundNBT writeSyncData() {
-    return new CompoundNBT();
+  default CompoundTag writeSyncData() {
+    return new CompoundTag();
   }
 
   /**
@@ -237,7 +235,7 @@ public interface ICurio {
    *
    * @param compound Data received from the server
    */
-  default void readSyncData(CompoundNBT compound) {
+  default void readSyncData(CompoundTag compound) {
 
   }
 
@@ -248,7 +246,6 @@ public interface ICurio {
    * @param livingEntity The entity that died
    * @return {@link DropRule}
    */
-  @Nonnull
   default DropRule getDropRule(LivingEntity livingEntity) {
     return DropRule.DEFAULT;
   }
@@ -274,9 +271,9 @@ public interface ICurio {
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    */
   default void render(String identifier, int index, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
-      float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-      float headPitch) {
+      VertexConsumerProvider vertexConsumerProvider, int light, LivingEntity livingEntity,
+      float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
+      float netHeadYaw, float headPitch) {
 
   }
 
@@ -308,7 +305,7 @@ public interface ICurio {
     public static void translateIfSneaking(final MatrixStack matrixStack,
         final LivingEntity livingEntity) {
 
-      if (livingEntity.isCrouching()) {
+      if (livingEntity.isSneaking()) {
         matrixStack.translate(0.0f, 0.2f, 0.0f);
       }
     }
@@ -323,34 +320,33 @@ public interface ICurio {
     public static void rotateIfSneaking(final MatrixStack matrixStack,
         final LivingEntity livingEntity) {
 
-      if (livingEntity.isCrouching()) {
-        matrixStack.rotate(Vector3f.XP.rotationDegrees(90.0F / (float) Math.PI));
+      if (livingEntity.isSneaking()) {
+        matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(90.0F / (float) Math.PI));
       }
     }
 
     /**
      * Rotates the rendering for the model renderers based on the entity's head movement. This will
      * align the model renderers with the movements and rotations of the head. This will do nothing
-     * if the entity render object does not implement {@link LivingRenderer} or if the model does
-     * not have a head (does not implement {@link BipedModel}).
+     * if the entity render object does not implement {@link LivingEntityRenderer} or if the model
+     * does not have a head (does not implement {@link BipedEntityModel}).
      *
      * @param livingEntity The wearer of the curio
-     * @param renderers    The list of model renderers to align to the head movement
+     * @param parts        The list of model renderers to align to the head movement
      */
-    public static void followHeadRotations(final LivingEntity livingEntity,
-        ModelRenderer... renderers) {
+    public static void followHeadRotations(final LivingEntity livingEntity, ModelPart... parts) {
 
-      EntityRenderer<? super LivingEntity> render = Minecraft.getInstance().getRenderManager()
-          .getRenderer(livingEntity);
+      EntityRenderer<? super LivingEntity> render = MinecraftClient.getInstance()
+          .getEntityRenderManager().getRenderer(livingEntity);
 
-      if (render instanceof LivingRenderer) {
-        @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
-        EntityModel<LivingEntity> model = livingRenderer.getEntityModel();
+      if (render instanceof LivingEntityRenderer) {
+        @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        EntityModel<LivingEntity> model = livingRenderer.getModel();
 
-        if (model instanceof BipedModel) {
+        if (model instanceof BipedEntityModel) {
 
-          for (ModelRenderer renderer : renderers) {
-            renderer.copyModelAngles(((BipedModel<LivingEntity>) model).bipedHead);
+          for (ModelPart part : parts) {
+            part.copyPositionAndRotation(((BipedEntityModel<LivingEntity>) model).head);
           }
         }
       }
@@ -358,28 +354,28 @@ public interface ICurio {
 
     /**
      * Rotates the rendering for the models based on the entity's poses and movements. This will do
-     * nothing if the entity render object does not implement {@link LivingRenderer} or if the model
-     * does not implement {@link BipedModel}).
+     * nothing if the entity render object does not implement {@link LivingEntityRenderer} or if the
+     * model does not implement {@link BipedEntityModel}).
      *
      * @param livingEntity The wearer of the curio
      * @param models       The list of models to align to the body movement
      */
     @SafeVarargs
     public static void followBodyRotations(final LivingEntity livingEntity,
-        final BipedModel<LivingEntity>... models) {
+        final BipedEntityModel<LivingEntity>... models) {
 
-      EntityRenderer<? super LivingEntity> render = Minecraft.getInstance().getRenderManager()
-          .getRenderer(livingEntity);
+      EntityRenderer<? super LivingEntity> render = MinecraftClient.getInstance()
+          .getEntityRenderManager().getRenderer(livingEntity);
 
-      if (render instanceof LivingRenderer) {
-        @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
-        EntityModel<LivingEntity> entityModel = livingRenderer.getEntityModel();
+      if (render instanceof LivingEntityRenderer) {
+        @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        EntityModel<LivingEntity> entityModel = livingRenderer.getModel();
 
-        if (entityModel instanceof BipedModel) {
+        if (entityModel instanceof BipedEntityModel) {
 
-          for (BipedModel<LivingEntity> model : models) {
-            BipedModel<LivingEntity> bipedModel = (BipedModel<LivingEntity>) entityModel;
-            bipedModel.setModelAttributes(model);
+          for (BipedEntityModel<LivingEntity> model : models) {
+            BipedEntityModel<LivingEntity> bipedModel = (BipedEntityModel<LivingEntity>) entityModel;
+            bipedModel.setAttributes(model);
           }
         }
       }
