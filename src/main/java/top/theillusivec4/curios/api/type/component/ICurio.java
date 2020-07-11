@@ -22,6 +22,7 @@ package top.theillusivec4.curios.api.type.component;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.List;
+import nerdhub.cardinal.components.api.component.Component;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -44,7 +45,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import top.theillusivec4.curios.api.type.ISlotType;
 
-public interface ICurio {
+public interface ICurio extends Component {
 
   /*
    * Copy of vanilla implementation for breaking items client-side

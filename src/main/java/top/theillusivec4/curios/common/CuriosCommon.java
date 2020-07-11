@@ -17,14 +17,19 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios;
+package top.theillusivec4.curios.common;
 
+import nerdhub.cardinal.components.api.event.EntityComponentCallback;
+import nerdhub.cardinal.components.api.util.EntityComponents;
+import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.entity.player.PlayerEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.CuriosComponent;
 
-public class Curios implements ModInitializer {
+public class CuriosCommon implements ModInitializer {
 
   public static final String MODID = CuriosApi.MODID;
   public static final Logger LOGGER = LogManager.getLogger();
@@ -33,6 +38,11 @@ public class Curios implements ModInitializer {
 
   @Override
   public void onInitialize() {
-
+    CuriosApi.setCuriosHelper(new CuriosHelper());
+    EntityComponentCallback.event(PlayerEntity.class).register(
+        (playerEntity, componentContainer) -> componentContainer
+            .put(CuriosComponent.INVENTORY, new CurioInventoryComponent()));
+    EntityComponents
+        .setRespawnCopyStrategy(CuriosComponent.INVENTORY, RespawnCopyStrategy.INVENTORY);
   }
 }

@@ -13,12 +13,28 @@ group = project.maven_group
 minecraft {
 }
 
+repositories {
+    maven {
+        name = "Ladysnake Libs"
+        url = 'https://dl.bintray.com/ladysnake/libs'
+    }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
     modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     implementation "me.zeroeightsix:fiber:${project.fiber_version}"
+
+    modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:2.4.1"
+    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:2.4.1"
+    modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:2.4.1"
+    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:2.4.1"
+    modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:2.4.1"
+    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:2.4.1"
+    modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-util:2.4.1"
+    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-util:2.4.1"
 }
 
 processResources {
