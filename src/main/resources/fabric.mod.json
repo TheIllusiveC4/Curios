@@ -15,7 +15,13 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "top.theillusivec4.curios.Curios"
+      "top.theillusivec4.curios.common.CuriosCommon"
+    ],
+    "client": [
+      "top.theillusivec4.curios.client.CuriosClient"
+    ],
+    "server": [
+      "top.theillusivec4.curios.server.CuriosServer"
     ]
   },
   "mixins": [],
