@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.client.CuriosClientConfig.ButtonCorner;
-import top.theillusivec4.curios.common.inventory.CuriosScreenHandler;
+import top.theillusivec4.curios.common.inventory.screen.CuriosScreenHandler;
 
 public class CuriosScreen extends HandledScreen<CuriosScreenHandler> {
 

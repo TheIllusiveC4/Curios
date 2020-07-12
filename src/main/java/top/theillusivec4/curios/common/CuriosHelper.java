@@ -85,8 +85,8 @@ public class CuriosHelper implements ICuriosHelper {
             ICurioStacksHandler stacksHandler = curios.get(id);
             IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
-            for (int i = 0; i < stackHandler.getSlots(); i++) {
-              ItemStack stack = stackHandler.getStackInSlot(i);
+            for (int i = 0; i < stackHandler.size(); i++) {
+              ItemStack stack = stackHandler.getStack(i);
 
               if (!stack.isEmpty() && filter.test(stack)) {
                 return new ImmutableTriple<>(id, i, stack);

@@ -26,29 +26,13 @@ import net.minecraft.nbt.CompoundTag;
 public interface IDynamicStackHandler extends Inventory {
 
   /**
-   * Sets a {@link ItemStack} to the given slot index as the current stack.
-   *
-   * @param slot  The slot index
-   * @param stack The {@link ItemStack} to assign as the current stack
-   */
-  void setStackInSlot(int slot, ItemStack stack);
-
-  /**
-   * Gets the {@link ItemStack} assigned as the current stack in the given slot index
-   *
-   * @param slot The slot index
-   * @return The {@link ItemStack} assigned as the current stack
-   */
-  ItemStack getStackInSlot(int slot);
-
-  /**
    * Sets a {@link ItemStack} to the given slot index as the previous stack, for comparison purposes
    * with the current stack.
    *
    * @param slot  The slot index
    * @param stack The {@link ItemStack} to assign as the previous stack
    */
-  void setPreviousStackInSlot(int slot, ItemStack stack);
+  void setPreviousStack(int slot, ItemStack stack);
 
   /**
    * Gets the {@link ItemStack} assigned as the previous stack in the given slot index
@@ -56,12 +40,7 @@ public interface IDynamicStackHandler extends Inventory {
    * @param slot The slot index
    * @return The {@link ItemStack} assigned as the previous stack
    */
-  ItemStack getPreviousStackInSlot(int slot);
-
-  /**
-   * @return The total number of slots
-   */
-  int getSlots();
+  ItemStack getPreviousStack(int slot);
 
   /**
    * Increases the number of slots by the given amount.
@@ -82,12 +61,12 @@ public interface IDynamicStackHandler extends Inventory {
    *
    * @return A {@link CompoundTag} representing the serialized data
    */
-  CompoundTag serializeNBT();
+  CompoundTag serializeTag();
 
   /**
    * Reads the data into this handler.
    *
    * @param tag A {@link CompoundTag} representing the serialized data
    */
-  void deserializeNBT(CompoundTag tag);
+  void deserializeTag(CompoundTag tag);
 }

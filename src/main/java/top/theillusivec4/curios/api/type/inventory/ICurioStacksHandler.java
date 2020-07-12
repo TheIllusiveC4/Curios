@@ -103,12 +103,12 @@ public interface ICurioStacksHandler {
    *
    * @return A {@link CompoundTag} representing the serialized data
    */
-  CompoundTag serializeNBT();
+  CompoundTag serializeTag();
 
   /**
    * Reads the data into this handler.
    *
    * @param nbt A {@link CompoundTag} representing the serialized data
    */
-  void deserializeNBT(CompoundTag nbt);
+  void deserializeTag(CompoundTag nbt);
 }

@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.common.inventory;
+package top.theillusivec4.curios.common.inventory.screen;
 
 import io.netty.buffer.Unpooled;
 import java.util.Map;
@@ -17,6 +17,8 @@ import top.theillusivec4.curios.api.type.component.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.CuriosRegistry;
+import top.theillusivec4.curios.common.inventory.CosmeticCurioSlot;
+import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.network.NetworkPackets;
 import top.theillusivec4.curios.mixin.IScreenHandlerAccessor;
 
@@ -44,7 +46,7 @@ public class CuriosScreenHandler extends PlayerScreenHandler {
 
         if (stacksHandler.isVisible()) {
 
-          for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+          for (int i = 0; i < stackHandler.size() && slots < 8; i++) {
             this.addSlot(new CurioSlot(owner, stackHandler, i, identifier, -18, yOffset,
                 stacksHandler.getRenders()));
 
@@ -89,7 +91,7 @@ public class CuriosScreenHandler extends PlayerScreenHandler {
 
         if (stacksHandler.isVisible()) {
 
-          for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+          for (int i = 0; i < stackHandler.size() && slots < 8; i++) {
 
             if (index >= indexIn) {
               this.addSlot(new CurioSlot(owner, stackHandler, i, identifier, -18, yOffset,

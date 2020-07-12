@@ -10,7 +10,7 @@ import net.minecraft.util.registry.Registry;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.component.ICurio;
-import top.theillusivec4.curios.common.inventory.CuriosScreenHandler;
+import top.theillusivec4.curios.common.inventory.screen.CuriosScreenHandler;
 import top.theillusivec4.curios.common.item.AmuletItem;
 
 public class CuriosRegistry {
