@@ -44,6 +44,8 @@ public class CurioSlot extends Slot {
     return this.identifier;
   }
 
+  public int getIndex() { return this.index; }
+
   public boolean getRenderStatus() {
     return this.renderStatuses.get(this.index);
   }

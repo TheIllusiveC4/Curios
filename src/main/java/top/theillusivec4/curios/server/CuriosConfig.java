@@ -19,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -47,7 +46,8 @@ public class CuriosConfig {
     CURIO_SETTINGS = PropertyMirror.create(ConfigTypes.makeMap(ConfigTypes.STRING, CONFIG_TYPE));
 
     ConfigTreeBuilder builder = ConfigTree.builder();
-    builder.beginValue("curios", ConfigTypes.makeList(CONFIG_TYPE), new ArrayList<>())
+    builder
+        .beginValue("curios", ConfigTypes.makeMap(ConfigTypes.STRING, CONFIG_TYPE), new HashMap<>())
         .withComment("List of curios").finishValue(CURIO_SETTINGS::mirror);
     INSTANCE = builder.build();
   }

@@ -36,7 +36,7 @@ public final class CuriosApi {
 
   private static final ConcurrentLinkedQueue<Pair<BuildScheme, SlotTypeInfo>> queue = new ConcurrentLinkedQueue<>();
 
-  public static void queueSlotType(BuildScheme scheme, SlotTypeInfo info) {
+  public static void enqueueSlotType(BuildScheme scheme, SlotTypeInfo info) {
     queue.add(new Pair<>(scheme, info));
   }
 
