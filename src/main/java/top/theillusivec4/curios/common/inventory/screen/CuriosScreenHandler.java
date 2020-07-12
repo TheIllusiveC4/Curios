@@ -28,7 +28,7 @@ import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.screen.AbstractRecipeScreenHandler;
+import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.CraftingResultSlot;
@@ -47,7 +47,7 @@ import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.network.NetworkPackets;
 import top.theillusivec4.curios.mixin.IScreenHandlerAccessor;
 
-public class CuriosScreenHandler extends AbstractRecipeScreenHandler<CraftingInventory> {
+public class CuriosScreenHandler extends CraftingScreenHandler {
 
   private static final Identifier[] EMPTY_ARMOR_SLOT_TEXTURES;
   private static final EquipmentSlot[] EQUIPMENT_SLOT_ORDER;
@@ -69,7 +69,8 @@ public class CuriosScreenHandler extends AbstractRecipeScreenHandler<CraftingInv
   }
 
   public CuriosScreenHandler(int syncId, PlayerInventory playerInventory) {
-    super(CuriosRegistry.CURIOS_SCREENHANDLER, syncId);
+    super(syncId, playerInventory);
+    this.slots.clear();
     this.owner = playerInventory.player;
     this.onServer = !playerInventory.player.world.isClient();
     this.addSlot(

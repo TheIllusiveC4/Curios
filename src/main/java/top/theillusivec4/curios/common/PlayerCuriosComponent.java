@@ -210,7 +210,6 @@ public class PlayerCuriosComponent implements ICuriosItemHandler {
 
   @Override
   public CompoundTag toTag(CompoundTag compoundTag) {
-    CompoundTag compound = new CompoundTag();
 
     ListTag taglist = new ListTag();
     this.getCurios().forEach((key, stacksHandler) -> {
@@ -219,15 +218,15 @@ public class PlayerCuriosComponent implements ICuriosItemHandler {
       tag.putString("Identifier", key);
       taglist.add(tag);
     });
-    compound.put("Curios", taglist);
+    compoundTag.put("Curios", taglist);
 
     ListTag taglist1 = new ListTag();
 
     for (String identifier : this.getLockedSlots()) {
       taglist1.add(StringTag.of(identifier));
     }
-    compound.put("Locked", taglist1);
-    return compound;
+    compoundTag.put("Locked", taglist1);
+    return compoundTag;
   }
 
   private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
