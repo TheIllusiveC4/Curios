@@ -17,7 +17,7 @@ public class CuriosRegistry {
 
   public static final Item AMULET = new AmuletItem();
 
-  public static final ScreenHandlerType<CuriosScreenHandler> CURIOS_SCREEN = ScreenHandlerRegistry
+  public static final ScreenHandlerType<CuriosScreenHandler> CURIOS_SCREENHANDLER = ScreenHandlerRegistry
       .registerSimple(new Identifier(CuriosApi.MODID, "curios_screen"), CuriosScreenHandler::new);
 
   public static void registerItems() {

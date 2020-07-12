@@ -43,7 +43,7 @@ public class NetworkPackets {
             }
           }
         })));
-    ClientSidePacketRegistry.INSTANCE.register(SCROLL, (((packetContext, packetByteBuf) -> {
+    ClientSidePacketRegistry.INSTANCE.register(GRAB_ITEM, (((packetContext, packetByteBuf) -> {
       MinecraftClient client = MinecraftClient.getInstance();
       ClientPlayerEntity clientPlayerEntity = client.player;
 
@@ -81,21 +81,22 @@ public class NetworkPackets {
             ((CuriosScreenHandler) screenHandler).scrollToIndex(lastScrollIndex);
           }
         }))));
-    ClientSidePacketRegistry.INSTANCE.register(TOGGLE_RENDER,
-        (((packetContext, packetByteBuf) -> packetContext.getTaskQueue().execute(() -> {
-          int index = packetByteBuf.readInt();
-          String id = packetByteBuf.readString();
-          PlayerEntity playerEntity = packetContext.getPlayer();
-          CuriosApi.getCuriosHelper().getCuriosHandler(playerEntity)
-              .ifPresent(handler -> handler.getStacksHandler(id).ifPresent(stacksHandler -> {
-                DefaultedList<Boolean> renderStatuses = stacksHandler.getRenders();
+    ServerSidePacketRegistry.INSTANCE.register(TOGGLE_RENDER, (((packetContext, packetByteBuf) -> {
+      int index = packetByteBuf.readInt();
+      String id = packetByteBuf.readString();
+      packetContext.getTaskQueue().execute(() -> {
+        PlayerEntity playerEntity = packetContext.getPlayer();
+        CuriosApi.getCuriosHelper().getCuriosHandler(playerEntity)
+            .ifPresent(handler -> handler.getStacksHandler(id).ifPresent(stacksHandler -> {
+              DefaultedList<Boolean> renderStatuses = stacksHandler.getRenders();
 
-                if (renderStatuses.size() > index) {
-                  boolean value = !renderStatuses.get(index);
-                  renderStatuses.set(index, value);
-                  handler.sync();
-                }
-              }));
-        }))));
+              if (renderStatuses.size() > index) {
+                boolean value = !renderStatuses.get(index);
+                renderStatuses.set(index, value);
+                handler.sync();
+              }
+            }));
+      });
+    })));
   }
 }

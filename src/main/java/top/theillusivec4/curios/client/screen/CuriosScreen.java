@@ -55,6 +55,7 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
   public CuriosScreen(CuriosScreenHandler handler, PlayerInventory inventory, Text title) {
     super(handler, inventory, title);
     this.passEvents = true;
+    this.titleX = 97;
   }
 
   public static Pair<Integer, Integer> getButtonOffset(boolean isCreative) {
@@ -128,7 +129,8 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
               String id = ((CurioSlot) inventorySlot).getIdentifier();
               PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
               packetByteBuf.writeInt(index);
-              packetByteBuf.writeString(id, 100);
+              packetByteBuf.writeString(id, 25);
+              ((CurioSlot) inventorySlot).toggleRenderStatus();
               ClientSidePacketRegistry.INSTANCE
                   .sendToServer(NetworkPackets.TOGGLE_RENDER, packetByteBuf);
             }));
@@ -191,6 +193,7 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
 
           if (button.isHovered()) {
             isButtonHovered = true;
+            break;
           }
         }
       }
@@ -372,7 +375,16 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
   @Override
   protected boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top,
       int button) {
-    boolean bl = mouseX < (double) left || mouseY < (double) top || mouseX >= (double) (left
+    int offset = -20;
+
+    if (hasScrollBar) {
+      offset -= 20;
+    }
+
+    if (this.getScreenHandler().hasCosmeticColumn()) {
+      offset -= 20;
+    }
+    boolean bl = mouseX < (double) (left + offset) || mouseY < (double) top || mouseX >= (double) (left
         + this.backgroundWidth) || mouseY >= (double) (top + this.backgroundHeight);
     return this.recipeBook
         .isClickOutsideBounds(mouseX, mouseY, this.x, this.y, this.backgroundWidth,

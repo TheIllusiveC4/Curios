@@ -50,6 +50,10 @@ public class CurioSlot extends Slot {
     return this.renderStatuses.get(this.index);
   }
 
+  public void toggleRenderStatus() {
+    this.renderStatuses.set(this.index, !getRenderStatus());
+  }
+
   @Environment(EnvType.CLIENT)
   public String getSlotName() {
     return I18n.translate("curios.identifier." + identifier);
