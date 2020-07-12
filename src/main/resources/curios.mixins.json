@@ -4,8 +4,10 @@
   "package": "top.theillusivec4.curios.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "PlayerManagerMixin",
     "ItemStackMixin",
-    "IScreenHandlerAccessor"
+    "IScreenHandlerAccessor",
+    "ISimpleInventoryAccessor"
   ],
   "client": [
     "InventoryScreenMixin",

@@ -1,6 +1,8 @@
 package top.theillusivec4.curios.common.network;
 
 import io.netty.buffer.Unpooled;
+import java.util.HashMap;
+import java.util.Map;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.minecraft.client.MinecraftClient;
@@ -24,8 +26,24 @@ public class NetworkPackets {
   public static final Identifier OPEN_VANILLA = new Identifier(CuriosApi.MODID, "open_vanilla");
   public static final Identifier TOGGLE_RENDER = new Identifier(CuriosApi.MODID, "toggle_render");
   public static final Identifier GRAB_ITEM = new Identifier(CuriosApi.MODID, "grab_item");
+  public static final Identifier SET_ICONS = new Identifier(CuriosApi.MODID, "set_icons");
 
   public static void registerPackets() {
+    ClientSidePacketRegistry.INSTANCE.register(SET_ICONS, (((packetContext, packetByteBuf) -> {
+      int entrySize = packetByteBuf.readInt();
+      Map<String, Identifier> map = new HashMap<>();
+
+      for (int i = 0; i < entrySize; i++) {
+        map.put(packetByteBuf.readString(25), new Identifier(packetByteBuf.readString(100)));
+      }
+      packetContext.getTaskQueue().execute(() -> {
+        CuriosApi.getIconHelper().clearIcons();
+
+        for (Map.Entry<String, Identifier> entry : map.entrySet()) {
+          CuriosApi.getIconHelper().addIcon(entry.getKey(), entry.getValue());
+        }
+      });
+    })));
     ServerSidePacketRegistry.INSTANCE.register(OPEN_CURIOS,
         ((packetContext, packetByteBuf) -> packetContext.getTaskQueue().execute(() -> {
           PlayerEntity playerEntity = packetContext.getPlayer();
