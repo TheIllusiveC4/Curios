@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import net.minecraft.entity.LivingEntity;
+import top.theillusivec4.curios.api.SlotTypeInfo;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
@@ -33,7 +34,7 @@ public interface ISlotHelper {
    * Registers a {@link ISlotType} instance.
    * <br>
    * Modders: DO NOT USE DIRECTLY - Use IMC to send the appropriate {@link
-   * top.theillusivec4.curios.api.SlotTypeMessage}
+   * SlotTypeInfo}
    *
    * @param slotType The {@link ISlotType} instance
    */

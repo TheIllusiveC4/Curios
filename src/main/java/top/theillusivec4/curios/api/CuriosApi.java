@@ -19,6 +19,9 @@
 
 package top.theillusivec4.curios.api;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+import net.minecraft.util.Pair;
+import top.theillusivec4.curios.api.SlotTypeInfo.BuildScheme;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 import top.theillusivec4.curios.api.type.util.IIconHelper;
 import top.theillusivec4.curios.api.type.util.ISlotHelper;
@@ -30,6 +33,16 @@ public final class CuriosApi {
   private static IIconHelper iconHelper;
   private static ISlotHelper slotHelper;
   private static ICuriosHelper curiosHelper;
+
+  private static final ConcurrentLinkedQueue<Pair<BuildScheme, SlotTypeInfo>> queue = new ConcurrentLinkedQueue<>();
+
+  public static void queueSlotType(BuildScheme scheme, SlotTypeInfo info) {
+    queue.add(new Pair<>(scheme, info));
+  }
+
+  public static ConcurrentLinkedQueue<Pair<BuildScheme, SlotTypeInfo>> getSlotTypeQueue() {
+    return queue;
+  }
 
   public static IIconHelper getIconHelper() {
     return iconHelper;

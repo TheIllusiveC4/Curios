@@ -21,10 +21,7 @@ package top.theillusivec4.curios.api;
 
 import net.minecraft.util.Identifier;
 
-public final class SlotTypeMessage {
-
-  public static final String REGISTER_TYPE = "register_type";
-  public static final String MODIFY_TYPE = "modify_type";
+public final class SlotTypeInfo {
 
   private final String identifier;
   private final Integer priority;
@@ -34,7 +31,7 @@ public final class SlotTypeMessage {
   private final boolean cosmetic;
   private final Identifier icon;
 
-  private SlotTypeMessage(Builder builder) {
+  private SlotTypeInfo(Builder builder) {
     this.identifier = builder.identifier;
     this.priority = builder.priority;
     this.size = builder.size;
@@ -116,8 +113,12 @@ public final class SlotTypeMessage {
       return this;
     }
 
-    public SlotTypeMessage build() {
-      return new SlotTypeMessage(this);
+    public SlotTypeInfo build() {
+      return new SlotTypeInfo(this);
     }
+  }
+
+  public enum BuildScheme {
+    REGISTER, MODIFY
   }
 }

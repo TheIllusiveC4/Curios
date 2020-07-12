@@ -23,22 +23,43 @@ import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.server.ServerStartCallback;
+import net.fabricmc.fabric.api.event.server.ServerStopCallback;
 import net.minecraft.entity.player.PlayerEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosComponent;
+import top.theillusivec4.curios.api.SlotTypeInfo.BuildScheme;
+import top.theillusivec4.curios.api.SlotTypePreset;
+import top.theillusivec4.curios.common.slottype.SlotTypeManager;
+import top.theillusivec4.curios.server.SlotHelper;
 
 public class CuriosCommon implements ModInitializer {
 
   public static final String MODID = CuriosApi.MODID;
   public static final Logger LOGGER = LogManager.getLogger();
 
-  private static final boolean DEBUG = false;
+  private static final boolean DEBUG = true;
 
   @Override
   public void onInitialize() {
     CuriosApi.setCuriosHelper(new CuriosHelper());
+
+    if (DEBUG) {
+      CuriosApi
+          .queueSlotType(BuildScheme.REGISTER, SlotTypePreset.NECKLACE.getInfoBuilder().build());
+    }
+
+    ServerStartCallback.EVENT.register((minecraftServer) -> {
+      CuriosApi.setSlotHelper(new SlotHelper());
+      SlotTypeManager.buildQueuedSlotTypes();
+      SlotTypeManager.buildConfigSlotTypes();
+      SlotTypeManager.buildSlotTypes();
+    });
+
+    ServerStopCallback.EVENT.register((minecraftServer) -> CuriosApi.setSlotHelper(null));
+
     EntityComponentCallback.event(PlayerEntity.class).register(
         (playerEntity, componentContainer) -> componentContainer
             .put(CuriosComponent.INVENTORY, new PlayerCuriosComponent(playerEntity)));

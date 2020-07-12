@@ -37,6 +37,7 @@ public class PlayerCuriosComponent implements ICuriosItemHandler {
 
   public PlayerCuriosComponent(PlayerEntity playerEntity) {
     this.wearer = playerEntity;
+    this.reset();
   }
 
   @Override

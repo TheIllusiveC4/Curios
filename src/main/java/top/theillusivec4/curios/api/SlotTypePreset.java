@@ -21,11 +21,11 @@ package top.theillusivec4.curios.api;
 
 import java.util.Optional;
 import net.minecraft.util.Identifier;
-import top.theillusivec4.curios.api.SlotTypeMessage.Builder;
+import top.theillusivec4.curios.api.SlotTypeInfo.Builder;
 
 /**
  * These slot type presets should be used whenever applicable by calling {@link
- * SlotTypePreset#getMessageBuilder()} and building off that in the IMC message
+ * SlotTypePreset#getInfoBuilder()} and building off that in the IMC message
  */
 public enum SlotTypePreset {
   HEAD("head", 40), NECKLACE("necklace", 60), BACK("back", 80), BODY("body", 100), BRACELET(
@@ -59,7 +59,7 @@ public enum SlotTypePreset {
     return this.id;
   }
 
-  public Builder getMessageBuilder() {
+  public Builder getInfoBuilder() {
     return new Builder(this.id).priority(this.priority)
         .icon(new Identifier(CuriosApi.MODID, "item/empty_" + this.getIdentifier() + "_slot"));
   }
