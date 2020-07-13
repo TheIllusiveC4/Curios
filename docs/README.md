@@ -27,11 +27,14 @@ repositories {
     maven {
         url = "https://maven.theillusivec4.top/"
     }
+    maven {
+	name = "Ladysnake Libs"
+	url = 'https://dl.bintray.com/ladysnake/libs'
+    }
 }
 
 dependencies {
-	modImplementation "top.theillusivec4.curios:curios-fabric:${version}"
-    modCompile "top.theillusivec4.curios:curios-fabric:${version}:api"
+    modImplementation "top.theillusivec4.curios:curios-fabric:${version}"
 }
 ```
 
