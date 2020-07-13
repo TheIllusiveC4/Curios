@@ -104,18 +104,14 @@ curseforge {
 }
 
 publishing {
+    tasks.publish.dependsOn 'build'
+
     publications {
 
         mavenJava(MavenPublication) {
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
-            artifact(apiJar) {
-                builtBy apiJar
-            }
+            artifact remapJar
+            artifact sourcesJar
+            artifact apiJar
         }
     }
 

@@ -30,8 +30,8 @@ repositories {
 }
 
 dependencies {
-	modImplementation "top.theillusivec4.curios:curios:${version}"
-    modCompile "top.theillusivec4.curios:curios:${version}:api"
+	modImplementation "top.theillusivec4.curios:Curios:${version}"
+    modCompile "top.theillusivec4.curios:Curios:${version}:api"
 }
 ```
 
