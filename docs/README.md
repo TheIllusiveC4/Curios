@@ -35,7 +35,6 @@ repositories {
 
 dependencies {
     modImplementation "top.theillusivec4.curios:curios-fabric:${version}"
-    modCompile "top.theillusivec4.curios:curios-fabric:${version}:api"
 }
 ```
 
