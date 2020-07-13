@@ -40,6 +40,7 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.network.NetworkPackets;
 import top.theillusivec4.curios.common.slottype.SlotTypeManager;
+import top.theillusivec4.curios.server.CuriosConfig;
 import top.theillusivec4.curios.server.SlotHelper;
 
 public class CuriosCommon implements ModInitializer {
@@ -61,6 +62,7 @@ public class CuriosCommon implements ModInitializer {
     ServerStartCallback.EVENT.register((minecraftServer) -> {
       CuriosApi.setSlotHelper(new SlotHelper());
       SlotTypeManager.buildQueuedSlotTypes();
+      CuriosConfig.init();
       SlotTypeManager.buildConfigSlotTypes();
       SlotTypeManager.buildSlotTypes();
     });

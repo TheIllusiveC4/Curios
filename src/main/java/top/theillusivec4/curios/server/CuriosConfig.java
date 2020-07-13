@@ -15,6 +15,8 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,13 +25,17 @@ import java.util.HashMap;
 import java.util.Map;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.CuriosCommon;
+import top.theillusivec4.curios.common.slottype.SlotType;
+import top.theillusivec4.curios.common.slottype.SlotType.Builder;
+import top.theillusivec4.curios.common.slottype.SlotTypeManager;
 
 public class CuriosConfig {
 
   private static final PropertyMirror<Map<String, CurioSetting>> CURIO_SETTINGS;
   private static final RecordConfigType<CurioSetting> CONFIG_TYPE;
   private static final RecordSerializableType SERIALIZABLE_TYPE;
-  private static final ConfigTree INSTANCE;
+
+  private static ConfigTree INSTANCE;
 
   static {
     Map<String, SerializableType<?>> fields = new HashMap<>();
@@ -44,21 +50,38 @@ public class CuriosConfig {
     CONFIG_TYPE = new RecordConfigType<>(SERIALIZABLE_TYPE, CurioSetting.class,
         CurioSetting::deserialize, CurioSetting::serialize);
     CURIO_SETTINGS = PropertyMirror.create(ConfigTypes.makeMap(ConfigTypes.STRING, CONFIG_TYPE));
-
-    ConfigTreeBuilder builder = ConfigTree.builder();
-    builder
-        .beginValue("curios", ConfigTypes.makeMap(ConfigTypes.STRING, CONFIG_TYPE), new HashMap<>())
-        .withComment("List of curios").finishValue(CURIO_SETTINGS::mirror);
-    INSTANCE = builder.build();
   }
 
   public static void init() {
     JanksonValueSerializer serializer = new JanksonValueSerializer(false);
     Path path = Paths.get("config", CuriosApi.MODID + ".json5");
+    Map<String, Builder> queuedSlotTypes = SlotTypeManager.getQueuedSlotTypes();
+    Map<String, CurioSetting> defaultSettings = new HashMap<>();
+
+    queuedSlotTypes.forEach((id, builder) -> {
+      SlotType type = new Builder(id).copyFrom(builder).build();
+      CurioSetting setting = new CurioSetting();
+      setting.override = false;
+      setting.size = BigDecimal.valueOf(type.getSize());
+      setting.icon = type.getIcon().toString();
+      setting.visible = type.isVisible();
+      setting.hasCosmetic = type.hasCosmetic();
+      setting.locked = type.isLocked();
+      setting.priority = BigDecimal.valueOf(type.getPriority());
+      defaultSettings.put(id, setting);
+    });
+
+    ConfigTreeBuilder builder = ConfigTree.builder();
+    builder
+        .beginValue("curios", ConfigTypes.makeMap(ConfigTypes.STRING, CONFIG_TYPE), defaultSettings)
+        .withComment("List of curios").finishValue(CURIO_SETTINGS::mirror);
+    INSTANCE = builder.build();
 
     try (OutputStream stream = new BufferedOutputStream(
         Files.newOutputStream(path, StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW))) {
       FiberSerialization.serialize(INSTANCE, stream, serializer);
+    } catch (FileAlreadyExistsException e) {
+      CuriosCommon.LOGGER.info("Curios config already exists, skipping new config creation...");
     } catch (IOException e) {
       CuriosCommon.LOGGER.error("Error serializing new config!");
       e.printStackTrace();
@@ -83,8 +106,8 @@ public class CuriosConfig {
   public static class CurioSetting {
 
     public String icon;
-    public Integer priority;
-    public Integer size;
+    public BigDecimal priority;
+    public BigDecimal size;
     public Boolean locked;
     public Boolean visible;
     public Boolean hasCosmetic;
@@ -92,18 +115,13 @@ public class CuriosConfig {
 
     public static CurioSetting deserialize(Map<String, Object> fields) {
       CurioSetting setting = new CurioSetting();
-      setting.icon = fields.get("icon") instanceof String ? (String) fields.get("icon") : null;
-      setting.priority =
-          fields.get("priority") instanceof Integer ? (Integer) fields.get("priority") : null;
-      setting.size = fields.get("size") instanceof Integer ? (Integer) fields.get("size") : null;
-      setting.locked =
-          fields.get("locked") instanceof Boolean ? (Boolean) fields.get("locked") : null;
-      setting.visible =
-          fields.get("visible") instanceof Boolean ? (Boolean) fields.get("visible") : null;
-      setting.hasCosmetic =
-          fields.get("hasCosmetic") instanceof Boolean ? (Boolean) fields.get("hasCosmetic") : null;
-      setting.override =
-          fields.get("override") instanceof Boolean ? (Boolean) fields.get("override") : null;
+      setting.icon = (String) fields.get("icon");
+      setting.priority = (BigDecimal) fields.get("priority");
+      setting.size = (BigDecimal) fields.get("size");
+      setting.locked = (Boolean) fields.get("locked");
+      setting.visible = (Boolean) fields.get("visible");
+      setting.hasCosmetic = (Boolean) fields.get("hasCosmetic");
+      setting.override = (Boolean) fields.get("override");
       return setting;
     }
 

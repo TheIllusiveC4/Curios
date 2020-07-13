@@ -17,6 +17,10 @@ public class SlotTypeManager {
   private static Map<String, Builder> queueBuilders = new HashMap<>();
   private static Map<String, Builder> configBuilders = new HashMap<>();
 
+  public static Map<String, Builder> getQueuedSlotTypes() {
+    return queueBuilders;
+  }
+
   public static void buildQueuedSlotTypes() {
     queueBuilders.clear();
 
@@ -80,7 +84,7 @@ public class SlotTypeManager {
       configBuilders.putIfAbsent(identifier, builder);
 
       if (setting.priority != null) {
-        builder.priority(setting.priority, force);
+        builder.priority(setting.priority.intValue(), force);
       }
 
       if (setting.icon != null && !setting.icon.isEmpty()) {
@@ -88,7 +92,7 @@ public class SlotTypeManager {
       }
 
       if (setting.size != null) {
-        builder.size(setting.size, force);
+        builder.size(setting.size.intValue(), force);
       }
 
       if (setting.locked != null) {
