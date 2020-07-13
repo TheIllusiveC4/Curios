@@ -19,7 +19,7 @@ public class AmuletItem extends Item {
       "textures/entity/amulet.png");
 
   public AmuletItem() {
-    super(new Item.Settings().group(ItemGroup.TOOLS).maxCount(1).maxDamageIfAbsent(0));
+    super(new Item.Settings().group(ItemGroup.TOOLS).maxCount(1));
     ItemComponentCallbackV2.event(this).register(
         ((item, itemStack, componentContainer) -> componentContainer
             .put(CuriosComponent.ITEM, new ICurio() {
@@ -31,11 +31,6 @@ public class AmuletItem extends Item {
                   livingEntity.addStatusEffect(
                       new StatusEffectInstance(StatusEffects.REGENERATION, 80, 0, true, true));
                 }
-              }
-
-              @Override
-              public ComponentType<ICurio> getComponentType() {
-                return CuriosComponent.ITEM;
               }
             })));
   }

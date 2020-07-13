@@ -22,6 +22,7 @@ package top.theillusivec4.curios.api.type.component;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.List;
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.entity.LivingEntity;
@@ -35,6 +36,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.ISlotType;
 
 public interface ICurio extends CopyableComponent<ICurio> {
@@ -232,5 +234,15 @@ public interface ICurio extends CopyableComponent<ICurio> {
   @Override
   default CompoundTag toTag(CompoundTag var1) {
     return new CompoundTag();
+  }
+
+  @Override
+  default boolean isComponentEqual(Component other) {
+    return true;
+  }
+
+  @Override
+  default ComponentType<ICurio> getComponentType() {
+    return CuriosComponent.ITEM;
   }
 }

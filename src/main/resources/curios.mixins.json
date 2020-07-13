@@ -6,6 +6,7 @@
   "mixins": [
     "PlayerManagerMixin",
     "ItemStackMixin",
+    "LivingEntityMixin",
     "IScreenHandlerAccessor",
     "ISimpleInventoryAccessor"
   ],
