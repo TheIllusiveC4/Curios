@@ -110,9 +110,16 @@ publishing {
 
         mavenJava(MavenPublication) {
             artifactId = project.archives_base_name
-            artifact remapJar
-            artifact sourcesJar
-            artifact apiJar
+
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+            artifact(apiJar) {
+                builtBy apiJar
+            }
         }
     }
 
