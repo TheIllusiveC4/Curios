@@ -19,20 +19,25 @@
 
 package top.theillusivec4.curios.common;
 
+import java.util.Map;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.event.server.ServerStartCallback;
 import net.fabricmc.fabric.api.event.server.ServerStopCallback;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.TypedActionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.SlotTypeInfo.BuildScheme;
 import top.theillusivec4.curios.api.SlotTypePreset;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.network.NetworkPackets;
 import top.theillusivec4.curios.common.slottype.SlotTypeManager;
 import top.theillusivec4.curios.server.SlotHelper;
@@ -61,6 +66,42 @@ public class CuriosCommon implements ModInitializer {
     });
 
     ServerStopCallback.EVENT.register((minecraftServer) -> CuriosApi.setSlotHelper(null));
+
+    UseItemCallback.EVENT.register(((player, world, hand) -> {
+      ItemStack stack = player.getStackInHand(hand);
+      return CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> {
+
+        if (curio.canRightClickEquip()) {
+          return CuriosApi.getCuriosHelper().getCuriosHandler(player).map(handler -> {
+
+            if (!player.world.isClient()) {
+              Map<String, ICurioStacksHandler> curios = handler.getCurios();
+
+              for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
+                IDynamicStackHandler stackHandler = entry.getValue().getStacks();
+
+                for (int i = 0; i < stackHandler.size(); i++) {
+                  ItemStack present = stackHandler.getStack(i);
+
+                  if (present.isEmpty() && curio.canEquip(entry.getKey(), player)) {
+                    stackHandler.setStack(i, stack.copy());
+                    curio.playRightClickEquipSound(player);
+
+                    if (!player.isCreative()) {
+                      int count = stack.getCount();
+                      stack.decrement(count);
+                    }
+                    return TypedActionResult.success(stack);
+                  }
+                }
+              }
+            }
+            return TypedActionResult.success(stack);
+          }).orElse(TypedActionResult.pass(stack));
+        }
+        return TypedActionResult.pass(stack);
+      }).orElse(TypedActionResult.pass(stack));
+    }));
 
     EntityComponentCallback.event(PlayerEntity.class).register(
         (playerEntity, componentContainer) -> componentContainer
