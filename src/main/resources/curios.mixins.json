@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "PlayerManagerMixin",
-    "ItemStackMixin",
     "LivingEntityMixin",
     "ExperienceOrbEntityMixin",
     "IScreenHandlerAccessor",
@@ -14,6 +13,7 @@
   "client": [
     "InventoryScreenMixin",
     "PlayerEntityRendererMixin",
+    "ItemStackMixin",
     "IHandledScreenAccessor"
   ],
   "server": [],
