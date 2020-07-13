@@ -1,6 +1,7 @@
 plugins {
     id 'fabric-loom' version '0.4-SNAPSHOT'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'maven-publish'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -61,6 +62,12 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
+task apiJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set("api")
+    include 'top/theillusivec4/curios/api/**'
+    from sourceSets.main.output
+}
+
 sourceSets {
     main {
         resources {
@@ -80,10 +87,12 @@ curseforge {
         addGameVersion "Fabric"
         addGameVersion project.minecraft_version
         addArtifact(sourcesJar)
+        addArtifact(apiJar)
         mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
 
         relations {
             requiredDependency 'fabric-api'
+            embeddedLibrary 'cardinal-components'
         }
         afterEvaluate {
             uploadTask.dependsOn(remapJar)
@@ -91,5 +100,39 @@ curseforge {
     }
     options {
         forgeGradleIntegration = false
+    }
+}
+
+publishing {
+    publications {
+
+        mavenJava(MavenPublication) {
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+            artifact(apiJar) {
+                builtBy apiJar
+            }
+        }
+    }
+
+    repositories {
+
+        if (project.hasProperty('urlMaven')) {
+
+            if (project.hasProperty('userMaven') && project.hasProperty('passMaven')) {
+
+                maven {
+                    url urlMaven
+                    credentials {
+                        username userMaven
+                        password passMaven
+                    }
+                }
+            }
+        }
     }
 }
