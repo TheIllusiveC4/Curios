@@ -11,8 +11,8 @@ public class CrownModel<T extends LivingEntity> extends EntityModel<T> {
   public ModelPart crown;
 
   public CrownModel() {
-    this.textureWidth = 16;
-    this.textureHeight = 16;
+    this.textureWidth = 32;
+    this.textureHeight = 32;
     this.crown = new ModelPart(this, 0, 0);
     this.crown.setPivot(0.0F, 0.0F, 0.0F);
     this.crown.addCuboid(-3.0F, -12.0F, -3.0F, 6, 4, 6, 0.0F);

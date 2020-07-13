@@ -141,16 +141,19 @@ public class NetworkPackets {
     })));
 
     ServerSidePacketRegistry.INSTANCE.register(SCROLL,
-        (((packetContext, packetByteBuf) -> packetContext.getTaskQueue().execute(() -> {
-          PlayerEntity playerEntity = packetContext.getPlayer();
-          ScreenHandler screenHandler = playerEntity.currentScreenHandler;
+        (((packetContext, packetByteBuf) -> {
           int syncId = packetByteBuf.readInt();
           int lastScrollIndex = packetByteBuf.readInt();
 
-          if (screenHandler instanceof CuriosScreenHandler && screenHandler.syncId == syncId) {
-            ((CuriosScreenHandler) screenHandler).scrollToIndex(lastScrollIndex);
-          }
-        }))));
+          packetContext.getTaskQueue().execute(() -> {
+            PlayerEntity playerEntity = packetContext.getPlayer();
+            ScreenHandler screenHandler = playerEntity.currentScreenHandler;
+
+            if (screenHandler instanceof CuriosScreenHandler && screenHandler.syncId == syncId) {
+              ((CuriosScreenHandler) screenHandler).scrollToIndex(lastScrollIndex);
+            }
+          });
+        })));
 
     ServerSidePacketRegistry.INSTANCE.register(TOGGLE_RENDER, (((packetContext, packetByteBuf) -> {
       int index = packetByteBuf.readInt();

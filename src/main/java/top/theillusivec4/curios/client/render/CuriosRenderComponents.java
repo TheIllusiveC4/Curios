@@ -13,6 +13,7 @@ import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.component.IRenderableCurio;
 import top.theillusivec4.curios.client.render.model.AmuletModel;
 import top.theillusivec4.curios.client.render.model.CrownModel;
+import top.theillusivec4.curios.client.render.model.KnucklesModel;
 import top.theillusivec4.curios.common.CuriosRegistry;
 
 public class CuriosRenderComponents {
@@ -21,6 +22,8 @@ public class CuriosRenderComponents {
       "textures/entity/amulet.png");
   private static final Identifier CROWN_TEXTURE = new Identifier(CuriosApi.MODID,
       "textures/entity/crown.png");
+  private static final Identifier KNUCKLES_TEXTURE = new Identifier(CuriosApi.MODID,
+      "textures/entity/knuckles.png");
 
   public static void register() {
     ItemComponentCallbackV2.event(CuriosRegistry.AMULET).register(
@@ -57,6 +60,27 @@ public class CuriosRenderComponents {
                 VertexConsumer consumer = ItemRenderer
                     .getArmorVertexConsumer(vertexConsumerProvider, model.getLayer(CROWN_TEXTURE),
                         false, itemStack.hasGlint());
+                model.render(matrixStack, consumer, light, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
+                    1.0F, 1.0F);
+              }
+            })));
+
+    ItemComponentCallbackV2.event(CuriosRegistry.KNUCKLES).register(
+        ((item, itemStack, componentContainer) -> componentContainer
+            .put(CuriosComponent.ITEM_RENDER, new IRenderableCurio() {
+              KnucklesModel model = new KnucklesModel();
+
+              @Override
+              public void render(String identifier, int index, MatrixStack matrixStack,
+                  VertexConsumerProvider vertexConsumerProvider, int light,
+                  LivingEntity livingEntity, float limbSwing, float limbSwingAmount,
+                  float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+                IRenderableCurio.RenderHelper.followBodyRotations(livingEntity, model);
+                model.setAngles(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
+                    headPitch);
+                VertexConsumer consumer = ItemRenderer
+                    .getArmorVertexConsumer(vertexConsumerProvider,
+                        model.getLayer(KNUCKLES_TEXTURE), false, itemStack.hasGlint());
                 model.render(matrixStack, consumer, light, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
                     1.0F, 1.0F);
               }

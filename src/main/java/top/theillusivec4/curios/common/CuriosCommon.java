@@ -55,8 +55,10 @@ public class CuriosCommon implements ModInitializer {
     CuriosApi.setCuriosHelper(new CuriosHelper());
 
     if (DEBUG) {
-      CuriosApi
-          .enqueueSlotType(BuildScheme.REGISTER, SlotTypePreset.NECKLACE.getInfoBuilder().build());
+
+      for (SlotTypePreset value : SlotTypePreset.values()) {
+        CuriosApi.enqueueSlotType(BuildScheme.REGISTER, value.getInfoBuilder().cosmetic().build());
+      }
     }
 
     ServerStartCallback.EVENT.register((minecraftServer) -> {

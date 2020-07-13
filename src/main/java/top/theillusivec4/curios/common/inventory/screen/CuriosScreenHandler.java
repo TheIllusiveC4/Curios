@@ -234,7 +234,7 @@ public class CuriosScreenHandler extends CraftingScreenHandler {
       if (!this.onServer) {
         PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
         packetByteBuf.writeInt(this.syncId);
-        packetByteBuf.writeInt(this.lastScrollIndex);
+        packetByteBuf.writeInt(j);
         ClientSidePacketRegistry.INSTANCE.sendToServer(NetworkPackets.SCROLL, packetByteBuf);
       }
     });

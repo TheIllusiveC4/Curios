@@ -21,8 +21,7 @@ public class CosmeticCurioSlot extends CurioSlot {
   @Override
   public Pair<Identifier, Identifier> getBackgroundSprite() {
     return new Pair<>(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE,
-        player.getEntityWorld().isClient() ? CuriosApi.getIconHelper().getIcon(identifier)
-            : new Identifier(CuriosApi.MODID, "item/empty_curio_slot"));
+        new Identifier(CuriosApi.MODID, "item/empty_cosmetic_slot"));
   }
 
   @Override
