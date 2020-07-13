@@ -109,6 +109,7 @@ publishing {
     publications {
 
         mavenJava(MavenPublication) {
+            artifactId = project.archives_base_name
             artifact remapJar
             artifact sourcesJar
             artifact apiJar
