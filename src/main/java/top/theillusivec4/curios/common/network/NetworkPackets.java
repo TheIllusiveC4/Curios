@@ -53,6 +53,7 @@ public class NetworkPackets {
       int entityId = packetByteBuf.readInt();
       String curioId = packetByteBuf.readString(25);
       int index = packetByteBuf.readInt();
+
       packetContext.getTaskQueue().execute(() -> {
         MinecraftClient client = MinecraftClient.getInstance();
 
@@ -111,53 +112,57 @@ public class NetworkPackets {
           }
         })));
 
-    ClientSidePacketRegistry.INSTANCE.register(GRAB_ITEM, (((packetContext, packetByteBuf) -> {
-      MinecraftClient client = MinecraftClient.getInstance();
-      ClientPlayerEntity clientPlayerEntity = client.player;
+    ClientSidePacketRegistry.INSTANCE.register(GRAB_ITEM,
+        (((packetContext, packetByteBuf) -> packetContext.getTaskQueue().execute(() -> {
+          MinecraftClient client = MinecraftClient.getInstance();
+          ClientPlayerEntity clientPlayerEntity = client.player;
 
-      if (clientPlayerEntity != null) {
-        clientPlayerEntity.inventory.setCursorStack(packetByteBuf.readItemStack());
-      }
-    })));
+          if (clientPlayerEntity != null) {
+            clientPlayerEntity.inventory.setCursorStack(packetByteBuf.readItemStack());
+          }
+        }))));
 
     ClientSidePacketRegistry.INSTANCE.register(SCROLL, (((packetContext, packetByteBuf) -> {
-      MinecraftClient client = MinecraftClient.getInstance();
-      ClientPlayerEntity clientPlayerEntity = client.player;
-      Screen screen = client.currentScreen;
       int syncId = packetByteBuf.readInt();
       int scrollIndex = packetByteBuf.readInt();
 
-      if (clientPlayerEntity != null) {
-        ScreenHandler screenHandler = clientPlayerEntity.currentScreenHandler;
+      packetContext.getTaskQueue().execute(() -> {
+        MinecraftClient client = MinecraftClient.getInstance();
+        ClientPlayerEntity clientPlayerEntity = client.player;
+        Screen screen = client.currentScreen;
 
-        if (screenHandler instanceof CuriosScreenHandler && screenHandler.syncId == syncId) {
-          ((CuriosScreenHandler) screenHandler).scrollToIndex(scrollIndex);
+        if (clientPlayerEntity != null) {
+          ScreenHandler screenHandler = clientPlayerEntity.currentScreenHandler;
+
+          if (screenHandler instanceof CuriosScreenHandler && screenHandler.syncId == syncId) {
+            ((CuriosScreenHandler) screenHandler).scrollToIndex(scrollIndex);
+          }
         }
-      }
 
-      if (screen instanceof CuriosScreen) {
-        ((CuriosScreen) screen).updateRenderButtons();
-      }
+        if (screen instanceof CuriosScreen) {
+          ((CuriosScreen) screen).updateRenderButtons();
+        }
+      });
     })));
 
-    ServerSidePacketRegistry.INSTANCE.register(SCROLL,
-        (((packetContext, packetByteBuf) -> {
-          int syncId = packetByteBuf.readInt();
-          int lastScrollIndex = packetByteBuf.readInt();
+    ServerSidePacketRegistry.INSTANCE.register(SCROLL, (((packetContext, packetByteBuf) -> {
+      int syncId = packetByteBuf.readInt();
+      int lastScrollIndex = packetByteBuf.readInt();
 
-          packetContext.getTaskQueue().execute(() -> {
-            PlayerEntity playerEntity = packetContext.getPlayer();
-            ScreenHandler screenHandler = playerEntity.currentScreenHandler;
+      packetContext.getTaskQueue().execute(() -> {
+        PlayerEntity playerEntity = packetContext.getPlayer();
+        ScreenHandler screenHandler = playerEntity.currentScreenHandler;
 
-            if (screenHandler instanceof CuriosScreenHandler && screenHandler.syncId == syncId) {
-              ((CuriosScreenHandler) screenHandler).scrollToIndex(lastScrollIndex);
-            }
-          });
-        })));
+        if (screenHandler instanceof CuriosScreenHandler && screenHandler.syncId == syncId) {
+          ((CuriosScreenHandler) screenHandler).scrollToIndex(lastScrollIndex);
+        }
+      });
+    })));
 
     ServerSidePacketRegistry.INSTANCE.register(TOGGLE_RENDER, (((packetContext, packetByteBuf) -> {
       int index = packetByteBuf.readInt();
       String id = packetByteBuf.readString();
+
       packetContext.getTaskQueue().execute(() -> {
         PlayerEntity playerEntity = packetContext.getPlayer();
         CuriosApi.getCuriosHelper().getCuriosHandler(playerEntity)

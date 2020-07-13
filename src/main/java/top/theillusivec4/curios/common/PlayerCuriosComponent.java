@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -227,6 +228,34 @@ public class PlayerCuriosComponent implements ICuriosItemHandler {
     }
     compoundTag.put("Locked", taglist1);
     return compoundTag;
+  }
+
+  @Override
+  public void writeToPacket(PacketByteBuf buf) {
+    buf.writeInt(this.curios.size());
+
+    for (Map.Entry<String, ICurioStacksHandler> entry : this.curios.entrySet()) {
+      buf.writeString(entry.getKey());
+      buf.writeCompoundTag(entry.getValue().serializeTag());
+    }
+  }
+
+  @Override
+  public void readFromPacket(PacketByteBuf buf) {
+    int entrySize = buf.readInt();
+    Map<String, ICurioStacksHandler> map = new LinkedHashMap<>();
+
+    for (int i = 0; i < entrySize; i++) {
+      String key = buf.readString(25);
+      CurioStacksHandler stacksHandler = new CurioStacksHandler();
+      CompoundTag compound = buf.readCompoundTag();
+
+      if (compound != null) {
+        stacksHandler.deserializeTag(compound);
+      }
+      map.put(key, stacksHandler);
+    }
+    this.setCurios(map);
   }
 
   private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
