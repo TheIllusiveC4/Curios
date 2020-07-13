@@ -48,7 +48,7 @@ public class CuriosCommon implements ModInitializer {
   public static final String MODID = CuriosApi.MODID;
   public static final Logger LOGGER = LogManager.getLogger();
 
-  private static final boolean DEBUG = true;
+  private static final boolean DEBUG = false;
 
   @Override
   public void onInitialize() {
