@@ -1,4 +1,4 @@
-# Curios API [![](http://cf.way2muchnoise.eu/versions/curios.svg)](https://www.curseforge.com/minecraft/mc-mods/curios) [![](http://cf.way2muchnoise.eu/short_curios_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/curios/files) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg?&style=flat-square)](https://www.gnu.org/licenses/lgpl-3.0) [![](https://img.shields.io/discord/500852157503766538.svg?color=green&label=Discord&style=flat-square)](https://discord.gg/JWgrdwt)
+# Curios API [![](http://cf.way2muchnoise.eu/versions/curios-fabric.svg)](https://www.curseforge.com/minecraft/mc-mods/curios-fabric) [![](http://cf.way2muchnoise.eu/short_curios-fabric_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/curios-fabric/files) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg?&style=flat-square)](https://www.gnu.org/licenses/lgpl-3.0) [![](https://img.shields.io/discord/500852157503766538.svg?color=green&label=Discord&style=flat-square)](https://discord.gg/JWgrdwt)
 
 ## Overview
 
@@ -15,8 +15,8 @@ Curios is a flexible and expandable accessory/equipment API for users and develo
 
 ## Documentation
 
-* [How to Use: Users](https://github.com/TheIllusiveC4/Curios/wiki/How-to-Use:-Users)
-* [How to Use: Developers](https://github.com/TheIllusiveC4/Curios/wiki/How-to-Use:-Developers)
+* [How to Use: Users](https://github.com/TheIllusiveC4/Curios/wiki/How-to-Use:-Fabric-Users)
+* [How to Use: Developers](https://github.com/TheIllusiveC4/Curios/wiki/How-to-Use:-Fabric-Developers)
 * [Commands](https://github.com/TheIllusiveC4/Curios/wiki/Commands)
 
 ## Adding to Your Project:
@@ -30,9 +30,9 @@ repositories {
 }
 
 dependencies {
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios:${version}")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios:${version}:api")
+	modImplementation "top.theillusivec4.curios:curios:${version}"
+    modCompile "top.theillusivec4.curios:curios:${version}:api"
 }
 ```
 
- Replace ${version} with the version of Curios that you want to use.
+Replace ${version} with the version of Curios that you want to use.
