@@ -10,9 +10,9 @@ public interface CurioChangeCallback {
   Event<CurioChangeCallback> EVENT = EventFactory.createArrayBacked(CurioChangeCallback.class,
       (listeners) -> (living, id, index, from, to) -> {
         for (CurioChangeCallback listener : listeners) {
-          listener.onChange(living, id, index, from, to);
+          listener.change(living, id, index, from, to);
         }
       });
 
-  void onChange(LivingEntity livingEntity, String id, int index, ItemStack from, ItemStack to);
+  void change(LivingEntity livingEntity, String id, int index, ItemStack from, ItemStack to);
 }
