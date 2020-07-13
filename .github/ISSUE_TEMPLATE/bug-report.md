@@ -13,7 +13,7 @@ Please reproduce all issues without any other unnecessary mods before submitting
 -->
 #### Versions (Be specific, do not write "latest"):
 * Curios:
-* Forge:
+* Forge/Fabric:
 #### Observed Behavior:
 #### Expected Behavior:
 #### Steps to Reproduce:
