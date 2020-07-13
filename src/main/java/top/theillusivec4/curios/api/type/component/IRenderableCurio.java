@@ -44,6 +44,11 @@ public interface IRenderableCurio extends CopyableComponent<IRenderableCurio> {
   }
 
   @Override
+  default boolean isComponentEqual(Component other) {
+    return true;
+  }
+
+  @Override
   default ComponentType<IRenderableCurio> getComponentType() {
     return CuriosComponent.ITEM_RENDER;
   }

@@ -12,12 +12,15 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.component.IRenderableCurio;
 import top.theillusivec4.curios.client.render.model.AmuletModel;
+import top.theillusivec4.curios.client.render.model.CrownModel;
 import top.theillusivec4.curios.common.CuriosRegistry;
 
 public class CuriosRenderComponents {
 
   private static final Identifier AMULET_TEXTURE = new Identifier(CuriosApi.MODID,
       "textures/entity/amulet.png");
+  private static final Identifier CROWN_TEXTURE = new Identifier(CuriosApi.MODID,
+      "textures/entity/crown.png");
 
   public static void register() {
     ItemComponentCallbackV2.event(CuriosRegistry.AMULET).register(
@@ -34,6 +37,25 @@ public class CuriosRenderComponents {
                 IRenderableCurio.RenderHelper.rotateIfSneaking(matrixStack, livingEntity);
                 VertexConsumer consumer = ItemRenderer
                     .getArmorVertexConsumer(vertexConsumerProvider, model.getLayer(AMULET_TEXTURE),
+                        false, itemStack.hasGlint());
+                model.render(matrixStack, consumer, light, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
+                    1.0F, 1.0F);
+              }
+            })));
+
+    ItemComponentCallbackV2.event(CuriosRegistry.CROWN).register(
+        ((item, itemStack, componentContainer) -> componentContainer
+            .put(CuriosComponent.ITEM_RENDER, new IRenderableCurio() {
+              CrownModel<LivingEntity> model = new CrownModel<>();
+
+              @Override
+              public void render(String identifier, int index, MatrixStack matrixStack,
+                  VertexConsumerProvider vertexConsumerProvider, int light,
+                  LivingEntity livingEntity, float limbSwing, float limbSwingAmount,
+                  float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+                IRenderableCurio.RenderHelper.followHeadRotations(livingEntity, model.crown);
+                VertexConsumer consumer = ItemRenderer
+                    .getArmorVertexConsumer(vertexConsumerProvider, model.getLayer(CROWN_TEXTURE),
                         false, itemStack.hasGlint());
                 model.render(matrixStack, consumer, light, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
                     1.0F, 1.0F);
