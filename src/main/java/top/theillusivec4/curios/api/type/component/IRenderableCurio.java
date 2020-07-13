@@ -1,6 +1,8 @@
 package top.theillusivec4.curios.api.type.component;
 
+import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
+import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -12,9 +14,10 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundTag;
+import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.ISlotType;
 
-public interface IRenderableCurio extends Component {
+public interface IRenderableCurio extends CopyableComponent<IRenderableCurio> {
 
   /**
    * Performs rendering of the ItemStack. Note that vertical sneaking translations are automatically
@@ -38,6 +41,11 @@ public interface IRenderableCurio extends Component {
   @Override
   default CompoundTag toTag(CompoundTag var1) {
     return new CompoundTag();
+  }
+
+  @Override
+  default ComponentType<IRenderableCurio> getComponentType() {
+    return CuriosComponent.ITEM_RENDER;
   }
 
   /**

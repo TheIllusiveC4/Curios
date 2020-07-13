@@ -42,6 +42,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.component.ICurio;
 import top.theillusivec4.curios.api.type.component.ICuriosItemHandler;
+import top.theillusivec4.curios.api.type.component.IRenderableCurio;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
@@ -53,6 +54,11 @@ public class CuriosHelper implements ICuriosHelper {
   @Override
   public Optional<ICurio> getCurio(ItemStack stack) {
     return CuriosComponent.ITEM.maybeGet(stack);
+  }
+
+  @Override
+  public Optional<IRenderableCurio> getRenderableCurio(ItemStack stack) {
+    return CuriosComponent.ITEM_RENDER.maybeGet(stack);
   }
 
   @Override

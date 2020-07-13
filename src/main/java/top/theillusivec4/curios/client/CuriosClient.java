@@ -6,12 +6,12 @@ import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.util.Identifier;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotTypePreset;
+import top.theillusivec4.curios.client.render.CuriosRenderComponents;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.network.NetworkPackets;
@@ -37,5 +37,6 @@ public class CuriosClient implements ClientModInitializer {
       registry.register(new Identifier(CuriosApi.MODID, "item/empty_cosmetic_slot"));
       registry.register(new Identifier(CuriosApi.MODID, "item/empty_curio_slot"));
     }));
+    CuriosRenderComponents.register();
   }
 }

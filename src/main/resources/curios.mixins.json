@@ -13,6 +13,7 @@
   ],
   "client": [
     "InventoryScreenMixin",
+    "PlayerEntityRendererMixin",
     "IHandledScreenAccessor"
   ],
   "server": [],

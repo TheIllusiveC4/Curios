@@ -110,6 +110,7 @@ public class CuriosCommon implements ModInitializer {
         .setRespawnCopyStrategy(CuriosComponent.INVENTORY, RespawnCopyStrategy.INVENTORY);
 
     CuriosRegistry.registerItems();
+    CuriosRegistry.registerComponents();
     NetworkPackets.registerPackets();
   }
 }

@@ -33,6 +33,7 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
 import top.theillusivec4.curios.api.type.component.ICurio;
 import top.theillusivec4.curios.api.type.component.ICuriosItemHandler;
+import top.theillusivec4.curios.api.type.component.IRenderableCurio;
 
 public interface ICuriosHelper {
 
@@ -43,6 +44,14 @@ public interface ICuriosHelper {
    * @return {@link Optional} of the curio capability
    */
   Optional<ICurio> getCurio(ItemStack stack);
+
+  /**
+   * Gets a {@link Optional} of the renderable curio capability attached to the {@link ItemStack}.
+   *
+   * @param stack The {@link ItemStack} to get the renderable curio capability from
+   * @return {@link Optional} of the renderable curio capability
+   */
+  Optional<IRenderableCurio> getRenderableCurio(ItemStack stack);
 
   /**
    * Gets a {@link Optional} of the curio inventory capability attached to the entity.
