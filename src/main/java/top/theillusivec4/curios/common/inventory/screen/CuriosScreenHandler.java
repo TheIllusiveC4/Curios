@@ -44,7 +44,7 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.inventory.CosmeticCurioSlot;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
-import top.theillusivec4.curios.common.network.NetworkPackets;
+import top.theillusivec4.curios.common.CuriosNetwork;
 import top.theillusivec4.curios.mixin.IScreenHandlerAccessor;
 
 public class CuriosScreenHandler extends CraftingScreenHandler {
@@ -212,7 +212,7 @@ public class CuriosScreenHandler extends CraftingScreenHandler {
         PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
         packetByteBuf.writeInt(this.syncId);
         packetByteBuf.writeInt(indexIn);
-        ServerSidePacketRegistry.INSTANCE.sendToPlayer(owner, NetworkPackets.SCROLL, packetByteBuf);
+        ServerSidePacketRegistry.INSTANCE.sendToPlayer(owner, CuriosNetwork.SCROLL, packetByteBuf);
       }
       lastScrollIndex = indexIn;
     });
@@ -235,7 +235,7 @@ public class CuriosScreenHandler extends CraftingScreenHandler {
         PacketByteBuf packetByteBuf = new PacketByteBuf(Unpooled.buffer());
         packetByteBuf.writeInt(this.syncId);
         packetByteBuf.writeInt(j);
-        ClientSidePacketRegistry.INSTANCE.sendToServer(NetworkPackets.SCROLL, packetByteBuf);
+        ClientSidePacketRegistry.INSTANCE.sendToServer(CuriosNetwork.SCROLL, packetByteBuf);
       }
     });
   }

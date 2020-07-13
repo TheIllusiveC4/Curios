@@ -29,7 +29,7 @@ import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.common.inventory.CosmeticCurioSlot;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.inventory.screen.CuriosScreenHandler;
-import top.theillusivec4.curios.common.network.NetworkPackets;
+import top.theillusivec4.curios.common.CuriosNetwork;
 
 public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements RecipeBookProvider {
 
@@ -60,17 +60,17 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
 
   public static Pair<Integer, Integer> getButtonOffset(boolean isCreative) {
     ButtonCorner corner = ButtonCorner.TOP_LEFT;
-    int x = 0;
-    int y = 0;
+    int left = 0;
+    int right = 0;
 
     if (isCreative) {
-      x += corner.getCreativeXoffset();
-      y += corner.getCreativeYoffset();
+      left += corner.getCreativeXoffset();
+      right += corner.getCreativeYoffset();
     } else {
-      x += corner.getXoffset();
-      y += corner.getYoffset();
+      left += corner.getXoffset();
+      right += corner.getYoffset();
     }
-    return new Pair<>(x, y);
+    return new Pair<>(left, right);
   }
 
   @Override
@@ -132,7 +132,7 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
               packetByteBuf.writeString(id, 25);
               ((CurioSlot) inventorySlot).toggleRenderStatus();
               ClientSidePacketRegistry.INSTANCE
-                  .sendToServer(NetworkPackets.TOGGLE_RENDER, packetByteBuf);
+                  .sendToServer(CuriosNetwork.TOGGLE_RENDER, packetByteBuf);
             }));
         yOffset += 18;
       }

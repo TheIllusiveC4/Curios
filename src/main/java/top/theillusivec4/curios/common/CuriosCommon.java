@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.common;
 
+import io.netty.buffer.Unpooled;
 import java.util.Map;
 import java.util.Set;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
@@ -28,8 +29,11 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.event.server.ServerStartCallback;
 import net.fabricmc.fabric.api.event.server.ServerStopCallback;
+import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.TypedActionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +43,6 @@ import top.theillusivec4.curios.api.SlotTypeInfo.BuildScheme;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
-import top.theillusivec4.curios.common.network.NetworkPackets;
 import top.theillusivec4.curios.common.slottype.SlotTypeManager;
 import top.theillusivec4.curios.server.CuriosConfig;
 import top.theillusivec4.curios.server.SlotHelper;
@@ -119,6 +122,6 @@ public class CuriosCommon implements ModInitializer {
 
     CuriosRegistry.registerItems();
     CuriosRegistry.registerComponents();
-    NetworkPackets.registerPackets();
+    CuriosNetwork.registerPackets();
   }
 }

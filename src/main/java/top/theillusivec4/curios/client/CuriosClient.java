@@ -14,7 +14,7 @@ import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.client.render.CuriosRenderComponents;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 import top.theillusivec4.curios.common.CuriosRegistry;
-import top.theillusivec4.curios.common.network.NetworkPackets;
+import top.theillusivec4.curios.common.CuriosNetwork;
 
 public class CuriosClient implements ClientModInitializer {
 
@@ -26,7 +26,7 @@ public class CuriosClient implements ClientModInitializer {
 
       if (KeyRegistry.openCurios.wasPressed()) {
         ClientSidePacketRegistry.INSTANCE
-            .sendToServer(NetworkPackets.OPEN_CURIOS, new PacketByteBuf(Unpooled.buffer()));
+            .sendToServer(CuriosNetwork.OPEN_CURIOS, new PacketByteBuf(Unpooled.buffer()));
       }
     });
     ScreenRegistry.register(CuriosRegistry.CURIOS_SCREENHANDLER, CuriosScreen::new);
@@ -38,5 +38,6 @@ public class CuriosClient implements ClientModInitializer {
       registry.register(new Identifier(CuriosApi.MODID, "item/empty_curio_slot"));
     }));
     CuriosRenderComponents.register();
+    CuriosClientNetwork.registerPackets();
   }
 }

@@ -14,7 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
-import top.theillusivec4.curios.common.network.NetworkPackets;
+import top.theillusivec4.curios.common.CuriosNetwork;
 import top.theillusivec4.curios.mixin.IHandledScreenAccessor;
 
 public class CuriosButton extends TexturedButtonWidget {
@@ -36,7 +36,7 @@ public class CuriosButton extends TexturedButtonWidget {
             mc.openScreen(inventory);
             mc.player.inventory.setCursorStack(stack);
             ClientSidePacketRegistry.INSTANCE
-                .sendToServer(NetworkPackets.OPEN_VANILLA, new PacketByteBuf(Unpooled.buffer()));
+                .sendToServer(CuriosNetwork.OPEN_VANILLA, new PacketByteBuf(Unpooled.buffer()));
           } else {
 
             if (parentGui instanceof InventoryScreen) {
@@ -48,7 +48,7 @@ public class CuriosButton extends TexturedButtonWidget {
               }
             }
             ClientSidePacketRegistry.INSTANCE
-                .sendToServer(NetworkPackets.OPEN_CURIOS, new PacketByteBuf(Unpooled.buffer()));
+                .sendToServer(CuriosNetwork.OPEN_CURIOS, new PacketByteBuf(Unpooled.buffer()));
           }
         });
     this.parentGui = parentGui;

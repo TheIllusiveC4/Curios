@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
-import top.theillusivec4.curios.common.network.NetworkPackets;
+import top.theillusivec4.curios.common.CuriosNetwork;
 
 @Mixin(PlayerManager.class)
 public class PlayerManagerMixin {
@@ -28,6 +28,6 @@ public class PlayerManagerMixin {
       packetByteBuf.writeString(type.getIdentifier());
       packetByteBuf.writeString(type.getIcon().toString());
     });
-    ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, NetworkPackets.SET_ICONS, packetByteBuf);
+    ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, CuriosNetwork.SET_ICONS, packetByteBuf);
   }
 }

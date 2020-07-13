@@ -20,8 +20,11 @@
 package top.theillusivec4.curios.common;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -34,6 +37,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.tag.ItemTags;
+import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
@@ -68,9 +72,16 @@ public class CuriosHelper implements ICuriosHelper {
 
   @Override
   public Set<String> getCurioTags(Item item) {
-    return ItemTags.getContainer().getTagsFor(item).stream()
-        .filter(tag -> tag.getNamespace().equals(CuriosApi.MODID)).map(Identifier::getPath)
-        .collect(Collectors.toSet());
+    List<Identifier> list = Lists.newArrayList();
+
+    for (Entry<Identifier, Tag<Item>> identifierTagEntry : ItemTags.getContainer().getEntries()
+        .entrySet()) {
+      if ((identifierTagEntry.getValue()).contains(item)) {
+        list.add(identifierTagEntry.getKey());
+      }
+    }
+    return list.stream().filter(tag -> tag.getNamespace().equals(CuriosApi.MODID))
+        .map(Identifier::getPath).collect(Collectors.toSet());
   }
 
   @Override
