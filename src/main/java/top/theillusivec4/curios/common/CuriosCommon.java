@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.common;
 
 import java.util.Map;
+import java.util.Set;
 import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
@@ -86,8 +87,11 @@ public class CuriosCommon implements ModInitializer {
 
                 for (int i = 0; i < stackHandler.size(); i++) {
                   ItemStack present = stackHandler.getStack(i);
+                  Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
+                  String id = entry.getKey();
 
-                  if (present.isEmpty() && curio.canEquip(entry.getKey(), player)) {
+                  if (present.isEmpty() && (tags.contains(id) || tags.contains("curio")) && curio
+                      .canEquip(id, player)) {
                     stackHandler.setStack(i, stack.copy());
                     curio.playRightClickEquipSound(player);
 
