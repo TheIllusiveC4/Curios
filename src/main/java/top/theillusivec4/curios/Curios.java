@@ -20,7 +20,9 @@
 package top.theillusivec4.curios;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
@@ -107,11 +109,9 @@ public class Curios {
   private void enqueue(InterModEnqueueEvent evt) {
 
     if (DEBUG) {
-
-      for (SlotTypePreset preset : SlotTypePreset.values()) {
-        InterModComms
-            .sendTo(MODID, SlotTypeMessage.REGISTER_TYPE, () -> preset.getMessageBuilder().build());
-      }
+      InterModComms.sendTo(MODID, SlotTypeMessage.REGISTER_TYPE,
+          () -> Arrays.stream(SlotTypePreset.values())
+              .map(preset -> preset.getMessageBuilder().build()).collect(Collectors.toList()));
     }
   }
 

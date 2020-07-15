@@ -21,6 +21,7 @@ package top.theillusivec4.curios.common.slottype;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -116,14 +117,30 @@ public class SlotTypeManager {
 
   private static void processImc(Stream<InterModComms.IMCMessage> messages, boolean create) {
     TreeMap<String, List<SlotTypeMessage>> messageMap = new TreeMap<>();
-    List<IMCMessage> list = messages.collect(Collectors.toList());
+    List<IMCMessage> messageList = messages.collect(Collectors.toList());
 
-    list.forEach(msg -> {
-      Object obj = msg.getMessageSupplier().get();
+    messageList.forEach(msg -> {
+      Object messageObject = msg.getMessageSupplier().get();
 
-      if (obj instanceof SlotTypeMessage) {
+      if (messageObject instanceof SlotTypeMessage) {
         messageMap.computeIfAbsent(msg.getSenderModId(), k -> new ArrayList<>())
-            .add((SlotTypeMessage) obj);
+            .add((SlotTypeMessage) messageObject);
+      } else if (messageObject instanceof Iterable) {
+        Iterable<?> iterable = (Iterable<?>) messageObject;
+        Iterator<?> iter = iterable.iterator();
+
+        if (iter.hasNext()) {
+          Object firstChild = iter.next();
+
+          if (firstChild instanceof SlotTypeMessage) {
+            messageMap.computeIfAbsent(msg.getSenderModId(), k -> new ArrayList<>())
+                .add((SlotTypeMessage) firstChild);
+
+            iter.forEachRemaining(
+                (child) -> messageMap.computeIfAbsent(msg.getSenderModId(), k -> new ArrayList<>())
+                    .add((SlotTypeMessage) child));
+          }
+        }
       }
     });
 
