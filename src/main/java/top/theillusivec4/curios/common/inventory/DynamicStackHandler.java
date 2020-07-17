@@ -51,6 +51,7 @@ public class DynamicStackHandler extends SimpleInventory implements IDynamicStac
     ((ISimpleInventoryAccessor) this).setStacks(
         getResizedList(this.size() + amount, ((ISimpleInventoryAccessor) this).getStacks()));
     this.previousStacks = getResizedList(this.previousStacks.size() + amount, this.previousStacks);
+    ((ISimpleInventoryAccessor) this).setSize(this.size() + amount);
   }
 
   @Override
@@ -58,6 +59,7 @@ public class DynamicStackHandler extends SimpleInventory implements IDynamicStac
     ((ISimpleInventoryAccessor) this).setStacks(
         getResizedList(this.size() - amount, ((ISimpleInventoryAccessor) this).getStacks()));
     this.previousStacks = getResizedList(this.previousStacks.size() - amount, this.previousStacks);
+    ((ISimpleInventoryAccessor) this).setSize(this.size() - amount);
   }
 
   @Override
@@ -75,11 +77,17 @@ public class DynamicStackHandler extends SimpleInventory implements IDynamicStac
     }
     CompoundTag tag = new CompoundTag();
     tag.put("Items", listTag);
+    tag.putInt("Size", ((ISimpleInventoryAccessor) this).getStacks().size());
     return tag;
   }
 
   @Override
   public void deserializeTag(CompoundTag tag) {
+    int size = tag.contains("Size", 3) ? tag.getInt("Size")
+        : ((ISimpleInventoryAccessor) this).getStacks().size();
+    ((ISimpleInventoryAccessor) this).setStacks(DefaultedList.ofSize(size, ItemStack.EMPTY));
+    this.previousStacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
+    ((ISimpleInventoryAccessor) this).setSize(size);
 
     if (tag.contains("Items")) {
       ListTag items = tag.getList("Items", 10);

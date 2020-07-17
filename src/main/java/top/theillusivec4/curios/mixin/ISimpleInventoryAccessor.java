@@ -29,6 +29,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface ISimpleInventoryAccessor {
 
   @Accessor
+  void setSize(int size);
+
+  @Accessor
   DefaultedList<ItemStack> getStacks();
 
   @Accessor
