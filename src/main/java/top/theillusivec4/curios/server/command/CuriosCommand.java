@@ -31,7 +31,6 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -41,10 +40,8 @@ public class CuriosCommand {
 
   public static void register(CommandDispatcher<CommandSource> dispatcher) {
 
-    final int opPermissionLevel = ServerLifecycleHooks.getCurrentServer().getOpPermissionLevel();
-
     LiteralArgumentBuilder<CommandSource> curiosCommand = Commands.literal("curios")
-        .requires(player -> player.hasPermissionLevel(opPermissionLevel));
+        .requires(player -> player.hasPermissionLevel(2));
 
     curiosCommand.then(Commands.literal("set").then(
         Commands.argument("slot", CurioArgumentType.slot()).then(

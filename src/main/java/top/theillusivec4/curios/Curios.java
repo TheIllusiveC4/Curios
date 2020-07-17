@@ -34,6 +34,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -89,9 +90,9 @@ public class Curios {
     eventBus.addListener(this::config);
     eventBus.addListener(this::enqueue);
     eventBus.addListener(this::process);
-    MinecraftForge.EVENT_BUS.addListener(this::serverStarting);
     MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
     MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
+    MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
     ModLoadingContext.get().registerConfig(Type.CLIENT, CuriosClientConfig.CLIENT_SPEC);
     ModLoadingContext.get().registerConfig(Type.SERVER, CuriosConfig.SERVER_SPEC);
   }
@@ -129,8 +130,8 @@ public class Curios {
     CuriosApi.setSlotHelper(null);
   }
 
-  private void serverStarting(FMLServerStartingEvent evt) {
-    CuriosCommand.register(evt.getCommandDispatcher());
+  private void registerCommands(RegisterCommandsEvent evt) {
+    CuriosCommand.register(evt.getDispatcher());
   }
 
   private void config(final ModConfig.Loading evt) {
