@@ -89,7 +89,10 @@ public class CuriosButton extends ImageButton {
       CreativeScreen gui = (CreativeScreen) parentGui;
       boolean isInventoryTab = gui.getSelectedTabIndex() == ItemGroup.INVENTORY.getIndex();
       this.field_230693_o_ = isInventoryTab;
-      this.field_230694_p_ = isInventoryTab;
+
+      if (!isInventoryTab) {
+        return;
+      }
     }
     super.func_230431_b_(matrixStack, mouseX, mouseY, partialTicks);
   }
