@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -300,8 +301,11 @@ public class CuriosEventHandler {
 
               for (int i = 0; i < stackHandler.getSlots(); i++) {
                 ItemStack present = stackHandler.getStackInSlot(i);
+                Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
+                String id = entry.getKey();
 
-                if (present.isEmpty() && curio.canEquip(entry.getKey(), player)) {
+                if (present.isEmpty() && (tags.contains(id) || tags.contains("curio")) && curio
+                    .canEquip(id, player)) {
                   stackHandler.setStackInSlot(i, stack.copy());
                   curio.playRightClickEquipSound(player);
 
