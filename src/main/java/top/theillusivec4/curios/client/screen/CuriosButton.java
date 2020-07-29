@@ -35,6 +35,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import top.theillusivec4.curios.common.CuriosNetwork;
 import top.theillusivec4.curios.mixin.IHandledScreenAccessor;
+import top.theillusivec4.curios.mixin.IInventoryScreenAccessor;
 
 public class CuriosButton extends TexturedButtonWidget {
 
@@ -52,7 +53,12 @@ public class CuriosButton extends TexturedButtonWidget {
             InventoryScreen inventory = new InventoryScreen(mc.player);
             ItemStack stack = mc.player.inventory.getCursorStack();
             mc.player.inventory.setCursorStack(ItemStack.EMPTY);
+            float mouseX = ((CuriosScreen) parentGui).currentMouseX;
+            float mouseY = ((CuriosScreen) parentGui).currentMouseY;
             mc.openScreen(inventory);
+            @SuppressWarnings("ConstantConditions") IInventoryScreenAccessor accessor = (IInventoryScreenAccessor) inventory;
+            accessor.setMouseX(mouseX);
+            accessor.setMouseY(mouseY);
             mc.player.inventory.setCursorStack(stack);
             ClientSidePacketRegistry.INSTANCE
                 .sendToServer(CuriosNetwork.OPEN_VANILLA, new PacketByteBuf(Unpooled.buffer()));

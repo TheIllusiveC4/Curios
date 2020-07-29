@@ -8,10 +8,12 @@
     "LivingEntityMixin",
     "ExperienceOrbEntityMixin",
     "IScreenHandlerAccessor",
-    "ISimpleInventoryAccessor"
+    "ISimpleInventoryAccessor",
+    "HandledScreenMixin"
   ],
   "client": [
     "InventoryScreenMixin",
+    "IInventoryScreenAccessor",
     "PlayerEntityRendererMixin",
     "ItemStackMixin",
     "IHandledScreenAccessor"

@@ -40,82 +40,88 @@ import top.theillusivec4.curios.common.inventory.screen.CuriosScreenHandler;
 public class CuriosClientNetwork {
 
   public static void registerPackets() {
-    ClientSidePacketRegistry.INSTANCE.register(CuriosNetwork.BREAK, (((packetContext, packetByteBuf) -> {
-      int entityId = packetByteBuf.readInt();
-      String curioId = packetByteBuf.readString(25);
-      int index = packetByteBuf.readInt();
+    ClientSidePacketRegistry.INSTANCE
+        .register(CuriosNetwork.BREAK, (((packetContext, packetByteBuf) -> {
+          int entityId = packetByteBuf.readInt();
+          String curioId = packetByteBuf.readString(25);
+          int index = packetByteBuf.readInt();
 
-      packetContext.getTaskQueue().execute(() -> {
-        MinecraftClient client = MinecraftClient.getInstance();
+          packetContext.getTaskQueue().execute(() -> {
+            MinecraftClient client = MinecraftClient.getInstance();
 
-        if (client != null && client.world != null) {
-          Entity entity = client.world.getEntityById(entityId);
+            if (client != null && client.world != null) {
+              Entity entity = client.world.getEntityById(entityId);
 
-          if (entity instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity) entity;
-            CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
-              ItemStack stack = handler.getStacksHandler(curioId)
-                  .map(stacksHandler -> stacksHandler.getStacks().getStack(index))
-                  .orElse(ItemStack.EMPTY);
-              Optional<ICurio> maybeCurio = CuriosApi.getCuriosHelper().getCurio(stack);
-              maybeCurio.ifPresent(curio -> curio.curioBreak(stack, livingEntity));
+              if (entity instanceof LivingEntity) {
+                LivingEntity livingEntity = (LivingEntity) entity;
+                CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
+                  ItemStack stack = handler.getStacksHandler(curioId)
+                      .map(stacksHandler -> stacksHandler.getStacks().getStack(index))
+                      .orElse(ItemStack.EMPTY);
+                  Optional<ICurio> maybeCurio = CuriosApi.getCuriosHelper().getCurio(stack);
+                  maybeCurio.ifPresent(curio -> curio.curioBreak(stack, livingEntity));
 
-              if (!maybeCurio.isPresent()) {
-                ICurio.playBreakAnimation(stack, livingEntity);
+                  if (!maybeCurio.isPresent()) {
+                    ICurio.playBreakAnimation(stack, livingEntity);
+                  }
+                });
               }
-            });
+            }
+          });
+        })));
+
+    ClientSidePacketRegistry.INSTANCE
+        .register(CuriosNetwork.SET_ICONS, (((packetContext, packetByteBuf) -> {
+          int entrySize = packetByteBuf.readInt();
+          Map<String, Identifier> map = new HashMap<>();
+
+          for (int i = 0; i < entrySize; i++) {
+            map.put(packetByteBuf.readString(25), new Identifier(packetByteBuf.readString(100)));
           }
-        }
-      });
-    })));
+          packetContext.getTaskQueue().execute(() -> {
+            CuriosApi.getIconHelper().clearIcons();
 
-    ClientSidePacketRegistry.INSTANCE.register(CuriosNetwork.SET_ICONS, (((packetContext, packetByteBuf) -> {
-      int entrySize = packetByteBuf.readInt();
-      Map<String, Identifier> map = new HashMap<>();
+            for (Map.Entry<String, Identifier> entry : map.entrySet()) {
+              CuriosApi.getIconHelper().addIcon(entry.getKey(), entry.getValue());
+            }
+          });
+        })));
 
-      for (int i = 0; i < entrySize; i++) {
-        map.put(packetByteBuf.readString(25), new Identifier(packetByteBuf.readString(100)));
-      }
-      packetContext.getTaskQueue().execute(() -> {
-        CuriosApi.getIconHelper().clearIcons();
+    ClientSidePacketRegistry.INSTANCE
+        .register(CuriosNetwork.GRAB_ITEM, (((packetContext, packetByteBuf) -> {
+          ItemStack stack = packetByteBuf.readItemStack();
+          packetContext.getTaskQueue().execute(() -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+            ClientPlayerEntity clientPlayerEntity = client.player;
 
-        for (Map.Entry<String, Identifier> entry : map.entrySet()) {
-          CuriosApi.getIconHelper().addIcon(entry.getKey(), entry.getValue());
-        }
-      });
-    })));
+            if (clientPlayerEntity != null) {
+              clientPlayerEntity.inventory.setCursorStack(stack);
+            }
+          });
+        })));
 
-    ClientSidePacketRegistry.INSTANCE.register(CuriosNetwork.GRAB_ITEM,
-        (((packetContext, packetByteBuf) -> packetContext.getTaskQueue().execute(() -> {
-          MinecraftClient client = MinecraftClient.getInstance();
-          ClientPlayerEntity clientPlayerEntity = client.player;
+    ClientSidePacketRegistry.INSTANCE
+        .register(CuriosNetwork.SCROLL, (((packetContext, packetByteBuf) -> {
+          int syncId = packetByteBuf.readInt();
+          int scrollIndex = packetByteBuf.readInt();
 
-          if (clientPlayerEntity != null) {
-            clientPlayerEntity.inventory.setCursorStack(packetByteBuf.readItemStack());
-          }
-        }))));
+          packetContext.getTaskQueue().execute(() -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+            ClientPlayerEntity clientPlayerEntity = client.player;
+            Screen screen = client.currentScreen;
 
-    ClientSidePacketRegistry.INSTANCE.register(CuriosNetwork.SCROLL, (((packetContext, packetByteBuf) -> {
-      int syncId = packetByteBuf.readInt();
-      int scrollIndex = packetByteBuf.readInt();
+            if (clientPlayerEntity != null) {
+              ScreenHandler screenHandler = clientPlayerEntity.currentScreenHandler;
 
-      packetContext.getTaskQueue().execute(() -> {
-        MinecraftClient client = MinecraftClient.getInstance();
-        ClientPlayerEntity clientPlayerEntity = client.player;
-        Screen screen = client.currentScreen;
+              if (screenHandler instanceof CuriosScreenHandler && screenHandler.syncId == syncId) {
+                ((CuriosScreenHandler) screenHandler).scrollToIndex(scrollIndex);
+              }
+            }
 
-        if (clientPlayerEntity != null) {
-          ScreenHandler screenHandler = clientPlayerEntity.currentScreenHandler;
-
-          if (screenHandler instanceof CuriosScreenHandler && screenHandler.syncId == syncId) {
-            ((CuriosScreenHandler) screenHandler).scrollToIndex(scrollIndex);
-          }
-        }
-
-        if (screen instanceof CuriosScreen) {
-          ((CuriosScreen) screen).updateRenderButtons();
-        }
-      });
-    })));
+            if (screen instanceof CuriosScreen) {
+              ((CuriosScreen) screen).updateRenderButtons();
+            }
+          });
+        })));
   }
 }

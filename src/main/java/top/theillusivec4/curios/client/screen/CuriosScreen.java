@@ -65,6 +65,8 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
 
   public boolean hasScrollBar;
   public boolean isNarrow;
+  public float currentMouseX;
+  public float currentMouseY;
 
   private CuriosButton buttonCurios;
   private boolean isScrolling;
@@ -230,6 +232,8 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
       }
     }
     this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+    currentMouseX = mouseX;
+    currentMouseY = mouseY;
   }
 
   @Override
@@ -255,7 +259,7 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
     } else if (KeyRegistry.openCurios.matchesKey(keyCode, scanCode)) {
 
       if (this.client != null && this.client.player != null) {
-        this.client.player.closeScreen();
+        this.client.player.closeHandledScreen();
       }
       return true;
     } else {
@@ -338,7 +342,7 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
       this.isScrolling = this.needsScrollBars();
       return true;
     }
-    return (!this.isNarrow || !this.recipeBook.isOpen()) && super
+    return this.isNarrow && this.recipeBook.isOpen() || super
         .mouseClicked(mouseX, mouseY, button);
   }
 

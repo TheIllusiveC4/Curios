@@ -26,6 +26,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -56,6 +57,24 @@ public class CuriosNetwork {
       PlayerStream.watching(livingEntity).forEach(watcher -> ServerSidePacketRegistry.INSTANCE
           .sendToPlayer(watcher, CuriosNetwork.BREAK, packetByteBuf));
     });
+
+    ServerSidePacketRegistry.INSTANCE.register(OPEN_VANILLA, (((packetContext, packetByteBuf) -> packetContext.getTaskQueue().execute(() -> {
+      PlayerEntity playerEntity = packetContext.getPlayer();
+
+      if (playerEntity instanceof ServerPlayerEntity) {
+        ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) playerEntity;
+        ItemStack stack = playerEntity.inventory.getCursorStack();
+        playerEntity.inventory.setCursorStack(ItemStack.EMPTY);
+        serverPlayerEntity.closeCurrentScreen();
+
+        if (!stack.isEmpty()) {
+          playerEntity.inventory.setCursorStack(stack);
+          PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+          buf.writeItemStack(stack);
+          ServerSidePacketRegistry.INSTANCE.sendToPlayer(playerEntity, GRAB_ITEM, buf);
+        }
+      }
+    }))));
 
     ServerSidePacketRegistry.INSTANCE.register(OPEN_CURIOS,
         ((packetContext, packetByteBuf) -> packetContext.getTaskQueue().execute(() -> {
