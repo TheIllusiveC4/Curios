@@ -49,30 +49,7 @@ public class RenderToggleButton extends TexturedButtonWidget {
 
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
-
-    if (this.visible) {
-      this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-
-      if (this.wasHovered != this.isHovered()) {
-
-        if (this.isHovered()) {
-
-          if (this.isFocused()) {
-            this.queueNarration(200);
-          } else {
-            this.queueNarration(750);
-          }
-        } else {
-          this.nextNarration = Long.MAX_VALUE;
-        }
-      }
-
-      if (this.visible) {
-        this.renderButton(matrixStack, mouseX, mouseY, delta);
-      }
-      this.narrate();
-      this.wasHovered = this.isHovered();
-    }
+    // NO-OP
   }
 
   public void renderButtonOverlay(MatrixStack matrixStack, int mouseX, int mouseY,
