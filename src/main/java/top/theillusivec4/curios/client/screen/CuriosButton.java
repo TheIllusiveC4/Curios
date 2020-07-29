@@ -95,7 +95,10 @@ public class CuriosButton extends TexturedButtonWidget {
       CreativeInventoryScreen gui = (CreativeInventoryScreen) parentGui;
       boolean isInventoryTab = gui.getSelectedTab() == ItemGroup.INVENTORY.getIndex();
       this.active = isInventoryTab;
-      this.visible = isInventoryTab;
+
+      if (!isInventoryTab) {
+        return;
+      }
     }
     super.renderButton(matrixStack, mouseX, mouseY, partialTicks);
   }

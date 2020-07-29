@@ -16,7 +16,8 @@
     "IInventoryScreenAccessor",
     "PlayerEntityRendererMixin",
     "ItemStackMixin",
-    "IHandledScreenAccessor"
+    "IHandledScreenAccessor",
+    "CreativeScreenMixin"
   ],
   "server": [],
   "injectors": {
