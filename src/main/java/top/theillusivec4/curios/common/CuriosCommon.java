@@ -25,9 +25,8 @@ import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.event.server.ServerStartCallback;
-import net.fabricmc.fabric.api.event.server.ServerStopCallback;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.TypedActionResult;
@@ -60,8 +59,7 @@ public class CuriosCommon implements ModInitializer {
         CuriosApi.enqueueSlotType(BuildScheme.REGISTER, value.getInfoBuilder().cosmetic().build());
       }
     }
-
-    ServerStartCallback.EVENT.register((minecraftServer) -> {
+    ServerLifecycleEvents.SERVER_STARTING.register(server -> {
       CuriosApi.setSlotHelper(new SlotHelper());
       SlotTypeManager.buildQueuedSlotTypes();
       CuriosConfig.init();
@@ -69,7 +67,7 @@ public class CuriosCommon implements ModInitializer {
       SlotTypeManager.buildSlotTypes();
     });
 
-    ServerStopCallback.EVENT.register((minecraftServer) -> CuriosApi.setSlotHelper(null));
+    ServerLifecycleEvents.SERVER_STOPPED.register(server -> CuriosApi.setSlotHelper(null));
 
     UseItemCallback.EVENT.register(((player, world, hand) -> {
       ItemStack stack = player.getStackInHand(hand);
