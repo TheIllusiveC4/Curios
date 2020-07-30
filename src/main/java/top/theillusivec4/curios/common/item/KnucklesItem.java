@@ -87,10 +87,10 @@ public class KnucklesItem extends Item {
         }
 
         KnucklesModel knuckles = (KnucklesModel) this.model;
-        ICurio.RenderHelper.followBodyRotations(livingEntity, knuckles);
         knuckles.setLivingAnimations(livingEntity, limbSwing, limbSwingAmount, partialTicks);
         knuckles.setRotationAngles(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
             headPitch);
+        ICurio.RenderHelper.followBodyRotations(livingEntity, knuckles);
         IVertexBuilder vertexBuilder = ItemRenderer
             .getBuffer(renderTypeBuffer, knuckles.getRenderType(KNUCKLES_TEXTURE), false,
                 stack.hasEffect());
