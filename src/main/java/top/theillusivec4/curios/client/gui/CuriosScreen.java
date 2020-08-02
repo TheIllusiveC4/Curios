@@ -233,17 +233,20 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
             slotCount += stacks.getSlots();
           }
         }
-        int upperHeight = 7 + slotCount * 18;
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
-        this.blit(i - 26, j + 4, 0, 0, 27, upperHeight);
 
-        if (slotCount <= 8) {
-          this.blit(i - 26, j + 4 + upperHeight, 0, 151, 27, 7);
-        } else {
-          this.blit(i - 42, j + 4, 27, 0, 23, 158);
-          this.getMinecraft().getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
-          this.blit(i - 34, j + 12 + (int) (127f * currentScroll), 232, 0, 12, 15);
+        if (slotCount > 0) {
+          int upperHeight = 7 + slotCount * 18;
+          RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+          this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
+          this.blit(i - 26, j + 4, 0, 0, 27, upperHeight);
+
+          if (slotCount <= 8) {
+            this.blit(i - 26, j + 4 + upperHeight, 0, 151, 27, 7);
+          } else {
+            this.blit(i - 42, j + 4, 27, 0, 23, 158);
+            this.getMinecraft().getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
+            this.blit(i - 34, j + 12 + (int) (127f * currentScroll), 232, 0, 12, 15);
+          }
         }
       });
     }
