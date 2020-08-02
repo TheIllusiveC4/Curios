@@ -208,6 +208,19 @@ public class CapCurioInventory {
       return totalSlots;
     }
 
+    @Override
+    public int getVisibleSlots() {
+      int totalSlots = 0;
+
+      for (CurioStackHandler stacks : curioSlots.values()) {
+
+        if (!stacks.isHidden()) {
+          totalSlots += stacks.getSlots();
+        }
+      }
+      return totalSlots;
+    }
+
     @Nonnull
     public ItemStack getStackInSlot(String identifier, int slot) {
 

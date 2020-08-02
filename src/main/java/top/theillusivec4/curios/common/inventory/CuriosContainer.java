@@ -219,7 +219,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
   public void scrollTo(float pos) {
 
     this.curios.ifPresent(curios -> {
-      int k = (curios.getSlots() - 8);
+      int k = (curios.getVisibleSlots() - 8);
       int j = (int) ((double) (pos * (float) k) + 0.5D);
 
       if (j < 0) {
@@ -277,7 +277,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
     return this.curios.map(curios -> {
 
-      if (curios.getSlots() > 8) {
+      if (curios.getVisibleSlots() > 8) {
         return 1;
       }
       return 0;

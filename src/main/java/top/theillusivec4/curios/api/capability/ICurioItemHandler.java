@@ -52,6 +52,10 @@ public interface ICurioItemHandler {
    */
   int getSlots();
 
+  default int getVisibleSlots() {
+    return this.getSlots();
+  }
+
   /**
    * Gets the {@link CurioStackHandler} associated with the given {@link CurioType} identifier.
    *

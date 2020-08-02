@@ -36,9 +36,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
+import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 import top.theillusivec4.curios.api.inventory.SlotCurio;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.common.CuriosConfig;
@@ -81,7 +83,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
       if (this.minecraft.player != null) {
         hasScrollBar = CuriosAPI.getCuriosHandler(this.minecraft.player)
-            .map(handler -> handler.getSlots() > 8).orElse(false);
+            .map(handler -> handler.getVisibleSlots() > 8).orElse(false);
 
         if (hasScrollBar) {
           this.container.scrollTo(currentScroll);
@@ -223,7 +225,14 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       InventoryScreen.drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - mouseX,
           (float) (j + 75 - 50) - mouseY, this.minecraft.player);
       CuriosAPI.getCuriosHandler(this.minecraft.player).ifPresent(handler -> {
-        int slotCount = handler.getSlots();
+        int slotCount = 0;
+
+        for (CurioStackHandler stacks : handler.getCurioMap().values()) {
+
+          if (!stacks.isHidden()) {
+            slotCount += stacks.getSlots();
+          }
+        }
         int upperHeight = 7 + slotCount * 18;
         RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
         this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
@@ -306,7 +315,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (!this.needsScrollBars()) {
       return false;
     } else {
-      int i = (this.container).curios.map(ICurioItemHandler::getSlots).orElse(1);
+      int i = (this.container).curios.map(ICurioItemHandler::getVisibleSlots).orElse(1);
       currentScroll = (float) ((double) currentScroll - pMouseScrolled5 / (double) i);
       currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
       this.container.scrollTo(currentScroll);
