@@ -106,7 +106,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
       if (this.field_230706_i_.player != null) {
         hasScrollBar = CuriosApi.getCuriosHelper().getCuriosHandler(this.field_230706_i_.player)
-            .map(handler -> handler.getSlots() > 8).orElse(false);
+            .map(handler -> handler.getVisibleSlots() > 8).orElse(false);
 
         if (hasScrollBar) {
           this.container.scrollTo(currentScroll);
@@ -297,43 +297,45 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
           (float) (j + 75 - 50) - mouseY, this.field_230706_i_.player);
       CuriosApi.getCuriosHelper().getCuriosHandler(this.field_230706_i_.player)
           .ifPresent(handler -> {
-            int slotCount = handler.getSlots();
-            int upperHeight = 7 + slotCount * 18;
-            RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-            this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
-            int xTexOffset = 0;
-            int width = 27;
-            int xOffset = -26;
+            int slotCount = handler.getVisibleSlots();
 
-            if (this.container.hasCosmeticColumn()) {
-              xTexOffset = 92;
-              width = 46;
-              xOffset -= 19;
-            }
-            this.func_238474_b_(matrixStack, i + xOffset, j + 4, xTexOffset, 0, width, upperHeight);
+            if (slotCount > 0) {
+              int upperHeight = 7 + slotCount * 18;
+              RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+              this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
+              int xTexOffset = 0;
+              int width = 27;
+              int xOffset = -26;
 
-            if (slotCount <= 8) {
-              this.func_238474_b_(matrixStack, i + xOffset, j + 4 + upperHeight, xTexOffset, 151,
-                  width, 7);
-            } else {
-              this.func_238474_b_(matrixStack, i + xOffset - 16, j + 4, 27, 0, 23, 158);
-              this.getMinecraft().getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
-              this.func_238474_b_(matrixStack, i + xOffset - 8,
-                  j + 12 + (int) (127f * currentScroll), 232, 0, 12, 15);
-            }
+              if (this.container.hasCosmeticColumn()) {
+                xTexOffset = 92;
+                width = 46;
+                xOffset -= 19;
+              }
+              this.func_238474_b_(matrixStack, i + xOffset, j + 4, xTexOffset, 0, width,
+                  upperHeight);
 
-            for (Slot slot : this.container.inventorySlots) {
+              if (slotCount <= 8) {
+                this.func_238474_b_(matrixStack, i + xOffset, j + 4 + upperHeight, xTexOffset, 151,
+                    width, 7);
+              } else {
+                this.func_238474_b_(matrixStack, i + xOffset - 16, j + 4, 27, 0, 23, 158);
+                this.getMinecraft().getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
+                this.func_238474_b_(matrixStack, i + xOffset - 8,
+                    j + 12 + (int) (127f * currentScroll), 232, 0, 12, 15);
+              }
 
-              if (slot instanceof CosmeticCurioSlot) {
-                int x = this.guiLeft + slot.xPos - 1;
-                int y = this.guiTop + slot.yPos - 1;
-                this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
-                this.func_238474_b_(matrixStack, x, y, 138, 0, 18, 18);
+              for (Slot slot : this.container.inventorySlots) {
+
+                if (slot instanceof CosmeticCurioSlot) {
+                  int x = this.guiLeft + slot.xPos - 1;
+                  int y = this.guiTop + slot.yPos - 1;
+                  this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
+                  this.func_238474_b_(matrixStack, x, y, 138, 0, 18, 18);
+                }
               }
             }
           });
-
-
     }
   }
 
@@ -407,7 +409,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (!this.needsScrollBars()) {
       return false;
     } else {
-      int i = (this.container).curiosHandler.map(ICuriosItemHandler::getSlots).orElse(1);
+      int i = (this.container).curiosHandler.map(ICuriosItemHandler::getVisibleSlots).orElse(1);
       currentScroll = (float) ((double) currentScroll - pMouseScrolled5 / (double) i);
       currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
       this.container.scrollTo(currentScroll);

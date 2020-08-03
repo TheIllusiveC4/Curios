@@ -48,7 +48,11 @@ public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen
       return CuriosApi.getCuriosHelper().getCuriosHandler(containerScreen.getMinecraft().player)
           .map(handler -> {
             List<Rectangle2d> areas = new ArrayList<>();
-            int slotCount = handler.getSlots();
+            int slotCount = handler.getVisibleSlots();
+
+            if (slotCount <= 0) {
+              return areas;
+            }
             int width = slotCount > 8 ? 42 : 26;
 
             if (containerScreen.getContainer().hasCosmeticColumn()) {

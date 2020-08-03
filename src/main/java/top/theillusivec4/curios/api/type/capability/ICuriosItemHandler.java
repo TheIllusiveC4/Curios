@@ -50,6 +50,10 @@ public interface ICuriosItemHandler {
    */
   int getSlots();
 
+  default int getVisibleSlots() {
+    return this.getSlots();
+  }
+
   /**
    * Gets the identifiers of slot types locked for this handler.
    *

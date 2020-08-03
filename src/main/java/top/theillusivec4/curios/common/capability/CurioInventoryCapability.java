@@ -196,7 +196,25 @@ public class CurioInventoryCapability {
 
     @Override
     public int getSlots() {
-      return this.curios.values().stream().mapToInt(ICurioStacksHandler::getSlots).sum();
+      int totalSlots = 0;
+
+      for (ICurioStacksHandler stacks : curios.values()) {
+        totalSlots += stacks.getSlots();
+      }
+      return totalSlots;
+    }
+
+    @Override
+    public int getVisibleSlots() {
+      int totalSlots = 0;
+
+      for (ICurioStacksHandler stacks : curios.values()) {
+
+        if (stacks.isVisible()) {
+          totalSlots += stacks.getSlots();
+        }
+      }
+      return totalSlots;
     }
 
     @Override
