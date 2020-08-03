@@ -172,16 +172,12 @@ public class CuriosEventHandler {
 
     Entity entity = evt.getEntity();
 
-    if (entity instanceof LivingEntity) {
-      LivingEntity livingBase = (LivingEntity) evt.getEntity();
-      CuriosApi.getCuriosHelper().getCuriosHandler(livingBase).ifPresent(handler -> {
-        handler.handleInvalidStacks();
-
-        if (entity instanceof ServerPlayerEntity) {
-          ServerPlayerEntity mp = (ServerPlayerEntity) entity;
-          NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
-              new SPacketSyncCurios(mp.getEntityId(), handler.getCurios()));
-        }
+    if (entity instanceof ServerPlayerEntity) {
+      ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) entity;
+      CuriosApi.getCuriosHelper().getCuriosHandler(serverPlayerEntity).ifPresent(handler -> {
+        ServerPlayerEntity mp = (ServerPlayerEntity) entity;
+        NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
+            new SPacketSyncCurios(mp.getEntityId(), handler.getCurios()));
       });
     }
   }
@@ -332,6 +328,7 @@ public class CuriosEventHandler {
   public void tick(LivingEvent.LivingUpdateEvent evt) {
     LivingEntity livingEntity = evt.getEntityLiving();
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
+      handler.handleInvalidStacks();
       Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
