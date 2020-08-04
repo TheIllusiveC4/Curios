@@ -141,6 +141,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
   public void updateRenderButtons() {
     this.field_230710_m_.removeIf(widget -> widget instanceof RenderButton);
+    this.field_230705_e_.removeIf(widget -> widget instanceof RenderButton);
     int yOffset = 9;
 
     for (Slot inventorySlot : this.container.inventorySlots) {
