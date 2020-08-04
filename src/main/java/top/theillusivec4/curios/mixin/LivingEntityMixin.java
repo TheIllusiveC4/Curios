@@ -89,6 +89,7 @@ public class LivingEntityMixin {
   public void tick(CallbackInfo cb) {
     @SuppressWarnings("ConstantConditions") LivingEntity livingEntity = (LivingEntity) (Object) this;
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
+      handler.handleInvalidStacks();
       Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
