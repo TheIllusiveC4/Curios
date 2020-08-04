@@ -45,10 +45,10 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.component.ICuriosItemHandler;
 import top.theillusivec4.curios.client.CuriosClientConfig.ButtonCorner;
 import top.theillusivec4.curios.client.KeyRegistry;
+import top.theillusivec4.curios.common.CuriosNetwork;
 import top.theillusivec4.curios.common.inventory.CosmeticCurioSlot;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.inventory.screen.CuriosScreenHandler;
-import top.theillusivec4.curios.common.CuriosNetwork;
 
 public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements RecipeBookProvider {
 
@@ -108,7 +108,17 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
           this.getScreenHandler().scrollToPosition(currentScroll);
         }
       }
-      this.isNarrow = this.width < (hasScrollBar ? 461 : 491);
+
+      int neededWidth = 431;
+
+      if (hasScrollBar) {
+        neededWidth += 30;
+      }
+
+      if (handler.hasCosmeticColumn()) {
+        neededWidth += 40;
+      }
+      this.isNarrow = this.width < neededWidth;
       this.recipeBook.initialize(this.width, this.height, this.client, this.isNarrow, this.handler);
       this.updateScreenPosition();
       this.children.add(this.recipeBook);
@@ -125,8 +135,7 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
                 RECIPE_BUTTON_TEXTURE, (buttonWidget) -> {
               this.recipeBook.reset(this.isNarrow);
               this.recipeBook.toggleOpen();
-              this.x = this.recipeBook
-                  .findLeftEdge(this.isNarrow, this.width, this.backgroundWidth);
+              this.updateScreenPosition();
               ((TexturedButtonWidget) buttonWidget).setPos(this.x + 104, this.height / 2 - 22);
               this.buttonCurios
                   .setPos(this.x + offsets.getLeft(), this.height / 2 + offsets.getRight());
@@ -138,6 +147,7 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
 
   public void updateRenderButtons() {
     this.buttons.removeIf(widget -> widget instanceof RenderToggleButton);
+    this.children.removeIf(widget -> widget instanceof RenderToggleButton);
     int yOffset = 9;
 
     for (Slot inventorySlot : this.getScreenHandler().slots) {
@@ -164,11 +174,21 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
     int i;
 
     if (this.recipeBook.isOpen() && !this.isNarrow) {
-      i = 177 + (this.width - this.backgroundWidth - (hasScrollBar ? 118 : 148)) / 2;
+      int offset = 148;
+
+      if (hasScrollBar) {
+        offset -= 30;
+      }
+
+      if (handler.hasCosmeticColumn()) {
+        offset -= 40;
+      }
+      i = 177 + (this.width - this.backgroundWidth - offset) / 2;
     } else {
       i = (this.width - this.backgroundWidth) / 2;
     }
     this.x = i;
+    this.updateRenderButtons();
   }
 
   @Override
@@ -342,8 +362,7 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
       this.isScrolling = this.needsScrollBars();
       return true;
     }
-    return this.isNarrow && this.recipeBook.isOpen() || super
-        .mouseClicked(mouseX, mouseY, button);
+    return this.isNarrow && this.recipeBook.isOpen() || super.mouseClicked(mouseX, mouseY, button);
   }
 
   @Override
@@ -407,8 +426,9 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
     if (this.getScreenHandler().hasCosmeticColumn()) {
       offset -= 20;
     }
-    boolean bl = mouseX < (double) (left + offset) || mouseY < (double) top || mouseX >= (double) (left
-        + this.backgroundWidth) || mouseY >= (double) (top + this.backgroundHeight);
+    boolean bl =
+        mouseX < (double) (left + offset) || mouseY < (double) top || mouseX >= (double) (left
+            + this.backgroundWidth) || mouseY >= (double) (top + this.backgroundHeight);
     return this.recipeBook
         .isClickOutsideBounds(mouseX, mouseY, this.x, this.y, this.backgroundWidth,
             this.backgroundHeight, button) && bl;
