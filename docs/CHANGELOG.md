@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [0.4] - 2020.08.04
+### Added
+- Added REI integration
+### Fixed
+- Fixed hidden slots being handled by Curios GUI
+- Fixed render toggle buttons desyncing when scrolling
+- Fixed recipe book offsets in the Curios GUI [#62](https://github.com/TheIllusiveC4/Curios/issues/62)
+- Fixed absence of ICuriosItemHandler#handleInvalidStacks call [#61](https://github.com/TheIllusiveC4/Curios/issues/61)
+
 ## [0.3] - 2020.07.29
 ### Added
 - Added Creative Curios button [#60](https://github.com/TheIllusiveC4/Curios/issues/60)
