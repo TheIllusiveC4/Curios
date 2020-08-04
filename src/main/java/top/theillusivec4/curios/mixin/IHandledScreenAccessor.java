@@ -28,4 +28,7 @@ public interface IHandledScreenAccessor {
 
   @Accessor
   int getX();
+
+  @Accessor
+  int getY();
 }

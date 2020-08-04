@@ -15,6 +15,7 @@ minecraft {
 }
 
 repositories {
+
     maven {
         name = "Ladysnake Libs"
         url = 'https://dl.bintray.com/ladysnake/libs'
@@ -27,6 +28,8 @@ dependencies {
 
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    modApi "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
 
     modImplementation "me.zeroeightsix:fiber:${project.fiber_version}"
     include "me.zeroeightsix:fiber:${project.fiber_version}"

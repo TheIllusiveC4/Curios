@@ -21,6 +21,9 @@
     ],
     "client": [
       "top.theillusivec4.curios.client.CuriosClient"
+    ],
+    "rei_plugins": [
+      "top.theillusivec4.curios.integration.CuriosReiPlugin"
     ]
   },
   "mixins": [
