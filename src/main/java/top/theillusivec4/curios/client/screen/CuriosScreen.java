@@ -102,7 +102,7 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
 
       if (this.client.player != null) {
         hasScrollBar = CuriosApi.getCuriosHelper().getCuriosHandler(this.client.player)
-            .map(handler -> handler.getSlots() > 8).orElse(false);
+            .map(handler -> handler.getVisibleSlots() > 8).orElse(false);
 
         if (hasScrollBar) {
           this.getScreenHandler().scrollToPosition(currentScroll);
@@ -301,37 +301,40 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
           .drawEntity(i + 51, j + 75, 30, (float) (i + 51) - mouseX, (float) (j + 75 - 50) - mouseY,
               this.client.player);
       CuriosApi.getCuriosHelper().getCuriosHandler(this.client.player).ifPresent(handler -> {
-        int slotCount = handler.getSlots();
-        int upperHeight = 7 + slotCount * 18;
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        this.client.getTextureManager().bindTexture(CURIO_INVENTORY);
-        int xTexOffset = 0;
-        int width = 27;
-        int xOffset = -26;
+        int slotCount = handler.getVisibleSlots();
 
-        if (this.getScreenHandler().hasCosmeticColumn()) {
-          xTexOffset = 92;
-          width = 46;
-          xOffset -= 19;
-        }
-        this.drawTexture(matrices, i + xOffset, j + 4, xTexOffset, 0, width, upperHeight);
+        if (slotCount > 0) {
+          int upperHeight = 7 + slotCount * 18;
+          RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+          this.client.getTextureManager().bindTexture(CURIO_INVENTORY);
+          int xTexOffset = 0;
+          int width = 27;
+          int xOffset = -26;
 
-        if (slotCount <= 8) {
-          this.drawTexture(matrices, i + xOffset, j + 4 + upperHeight, xTexOffset, 151, width, 7);
-        } else {
-          this.drawTexture(matrices, i + xOffset - 16, j + 4, 27, 0, 23, 158);
-          this.client.getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
-          this.drawTexture(matrices, i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 232, 0,
-              12, 15);
-        }
+          if (this.getScreenHandler().hasCosmeticColumn()) {
+            xTexOffset = 92;
+            width = 46;
+            xOffset -= 19;
+          }
+          this.drawTexture(matrices, i + xOffset, j + 4, xTexOffset, 0, width, upperHeight);
 
-        for (Slot slot : this.getScreenHandler().slots) {
+          if (slotCount <= 8) {
+            this.drawTexture(matrices, i + xOffset, j + 4 + upperHeight, xTexOffset, 151, width, 7);
+          } else {
+            this.drawTexture(matrices, i + xOffset - 16, j + 4, 27, 0, 23, 158);
+            this.client.getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
+            this.drawTexture(matrices, i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 232,
+                0, 12, 15);
+          }
 
-          if (slot instanceof CosmeticCurioSlot) {
-            int x = this.x + slot.x - 1;
-            int y = this.y + slot.y - 1;
-            this.client.getTextureManager().bindTexture(CURIO_INVENTORY);
-            this.drawTexture(matrices, x, y, 138, 0, 18, 18);
+          for (Slot slot : this.getScreenHandler().slots) {
+
+            if (slot instanceof CosmeticCurioSlot) {
+              int x = this.x + slot.x - 1;
+              int y = this.y + slot.y - 1;
+              this.client.getTextureManager().bindTexture(CURIO_INVENTORY);
+              this.drawTexture(matrices, x, y, 138, 0, 18, 18);
+            }
           }
         }
       });
@@ -401,7 +404,7 @@ public class CuriosScreen extends HandledScreen<CuriosScreenHandler> implements 
     if (!this.needsScrollBars()) {
       return false;
     } else {
-      int i = this.getScreenHandler().getCuriosHandler().map(ICuriosItemHandler::getSlots)
+      int i = this.getScreenHandler().getCuriosHandler().map(ICuriosItemHandler::getVisibleSlots)
           .orElse(1);
       currentScroll = (float) ((double) currentScroll - amount / (double) i);
       currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);

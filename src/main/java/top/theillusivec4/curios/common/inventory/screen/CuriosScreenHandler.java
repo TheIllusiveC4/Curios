@@ -239,7 +239,7 @@ public class CuriosScreenHandler extends CraftingScreenHandler {
 
   public void scrollToPosition(float pos) {
     this.getCuriosHandler().ifPresent(curios -> {
-      int k = (curios.getSlots() - 8);
+      int k = (curios.getVisibleSlots() - 8);
       int j = (int) ((double) (pos * (float) k) + 0.5D);
 
       if (j < 0) {
@@ -260,7 +260,7 @@ public class CuriosScreenHandler extends CraftingScreenHandler {
   }
 
   public boolean canScroll() {
-    return this.getCuriosHandler().map(curios -> curios.getSlots() > 8).orElse(false);
+    return this.getCuriosHandler().map(curios -> curios.getVisibleSlots() > 8).orElse(false);
   }
 
   @Override
