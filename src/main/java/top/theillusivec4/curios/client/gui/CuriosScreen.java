@@ -112,7 +112,16 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
           this.container.scrollTo(currentScroll);
         }
       }
-      this.widthTooNarrow = this.field_230708_k_ < (hasScrollBar ? 461 : 491);
+      int neededWidth = 431;
+
+      if (hasScrollBar) {
+        neededWidth += 30;
+      }
+
+      if (container.hasCosmeticColumn()) {
+        neededWidth += 40;
+      }
+      this.widthTooNarrow = this.field_230708_k_ < neededWidth;
       this.recipeBookGui.init(this.field_230708_k_, this.field_230709_l_, this.field_230706_i_,
           this.widthTooNarrow, this.container);
       this.updateScreenPosition();
@@ -162,11 +171,21 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     int i;
 
     if (this.recipeBookGui.isVisible() && !this.widthTooNarrow) {
-      i = 177 + (this.field_230708_k_ - this.xSize - (hasScrollBar ? 118 : 148)) / 2;
+      int offset = 148;
+
+      if (hasScrollBar) {
+        offset -= 30;
+      }
+
+      if (container.hasCosmeticColumn()) {
+        offset -= 40;
+      }
+      i = 177 + (this.field_230708_k_ - this.xSize - offset) / 2;
     } else {
       i = (this.field_230708_k_ - this.xSize) / 2;
     }
     this.guiLeft = i;
+    this.updateRenderButtons();
   }
 
   @Override
