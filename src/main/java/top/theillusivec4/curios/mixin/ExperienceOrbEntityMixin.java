@@ -39,7 +39,7 @@ public class ExperienceOrbEntityMixin {
   @Shadow
   int amount;
 
-  @Inject(method = "onPlayerCollision", at = @At(value = "INVOKE", target = "net/minecraft/enchantment/EnchantmentHelper.chooseEquipmentWith (Lnet/minecraft/enchantment/Enchantment;Lnet/minecraft/entity/LivingEntity;Ljava/util/function/Predicate;)Ljava/util/Map$Entry;"))
+  @Inject(method = "onPlayerCollision", at = @At(value = "INVOKE", target = "net/minecraft/enchantment/EnchantmentHelper.chooseEquipmentWith (Lnet/minecraft/enchantment/Enchantment;Lnet/minecraft/entity/LivingEntity;Ljava/util/function/Predicate;)Ljava/util/Map$Entry;"), cancellable = true)
   private void onPlayerCollision(PlayerEntity playerEntity, CallbackInfo cb) {
     @SuppressWarnings("ConstantConditions") ExperienceOrbEntity orb = (ExperienceOrbEntity) (Object) this;
     CuriosApi.getCuriosHelper().getCuriosHandler(playerEntity).ifPresent(handler -> {
