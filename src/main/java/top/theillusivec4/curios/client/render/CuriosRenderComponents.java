@@ -58,7 +58,7 @@ public class CuriosRenderComponents {
                 IRenderableCurio.RenderHelper.translateIfSneaking(matrixStack, livingEntity);
                 IRenderableCurio.RenderHelper.rotateIfSneaking(matrixStack, livingEntity);
                 VertexConsumer consumer = ItemRenderer
-                    .getArmorVertexConsumer(vertexConsumerProvider, model.getLayer(AMULET_TEXTURE),
+                    .getGlintVertexConsumer(vertexConsumerProvider, model.getLayer(AMULET_TEXTURE),
                         false, itemStack.hasGlint());
                 model.render(matrixStack, consumer, light, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
                     1.0F, 1.0F);
@@ -77,7 +77,7 @@ public class CuriosRenderComponents {
                   float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
                 IRenderableCurio.RenderHelper.followHeadRotations(livingEntity, model.crown);
                 VertexConsumer consumer = ItemRenderer
-                    .getArmorVertexConsumer(vertexConsumerProvider, model.getLayer(CROWN_TEXTURE),
+                    .getGlintVertexConsumer(vertexConsumerProvider, model.getLayer(CROWN_TEXTURE),
                         false, itemStack.hasGlint());
                 model.render(matrixStack, consumer, light, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
                     1.0F, 1.0F);
@@ -98,7 +98,7 @@ public class CuriosRenderComponents {
                 model.setAngles(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
                     headPitch);
                 VertexConsumer consumer = ItemRenderer
-                    .getArmorVertexConsumer(vertexConsumerProvider,
+                    .getGlintVertexConsumer(vertexConsumerProvider,
                         model.getLayer(KNUCKLES_TEXTURE), false, itemStack.hasGlint());
                 model.render(matrixStack, consumer, light, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F,
                     1.0F, 1.0F);

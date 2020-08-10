@@ -117,7 +117,7 @@ public interface IRenderableCurio extends CopyableComponent<IRenderableCurio> {
     public static void followHeadRotations(final LivingEntity livingEntity, ModelPart... parts) {
 
       EntityRenderer<? super LivingEntity> render = MinecraftClient.getInstance()
-          .getEntityRenderManager().getRenderer(livingEntity);
+          .getEntityRenderDispatcher().getRenderer(livingEntity);
 
       if (render instanceof LivingEntityRenderer) {
         @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
@@ -145,7 +145,7 @@ public interface IRenderableCurio extends CopyableComponent<IRenderableCurio> {
         final BipedEntityModel<LivingEntity>... models) {
 
       EntityRenderer<? super LivingEntity> render = MinecraftClient.getInstance()
-          .getEntityRenderManager().getRenderer(livingEntity);
+          .getEntityRenderDispatcher().getRenderer(livingEntity);
 
       if (render instanceof LivingEntityRenderer) {
         @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
