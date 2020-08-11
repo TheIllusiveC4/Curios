@@ -25,8 +25,11 @@ import nerdhub.cardinal.components.api.event.EntityComponentCallback;
 import nerdhub.cardinal.components.api.util.EntityComponents;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.minecraft.command.argument.ArgumentTypes;
+import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.TypedActionResult;
@@ -39,6 +42,8 @@ import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.slottype.SlotTypeManager;
+import top.theillusivec4.curios.server.CurioArgumentType;
+import top.theillusivec4.curios.server.CuriosCommand;
 import top.theillusivec4.curios.server.CuriosConfig;
 import top.theillusivec4.curios.server.SlotHelper;
 
@@ -117,5 +122,10 @@ public class CuriosCommon implements ModInitializer {
     CuriosRegistry.registerItems();
     CuriosRegistry.registerComponents();
     CuriosNetwork.registerPackets();
+
+    CommandRegistrationCallback.EVENT
+        .register((commandDispatcher, b) -> CuriosCommand.register(commandDispatcher));
+    ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
+        new ConstantArgumentSerializer<>(CurioArgumentType::slot));
   }
 }
