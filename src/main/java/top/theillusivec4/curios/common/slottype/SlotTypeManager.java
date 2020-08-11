@@ -103,7 +103,7 @@ public class SlotTypeManager {
       configBuilders.putIfAbsent(identifier, builder);
 
       if (setting.priority != null) {
-        builder.priority(setting.priority.intValue(), force);
+        builder.priority(setting.priority, force);
       }
 
       if (setting.icon != null && !setting.icon.isEmpty()) {
@@ -111,7 +111,7 @@ public class SlotTypeManager {
       }
 
       if (setting.size != null) {
-        builder.size(setting.size.intValue(), force);
+        builder.size(setting.size, force);
       }
 
       if (setting.locked != null) {

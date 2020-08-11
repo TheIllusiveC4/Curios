@@ -31,17 +31,12 @@ dependencies {
 
     modApi "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
 
-    modImplementation "me.zeroeightsix:fiber:${project.fiber_version}"
-    include "me.zeroeightsix:fiber:${project.fiber_version}"
-
     modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cca_version}"
     include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cca_version}"
     modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cca_version}"
     include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cca_version}"
     modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:${project.cca_version}"
     include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:${project.cca_version}"
-    modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-util:${project.cca_version}"
-    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-util:${project.cca_version}"
 }
 
 processResources {
