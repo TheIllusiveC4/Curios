@@ -109,7 +109,7 @@ public class CuriosScreenHandler extends CraftingScreenHandler {
     for (n = 0; n < 4; ++n) {
       final EquipmentSlot equipmentSlot = EQUIPMENT_SLOT_ORDER[n];
       this.addSlot(new Slot(playerInventory, 39 - n, 8, 8 + n * 18) {
-        public int getMaxStackAmount() {
+        public int getMaxItemCount() {
           return 1;
         }
 

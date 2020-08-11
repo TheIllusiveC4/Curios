@@ -74,7 +74,7 @@ public class CuriosHelper implements ICuriosHelper {
   public Set<String> getCurioTags(Item item) {
     List<Identifier> list = Lists.newArrayList();
 
-    for (Entry<Identifier, Tag<Item>> identifierTagEntry : ItemTags.getContainer().getEntries()
+    for (Entry<Identifier, Tag<Item>> identifierTagEntry : ItemTags.getTagGroup().getTags()
         .entrySet()) {
       if ((identifierTagEntry.getValue()).contains(item)) {
         list.add(identifierTagEntry.getKey());
