@@ -19,13 +19,10 @@
 
 package top.theillusivec4.curios.common.inventory.container;
 
-import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-import net.minecraft.client.util.RecipeBookCategories;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -44,6 +41,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ICraftingRecipe;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.item.crafting.RecipeBookCategory;
 import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SSetSlotPacket;
@@ -126,9 +124,10 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
               .hasBindingCurse(itemstack)) && super.canTakeStack(playerIn);
         }
 
+
         @OnlyIn(Dist.CLIENT)
         @Override
-        public Pair<ResourceLocation, ResourceLocation> func_225517_c_() {
+        public Pair<ResourceLocation, ResourceLocation> getBackground() {
           return Pair.of(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
               ARMOR_SLOT_TEXTURES[equipmentslottype.getIndex()]);
         }
@@ -148,7 +147,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
     this.addSlot(new Slot(playerInventory, 40, 77, 62) {
       @OnlyIn(Dist.CLIENT)
       @Override
-      public Pair<ResourceLocation, ResourceLocation> func_225517_c_() {
+      public Pair<ResourceLocation, ResourceLocation> getBackground() {
         return Pair
             .of(PlayerContainer.LOCATION_BLOCKS_TEXTURE, PlayerContainer.EMPTY_ARMOR_SLOT_SHIELD);
       }
@@ -391,10 +390,8 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
   @Nonnull
   @Override
-  public List<RecipeBookCategories> getRecipeBookCategories() {
-    return Lists.newArrayList(RecipeBookCategories.SEARCH, RecipeBookCategories.CRAFTING_EQUIPMENT,
-        RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_MISC,
-        RecipeBookCategories.CRAFTING_REDSTONE);
+  public RecipeBookCategory func_241850_m() {
+    return RecipeBookCategory.CRAFTING;
   }
 
   @Override

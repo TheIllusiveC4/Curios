@@ -64,7 +64,7 @@ public class KnucklesItem extends Item {
         Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
         if (CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).contains(identifier)) {
-          atts.put(Attributes.field_233823_f_,
+          atts.put(Attributes.ATTACK_DAMAGE,
               new AttributeModifier(AD_UUID, "Attack damage bonus", 4,
                   AttributeModifier.Operation.ADDITION));
         }

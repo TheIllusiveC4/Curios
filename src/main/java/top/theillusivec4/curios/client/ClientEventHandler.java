@@ -93,18 +93,18 @@ public class ClientEventHandler {
       if (!slots.isEmpty()) {
         List<ITextComponent> tagTooltips = new ArrayList<>();
         IFormattableTextComponent slotsTooltip = new TranslationTextComponent("curios.slot")
-            .func_240702_b_(": ").func_240699_a_(TextFormatting.GOLD);
+            .appendString(": ").mergeStyle(TextFormatting.GOLD);
 
         for (int j = 0; j < slots.size(); j++) {
           String key = "curios.identifier." + slots.get(j);
           IFormattableTextComponent type = new TranslationTextComponent(key);
 
           if (j < slots.size() - 1) {
-            type = type.func_240702_b_(", ");
+            type = type.appendString(", ");
           }
 
-          type = type.func_240699_a_(TextFormatting.YELLOW);
-          slotsTooltip.func_230529_a_(type);
+          type = type.mergeStyle(TextFormatting.YELLOW);
+          slotsTooltip.append(type);
         }
 
         tagTooltips.add(slotsTooltip);
@@ -128,9 +128,9 @@ public class ClientEventHandler {
 
           if (!multimap.isEmpty() && (i & 2) == 0) {
             PlayerEntity player = evt.getPlayer();
-            tooltip.add(StringTextComponent.field_240750_d_);
+            tooltip.add(StringTextComponent.EMPTY);
             tooltip.add(new TranslationTextComponent("curios.modifiers." + identifier)
-                .func_240699_a_(TextFormatting.GOLD));
+                .mergeStyle(TextFormatting.GOLD));
 
             for (Map.Entry<Attribute, AttributeModifier> entry : multimap.entries()) {
               AttributeModifier attributemodifier = entry.getValue();
@@ -140,7 +140,7 @@ public class ClientEventHandler {
               if (player != null) {
 
                 if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
-                  ModifiableAttributeInstance att = player.getAttribute(Attributes.field_233823_f_);
+                  ModifiableAttributeInstance att = player.getAttribute(Attributes.ATTACK_DAMAGE);
 
                   if (att != null) {
                     amount = amount + att.getBaseValue();
@@ -149,7 +149,7 @@ public class ClientEventHandler {
                       .getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
                   flag = true;
                 } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
-                  ModifiableAttributeInstance att = player.getAttribute(Attributes.field_233825_h_);
+                  ModifiableAttributeInstance att = player.getAttribute(Attributes.ATTACK_SPEED);
 
                   if (att != null) {
                     amount += att.getBaseValue();
@@ -168,25 +168,24 @@ public class ClientEventHandler {
                 }
 
                 if (flag) {
-                  tooltip.add((new StringTextComponent(" ")).func_230529_a_(
-                      new TranslationTextComponent(
-                          "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
-                          DECIMALFORMAT.format(d1),
-                          new TranslationTextComponent(entry.getKey().func_233754_c_())))
-                      .func_240699_a_(TextFormatting.DARK_GREEN));
+                  tooltip.add((new StringTextComponent(" ")).append(new TranslationTextComponent(
+                      "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
+                      DECIMALFORMAT.format(d1),
+                      new TranslationTextComponent(entry.getKey().func_233754_c_())))
+                      .mergeStyle(TextFormatting.DARK_GREEN));
                 } else if (amount > 0.0D) {
                   tooltip.add((new TranslationTextComponent(
                       "attribute.modifier.plus." + attributemodifier.getOperation().getId(),
                       DECIMALFORMAT.format(d1),
                       new TranslationTextComponent(entry.getKey().func_233754_c_())))
-                      .func_240699_a_(TextFormatting.BLUE));
+                      .mergeStyle(TextFormatting.BLUE));
                 } else if (amount < 0.0D) {
                   d1 = d1 * -1.0D;
                   tooltip.add((new TranslationTextComponent(
                       "attribute.modifier.take." + attributemodifier.getOperation().getId(),
                       DECIMALFORMAT.format(d1),
                       new TranslationTextComponent(entry.getKey().func_233754_c_())))
-                      .func_240699_a_(TextFormatting.RED));
+                      .mergeStyle(TextFormatting.RED));
                 }
               }
             }

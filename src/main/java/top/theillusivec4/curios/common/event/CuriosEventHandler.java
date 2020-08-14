@@ -216,8 +216,8 @@ public class CuriosEventHandler {
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
-          player.func_233645_dx_()
-              .func_233793_b_(CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
+          player.getAttributeManager().reapplyModifiers(
+              CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
           int index = i;
           CuriosApi.getCuriosHelper().getCurio(stack)
               .ifPresent(curio -> curio.onEquip(identifier, index, player));
@@ -362,9 +362,9 @@ public class CuriosEventHandler {
                   HandlerType.EQUIPMENT);
               MinecraftForge.EVENT_BUS
                   .post(new CurioChangeEvent(livingEntity, identifier, i, prevStack, stack));
-              livingEntity.func_233645_dx_().func_233785_a_(
+              livingEntity.getAttributeManager().removeModifiers(
                   CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, prevStack));
-              livingEntity.func_233645_dx_().func_233793_b_(
+              livingEntity.getAttributeManager().reapplyModifiers(
                   CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
               prevCurio.ifPresent(curio -> curio.onUnequip(identifier, index, livingEntity));
               currentCurio.ifPresent(curio -> curio.onEquip(identifier, index, livingEntity));

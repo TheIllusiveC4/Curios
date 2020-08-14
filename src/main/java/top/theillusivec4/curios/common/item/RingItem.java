@@ -75,9 +75,9 @@ public class RingItem extends Item {
         Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
         if (CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).contains(identifier)) {
-          atts.put(Attributes.field_233821_d_, new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
+          atts.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
               AttributeModifier.Operation.MULTIPLY_TOTAL));
-          atts.put(Attributes.field_233826_i_, new AttributeModifier(ARMOR_UUID, "Armor bonus", 2,
+          atts.put(Attributes.ARMOR, new AttributeModifier(ARMOR_UUID, "Armor bonus", 2,
               AttributeModifier.Operation.ADDITION));
         }
         return atts;

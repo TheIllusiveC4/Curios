@@ -73,7 +73,7 @@ public class CuriosButton extends ImageButton {
   }
 
   @Override
-  public void func_230431_b_(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY,
+  public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY,
       float partialTicks) {
 
     if (parentGui instanceof InventoryScreen) {
@@ -83,17 +83,17 @@ public class CuriosButton extends ImageButton {
       if (lastVisible != isRecipeBookVisible) {
         Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset(false);
         this.setPosition(parentGui.getGuiLeft() + offsets.getA(),
-            parentGui.field_230709_l_ / 2 + offsets.getB());
+            parentGui.height / 2 + offsets.getB());
       }
     } else if (parentGui instanceof CreativeScreen) {
       CreativeScreen gui = (CreativeScreen) parentGui;
       boolean isInventoryTab = gui.getSelectedTabIndex() == ItemGroup.INVENTORY.getIndex();
-      this.field_230693_o_ = isInventoryTab;
+      this.active = isInventoryTab;
 
       if (!isInventoryTab) {
         return;
       }
     }
-    super.func_230431_b_(matrixStack, mouseX, mouseY, partialTicks);
+    super.render(matrixStack, mouseX, mouseY, partialTicks);
   }
 }
