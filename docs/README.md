@@ -30,8 +30,8 @@ repositories {
 }
 
 dependencies {
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios:${version}")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios:${version}:api")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${version}")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${version}:api")
 }
 ```
 

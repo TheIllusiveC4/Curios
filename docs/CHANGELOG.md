@@ -1,12 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
-This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
-## [4.0.0.0] - 2020.08.13
+## [1.16.2-4.0.0.0] - 2020.08.13
 ### Changed
 - Updated to Minecraft 1.16.2
+- Archive base name changed from "curios" to "curios-forge"
+- Mod version no longer contains "FORGE"
 
 ## [3.0.0.2] - 2020.08.03
 ### Fixed
