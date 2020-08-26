@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.2-4.0.0.1] - 2020.08.26
+### Changed
+- Updated to Forge 33.0.21
+
 ## [1.16.2-4.0.0.0] - 2020.08.13
 ### Changed
 - Updated to Minecraft 1.16.2

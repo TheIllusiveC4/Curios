@@ -72,7 +72,7 @@ public class CuriosHelper implements ICuriosHelper {
 
   @Override
   public LazyOptional<IItemHandlerModifiable> getEquippedCurios(LivingEntity livingEntity) {
-    return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).map(handler -> {
+    return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).lazyMap(handler -> {
       Map<String, ICurioStacksHandler> curios = handler.getCurios();
       IItemHandlerModifiable[] itemHandlers = new IItemHandlerModifiable[curios.size()];
       int index = 0;

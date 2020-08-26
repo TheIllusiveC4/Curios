@@ -92,11 +92,7 @@ jar {
     }
 }
 
-def reobfFile = file("build/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
-}
+jar.finalizedBy('reobfJar')
 
 task apiJar(type: Jar) {
     archiveClassifier.set('api')
@@ -144,7 +140,7 @@ publishing {
         mavenJava(MavenPublication) {
             artifactId project.archivesBaseName
             
-            artifact reobfArtifact
+            artifact jar
             artifact sourcesJar
             artifact apiJar
         }
