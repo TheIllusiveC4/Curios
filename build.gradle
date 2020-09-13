@@ -29,7 +29,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modApi "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
+    modImplemenation "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
 
     modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cca_version}"
     include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cca_version}"
