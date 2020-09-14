@@ -92,6 +92,11 @@ public interface ICuriosItemHandler {
   void lockSlotType(String identifier);
 
   /**
+   * Processes the lock/unlock slot states that are enqueued
+   */
+  void processSlots();
+
+  /**
    * Adds an amount of slots to the {@link ICurioStacksHandler} of a {@link ISlotType} associated
    * with the identifier.
    *

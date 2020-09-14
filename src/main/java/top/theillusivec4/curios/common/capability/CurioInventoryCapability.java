@@ -172,6 +172,8 @@ public class CurioInventoryCapability {
     Set<String> locked = new HashSet<>();
     NonNullList<ItemStack> invalidStacks = NonNullList.create();
     PlayerEntity wearer;
+    Set<String> toLock = new HashSet<>();
+    List<UnlockState> toUnlock = new ArrayList<>();
 
     CurioInventoryWrapper() {
       this(null);
@@ -239,17 +241,28 @@ public class CurioInventoryCapability {
 
     @Override
     public void unlockSlotType(String identifier, int amount, boolean visible, boolean cosmetic) {
-      this.curios.putIfAbsent(identifier, new CurioStacksHandler(amount, 0, visible, cosmetic));
-      this.locked.remove(identifier);
+      this.toUnlock.add(new UnlockState(identifier, amount, visible, cosmetic));
     }
 
     @Override
     public void lockSlotType(String identifier) {
-      this.getStacksHandler(identifier).ifPresent(stackHandler -> {
-        this.curios.remove(identifier);
-        this.locked.add(identifier);
-        this.loseStacks(stackHandler.getStacks(), identifier, stackHandler.getSlots());
+      this.toLock.add(identifier);
+    }
+
+    @Override
+    public void processSlots() {
+      this.toLock.forEach(id -> this.getStacksHandler(id).ifPresent(stackHandler -> {
+        this.curios.remove(id);
+        this.locked.add(id);
+        this.loseStacks(stackHandler.getStacks(), id, stackHandler.getSlots());
+      }));
+      this.toUnlock.forEach(state -> {
+        this.curios.putIfAbsent(state.identifier,
+            new CurioStacksHandler(state.amount, 0, state.visible, state.cosmetic));
+        this.locked.remove(state.identifier);
       });
+      this.toLock.clear();
+      this.toUnlock.clear();
     }
 
     @Override
@@ -311,6 +324,21 @@ public class CurioInventoryCapability {
           stackHandler.setStackInSlot(i, ItemStack.EMPTY);
         }
         drops.forEach(drop -> ItemHandlerHelper.giveItemToPlayer(wearer, drop));
+      }
+    }
+
+    public static class UnlockState {
+
+      final String identifier;
+      final int amount;
+      final boolean visible;
+      final boolean cosmetic;
+
+      UnlockState(String identifier, int amount, boolean visible, boolean cosmetic) {
+        this.identifier = identifier;
+        this.amount = amount;
+        this.visible = visible;
+        this.cosmetic = cosmetic;
       }
     }
   }

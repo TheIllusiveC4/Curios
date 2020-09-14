@@ -385,6 +385,7 @@ public class CuriosEventHandler {
           }
         }
       }
+      handler.processSlots();
     });
   }
 
