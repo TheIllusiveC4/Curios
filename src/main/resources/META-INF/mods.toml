@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[33,)"
+loaderVersion="[34,)"
 license="LGPL-3.0-or-later"
 issueTrackerURL="https://github.com/TheIllusiveC4/Curios/issues"
 logoFile="${mod_icon}"
@@ -15,12 +15,12 @@ ${mod_description}
 [[dependencies.curios]]
     modId="forge"
     mandatory=true
-    versionRange="[33.0.21,)"
+    versionRange="[34,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curios]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.2,1.17)"
+    versionRange="[1.16.3,1.17)"
     ordering="NONE"
     side="BOTH"
