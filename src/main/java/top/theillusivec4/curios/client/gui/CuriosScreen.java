@@ -150,18 +150,16 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   public void updateRenderButtons() {
     this.buttons.removeIf(widget -> widget instanceof RenderButton);
     this.buttons.removeIf(widget -> widget instanceof RenderButton);
-    int yOffset = 9;
 
     for (Slot inventorySlot : this.container.inventorySlots) {
 
       if (inventorySlot instanceof CurioSlot && !(inventorySlot instanceof CosmeticCurioSlot)) {
         this.addButton(
-            new RenderButton((CurioSlot) inventorySlot, this.guiLeft - 8, this.guiTop + yOffset, 8,
-                8, 75, 0, 8, CURIO_INVENTORY, (button) -> NetworkHandler.INSTANCE
-                .send(PacketDistributor.SERVER.noArg(),
+            new RenderButton((CurioSlot) inventorySlot, this.guiLeft + inventorySlot.xPos + 11,
+                this.guiTop + inventorySlot.yPos - 3, 8, 8, 75, 0, 8, CURIO_INVENTORY,
+                (button) -> NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
                     new CPacketToggleRender(((CurioSlot) inventorySlot).getIdentifier(),
                         inventorySlot.getSlotIndex()))));
-        yOffset += 18;
       }
     }
   }
