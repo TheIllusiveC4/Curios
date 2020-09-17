@@ -62,9 +62,8 @@ public class ClientEventHandler {
   @SubscribeEvent
   public void onKeyInput(TickEvent.ClientTickEvent evt) {
 
-    if (evt.phase != TickEvent.Phase.END) {
-      return;
-    }
+    if (evt.phase != TickEvent.Phase.END)
+		return;
 
     Minecraft mc = Minecraft.getInstance();
 
@@ -116,17 +115,26 @@ public class ClientEventHandler {
           if (!curioTagsTooltip.isEmpty()) {
             tooltip.addAll(1, curio.getTagsTooltip(tagTooltips));
           }
+          
         });
 
         if (!optionalCurio.isPresent()) {
           tooltip.addAll(1, tagTooltips);
         }
 
+
+        
         for (String identifier : slots) {
           Multimap<Attribute, AttributeModifier> multimap = CuriosApi.getCuriosHelper()
               .getAttributeModifiers(identifier, stack);
+          boolean addAttributeTooltips = true;
+          
+          if (optionalCurio.isPresent()) {
+        	  ICurio curio = optionalCurio.orElse(null);
+        	  addAttributeTooltips = curio.showAttributesTooltip(identifier);
+          }
 
-          if (!multimap.isEmpty() && (i & 2) == 0) {
+          if (addAttributeTooltips && !multimap.isEmpty() && (i & 2) == 0) {
             PlayerEntity player = evt.getPlayer();
             tooltip.add(StringTextComponent.EMPTY);
             tooltip.add(new TranslationTextComponent("curios.modifiers." + identifier)
@@ -145,7 +153,7 @@ public class ClientEventHandler {
                   if (att != null) {
                     amount = amount + att.getBaseValue();
                   }
-                  amount = amount + (double) EnchantmentHelper
+                  amount = amount + EnchantmentHelper
                       .getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
                   flag = true;
                 } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {

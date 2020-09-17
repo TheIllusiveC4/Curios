@@ -63,18 +63,18 @@ public interface ICurio {
       }
 
       for (int i = 0; i < 5; ++i) {
-        Vector3d vec3d = new Vector3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
+        Vector3d vec3d = new Vector3d((livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
             Math.random() * 0.1D + 0.1D, 0.0D);
         vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
+        double d0 = (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
 
-        Vector3d vec3d1 = new Vector3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D,
+        Vector3d vec3d1 = new Vector3d((livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D,
             d0, 0.6D);
         vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
         vec3d1 = vec3d1.add(livingEntity.getPosX(),
-            livingEntity.getPosY() + (double) livingEntity.getEyeHeight(), livingEntity.getPosZ());
+            livingEntity.getPosY() + livingEntity.getEyeHeight(), livingEntity.getPosZ());
 
         livingEntity.world
             .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
@@ -251,6 +251,17 @@ public interface ICurio {
   @Nonnull
   default DropRule getDropRule(LivingEntity livingEntity) {
     return DropRule.DEFAULT;
+  }
+
+  /**
+   * Determines whether or not Curios will automatically add tooltip listing attribute modifiers
+   * that are returned by {@link ICurio#getAttributeModifiers(String)}.
+   *
+   * @param identifier   The identifier of the {@link ISlotType} of the slot
+   * @return True to show attributes tooltip, false to disable
+   */
+  default boolean showAttributesTooltip(String identifier) {
+    return false;
   }
 
   /**
