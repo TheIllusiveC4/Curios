@@ -224,11 +224,11 @@ public class CuriosEventHandler {
           CuriosApi.getCuriosHelper().getCurio(stack)
               .ifPresent(curio -> { 
             	  curio.onEquip(identifier, index, player);
-            	  
-            	  if (player instanceof ServerPlayerEntity) {
-					EquipCurioTrigger.INSTANCE.trigger((ServerPlayerEntity)player, stack, (ServerWorld)player.world, player.getPosX(), player.getPosY(), player.getPosZ());
-            	  }
               });
+          
+          if (player instanceof ServerPlayerEntity) {
+				EquipCurioTrigger.INSTANCE.trigger((ServerPlayerEntity)player, stack, (ServerWorld)player.world, player.getPosX(), player.getPosY(), player.getPosZ());
+      	  }
         }
       });
     }));
@@ -376,11 +376,12 @@ public class CuriosEventHandler {
               prevCurio.ifPresent(curio -> curio.onUnequip(identifier, index, livingEntity));
               currentCurio.ifPresent(curio -> { 
             	  curio.onEquip(identifier, index, livingEntity);
-            	  
-            	  if (livingEntity instanceof ServerPlayerEntity) {
-					EquipCurioTrigger.INSTANCE.trigger((ServerPlayerEntity)livingEntity, stack, (ServerWorld)livingEntity.world, livingEntity.getPosX(), livingEntity.getPosY(), livingEntity.getPosZ());
-            	  }
               });
+              
+              if (livingEntity instanceof ServerPlayerEntity) {
+					EquipCurioTrigger.INSTANCE.trigger((ServerPlayerEntity)livingEntity, stack, (ServerWorld)livingEntity.world, livingEntity.getPosX(), livingEntity.getPosY(), livingEntity.getPosZ());
+          	  }
+              
               stackHandler
                   .setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
             }

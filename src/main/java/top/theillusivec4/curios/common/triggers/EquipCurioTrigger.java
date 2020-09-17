@@ -12,6 +12,12 @@ import top.theillusivec4.curios.Curios;
 
 import javax.annotation.Nonnull;
 
+/**
+ * This should be triggered whenever player successfully equips any item in their curios slot.
+ * In theory, the item may not neccessarily be valid for slot or have ICurio capability attached
+ * to it at all, but that is mostly unimportant under normal circumstances.
+ */
+
 public class EquipCurioTrigger extends AbstractCriterionTrigger<EquipCurioTrigger.Instance> {
 	public static final ResourceLocation ID = new ResourceLocation(Curios.MODID, "equip_curio");
 	public static final EquipCurioTrigger INSTANCE = new EquipCurioTrigger();
