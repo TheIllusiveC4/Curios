@@ -23,6 +23,8 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
@@ -72,6 +74,7 @@ import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.slottype.SlotTypeManager;
+import top.theillusivec4.curios.common.triggers.EquipCurioTrigger;
 import top.theillusivec4.curios.server.SlotHelper;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
@@ -105,6 +108,8 @@ public class Curios {
     NetworkHandler.register();
     ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
         new ArgumentSerializer<>(CurioArgumentType::slot));
+    
+    CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
   }
 
   private void enqueue(InterModEnqueueEvent evt) {

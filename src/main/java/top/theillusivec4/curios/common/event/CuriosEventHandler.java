@@ -42,6 +42,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -72,6 +73,7 @@ import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
+import top.theillusivec4.curios.common.triggers.EquipCurioTrigger;
 
 public class CuriosEventHandler {
 
@@ -108,7 +110,7 @@ public class CuriosEventHandler {
 
   private static ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
     double d0 =
-        livingEntity.getPosY() - 0.30000001192092896D + (double) livingEntity.getEyeHeight();
+        livingEntity.getPosY() - 0.30000001192092896D + livingEntity.getEyeHeight();
     ItemEntity entityitem = new ItemEntity(livingEntity.world, livingEntity.getPosX(), d0,
         livingEntity.getPosZ(), droppedItem);
     entityitem.setPickupDelay(40);
@@ -220,7 +222,13 @@ public class CuriosEventHandler {
               CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
           int index = i;
           CuriosApi.getCuriosHelper().getCurio(stack)
-              .ifPresent(curio -> curio.onEquip(identifier, index, player));
+              .ifPresent(curio -> { 
+            	  curio.onEquip(identifier, index, player);
+            	  
+            	  if (player instanceof ServerPlayerEntity) {
+					EquipCurioTrigger.INSTANCE.trigger((ServerPlayerEntity)player, stack, (ServerWorld)player.world, player.getPosX(), player.getPosY(), player.getPosZ());
+            	  }
+              });
         }
       });
     }));
@@ -272,9 +280,8 @@ public class CuriosEventHandler {
         for (ICurioStacksHandler stacksHandler : curios.values()) {
 
           if (handleMending(player, stacksHandler.getStacks(), evt) || handleMending(player,
-              stacksHandler.getCosmeticStacks(), evt)) {
-            return;
-          }
+              stacksHandler.getCosmeticStacks(), evt))
+			return;
         }
       });
     }
@@ -367,7 +374,13 @@ public class CuriosEventHandler {
               livingEntity.getAttributeManager().reapplyModifiers(
                   CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
               prevCurio.ifPresent(curio -> curio.onUnequip(identifier, index, livingEntity));
-              currentCurio.ifPresent(curio -> curio.onEquip(identifier, index, livingEntity));
+              currentCurio.ifPresent(curio -> { 
+            	  curio.onEquip(identifier, index, livingEntity);
+            	  
+            	  if (livingEntity instanceof ServerPlayerEntity) {
+					EquipCurioTrigger.INSTANCE.trigger((ServerPlayerEntity)livingEntity, stack, (ServerWorld)livingEntity.world, livingEntity.getPosX(), livingEntity.getPosY(), livingEntity.getPosZ());
+            	  }
+              });
               stackHandler
                   .setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
             }
