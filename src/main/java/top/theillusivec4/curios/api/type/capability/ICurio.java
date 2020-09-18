@@ -31,6 +31,8 @@ import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -262,6 +264,34 @@ public interface ICurio {
    */
   default boolean showAttributesTooltip(String identifier) {
     return false;
+  }
+
+  /**
+   * Allows to set the amount of bonus Fortune levels that are provided by curio.
+   * Default implementation returns level of Fortune enchantment on ItemStack.
+   *
+   * @param identifier   The identifier of the {@link ISlotType} of the slot
+   * @param curio	ItemStack that is checked
+   * @param index        The index of the slot
+   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @return Amount of additional Fortune levels that will be applied when mining
+   */
+  default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio, int index) {
+    return EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, curio);
+  }
+
+  /**
+   * Allows to set the amount of bonus Looting levels that are provided by curio.
+   * Default implementation returns level of Looting enchantment on ItemStack.
+   *
+   * @param identifier   The identifier of the {@link ISlotType} of the slot
+   * @param curio	ItemStack that is checked
+   * @param index        The index of the slot
+   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @return Amount of additional Looting levels that will be applied in LootingLevelEvent
+   */
+  default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio, int index) {
+    return EnchantmentHelper.getEnchantmentLevel(Enchantments.LOOTING, curio);
   }
 
   /**

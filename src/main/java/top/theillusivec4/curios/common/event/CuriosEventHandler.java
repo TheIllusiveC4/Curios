@@ -49,6 +49,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -329,6 +330,44 @@ public class CuriosEventHandler {
         });
       }
     });
+  }
+  
+  @SubscribeEvent
+  public void looting(LootingLevelEvent event) {
+	  if (event.getDamageSource() != null)
+		  if (event.getDamageSource().getTrueSource() instanceof LivingEntity) {
+			  LivingEntity living = (LivingEntity) event.getDamageSource().getTrueSource();
+			  
+			  int totalLootingBonus = 0;
+			  
+			  if (CuriosApi.getCuriosHelper().getCuriosHandler(living).isPresent()) {
+					ICuriosItemHandler handler = CuriosApi.getCuriosHelper().getCuriosHandler(living).orElse(null);
+					Map<String, ICurioStacksHandler> curios = handler.getCurios();
+					
+					for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
+						ICurioStacksHandler stacksHandler = entry.getValue();
+						String identifier = entry.getKey();
+						IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+
+						for (int i = 0; i < stackHandler.getSlots(); i++) {
+							ItemStack stack = stackHandler.getStackInSlot(i);
+							LazyOptional<ICurio> curioCapability = CuriosApi.getCuriosHelper().getCurio(stack);
+							final int index = i;
+
+							if (!living.world.isRemote && !stack.isEmpty()) {
+								if (curioCapability.isPresent()) {
+									totalLootingBonus += curioCapability.orElseGet(null).getLootingBonus(identifier, living, stack, index);
+								} else {
+									totalLootingBonus += EnchantmentHelper.getEnchantmentLevel(Enchantments.LOOTING, stack);
+								}
+							}
+						}
+					}
+				}
+			  
+			  event.setLootingLevel(event.getLootingLevel()+totalLootingBonus);
+			  
+		  }
   }
 
   @SubscribeEvent
