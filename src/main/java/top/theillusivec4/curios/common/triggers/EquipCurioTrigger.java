@@ -14,8 +14,10 @@ import javax.annotation.Nonnull;
 
 /**
  * This should be triggered whenever player successfully equips any item in their curios slot.
- * In theory, the item may not neccessarily be valid for slot or have ICurio capability attached
+ * In theory, the item may not necessarily be valid for slot or have ICurio capability attached
  * to it at all, but that is mostly unimportant under normal circumstances.
+ * 
+ * Current implementation allows to perform item and location tests in criteria.
  */
 
 public class EquipCurioTrigger extends AbstractCriterionTrigger<EquipCurioTrigger.Instance> {
