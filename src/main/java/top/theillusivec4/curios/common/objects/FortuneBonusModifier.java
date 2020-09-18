@@ -50,26 +50,7 @@ public class FortuneBonusModifier extends LootModifier {
 		int totalFortuneBonus = 0;
 
 		if (CuriosApi.getCuriosHelper().getCuriosHandler(player).isPresent()) {
-			ICuriosItemHandler handler = CuriosApi.getCuriosHelper().getCuriosHandler(player).orElse(null);
-			Map<String, ICurioStacksHandler> curios = handler.getCurios();
-			
-			for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
-				ICurioStacksHandler stacksHandler = entry.getValue();
-				String identifier = entry.getKey();
-				IDynamicStackHandler stackHandler = stacksHandler.getStacks();
-
-				for (int i = 0; i < stackHandler.getSlots(); i++) {
-					ItemStack stack = stackHandler.getStackInSlot(i);
-					LazyOptional<ICurio> curioCapability = CuriosApi.getCuriosHelper().getCurio(stack);
-					final int index = i;
-
-					if (!player.world.isRemote && !stack.isEmpty()) {
-						if (curioCapability.isPresent()) {
-							totalFortuneBonus += curioCapability.orElseGet(null).getFortuneBonus(identifier, player, stack, index);
-						}
-					}
-				}
-			}
+			totalFortuneBonus = CuriosApi.getCuriosHelper().getCuriosHandler(player).orElse(null).getFortuneBonus();
 		}
 
 		if (totalFortuneBonus <= 0)

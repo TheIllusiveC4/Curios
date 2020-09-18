@@ -338,63 +338,51 @@ public class CuriosEventHandler {
 		  if (event.getDamageSource().getTrueSource() instanceof LivingEntity) {
 			  LivingEntity living = (LivingEntity) event.getDamageSource().getTrueSource();
 			  
-			  int totalLootingBonus = 0;
-			  
-			  if (CuriosApi.getCuriosHelper().getCuriosHandler(living).isPresent()) {
-					ICuriosItemHandler handler = CuriosApi.getCuriosHelper().getCuriosHandler(living).orElse(null);
-					Map<String, ICurioStacksHandler> curios = handler.getCurios();
-					
-					for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
-						ICurioStacksHandler stacksHandler = entry.getValue();
-						String identifier = entry.getKey();
-						IDynamicStackHandler stackHandler = stacksHandler.getStacks();
-
-						for (int i = 0; i < stackHandler.getSlots(); i++) {
-							ItemStack stack = stackHandler.getStackInSlot(i);
-							LazyOptional<ICurio> curioCapability = CuriosApi.getCuriosHelper().getCurio(stack);
-							final int index = i;
-
-							if (!living.world.isRemote && !stack.isEmpty()) {
-								if (curioCapability.isPresent()) {
-									totalLootingBonus += curioCapability.orElseGet(null).getLootingBonus(identifier, living, stack, index);
-								}
-							}
-						}
-					}
-				}
-			  
-			  event.setLootingLevel(event.getLootingLevel()+totalLootingBonus);
-			  
+			  CuriosApi.getCuriosHelper().getCuriosHandler(living).ifPresent(handler -> {
+				  event.setLootingLevel(event.getLootingLevel()+handler.getLootingBonus());
+			  });
 		  }
   }
 
   @SubscribeEvent
   public void tick(LivingEvent.LivingUpdateEvent evt) {
     LivingEntity livingEntity = evt.getEntityLiving();
+    
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
       handler.handleInvalidStacks();
       Map<String, ICurioStacksHandler> curios = handler.getCurios();
-
+      int totalFortuneBonus = 0;
+      int totalLootingBonus = 0;
+      
+      
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
         ICurioStacksHandler stacksHandler = entry.getValue();
         String identifier = entry.getKey();
         IDynamicStackHandler stackHandler = stacksHandler.getStacks();
         IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
-
+        
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
           LazyOptional<ICurio> currentCurio = CuriosApi.getCuriosHelper().getCurio(stack);
           final int index = i;
 
+          
           if (!stack.isEmpty()) {
             stack.inventoryTick(livingEntity.world, livingEntity, -1, false);
-            currentCurio.ifPresent(curio -> {
-              curio.curioTick(identifier, index, livingEntity);
-
-              if (livingEntity.world.isRemote) {
-                curio.curioAnimate(identifier, index, livingEntity);
-              }
-            });
+            
+            if (currentCurio.isPresent()) {
+            	ICurio certainCurio = currentCurio.orElseGet(null);
+            	
+            	certainCurio.curioTick(identifier, index, livingEntity);
+            	
+            	if (livingEntity.world.isRemote) {
+            		certainCurio.curioAnimate(identifier, index, livingEntity);
+                }
+                	
+            	totalFortuneBonus += certainCurio.getFortuneBonus(identifier, livingEntity, stack, index);
+                totalLootingBonus += certainCurio.getLootingBonus(identifier, livingEntity, stack, index);
+                
+            }
           }
 
           if (!livingEntity.world.isRemote) {
@@ -437,6 +425,7 @@ public class CuriosEventHandler {
         }
       }
       handler.processSlots();
+      handler.setEnchantmentBonuses(new Tuple<Integer, Integer>(totalFortuneBonus, totalLootingBonus));
     });
   }
 
