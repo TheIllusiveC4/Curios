@@ -263,7 +263,7 @@ public interface ICurio {
    * @return True to show attributes tooltip, false to disable
    */
   default boolean showAttributesTooltip(String identifier) {
-    return false;
+    return true;
   }
 
   /**
