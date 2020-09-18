@@ -357,8 +357,6 @@ public class CuriosEventHandler {
 							if (!living.world.isRemote && !stack.isEmpty()) {
 								if (curioCapability.isPresent()) {
 									totalLootingBonus += curioCapability.orElseGet(null).getLootingBonus(identifier, living, stack, index);
-								} else {
-									totalLootingBonus += EnchantmentHelper.getEnchantmentLevel(Enchantments.LOOTING, stack);
 								}
 							}
 						}

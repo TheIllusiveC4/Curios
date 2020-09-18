@@ -66,8 +66,6 @@ public class FortuneBonusModifier extends LootModifier {
 					if (!player.world.isRemote && !stack.isEmpty()) {
 						if (curioCapability.isPresent()) {
 							totalFortuneBonus += curioCapability.orElseGet(null).getFortuneBonus(identifier, player, stack, index);
-						} else {
-							totalFortuneBonus += EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, stack);
 						}
 					}
 				}
