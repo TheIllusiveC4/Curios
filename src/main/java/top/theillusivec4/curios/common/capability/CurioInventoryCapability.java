@@ -40,6 +40,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -167,13 +168,13 @@ public class CurioInventoryCapability {
   }
 
   public static class CurioInventoryWrapper implements ICuriosItemHandler {
-
     Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
     Set<String> locked = new HashSet<>();
     NonNullList<ItemStack> invalidStacks = NonNullList.create();
     PlayerEntity wearer;
     Set<String> toLock = new HashSet<>();
     List<UnlockState> toUnlock = new ArrayList<>();
+    Tuple<Integer, Integer> fortuneAndLooting = new Tuple<Integer, Integer>(0, 0);
 
     CurioInventoryWrapper() {
       this(null);
@@ -187,12 +188,12 @@ public class CurioInventoryCapability {
     @Override
     public void reset() {
 
-      if (!this.wearer.getEntityWorld().isRemote() && wearer instanceof ServerPlayerEntity) {
+      if (!this.wearer.getEntityWorld().isRemote() && this.wearer instanceof ServerPlayerEntity) {
         this.locked.clear();
         this.curios.clear();
         this.invalidStacks.clear();
         CuriosApi.getSlotHelper().createSlots().forEach(
-            ((slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler)));
+            ((slotType, stacksHandler) -> this.curios.put(slotType.getIdentifier(), stacksHandler)));
       }
     }
 
@@ -200,7 +201,7 @@ public class CurioInventoryCapability {
     public int getSlots() {
       int totalSlots = 0;
 
-      for (ICurioStacksHandler stacks : curios.values()) {
+      for (ICurioStacksHandler stacks : this.curios.values()) {
         totalSlots += stacks.getSlots();
       }
       return totalSlots;
@@ -210,7 +211,7 @@ public class CurioInventoryCapability {
     public int getVisibleSlots() {
       int totalSlots = 0;
 
-      for (ICurioStacksHandler stacks : curios.values()) {
+      for (ICurioStacksHandler stacks : this.curios.values()) {
 
         if (stacks.isVisible()) {
           totalSlots += stacks.getSlots();
@@ -300,7 +301,7 @@ public class CurioInventoryCapability {
     public void handleInvalidStacks() {
 
       if (this.wearer != null && !this.invalidStacks.isEmpty()) {
-        this.invalidStacks.forEach(drop -> ItemHandlerHelper.giveItemToPlayer(wearer, drop));
+        this.invalidStacks.forEach(drop -> ItemHandlerHelper.giveItemToPlayer(this.wearer, drop));
         this.invalidStacks = NonNullList.create();
       }
     }
@@ -315,7 +316,7 @@ public class CurioInventoryCapability {
           drops.add(stackHandler.getStackInSlot(i));
 
           if (!stack.isEmpty()) {
-            wearer.getAttributeManager().removeModifiers(
+            this.wearer.getAttributeManager().removeModifiers(
                 CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
             int index = i;
             CuriosApi.getCuriosHelper().getCurio(stack)
@@ -323,7 +324,7 @@ public class CurioInventoryCapability {
           }
           stackHandler.setStackInSlot(i, ItemStack.EMPTY);
         }
-        drops.forEach(drop -> ItemHandlerHelper.giveItemToPlayer(wearer, drop));
+        drops.forEach(drop -> ItemHandlerHelper.giveItemToPlayer(this.wearer, drop));
       }
     }
 
@@ -341,6 +342,22 @@ public class CurioInventoryCapability {
         this.cosmetic = cosmetic;
       }
     }
+
+	@Override
+	public int getFortuneBonus() {
+		return this.fortuneAndLooting.getA();
+	}
+
+	@Override
+	public int getLootingBonus() {
+		return this.fortuneAndLooting.getB();
+	}
+
+	@Override
+	public void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLootingIn) {
+		this.fortuneAndLooting = fortuneAndLootingIn;
+	}
+	
   }
 
   public static class Provider implements ICapabilitySerializable<INBT> {
@@ -350,23 +367,23 @@ public class CurioInventoryCapability {
 
     Provider(final PlayerEntity playerEntity) {
       this.handler = new CurioInventoryWrapper(playerEntity);
-      this.optional = LazyOptional.of(() -> handler);
+      this.optional = LazyOptional.of(() -> this.handler);
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nullable Capability<T> capability, Direction facing) {
-      return CuriosCapability.INVENTORY.orEmpty(capability, optional);
+      return CuriosCapability.INVENTORY.orEmpty(capability, this.optional);
     }
 
     @Override
     public INBT serializeNBT() {
-      return CuriosCapability.INVENTORY.writeNBT(handler, null);
+      return CuriosCapability.INVENTORY.writeNBT(this.handler, null);
     }
 
     @Override
     public void deserializeNBT(INBT nbt) {
-      CuriosCapability.INVENTORY.readNBT(handler, null, nbt);
+      CuriosCapability.INVENTORY.readNBT(this.handler, null, nbt);
     }
   }
 }

@@ -31,6 +31,8 @@ import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -63,18 +65,18 @@ public interface ICurio {
       }
 
       for (int i = 0; i < 5; ++i) {
-        Vector3d vec3d = new Vector3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
+        Vector3d vec3d = new Vector3d((livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
             Math.random() * 0.1D + 0.1D, 0.0D);
         vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        double d0 = (double) (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
+        double d0 = (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
 
-        Vector3d vec3d1 = new Vector3d(((double) livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D,
+        Vector3d vec3d1 = new Vector3d((livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D,
             d0, 0.6D);
         vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
         vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
         vec3d1 = vec3d1.add(livingEntity.getPosX(),
-            livingEntity.getPosY() + (double) livingEntity.getEyeHeight(), livingEntity.getPosZ());
+            livingEntity.getPosY() + livingEntity.getEyeHeight(), livingEntity.getPosZ());
 
         livingEntity.world
             .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
@@ -251,6 +253,45 @@ public interface ICurio {
   @Nonnull
   default DropRule getDropRule(LivingEntity livingEntity) {
     return DropRule.DEFAULT;
+  }
+
+  /**
+   * Determines whether or not Curios will automatically add tooltip listing attribute modifiers
+   * that are returned by {@link ICurio#getAttributeModifiers(String)}.
+   *
+   * @param identifier   The identifier of the {@link ISlotType} of the slot
+   * @return True to show attributes tooltip, false to disable
+   */
+  default boolean showAttributesTooltip(String identifier) {
+    return true;
+  }
+
+  /**
+   * Allows to set the amount of bonus Fortune levels that are provided by curio.
+   * Default implementation returns level of Fortune enchantment on ItemStack.
+   *
+   * @param identifier   The identifier of the {@link ISlotType} of the slot
+   * @param curio	ItemStack that is checked
+   * @param index        The index of the slot
+   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @return Amount of additional Fortune levels that will be applied when mining
+   */
+  default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio, int index) {
+    return EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, curio);
+  }
+
+  /**
+   * Allows to set the amount of bonus Looting levels that are provided by curio.
+   * Default implementation returns level of Looting enchantment on ItemStack.
+   *
+   * @param identifier   The identifier of the {@link ISlotType} of the slot
+   * @param curio	ItemStack that is checked
+   * @param index        The index of the slot
+   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @return Amount of additional Looting levels that will be applied in LootingLevelEvent
+   */
+  default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio, int index) {
+    return EnchantmentHelper.getEnchantmentLevel(Enchantments.LOOTING, curio);
   }
 
   /**

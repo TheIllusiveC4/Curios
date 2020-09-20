@@ -105,20 +105,20 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (this.minecraft != null) {
 
       if (this.minecraft.player != null) {
-        hasScrollBar = CuriosApi.getCuriosHelper().getCuriosHandler(this.minecraft.player)
+        this.hasScrollBar = CuriosApi.getCuriosHelper().getCuriosHandler(this.minecraft.player)
             .map(handler -> handler.getVisibleSlots() > 8).orElse(false);
 
-        if (hasScrollBar) {
+        if (this.hasScrollBar) {
           this.container.scrollTo(currentScroll);
         }
       }
       int neededWidth = 431;
 
-      if (hasScrollBar) {
+      if (this.hasScrollBar) {
         neededWidth += 30;
       }
 
-      if (container.hasCosmeticColumn()) {
+      if (this.container.hasCosmeticColumn()) {
         neededWidth += 40;
       }
       this.widthTooNarrow = this.width < neededWidth;
@@ -127,6 +127,23 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       this.updateScreenPosition();
       this.children.add(this.recipeBookGui);
       this.setFocusedDefault(this.recipeBookGui);
+      
+      /**
+       * This may not be a perfect workaround as it doesn't return the book upon switching back
+       * to survival mode. Creative inventory doesn't have this problem because it doesn't have
+       * recipe book at all, but here we only have one Screen and must toggle it circumstantially,
+       * and sadly Curios' recipe book isn't and must not be an independent object. I can't think
+       * of better implementation at the moment though.
+       * 
+       * Anyhow, this is better than letting the book persist in creative without a way to toggle it.
+       * @author Extegral
+       */
+      
+      if (this.getMinecraft().player.isCreative() && this.recipeBookGui.isVisible()) {
+      	this.recipeBookGui.toggleVisibility();
+      	this.updateScreenPosition();
+      }
+      
       Tuple<Integer, Integer> offsets = getButtonOffset(false);
       this.buttonCurios = new CuriosButton(this, this.getGuiLeft() + offsets.getA(),
           this.height / 2 + offsets.getB(), 14, 14, 50, 0, 14, CURIO_INVENTORY);
@@ -143,6 +160,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
               .setPosition(this.guiLeft + offsets.getA(), this.height / 2 + offsets.getB());
         }));
       }
+      
       this.updateRenderButtons();
     }
   }
@@ -170,11 +188,11 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (this.recipeBookGui.isVisible() && !this.widthTooNarrow) {
       int offset = 148;
 
-      if (hasScrollBar) {
+      if (this.hasScrollBar) {
         offset -= 30;
       }
 
-      if (container.hasCosmeticColumn()) {
+      if (this.container.hasCosmeticColumn()) {
         offset -= 40;
       }
       i = 177 + (this.width - this.xSize - offset) / 2;
@@ -203,8 +221,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       i1 -= 19;
       k -= 19;
     }
-    return mouseX >= (double) k && mouseY >= (double) l && mouseX < (double) i1
-        && mouseY < (double) j1;
+    return mouseX >= k && mouseY >= l && mouseX < i1
+        && mouseY < j1;
   }
 
   @Override
@@ -282,9 +300,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
         playerEntity.closeScreen();
       }
       return true;
-    } else {
-      return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
-    }
+    } else
+		return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
   }
 
   @Override
@@ -361,9 +378,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight,
       double pointX, double pointY) {
 
-    if (isRenderButtonHovered) {
-      return false;
-    }
+    if (this.isRenderButtonHovered)
+		return false;
     return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super
         .isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
   }
@@ -374,9 +390,9 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 
-    if (this.recipeBookGui.mouseClicked(mouseX, mouseY, mouseButton)) {
-      return true;
-    } else if (this.inScrollBar(mouseX, mouseY)) {
+    if (this.recipeBookGui.mouseClicked(mouseX, mouseY, mouseButton))
+		return true;
+	else if (this.inScrollBar(mouseX, mouseY)) {
       this.isScrolling = this.needsScrollBars();
       return true;
     }
@@ -394,9 +410,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (this.buttonClicked) {
       this.buttonClicked = false;
       return true;
-    } else {
-      return super.mouseReleased(mouseReleased1, mouseReleased3, mouseReleased5);
-    }
+    } else
+		return super.mouseReleased(mouseReleased1, mouseReleased3, mouseReleased5);
   }
 
   @Override
@@ -406,25 +421,24 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (this.isScrolling) {
       int i = this.guiTop + 8;
       int j = i + 148;
-      currentScroll = ((float) pMouseDragged3 - (float) i - 7.5F) / ((float) (j - i) - 15.0F);
+      currentScroll = ((float) pMouseDragged3 - i - 7.5F) / (j - i - 15.0F);
       currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
       this.container.scrollTo(currentScroll);
       return true;
-    } else {
-      return super.mouseDragged(pMouseDragged1, pMouseDragged3, pMouseDragged5, pMouseDragged6,
-          pMouseDragged8);
-    }
+    } else
+		return super.mouseDragged(pMouseDragged1, pMouseDragged3, pMouseDragged5, pMouseDragged6,
+		      pMouseDragged8);
   }
 
   @Override
   public boolean mouseScrolled(double pMouseScrolled1, double pMouseScrolled3,
       double pMouseScrolled5) {
 
-    if (!this.needsScrollBars()) {
-      return false;
-    } else {
+    if (!this.needsScrollBars())
+		return false;
+	else {
       int i = (this.container).curiosHandler.map(ICuriosItemHandler::getVisibleSlots).orElse(1);
-      currentScroll = (float) ((double) currentScroll - pMouseScrolled5 / (double) i);
+      currentScroll = (float) (currentScroll - pMouseScrolled5 / i);
       currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
       this.container.scrollTo(currentScroll);
       return true;
@@ -438,8 +452,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn,
       int mouseButton) {
     boolean flag =
-        mouseX < (double) guiLeftIn || mouseY < (double) guiTopIn || mouseX >= (double) (guiLeftIn
-            + this.xSize) || mouseY >= (double) (guiTopIn + this.ySize);
+        mouseX < guiLeftIn || mouseY < guiTopIn || mouseX >= guiLeftIn
+            + this.xSize || mouseY >= guiTopIn + this.ySize;
     return this.recipeBookGui
         .func_195604_a(mouseX, mouseY, this.guiLeft, this.guiTop, this.xSize, this.ySize,
             mouseButton) && flag;

@@ -21,10 +21,13 @@ package top.theillusivec4.curios.common;
 
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
@@ -32,6 +35,7 @@ import top.theillusivec4.curios.common.item.AmuletItem;
 import top.theillusivec4.curios.common.item.CrownItem;
 import top.theillusivec4.curios.common.item.KnucklesItem;
 import top.theillusivec4.curios.common.item.RingItem;
+import top.theillusivec4.curios.common.objects.FortuneBonusModifier;
 
 @Mod.EventBusSubscriber(modid = Curios.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CuriosRegistry {
@@ -69,5 +73,13 @@ public class CuriosRegistry {
   public static void registerContainer(RegistryEvent.Register<ContainerType<?>> evt) {
     evt.getRegistry().register(
         IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
+  }
+  
+  @SubscribeEvent
+  public static void registerLootModifiers(final RegistryEvent.Register<GlobalLootModifierSerializer<?>> event) {
+	  final IForgeRegistry<GlobalLootModifierSerializer<?>> registry = event.getRegistry();
+	  
+	  registry.register(
+			new FortuneBonusModifier.Serializer().setRegistryName(new ResourceLocation(Curios.MODID, "fortune_bonus")));
   }
 }
