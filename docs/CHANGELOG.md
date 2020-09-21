@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.3-4.0.2.0] - 2020.09.20
+Update courtesy of Extegral, thanks! [#72](https://github.com/TheIllusiveC4/Curios/pull/72)
+### Added
+- [API] Added ICurio#showAttributesTooltip for toggling attribute tooltips per curio
+- [API] Added ICurio#getFortuneBonus for adding fortune levels when curio is equipped
+- [API] Added ICurio#getLootingBonus for adding looting levels when curio is equipped
+- Added curios:equip_curio criterion trigger for listening to curio equips
+### Changed
+- Updated Russian localization
+### Fixed
+- Fixed bug with recipe book persisting on Curios screen when going from Survival to Creative
+
 ## [1.16.3-4.0.1.0] - 2020.09.14
 ### Added
 - Added Brazilian localization (thanks Mikeliro!) [#65](https://github.com/TheIllusiveC4/Curios/pull/65)
