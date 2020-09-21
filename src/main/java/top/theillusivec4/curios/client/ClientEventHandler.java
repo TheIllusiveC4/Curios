@@ -62,8 +62,9 @@ public class ClientEventHandler {
   @SubscribeEvent
   public void onKeyInput(TickEvent.ClientTickEvent evt) {
 
-    if (evt.phase != TickEvent.Phase.END)
-		return;
+    if (evt.phase != TickEvent.Phase.END) {
+      return;
+    }
 
     Minecraft mc = Minecraft.getInstance();
 
@@ -115,24 +116,18 @@ public class ClientEventHandler {
           if (!curioTagsTooltip.isEmpty()) {
             tooltip.addAll(1, curio.getTagsTooltip(tagTooltips));
           }
-          
+
         });
 
         if (!optionalCurio.isPresent()) {
           tooltip.addAll(1, tagTooltips);
         }
 
-
-        
         for (String identifier : slots) {
           Multimap<Attribute, AttributeModifier> multimap = CuriosApi.getCuriosHelper()
               .getAttributeModifiers(identifier, stack);
-          boolean addAttributeTooltips = true;
-          
-          if (optionalCurio.isPresent()) {
-        	  ICurio curio = optionalCurio.orElse(null);
-        	  addAttributeTooltips = curio.showAttributesTooltip(identifier);
-          }
+          boolean addAttributeTooltips = optionalCurio
+              .map(iCurio -> iCurio.showAttributesTooltip(identifier)).orElse(true);
 
           if (addAttributeTooltips && !multimap.isEmpty() && (i & 2) == 0) {
             PlayerEntity player = evt.getPlayer();

@@ -23,7 +23,6 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
@@ -51,7 +50,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -108,7 +106,6 @@ public class Curios {
     NetworkHandler.register();
     ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
         new ArgumentSerializer<>(CurioArgumentType::slot));
-    
     CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
   }
 
