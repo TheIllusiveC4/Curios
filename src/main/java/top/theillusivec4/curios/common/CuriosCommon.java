@@ -117,7 +117,7 @@ public class CuriosCommon implements ModInitializer {
         (playerEntity, componentContainer) -> componentContainer
             .put(CuriosComponent.INVENTORY, new PlayerCuriosComponent(playerEntity)));
     EntityComponents
-        .setRespawnCopyStrategy(CuriosComponent.INVENTORY, RespawnCopyStrategy.INVENTORY);
+        .setRespawnCopyStrategy(CuriosComponent.INVENTORY, RespawnCopyStrategy.ALWAYS_COPY);
 
     CuriosRegistry.registerItems();
     CuriosRegistry.registerComponents();
