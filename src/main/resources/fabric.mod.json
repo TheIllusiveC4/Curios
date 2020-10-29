@@ -30,7 +30,7 @@
     "curios.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.7.4",
+    "fabricloader": ">=0.10.5",
     "minecraft": "1.16.x",
     "fabric": ">=0.16.0"
   }
