@@ -42,56 +42,56 @@ import top.theillusivec4.curios.common.capability.CurioItemCapability;
 public class CrownItem extends Item {
 
   private static final ResourceLocation CROWN_TEXTURE = new ResourceLocation(Curios.MODID,
-      "textures/entity/crown.png");
+	  "textures/entity/crown.png");
 
   public CrownItem() {
-    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(2000));
-    this.setRegistryName(Curios.MODID, "crown");
+	super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(2000));
+	this.setRegistryName(Curios.MODID, "crown");
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-    return CurioItemCapability.createProvider(new ICurio() {
-      private Object model;
+	return CurioItemCapability.createProvider(new ICurio() {
+	  private Object model;
 
-      @Override
-      public void curioTick(String identifier, int index, LivingEntity livingEntity) {
+	  @Override
+	  public void curioTick(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
 
-        if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 20 == 0) {
-          livingEntity
-              .addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, -1, true, true));
-          stack.damageItem(1, livingEntity,
-              damager -> CuriosApi.getCuriosHelper().onBrokenCurio(identifier, index, damager));
-        }
-      }
+		if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 20 == 0) {
+		  livingEntity
+		  .addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, -1, true, true));
+		  stack.damageItem(1, livingEntity,
+			  damager -> CuriosApi.getCuriosHelper().onBrokenCurio(identifier, index, damager));
+		}
+	  }
 
-      @Override
-      public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
-        return true;
-      }
+	  @Override
+	  public boolean canRender(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
+		return true;
+	  }
 
-      @Override
-      public void render(String identifier, int index, MatrixStack matrixStack,
-          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
-          float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-          float headPitch) {
+	  @Override
+	  public void render(String identifier, int index, MatrixStack matrixStack,
+		  IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
+		  float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+		  float headPitch, ItemStack stack) {
 
-        if (!(this.model instanceof CrownModel)) {
-          model = new CrownModel<>();
-        }
-        CrownModel<?> crown = (CrownModel<?>) this.model;
-        ICurio.RenderHelper.followHeadRotations(livingEntity, crown.crown);
-        IVertexBuilder vertexBuilder = ItemRenderer
-            .getBuffer(renderTypeBuffer, crown.getRenderType(CROWN_TEXTURE), false,
-                stack.hasEffect());
-        crown.render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
-            1.0F);
-      }
-    });
+		if (!(this.model instanceof CrownModel)) {
+		  this.model = new CrownModel<>();
+		}
+		CrownModel<?> crown = (CrownModel<?>) this.model;
+		ICurio.RenderHelper.followHeadRotations(livingEntity, crown.crown);
+		IVertexBuilder vertexBuilder = ItemRenderer
+			.getBuffer(renderTypeBuffer, crown.getRenderType(CROWN_TEXTURE), false,
+				stack.hasEffect());
+		crown.render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
+			1.0F);
+	  }
+	});
   }
 
   @Override
   public boolean hasEffect(ItemStack stack) {
-    return true;
+	return true;
   }
 }

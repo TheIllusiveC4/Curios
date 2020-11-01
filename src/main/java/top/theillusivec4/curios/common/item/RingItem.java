@@ -48,56 +48,56 @@ public class RingItem extends Item {
   private static final UUID ARMOR_UUID = UUID.fromString("38faf191-bf78-4654-b349-cc1f4f1143bf");
 
   public RingItem() {
-    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
-    this.setRegistryName(Curios.MODID, "ring");
+	super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
+	this.setRegistryName(Curios.MODID, "ring");
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-    return CurioItemCapability.createProvider(new ICurio() {
+	return CurioItemCapability.createProvider(new ICurio() {
 
-      @Override
-      public void curioTick(String identifier, int index, LivingEntity livingEntity) {
+	  @Override
+	  public void curioTick(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
 
-        if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 19 == 0) {
-          livingEntity.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));
-        }
-      }
+		if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 19 == 0) {
+		  livingEntity.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));
+		}
+	  }
 
-      @Override
-      public void playRightClickEquipSound(LivingEntity livingEntity) {
-        livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
-            SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL, 1.0f, 1.0f);
-      }
+	  @Override
+	  public void playRightClickEquipSound(String identifer, LivingEntity livingEntity, ItemStack stack) {
+		livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
+			SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+	  }
 
-      @Override
-      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
-        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
+	  @Override
+	  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack) {
+		Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
-        if (CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).contains(identifier)) {
-          atts.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
-              AttributeModifier.Operation.MULTIPLY_TOTAL));
-          atts.put(Attributes.ARMOR, new AttributeModifier(ARMOR_UUID, "Armor bonus", 2,
-              AttributeModifier.Operation.ADDITION));
-        }
-        return atts;
-      }
+		if (CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).contains(identifier)) {
+		  atts.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
+			  AttributeModifier.Operation.MULTIPLY_TOTAL));
+		  atts.put(Attributes.ARMOR, new AttributeModifier(ARMOR_UUID, "Armor bonus", 2,
+			  AttributeModifier.Operation.ADDITION));
+		}
+		return atts;
+	  }
 
-      @Nonnull
-      @Override
-      public DropRule getDropRule(LivingEntity livingEntity) {
-        return DropRule.ALWAYS_KEEP;
-      }
+	  @Nonnull
+	  @Override
+	  public DropRule getDropRule(String identifier, LivingEntity livingEntity, ItemStack stack) {
+		return DropRule.ALWAYS_KEEP;
+	  }
 
-      @Override
-      public boolean canRightClickEquip() {
-        return true;
-      }
-    });
+	  @Override
+	  public boolean canRightClickEquip(LivingEntity livingEntity, ItemStack stack) {
+		return true;
+	  }
+	});
   }
 
   @Override
   public boolean hasEffect(ItemStack stack) {
-    return true;
+	return true;
   }
 }

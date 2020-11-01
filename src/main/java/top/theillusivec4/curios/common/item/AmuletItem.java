@@ -54,7 +54,7 @@ public class AmuletItem extends Item {
 	  private Object model;
 
 	  @Override
-	  public void curioTick(String identifier, int index, LivingEntity livingEntity) {
+	  public void curioTick(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
 
 		if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 40 == 0) {
 		  livingEntity.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
@@ -62,7 +62,7 @@ public class AmuletItem extends Item {
 	  }
 
 	  @Override
-	  public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
+	  public boolean canRender(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
 		return true;
 	  }
 
@@ -70,7 +70,7 @@ public class AmuletItem extends Item {
 	  public void render(String identifier, int index, MatrixStack matrixStack,
 		  IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
 		  float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-		  float headPitch) {
+		  float headPitch, ItemStack stack) {
 		ICurio.RenderHelper.translateIfSneaking(matrixStack, livingEntity);
 		ICurio.RenderHelper.rotateIfSneaking(matrixStack, livingEntity);
 

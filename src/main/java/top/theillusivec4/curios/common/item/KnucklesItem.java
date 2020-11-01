@@ -47,62 +47,62 @@ public class KnucklesItem extends Item {
 
   private static final UUID AD_UUID = UUID.fromString("7ce10414-adcc-4bf2-8804-f5dbd39fadaf");
   private static final ResourceLocation KNUCKLES_TEXTURE = new ResourceLocation(Curios.MODID,
-      "textures/entity/knuckles.png");
+	  "textures/entity/knuckles.png");
 
   public KnucklesItem() {
-    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1));
-    this.setRegistryName(Curios.MODID, "knuckles");
+	super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1));
+	this.setRegistryName(Curios.MODID, "knuckles");
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-    return CurioItemCapability.createProvider(new ICurio() {
-      private Object model;
+	return CurioItemCapability.createProvider(new ICurio() {
+	  private Object model;
 
-      @Override
-      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
-        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
+	  @Override
+	  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack) {
+		Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
-        if (CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).contains(identifier)) {
-          atts.put(Attributes.ATTACK_DAMAGE,
-              new AttributeModifier(AD_UUID, "Attack damage bonus", 4,
-                  AttributeModifier.Operation.ADDITION));
-        }
-        return atts;
-      }
+		if (CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).contains(identifier)) {
+		  atts.put(Attributes.ATTACK_DAMAGE,
+			  new AttributeModifier(AD_UUID, "Attack damage bonus", 4,
+				  AttributeModifier.Operation.ADDITION));
+		}
+		return atts;
+	  }
 
-      @Override
-      public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
-        return true;
-      }
+	  @Override
+	  public boolean canRender(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
+		return true;
+	  }
 
-      @Override
-      public void render(String identifier, int index, MatrixStack matrixStack,
-          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
-          float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-          float headPitch) {
+	  @Override
+	  public void render(String identifier, int index, MatrixStack matrixStack,
+		  IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
+		  float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+		  float headPitch, ItemStack stack) {
 
-        if (!(this.model instanceof KnucklesModel)) {
-          model = new KnucklesModel();
-        }
+		if (!(this.model instanceof KnucklesModel)) {
+		  this.model = new KnucklesModel();
+		}
 
-        KnucklesModel knuckles = (KnucklesModel) this.model;
-        knuckles.setLivingAnimations(livingEntity, limbSwing, limbSwingAmount, partialTicks);
-        knuckles.setRotationAngles(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
-            headPitch);
-        ICurio.RenderHelper.followBodyRotations(livingEntity, knuckles);
-        IVertexBuilder vertexBuilder = ItemRenderer
-            .getBuffer(renderTypeBuffer, knuckles.getRenderType(KNUCKLES_TEXTURE), false,
-                stack.hasEffect());
-        knuckles
-            .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
-                1.0F);
-      }
-    });
+		KnucklesModel knuckles = (KnucklesModel) this.model;
+		knuckles.setLivingAnimations(livingEntity, limbSwing, limbSwingAmount, partialTicks);
+		knuckles.setRotationAngles(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
+			headPitch);
+		ICurio.RenderHelper.followBodyRotations(livingEntity, knuckles);
+		IVertexBuilder vertexBuilder = ItemRenderer
+			.getBuffer(renderTypeBuffer, knuckles.getRenderType(KNUCKLES_TEXTURE), false,
+				stack.hasEffect());
+		knuckles
+		.render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
+			1.0F);
+	  }
+	});
   }
 
   @Override
   public boolean hasEffect(ItemStack stack) {
-    return true;
+	return true;
   }
 }
