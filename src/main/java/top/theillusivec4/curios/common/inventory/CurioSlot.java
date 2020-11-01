@@ -43,46 +43,47 @@ public class CurioSlot extends SlotItemHandler {
   private NonNullList<Boolean> renderStatuses;
 
   public CurioSlot(PlayerEntity player, IDynamicStackHandler handler, int index, String identifier,
-      int xPosition, int yPosition, NonNullList<Boolean> renders) {
-    super(handler, index, xPosition, yPosition);
-    this.identifier = identifier;
-    this.renderStatuses = renders;
-    this.player = player;
-    this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
-        player.getEntityWorld().isRemote() ? CuriosApi.getIconHelper().getIcon(identifier)
-            : new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
+	  int xPosition, int yPosition, NonNullList<Boolean> renders) {
+	super(handler, index, xPosition, yPosition);
+	this.identifier = identifier;
+	this.renderStatuses = renders;
+	this.player = player;
+	this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
+		player.getEntityWorld().isRemote() ? CuriosApi.getIconHelper().getIcon(identifier)
+			: new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
   }
 
   public String getIdentifier() {
-    return this.identifier;
+	return this.identifier;
   }
 
   public boolean getRenderStatus() {
-    return this.renderStatuses.get(this.getSlotIndex());
+	return this.renderStatuses.get(this.getSlotIndex());
   }
 
   @OnlyIn(Dist.CLIENT)
   public String getSlotName() {
-    return I18n.format("curios.identifier." + identifier);
+	return I18n.format("curios.identifier." + this.identifier);
   }
 
   @Override
   public boolean isItemValid(@Nonnull ItemStack stack) {
-    return hasValidTag(CuriosApi.getCuriosHelper().getCurioTags(stack.getItem())) && CuriosApi
-        .getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(identifier, player))
-        .orElse(true) && super.isItemValid(stack);
+	return this.hasValidTag(CuriosApi.getCuriosHelper().getCurioTags(stack.getItem())) && CuriosApi
+		.getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(this.identifier, this.player, stack))
+		.orElse(true) && super.isItemValid(stack);
   }
 
   protected boolean hasValidTag(Set<String> tags) {
-    return tags.contains(identifier) || tags.contains("curio");
+	return tags.contains(this.identifier) || tags.contains("curio");
   }
 
   @Override
   public boolean canTakeStack(PlayerEntity playerIn) {
-    ItemStack stack = this.getStack();
-    return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
-        && CuriosApi.getCuriosHelper().getCurio(stack)
-        .map(curio -> curio.canUnequip(identifier, playerIn)).orElse(true) && super
-        .canTakeStack(playerIn);
+	ItemStack stack = this.getStack();
+
+	return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
+		&& CuriosApi.getCuriosHelper().getCurio(stack)
+		.map(curio -> curio.canUnequip(this.identifier, playerIn, stack, this.getSlotIndex())).orElse(true) && super
+		.canTakeStack(playerIn);
   }
 }

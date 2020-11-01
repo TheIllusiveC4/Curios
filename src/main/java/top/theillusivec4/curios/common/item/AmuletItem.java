@@ -41,55 +41,55 @@ import top.theillusivec4.curios.common.capability.CurioItemCapability;
 public class AmuletItem extends Item {
 
   private static final ResourceLocation AMULET_TEXTURE = new ResourceLocation(Curios.MODID,
-      "textures/entity/amulet.png");
+	  "textures/entity/amulet.png");
 
   public AmuletItem() {
-    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
-    this.setRegistryName(Curios.MODID, "amulet");
+	super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
+	this.setRegistryName(Curios.MODID, "amulet");
   }
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-    return CurioItemCapability.createProvider(new ICurio() {
-      private Object model;
+	return CurioItemCapability.createProvider(new ICurio() {
+	  private Object model;
 
-      @Override
-      public void curioTick(String identifier, int index, LivingEntity livingEntity) {
+	  @Override
+	  public void curioTick(String identifier, int index, LivingEntity livingEntity) {
 
-        if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 40 == 0) {
-          livingEntity.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
-        }
-      }
+		if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 40 == 0) {
+		  livingEntity.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
+		}
+	  }
 
-      @Override
-      public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
-        return true;
-      }
+	  @Override
+	  public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
+		return true;
+	  }
 
-      @Override
-      public void render(String identifier, int index, MatrixStack matrixStack,
-          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
-          float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-          float headPitch) {
-        ICurio.RenderHelper.translateIfSneaking(matrixStack, livingEntity);
-        ICurio.RenderHelper.rotateIfSneaking(matrixStack, livingEntity);
+	  @Override
+	  public void render(String identifier, int index, MatrixStack matrixStack,
+		  IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
+		  float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+		  float headPitch) {
+		ICurio.RenderHelper.translateIfSneaking(matrixStack, livingEntity);
+		ICurio.RenderHelper.rotateIfSneaking(matrixStack, livingEntity);
 
-        if (!(this.model instanceof AmuletModel)) {
-          this.model = new AmuletModel<>();
-        }
-        AmuletModel<?> amuletModel = (AmuletModel<?>) this.model;
-        IVertexBuilder vertexBuilder = ItemRenderer
-            .getBuffer(renderTypeBuffer, amuletModel.getRenderType(AMULET_TEXTURE), false,
-                stack.hasEffect());
-        amuletModel
-            .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
-                1.0F);
-      }
-    });
+		if (!(this.model instanceof AmuletModel)) {
+		  this.model = new AmuletModel<>();
+		}
+		AmuletModel<?> amuletModel = (AmuletModel<?>) this.model;
+		IVertexBuilder vertexBuilder = ItemRenderer
+			.getBuffer(renderTypeBuffer, amuletModel.getRenderType(AMULET_TEXTURE), false,
+				stack.hasEffect());
+		amuletModel
+		.render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
+			1.0F);
+	  }
+	});
   }
 
   @Override
   public boolean hasEffect(ItemStack stack) {
-    return true;
+	return true;
   }
 }
