@@ -1,10 +1,9 @@
 package top.theillusivec4.curios.common.objects;
 
+import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
-
-import com.google.gson.JsonObject;
-
+import javax.annotation.Nonnull;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -21,64 +20,62 @@ import net.minecraft.loot.conditions.ILootCondition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
-import net.minecraftforge.common.util.LazyOptional;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
-import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
-import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class FortuneBonusModifier extends LootModifier {
 
-	protected FortuneBonusModifier(ILootCondition[] conditions) {
-		super(conditions);
-	}
+  protected FortuneBonusModifier(ILootCondition[] conditions) {
+    super(conditions);
+  }
 
-	@Override
-	protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
-		ItemStack tool = context.get(LootParameters.TOOL);
+  @Nonnull
+  @Override
+  protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
+    ItemStack tool = context.get(LootParameters.TOOL);
 
-		if (tool == null || tool.getOrCreateTag().getBoolean("HasCuriosFortuneBonus"))
-			return generatedLoot;
+    if (tool == null || tool.getOrCreateTag().getBoolean("HasCuriosFortuneBonus")) {
+      return generatedLoot;
+    }
+    Entity entity = context.get(LootParameters.THIS_ENTITY);
+    BlockState blockState = context.get(LootParameters.BLOCK_STATE);
 
-		Entity entity = context.get(LootParameters.THIS_ENTITY);
-		BlockState blockState = context.get(LootParameters.BLOCK_STATE);
-		if (blockState == null || !(entity instanceof LivingEntity))
-			return generatedLoot;
+    if (blockState == null || !(entity instanceof LivingEntity)) {
+      return generatedLoot;
+    }
+    LivingEntity player = (LivingEntity) entity;
+    int totalFortuneBonus = CuriosApi.getCuriosHelper().getCuriosHandler(player)
+        .map(ICuriosItemHandler::getFortuneBonus).orElse(0);
 
-		LivingEntity player = (LivingEntity) entity;
-		int totalFortuneBonus = 0;
+    if (totalFortuneBonus <= 0) {
+      return generatedLoot;
+    }
+    ItemStack fakeTool = tool.isEmpty() ? new ItemStack(Items.BARRIER) : tool.copy();
+    fakeTool.getOrCreateTag().putBoolean("HasCuriosFortuneBonus", true);
 
-		if (CuriosApi.getCuriosHelper().getCuriosHandler(player).isPresent()) {
-			totalFortuneBonus = CuriosApi.getCuriosHelper().getCuriosHandler(player).orElse(null).getFortuneBonus();
-		}
+    Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(fakeTool);
+    enchantments.put(Enchantments.FORTUNE,
+        EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, fakeTool) + totalFortuneBonus);
+    EnchantmentHelper.setEnchantments(enchantments, fakeTool);
+    LootContext.Builder builder = new LootContext.Builder(context);
+    builder.withParameter(LootParameters.TOOL, fakeTool);
+    LootContext newContext = builder.build(LootParameterSets.BLOCK);
+    LootTable lootTable = context.getWorld().getServer().getLootTableManager()
+        .getLootTableFromLocation(blockState.getBlock().getLootTable());
+    return lootTable.generate(newContext);
+  }
 
-		if (totalFortuneBonus <= 0)
-			return generatedLoot;
+  public static class Serializer extends GlobalLootModifierSerializer<FortuneBonusModifier> {
 
-		ItemStack fakeTool = tool.isEmpty() ? new ItemStack(Items.BARRIER) : tool.copy();
-		fakeTool.getOrCreateTag().putBoolean("HasCuriosFortuneBonus", true);
+    @Override
+    public FortuneBonusModifier read(ResourceLocation location, JsonObject object,
+        ILootCondition[] conditions) {
+      return new FortuneBonusModifier(conditions);
+    }
 
-		Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(fakeTool);
-		enchantments.put(Enchantments.FORTUNE, EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, fakeTool) + totalFortuneBonus);
-		EnchantmentHelper.setEnchantments(enchantments, fakeTool);
-		LootContext.Builder builder = new LootContext.Builder(context);
-		builder.withParameter(LootParameters.TOOL, fakeTool);
-		LootContext newContext = builder.build(LootParameterSets.BLOCK);
-		LootTable lootTable = context.getWorld().getServer().getLootTableManager().getLootTableFromLocation(blockState.getBlock().getLootTable());
-		return lootTable.generate(newContext);
-	}
-
-	public static class Serializer extends GlobalLootModifierSerializer<FortuneBonusModifier> {
-
-		@Override
-		public FortuneBonusModifier read(ResourceLocation location, JsonObject object, ILootCondition[] conditions) {
-			return new FortuneBonusModifier(conditions);
-		}
-
-		@Override
-		public JsonObject write(FortuneBonusModifier instance) {
-			return this.makeConditions(instance.conditions);
-		}
-	}
+    @Override
+    public JsonObject write(FortuneBonusModifier instance) {
+      return this.makeConditions(instance.conditions);
+    }
+  }
 }

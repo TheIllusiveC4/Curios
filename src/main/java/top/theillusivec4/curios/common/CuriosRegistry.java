@@ -74,12 +74,12 @@ public class CuriosRegistry {
     evt.getRegistry().register(
         IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
   }
-  
+
   @SubscribeEvent
-  public static void registerLootModifiers(final RegistryEvent.Register<GlobalLootModifierSerializer<?>> event) {
-	  final IForgeRegistry<GlobalLootModifierSerializer<?>> registry = event.getRegistry();
-	  
-	  registry.register(
-			new FortuneBonusModifier.Serializer().setRegistryName(new ResourceLocation(Curios.MODID, "fortune_bonus")));
+  public static void registerLootModifiers(
+      final RegistryEvent.Register<GlobalLootModifierSerializer<?>> event) {
+    final IForgeRegistry<GlobalLootModifierSerializer<?>> registry = event.getRegistry();
+    registry.register(new FortuneBonusModifier.Serializer()
+        .setRegistryName(new ResourceLocation(Curios.MODID, "fortune_bonus")));
   }
 }
