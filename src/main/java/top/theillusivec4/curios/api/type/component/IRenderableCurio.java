@@ -19,8 +19,7 @@
 
 package top.theillusivec4.curios.api.type.component;
 
-import nerdhub.cardinal.components.api.ComponentType;
-import nerdhub.cardinal.components.api.component.Component;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
@@ -33,10 +32,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.CompoundTag;
-import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.ISlotType;
 
-public interface IRenderableCurio extends CopyableComponent<IRenderableCurio> {
+public interface IRenderableCurio extends Component, CopyableComponent<IRenderableCurio> {
 
   /**
    * Performs rendering of the ItemStack. Note that vertical sneaking translations are automatically
@@ -46,30 +44,36 @@ public interface IRenderableCurio extends CopyableComponent<IRenderableCurio> {
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    */
   default void render(String identifier, int index, MatrixStack matrixStack,
-      VertexConsumerProvider vertexConsumerProvider, int light, LivingEntity livingEntity,
-      float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
-      float netHeadYaw, float headPitch) {
+                      VertexConsumerProvider vertexConsumerProvider, int light,
+                      LivingEntity livingEntity,
+                      float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
+                      float netHeadYaw, float headPitch) {
 
   }
 
   @Override
-  default void fromTag(CompoundTag var1) {
-
+  default void readFromNbt(CompoundTag compoundTag) {
+    this.fromTag(compoundTag);
   }
 
   @Override
-  default CompoundTag toTag(CompoundTag var1) {
-    return new CompoundTag();
+  default void writeToNbt(CompoundTag compoundTag) {
+    this.toTag(compoundTag);
   }
 
   @Override
-  default boolean isComponentEqual(Component other) {
+  default boolean isComponentEqual(nerdhub.cardinal.components.api.component.Component other) {
     return true;
   }
 
   @Override
-  default ComponentType<IRenderableCurio> getComponentType() {
-    return CuriosComponent.ITEM_RENDER;
+  default void fromTag(CompoundTag compoundTag) {
+
+  }
+
+  @Override
+  default CompoundTag toTag(CompoundTag compoundTag) {
+    return new CompoundTag();
   }
 
   /**
@@ -83,7 +87,7 @@ public interface IRenderableCurio extends CopyableComponent<IRenderableCurio> {
      * @param livingEntity The wearer of the curio
      */
     public static void translateIfSneaking(final MatrixStack matrixStack,
-        final LivingEntity livingEntity) {
+                                           final LivingEntity livingEntity) {
 
       if (livingEntity.isSneaking()) {
         matrixStack.translate(0.0f, 0.2f, 0.0f);
@@ -98,7 +102,7 @@ public interface IRenderableCurio extends CopyableComponent<IRenderableCurio> {
      * @param livingEntity The wearer of the curio
      */
     public static void rotateIfSneaking(final MatrixStack matrixStack,
-        final LivingEntity livingEntity) {
+                                        final LivingEntity livingEntity) {
 
       if (livingEntity.isSneaking()) {
         matrixStack.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(90.0F / (float) Math.PI));
@@ -120,7 +124,8 @@ public interface IRenderableCurio extends CopyableComponent<IRenderableCurio> {
           .getEntityRenderDispatcher().getRenderer(livingEntity);
 
       if (render instanceof LivingEntityRenderer) {
-        @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>
+            livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
         EntityModel<LivingEntity> model = livingRenderer.getModel();
 
         if (model instanceof BipedEntityModel) {
@@ -142,19 +147,21 @@ public interface IRenderableCurio extends CopyableComponent<IRenderableCurio> {
      */
     @SafeVarargs
     public static void followBodyRotations(final LivingEntity livingEntity,
-        final BipedEntityModel<LivingEntity>... models) {
+                                           final BipedEntityModel<LivingEntity>... models) {
 
       EntityRenderer<? super LivingEntity> render = MinecraftClient.getInstance()
           .getEntityRenderDispatcher().getRenderer(livingEntity);
 
       if (render instanceof LivingEntityRenderer) {
-        @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>
+            livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
         EntityModel<LivingEntity> entityModel = livingRenderer.getModel();
 
         if (entityModel instanceof BipedEntityModel) {
 
           for (BipedEntityModel<LivingEntity> model : models) {
-            BipedEntityModel<LivingEntity> bipedModel = (BipedEntityModel<LivingEntity>) entityModel;
+            BipedEntityModel<LivingEntity> bipedModel =
+                (BipedEntityModel<LivingEntity>) entityModel;
             bipedModel.setAttributes(model);
           }
         }

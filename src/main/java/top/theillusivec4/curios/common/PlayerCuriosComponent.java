@@ -42,6 +42,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.collection.DefaultedList;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.component.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -169,130 +170,8 @@ public class PlayerCuriosComponent implements ICuriosItemHandler {
   }
 
   @Override
-  public Entity getEntity() {
-    return this.wearer;
-  }
-
-  @Override
-  public void fromTag(CompoundTag compoundTag) {
-    ListTag tagList = compoundTag.getList("Curios", 10);
-    ListTag lockedList = compoundTag.getList("Locked", 8);
-
-    if (!tagList.isEmpty()) {
-      Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
-      SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = CuriosApi.getSlotHelper()
-          .createSlots();
-
-      for (int i = 0; i < tagList.size(); i++) {
-        CompoundTag tag = tagList.getCompound(i);
-        String identifier = tag.getString("Identifier");
-        CurioStacksHandler prevStacksHandler = new CurioStacksHandler();
-        prevStacksHandler.deserializeTag(tag.getCompound("StacksHandler"));
-
-        Optional<ISlotType> optionalType = CuriosApi.getSlotHelper().getSlotType(identifier);
-        optionalType.ifPresent(type -> {
-          CurioStacksHandler newStacksHandler = new CurioStacksHandler(type.getSize(),
-              prevStacksHandler.getSizeShift(), type.isVisible(), type.hasCosmetic());
-          int index = 0;
-
-          while (index < newStacksHandler.getSlots() && index < prevStacksHandler.getSlots()) {
-            newStacksHandler.getStacks()
-                .setStack(index, prevStacksHandler.getStacks().getStack(index));
-            newStacksHandler.getCosmeticStacks()
-                .setStack(index, prevStacksHandler.getCosmeticStacks().getStack(index));
-            index++;
-          }
-
-          while (index < prevStacksHandler.getSlots()) {
-            this.loseInvalidStack(prevStacksHandler.getStacks().getStack(index));
-            this.loseInvalidStack(prevStacksHandler.getCosmeticStacks().getStack(index));
-            index++;
-          }
-          sortedCurios.put(type, newStacksHandler);
-
-          for (int j = 0;
-              j < newStacksHandler.getRenders().size() && j < prevStacksHandler.getRenders().size();
-              j++) {
-            newStacksHandler.getRenders().set(j, prevStacksHandler.getRenders().get(j));
-          }
-        });
-
-        if (!optionalType.isPresent()) {
-          IDynamicStackHandler stackHandler = prevStacksHandler.getStacks();
-          IDynamicStackHandler cosmeticStackHandler = prevStacksHandler.getCosmeticStacks();
-
-          for (int j = 0; j < stackHandler.size(); j++) {
-            ItemStack stack = stackHandler.getStack(j);
-
-            if (!stack.isEmpty()) {
-              this.loseInvalidStack(stack);
-            }
-
-            ItemStack cosmeticStack = cosmeticStackHandler.getStack(j);
-
-            if (!cosmeticStack.isEmpty()) {
-              this.loseInvalidStack(cosmeticStack);
-            }
-          }
-        }
-      }
-      sortedCurios.forEach(
-          (slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler));
-      this.setCurios(curios);
-
-      for (int k = 0; k < lockedList.size(); k++) {
-        this.lockSlotType(lockedList.getString(k));
-      }
-    }
-  }
-
-  @Override
-  public CompoundTag toTag(CompoundTag compoundTag) {
-
-    ListTag taglist = new ListTag();
-    this.getCurios().forEach((key, stacksHandler) -> {
-      CompoundTag tag = new CompoundTag();
-      tag.put("StacksHandler", stacksHandler.serializeTag());
-      tag.putString("Identifier", key);
-      taglist.add(tag);
-    });
-    compoundTag.put("Curios", taglist);
-
-    ListTag taglist1 = new ListTag();
-
-    for (String identifier : this.getLockedSlots()) {
-      taglist1.add(StringTag.of(identifier));
-    }
-    compoundTag.put("Locked", taglist1);
-    return compoundTag;
-  }
-
-  @Override
-  public void writeToPacket(PacketByteBuf buf) {
-    buf.writeInt(this.curios.size());
-
-    for (Map.Entry<String, ICurioStacksHandler> entry : this.curios.entrySet()) {
-      buf.writeString(entry.getKey());
-      buf.writeCompoundTag(entry.getValue().serializeTag());
-    }
-  }
-
-  @Override
-  public void readFromPacket(PacketByteBuf buf) {
-    int entrySize = buf.readInt();
-    Map<String, ICurioStacksHandler> map = new LinkedHashMap<>();
-
-    for (int i = 0; i < entrySize; i++) {
-      String key = buf.readString(25);
-      CurioStacksHandler stacksHandler = new CurioStacksHandler();
-      CompoundTag compound = buf.readCompoundTag();
-
-      if (compound != null) {
-        stacksHandler.deserializeTag(compound);
-      }
-      map.put(key, stacksHandler);
-    }
-    this.setCurios(map);
+  public void sync() {
+    CuriosComponent.INVENTORY.sync(this.getWearer());
   }
 
   private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
@@ -342,5 +221,125 @@ public class PlayerCuriosComponent implements ICuriosItemHandler {
         itemEntity.setOwner(playerEntity.getUuid());
       }
     }
+  }
+
+  @Override
+  public void writeSyncPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+    buf.writeInt(this.curios.size());
+
+    for (Map.Entry<String, ICurioStacksHandler> entry : this.curios.entrySet()) {
+      buf.writeString(entry.getKey());
+      buf.writeCompoundTag(entry.getValue().serializeTag());
+    }
+  }
+
+  @Override
+  public void applySyncPacket(PacketByteBuf buf) {
+    int entrySize = buf.readInt();
+    Map<String, ICurioStacksHandler> map = new LinkedHashMap<>();
+
+    for (int i = 0; i < entrySize; i++) {
+      String key = buf.readString(25);
+      CurioStacksHandler stacksHandler = new CurioStacksHandler();
+      CompoundTag compound = buf.readCompoundTag();
+
+      if (compound != null) {
+        stacksHandler.deserializeTag(compound);
+      }
+      map.put(key, stacksHandler);
+    }
+    this.setCurios(map);
+  }
+
+  @Override
+  public void readFromNbt(CompoundTag compoundTag) {
+    ListTag tagList = compoundTag.getList("Curios", 10);
+    ListTag lockedList = compoundTag.getList("Locked", 8);
+
+    if (!tagList.isEmpty()) {
+      Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
+      SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = CuriosApi.getSlotHelper()
+          .createSlots();
+
+      for (int i = 0; i < tagList.size(); i++) {
+        CompoundTag tag = tagList.getCompound(i);
+        String identifier = tag.getString("Identifier");
+        CurioStacksHandler prevStacksHandler = new CurioStacksHandler();
+        prevStacksHandler.deserializeTag(tag.getCompound("StacksHandler"));
+
+        Optional<ISlotType> optionalType = CuriosApi.getSlotHelper().getSlotType(identifier);
+        optionalType.ifPresent(type -> {
+          CurioStacksHandler newStacksHandler = new CurioStacksHandler(type.getSize(),
+              prevStacksHandler.getSizeShift(), type.isVisible(), type.hasCosmetic());
+          int index = 0;
+
+          while (index < newStacksHandler.getSlots() && index < prevStacksHandler.getSlots()) {
+            newStacksHandler.getStacks()
+                .setStack(index, prevStacksHandler.getStacks().getStack(index));
+            newStacksHandler.getCosmeticStacks()
+                .setStack(index, prevStacksHandler.getCosmeticStacks().getStack(index));
+            index++;
+          }
+
+          while (index < prevStacksHandler.getSlots()) {
+            this.loseInvalidStack(prevStacksHandler.getStacks().getStack(index));
+            this.loseInvalidStack(prevStacksHandler.getCosmeticStacks().getStack(index));
+            index++;
+          }
+          sortedCurios.put(type, newStacksHandler);
+
+          for (int j = 0;
+               j < newStacksHandler.getRenders().size() &&
+                   j < prevStacksHandler.getRenders().size();
+               j++) {
+            newStacksHandler.getRenders().set(j, prevStacksHandler.getRenders().get(j));
+          }
+        });
+
+        if (!optionalType.isPresent()) {
+          IDynamicStackHandler stackHandler = prevStacksHandler.getStacks();
+          IDynamicStackHandler cosmeticStackHandler = prevStacksHandler.getCosmeticStacks();
+
+          for (int j = 0; j < stackHandler.size(); j++) {
+            ItemStack stack = stackHandler.getStack(j);
+
+            if (!stack.isEmpty()) {
+              this.loseInvalidStack(stack);
+            }
+
+            ItemStack cosmeticStack = cosmeticStackHandler.getStack(j);
+
+            if (!cosmeticStack.isEmpty()) {
+              this.loseInvalidStack(cosmeticStack);
+            }
+          }
+        }
+      }
+      sortedCurios.forEach(
+          (slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler));
+      this.setCurios(curios);
+
+      for (int k = 0; k < lockedList.size(); k++) {
+        this.lockSlotType(lockedList.getString(k));
+      }
+    }
+  }
+
+  @Override
+  public void writeToNbt(CompoundTag compoundTag) {
+    ListTag taglist = new ListTag();
+    this.getCurios().forEach((key, stacksHandler) -> {
+      CompoundTag tag = new CompoundTag();
+      tag.put("StacksHandler", stacksHandler.serializeTag());
+      tag.putString("Identifier", key);
+      taglist.add(tag);
+    });
+    compoundTag.put("Curios", taglist);
+    ListTag taglist1 = new ListTag();
+
+    for (String identifier : this.getLockedSlots()) {
+      taglist1.add(StringTag.of(identifier));
+    }
+    compoundTag.put("Locked", taglist1);
   }
 }

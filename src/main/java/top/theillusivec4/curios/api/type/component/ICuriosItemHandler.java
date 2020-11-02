@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.api.type.component;
 
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -31,7 +32,7 @@ import top.theillusivec4.curios.api.CuriosComponent;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
-public interface ICuriosItemHandler extends EntitySyncedComponent {
+public interface ICuriosItemHandler extends AutoSyncedComponent {
 
   /**
    * A map of the current curios, keyed by the {@link ISlotType} identifier.
@@ -134,8 +135,5 @@ public interface ICuriosItemHandler extends EntitySyncedComponent {
    */
   void handleInvalidStacks();
 
-  @Override
-  default ComponentType<ICuriosItemHandler> getComponentType() {
-    return CuriosComponent.INVENTORY;
-  }
+  void sync();
 }

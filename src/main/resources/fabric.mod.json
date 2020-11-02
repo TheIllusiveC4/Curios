@@ -29,6 +29,13 @@
   "mixins": [
     "curios.mixins.json"
   ],
+  "custom": {
+    "cardinal-components": [
+      "curios:item",
+      "curios:item_render",
+      "curios:inventory"
+    ]
+  },
   "depends": {
     "fabricloader": ">=0.10.5",
     "minecraft": "1.16.x",

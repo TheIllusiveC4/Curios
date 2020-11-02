@@ -21,8 +21,8 @@ package top.theillusivec4.curios.api.type.component;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import java.util.List;
-import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
 import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
 import net.minecraft.entity.LivingEntity;
@@ -36,10 +36,10 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
-import top.theillusivec4.curios.api.CuriosComponent;
+import org.jetbrains.annotations.ApiStatus;
 import top.theillusivec4.curios.api.type.ISlotType;
 
-public interface ICurio extends CopyableComponent<ICurio> {
+public interface ICurio extends AutoSyncedComponent, CopyableComponent<ICurio> {
 
   /*
    * Copy of vanilla implementation for breaking items client-side
@@ -227,22 +227,29 @@ public interface ICurio extends CopyableComponent<ICurio> {
   }
 
   @Override
-  default void fromTag(CompoundTag var1) {
-
-  }
-
-  @Override
-  default CompoundTag toTag(CompoundTag var1) {
-    return new CompoundTag();
-  }
-
-  @Override
   default boolean isComponentEqual(Component other) {
     return true;
   }
 
   @Override
-  default ComponentType<ICurio> getComponentType() {
-    return CuriosComponent.ITEM;
+  default void readFromNbt(CompoundTag compoundTag) {
+    this.fromTag(compoundTag);
+  }
+
+  @Override
+  default void writeToNbt(CompoundTag compoundTag) {
+    this.toTag(compoundTag);
+  }
+
+  @Deprecated
+  @ApiStatus.ScheduledForRemoval
+  default void fromTag(CompoundTag var1) {
+
+  }
+
+  @Deprecated
+  @ApiStatus.ScheduledForRemoval
+  default CompoundTag toTag(CompoundTag var1) {
+    return new CompoundTag();
   }
 }
