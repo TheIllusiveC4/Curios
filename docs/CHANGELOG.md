@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.10] - 2020.11.02
+### Fixed
+- Fixed syncing issue with CCA
+
 ## [0.0.9] - 2020.10.29
 ### Changed
 - Updated CCA dependency to 2.7.2
