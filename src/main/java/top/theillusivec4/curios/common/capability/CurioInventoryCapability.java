@@ -54,6 +54,7 @@ import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+import top.theillusivec4.curios.api.type.util.ISlotHelper;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 
 public class CurioInventoryCapability {
@@ -89,11 +90,11 @@ public class CurioInventoryCapability {
               ICuriosItemHandler instance, Direction side, INBT nbt) {
             ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", NBT.TAG_COMPOUND);
             ListNBT lockedList = ((CompoundNBT) nbt).getList("Locked", NBT.TAG_STRING);
+            ISlotHelper slotHelper = CuriosApi.getSlotHelper();
 
-            if (!tagList.isEmpty()) {
+            if (!tagList.isEmpty() && slotHelper != null) {
               Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
-              SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = CuriosApi.getSlotHelper()
-                  .createSlots();
+              SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = slotHelper.createSlots();
 
               for (int i = 0; i < tagList.size(); i++) {
                 CompoundNBT tag = tagList.getCompound(i);
@@ -174,7 +175,7 @@ public class CurioInventoryCapability {
     PlayerEntity wearer;
     Set<String> toLock = new HashSet<>();
     List<UnlockState> toUnlock = new ArrayList<>();
-    Tuple<Integer, Integer> fortuneAndLooting = new Tuple<Integer, Integer>(0, 0);
+    Tuple<Integer, Integer> fortuneAndLooting = new Tuple<>(0, 0);
 
     CurioInventoryWrapper() {
       this(null);
