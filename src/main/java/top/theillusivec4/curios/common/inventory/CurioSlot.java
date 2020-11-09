@@ -74,7 +74,7 @@ public class CurioSlot extends SlotItemHandler {
   }
 
   protected boolean hasValidTag(Set<String> tags) {
-    return tags.contains(identifier) || tags.contains("curio");
+    return this.identifier.equals("curio") || tags.contains(identifier) || tags.contains("curio");
   }
 
   @Override
