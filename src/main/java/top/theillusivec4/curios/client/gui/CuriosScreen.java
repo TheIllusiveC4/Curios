@@ -167,7 +167,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
   public void updateRenderButtons() {
     this.buttons.removeIf(widget -> widget instanceof RenderButton);
-    this.buttons.removeIf(widget -> widget instanceof RenderButton);
+    this.children.removeIf(widget -> widget instanceof RenderButton);
 
     for (Slot inventorySlot : this.container.inventorySlots) {
 
@@ -462,7 +462,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   }
 
   @Override
-  protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton,
+  protected void handleMouseClick(@Nonnull Slot slotIn, int slotId, int mouseButton,
       @Nonnull ClickType type) {
     super.handleMouseClick(slotIn, slotId, mouseButton, type);
     this.recipeBookGui.slotClicked(slotIn);
