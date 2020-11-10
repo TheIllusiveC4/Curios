@@ -262,11 +262,11 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
         }
       }
     }
-    this.func_230459_a_(matrixStack, mouseX, mouseY);
+    this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
   }
 
   @Override
-  protected void func_230459_a_(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY) {
+  protected void renderHoveredTooltip(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY) {
     Minecraft mc = this.minecraft;
 
     if (mc != null) {
