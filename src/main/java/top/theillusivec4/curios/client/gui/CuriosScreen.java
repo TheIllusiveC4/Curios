@@ -167,7 +167,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
   public void updateRenderButtons() {
     this.buttons.removeIf(widget -> widget instanceof RenderButton);
-    this.buttons.removeIf(widget -> widget instanceof RenderButton);
+    this.children.removeIf(widget -> widget instanceof RenderButton);
 
     for (Slot inventorySlot : this.container.inventorySlots) {
 
@@ -262,11 +262,11 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
         }
       }
     }
-    this.func_230459_a_(matrixStack, mouseX, mouseY);
+    this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
   }
 
   @Override
-  protected void func_230459_a_(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY) {
+  protected void renderHoveredTooltip(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY) {
     Minecraft mc = this.minecraft;
 
     if (mc != null) {
@@ -462,7 +462,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   }
 
   @Override
-  protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton,
+  protected void handleMouseClick(@Nonnull Slot slotIn, int slotId, int mouseButton,
       @Nonnull ClickType type) {
     super.handleMouseClick(slotIn, slotId, mouseButton, type);
     this.recipeBookGui.slotClicked(slotIn);

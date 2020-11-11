@@ -75,7 +75,7 @@ public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen
                 for (RecipeTabToggleWidget tab : tabs) {
 
                   if (tab.active) {
-                    areas.add(new Rectangle2d(tab.x, tab.y, tab.getWidth(), tab.getWidth_CLASH()));
+                    areas.add(new Rectangle2d(tab.x, tab.y, tab.getWidth(), tab.getBlitOffset()));
                   }
                 }
               } catch (IllegalAccessException e) {

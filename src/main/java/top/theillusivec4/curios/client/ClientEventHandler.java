@@ -174,20 +174,20 @@ public class ClientEventHandler {
                   tooltip.add((new StringTextComponent(" ")).append(new TranslationTextComponent(
                       "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
                       DECIMALFORMAT.format(d1),
-                      new TranslationTextComponent(entry.getKey().func_233754_c_())))
+                      new TranslationTextComponent(entry.getKey().getAttributeName())))
                       .mergeStyle(TextFormatting.DARK_GREEN));
                 } else if (amount > 0.0D) {
                   tooltip.add((new TranslationTextComponent(
                       "attribute.modifier.plus." + attributemodifier.getOperation().getId(),
                       DECIMALFORMAT.format(d1),
-                      new TranslationTextComponent(entry.getKey().func_233754_c_())))
+                      new TranslationTextComponent(entry.getKey().getAttributeName())))
                       .mergeStyle(TextFormatting.BLUE));
                 } else if (amount < 0.0D) {
                   d1 = d1 * -1.0D;
                   tooltip.add((new TranslationTextComponent(
                       "attribute.modifier.take." + attributemodifier.getOperation().getId(),
                       DECIMALFORMAT.format(d1),
-                      new TranslationTextComponent(entry.getKey().func_233754_c_())))
+                      new TranslationTextComponent(entry.getKey().getAttributeName())))
                       .mergeStyle(TextFormatting.RED));
                 }
               }

@@ -138,7 +138,7 @@ public class CuriosHelper implements ICuriosHelper {
               .getValue(ResourceLocation.tryCreate(compoundnbt.getString("AttributeName")));
 
           if (attribute != null) {
-            AttributeModifier attributemodifier = AttributeModifier.func_233800_a_(compoundnbt);
+            AttributeModifier attributemodifier = AttributeModifier.read(compoundnbt);
 
             if (attributemodifier != null
                 && attributemodifier.getID().getLeastSignificantBits() != 0L
