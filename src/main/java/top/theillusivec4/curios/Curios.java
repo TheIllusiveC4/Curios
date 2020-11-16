@@ -83,7 +83,7 @@ public class Curios {
   public static final String MODID = CuriosApi.MODID;
   public static final Logger LOGGER = LogManager.getLogger();
 
-  private static final boolean DEBUG = false;
+  private static final boolean DEBUG = true;
 
   public Curios() {
     final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
