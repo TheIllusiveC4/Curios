@@ -28,13 +28,16 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.text.TranslationTextComponent;
-import top.theillusivec4.curios.api.CuriosApi;
 
 public class CurioArgumentType implements ArgumentType<String> {
+
+  public static Set<String> slotIds = new HashSet<>();
 
   private static final Collection<String> EXAMPLES = Arrays.asList("ring", "head");
   private static final DynamicCommandExceptionType UNKNOWN_TYPE = new DynamicCommandExceptionType(
@@ -50,8 +53,8 @@ public class CurioArgumentType implements ArgumentType<String> {
 
   @Override
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
-      SuggestionsBuilder builder) {
-    return ISuggestionProvider.suggest(CuriosApi.getSlotHelper().getSlotTypeIds(), builder);
+                                                            SuggestionsBuilder builder) {
+    return ISuggestionProvider.suggest(slotIds, builder);
   }
 
   @Override
@@ -63,7 +66,7 @@ public class CurioArgumentType implements ArgumentType<String> {
   public String parse(StringReader reader) throws CommandSyntaxException {
     String s = reader.readUnquotedString();
 
-    if (!CuriosApi.getSlotHelper().getSlotTypeIds().contains(s)) {
+    if (!slotIds.contains(s)) {
       throw UNKNOWN_TYPE.create(s);
     } else {
       return s;

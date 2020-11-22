@@ -20,7 +20,9 @@
 package top.theillusivec4.curios.common.network.server;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
@@ -28,6 +30,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.server.command.CurioArgumentType;
 
 public class SPacketSetIcons {
 
@@ -61,14 +64,17 @@ public class SPacketSetIcons {
   public static void handle(SPacketSetIcons msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
       ClientWorld world = Minecraft.getInstance().world;
+      Set<String> slotIds = new HashSet<>();
 
       if (world != null) {
         CuriosApi.getIconHelper().clearIcons();
 
         for (Map.Entry<String, ResourceLocation> entry : msg.map.entrySet()) {
           CuriosApi.getIconHelper().addIcon(entry.getKey(), entry.getValue());
+          slotIds.add(entry.getKey());
         }
       }
+      CurioArgumentType.slotIds = slotIds;
     });
     ctx.get().setPacketHandled(true);
   }

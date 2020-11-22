@@ -79,8 +79,9 @@ import top.theillusivec4.curios.common.triggers.EquipCurioTrigger;
 public class CuriosEventHandler {
 
   private static void handleDrops(LivingEntity livingEntity,
-      List<Tuple<Predicate<ItemStack>, DropRule>> dropRules, IDynamicStackHandler stacks,
-      Collection<ItemEntity> drops, boolean keepInventory) {
+                                  List<Tuple<Predicate<ItemStack>, DropRule>> dropRules,
+                                  IDynamicStackHandler stacks, Collection<ItemEntity> drops,
+                                  boolean keepInventory) {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
 
@@ -95,7 +96,7 @@ public class CuriosEventHandler {
         }
         DropRule dropRule = dropRuleOverride != null ? dropRuleOverride
             : CuriosApi.getCuriosHelper().getCurio(stack)
-                .map(curio -> curio.getDropRule(livingEntity)).orElse(DropRule.DEFAULT);
+            .map(curio -> curio.getDropRule(livingEntity)).orElse(DropRule.DEFAULT);
 
         if ((dropRule == DropRule.DEFAULT && keepInventory) || dropRule == DropRule.ALWAYS_KEEP) {
           continue;
@@ -121,7 +122,7 @@ public class CuriosEventHandler {
   }
 
   private static boolean handleMending(PlayerEntity player, IDynamicStackHandler stacks,
-      PickupXp evt) {
+                                       PickupXp evt) {
 
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
@@ -425,8 +426,8 @@ public class CuriosEventHandler {
   }
 
   private static void syncCurios(LivingEntity livingEntity, ItemStack stack,
-      LazyOptional<ICurio> currentCurio, LazyOptional<ICurio> prevCurio, String identifier,
-      int index, HandlerType type) {
+                                 LazyOptional<ICurio> currentCurio, LazyOptional<ICurio> prevCurio,
+                                 String identifier, int index, HandlerType type) {
     boolean syncable =
         currentCurio.map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false)
             || prevCurio.map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false);
