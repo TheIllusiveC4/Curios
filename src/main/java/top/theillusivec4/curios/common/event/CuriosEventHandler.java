@@ -27,6 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -38,12 +42,15 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -67,9 +74,11 @@ import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+import top.theillusivec4.curios.api.type.capability.IItemCurio;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
+import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
@@ -168,6 +177,34 @@ public class CuriosEventHandler {
       evt.addCapability(CuriosCapability.ID_INVENTORY,
           CurioInventoryCapability.createProvider((PlayerEntity) evt.getObject()));
     }
+  }
+
+  /**
+   * Handler for registering item's capabilities implemented through IItemCurio interface.
+   */
+
+  @SubscribeEvent
+  public void attachStackCabilities(AttachCapabilitiesEvent<ItemStack> evt) {
+	ItemStack stack = evt.getObject();
+
+	if (stack.getItem() instanceof IItemCurio) {
+	  IItemCurio itemCurio = (IItemCurio)stack.getItem();
+
+	  if (itemCurio.attachCapability(stack)) {
+		ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(itemCurio, stack);
+
+		evt.addCapability(CuriosCapability.ID_ITEM, new ICapabilityProvider() {
+		LazyOptional<ICurio> curio = LazyOptional.of(() -> itemizedCapability);
+
+		@Nonnull
+		@Override
+		public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+		  return CuriosCapability.ITEM.orEmpty(cap, this.curio);
+		}
+		});
+	  }
+	}
+
   }
 
   @SubscribeEvent

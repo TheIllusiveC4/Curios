@@ -35,61 +35,56 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.api.type.capability.IItemCurio;
 import top.theillusivec4.curios.client.render.model.AmuletModel;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
-public class AmuletItem extends Item {
-
+public class AmuletItem extends Item implements IItemCurio {
   private static final ResourceLocation AMULET_TEXTURE = new ResourceLocation(Curios.MODID,
-      "textures/entity/amulet.png");
+	  "textures/entity/amulet.png");
+  private Object model;
 
   public AmuletItem() {
-    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
-    this.setRegistryName(Curios.MODID, "amulet");
+	super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
+	this.setRegistryName(Curios.MODID, "amulet");
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
-    return CurioItemCapability.createProvider(new ICurio() {
-      private Object model;
+  public void curioTick(String identifier, int index, LivingEntity living, ItemStack stack) {
+	if (!living.getEntityWorld().isRemote && living.ticksExisted % 40 == 0) {
+	  living.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
+	}
+  }
 
-      @Override
-      public void curioTick(String identifier, int index, LivingEntity livingEntity) {
+  @Override
+  public boolean canRender(String identifier, int index, LivingEntity living, ItemStack stack) {
+	return true;
+  }
 
-        if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 40 == 0) {
-          livingEntity.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
-        }
-      }
+  @Override
+  public void render(String identifier, int index, MatrixStack matrixStack,
+      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity living, float limbSwing,
+      float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+      float headPitch, ItemStack stack) {
+    ICurio.RenderHelper.translateIfSneaking(matrixStack, living);
+    ICurio.RenderHelper.rotateIfSneaking(matrixStack, living);
 
-      @Override
-      public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
-        return true;
-      }
+    if (!(this.model instanceof AmuletModel)) {
+      this.model = new AmuletModel<>();
+    }
 
-      @Override
-      public void render(String identifier, int index, MatrixStack matrixStack,
-          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
-          float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-          float headPitch) {
-        ICurio.RenderHelper.translateIfSneaking(matrixStack, livingEntity);
-        ICurio.RenderHelper.rotateIfSneaking(matrixStack, livingEntity);
-
-        if (!(this.model instanceof AmuletModel)) {
-          this.model = new AmuletModel<>();
-        }
-        AmuletModel<?> amuletModel = (AmuletModel<?>) this.model;
-        IVertexBuilder vertexBuilder = ItemRenderer
-            .getBuffer(renderTypeBuffer, amuletModel.getRenderType(AMULET_TEXTURE), false,
-                stack.hasEffect());
-        amuletModel
-            .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
-                1.0F);
-      }
-    });
+    AmuletModel<?> amuletModel = (AmuletModel<?>) this.model;
+    IVertexBuilder vertexBuilder = ItemRenderer
+        .getBuffer(renderTypeBuffer, amuletModel.getRenderType(AMULET_TEXTURE), false,
+            stack.hasEffect());
+    amuletModel
+        .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
+            1.0F);
   }
 
   @Override
   public boolean hasEffect(ItemStack stack) {
-    return true;
+	return true;
   }
+
 }
