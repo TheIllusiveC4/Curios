@@ -31,7 +31,6 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 import top.theillusivec4.curios.Curios;
@@ -39,9 +38,6 @@ import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 
 public class GuiEventHandler {
-
-  private static final Method GET_SELECTED_SLOT = ObfuscationReflectionHelper
-      .findMethod(ContainerScreen.class, "func_195360_a", double.class, double.class);
 
   @SubscribeEvent
   public void onInventoryGuiInit(GuiScreenEvent.InitGuiEvent.Post evt) {
@@ -63,14 +59,12 @@ public class GuiEventHandler {
   @SubscribeEvent
   public void onInventoryGuiDrawBackground(GuiScreenEvent.DrawScreenEvent.Pre evt) {
 
-    if (!(evt.getGui() instanceof InventoryScreen)) {
-      return;
-    }
+    if (!(evt.getGui() instanceof InventoryScreen))
+	  return;
     InventoryScreen gui = (InventoryScreen) evt.getGui();
-    ObfuscationReflectionHelper
-        .setPrivateValue(InventoryScreen.class, gui, evt.getMouseX(), "field_147048_u");
-    ObfuscationReflectionHelper
-        .setPrivateValue(InventoryScreen.class, gui, evt.getMouseY(), "field_147047_v");
+
+    gui.oldMouseX = evt.getMouseX();
+    gui.oldMouseY = evt.getMouseY();
   }
 
   @SubscribeEvent
@@ -80,22 +74,20 @@ public class GuiEventHandler {
     boolean isRightShiftDown = InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);
     boolean isShiftDown = isLeftShiftDown || isRightShiftDown;
 
-    if (!(evt.getGui() instanceof CreativeScreen) || !isShiftDown) {
-      return;
-    }
+    if (!(evt.getGui() instanceof CreativeScreen) || !isShiftDown)
+	  return;
 
     CreativeScreen gui = (CreativeScreen) evt.getGui();
 
-    if (gui.getSelectedTabIndex() != ItemGroup.INVENTORY.getIndex()) {
-      return;
-    }
-    Slot destroyItemSlot = ObfuscationReflectionHelper
-        .getPrivateValue(CreativeScreen.class, gui, "field_147064_C");
+    if (gui.getSelectedTabIndex() != ItemGroup.INVENTORY.getIndex())
+	  return;
+    Slot destroyItemSlot = gui.destroyItemSlot;
     Slot slot = null;
 
     try {
-      slot = (Slot) GET_SELECTED_SLOT.invoke(gui, evt.getMouseX(), evt.getMouseY());
+      slot = gui.getSelectedSlot(evt.getMouseX(), evt.getMouseY());
     } catch (Exception err) {
+      // Likely impossibe condition now but whatever
       Curios.LOGGER.error("Could not get selected slot in Creative gui!");
     }
 

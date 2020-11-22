@@ -33,6 +33,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.SlotItemHandler;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CurioSlot extends SlotItemHandler {
@@ -63,18 +64,18 @@ public class CurioSlot extends SlotItemHandler {
 
   @OnlyIn(Dist.CLIENT)
   public String getSlotName() {
-    return I18n.format("curios.identifier." + identifier);
+    return I18n.format("curios.identifier." + this.identifier);
   }
 
   @Override
   public boolean isItemValid(@Nonnull ItemStack stack) {
-    return hasValidTag(CuriosApi.getCuriosHelper().getCurioTags(stack.getItem())) && CuriosApi
-        .getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(identifier, player))
+    return this.hasValidTag(CuriosApi.getCuriosHelper().getCurioTags(stack.getItem())) && CuriosApi
+        .getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(this.identifier, this.player))
         .orElse(true) && super.isItemValid(stack);
   }
 
   protected boolean hasValidTag(Set<String> tags) {
-    return this.identifier.equals("curio") || tags.contains(identifier) || tags.contains("curio");
+    return (!tags.isEmpty() && this.identifier.equals(SlotTypePreset.CURIO.getIdentifier())) || tags.contains(this.identifier) || tags.contains(SlotTypePreset.CURIO.getIdentifier());
   }
 
   @Override
@@ -82,7 +83,7 @@ public class CurioSlot extends SlotItemHandler {
     ItemStack stack = this.getStack();
     return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
         && CuriosApi.getCuriosHelper().getCurio(stack)
-        .map(curio -> curio.canUnequip(identifier, playerIn)).orElse(true) && super
+        .map(curio -> curio.canUnequip(this.identifier, playerIn)).orElse(true) && super
         .canTakeStack(playerIn);
   }
 }

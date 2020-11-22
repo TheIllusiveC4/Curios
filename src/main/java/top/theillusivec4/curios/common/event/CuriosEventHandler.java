@@ -59,6 +59,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 import top.theillusivec4.curios.api.event.CurioDropsEvent;
 import top.theillusivec4.curios.api.event.DropRulesEvent;
@@ -281,9 +282,8 @@ public class CuriosEventHandler {
         for (ICurioStacksHandler stacksHandler : curios.values()) {
 
           if (handleMending(player, stacksHandler.getStacks(), evt) || handleMending(player,
-              stacksHandler.getCosmeticStacks(), evt)) {
-            return;
-          }
+              stacksHandler.getCosmeticStacks(), evt))
+			return;
         }
       });
     }
@@ -309,7 +309,7 @@ public class CuriosEventHandler {
                 Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
                 String id = entry.getKey();
 
-                if (present.isEmpty() && (tags.contains(id) || tags.contains("curio")) && curio
+                if (present.isEmpty() && ((tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier())) || (!tags.isEmpty() && id == SlotTypePreset.CURIO.getIdentifier())) && curio
                     .canEquip(id, player)) {
                   stackHandler.setStackInSlot(i, stack.copy());
                   curio.playRightClickEquipSound(player);
