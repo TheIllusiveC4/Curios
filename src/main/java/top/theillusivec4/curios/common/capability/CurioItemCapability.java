@@ -19,6 +19,8 @@
 
 package top.theillusivec4.curios.common.capability;
 
+import java.util.concurrent.Callable;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundNBT;
@@ -66,7 +68,7 @@ public class CurioItemCapability {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-      return CuriosCapability.ITEM.orEmpty(cap, capability);
+      return CuriosCapability.ITEM.orEmpty(cap, this.capability);
     }
   }
 }
