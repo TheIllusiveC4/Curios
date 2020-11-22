@@ -82,7 +82,8 @@ public interface ICuriosHelper {
    * nothing was found.
    */
   Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(Item item,
-      @Nonnull LivingEntity livingEntity);
+                                                                          @Nonnull
+                                                                              LivingEntity livingEntity);
 
   /**
    * Gets the first found {@link ItemStack} of the item type equipped in a curio slot that matches

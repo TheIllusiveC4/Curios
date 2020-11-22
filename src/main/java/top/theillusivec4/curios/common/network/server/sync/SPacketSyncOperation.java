@@ -46,7 +46,7 @@ public class SPacketSyncOperation {
   }
 
   public SPacketSyncOperation(int entityId, String curioId, Operation operation, int amount,
-      boolean visible, boolean cosmetic) {
+                              boolean visible, boolean cosmetic) {
     this.entityId = entityId;
     this.curioId = curioId;
     this.amount = amount;

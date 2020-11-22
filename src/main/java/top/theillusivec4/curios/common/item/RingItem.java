@@ -38,7 +38,6 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
@@ -70,17 +69,19 @@ public class RingItem extends Item {
             SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL, 1.0f, 1.0f);
       }
 
-	  @Override
-	  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
-		Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
+      @Override
+      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
+        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
-		atts.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(SPEED_UUID, Curios.MODID + ":speed_bonus", 0.1,
-			AttributeModifier.Operation.MULTIPLY_TOTAL));
-		atts.put(Attributes.ARMOR,
-			new AttributeModifier(ARMOR_UUID, Curios.MODID + ":armor_bonus", 2, AttributeModifier.Operation.ADDITION));
+        atts.put(Attributes.MOVEMENT_SPEED,
+            new AttributeModifier(SPEED_UUID, Curios.MODID + ":speed_bonus", 0.1,
+                AttributeModifier.Operation.MULTIPLY_TOTAL));
+        atts.put(Attributes.ARMOR,
+            new AttributeModifier(ARMOR_UUID, Curios.MODID + ":armor_bonus", 2,
+                AttributeModifier.Operation.ADDITION));
 
-		return atts;
-	  }
+        return atts;
+      }
 
       @Nonnull
       @Override
@@ -96,7 +97,7 @@ public class RingItem extends Item {
   }
 
   @Override
-  public boolean hasEffect(ItemStack stack) {
+  public boolean hasEffect(@Nonnull ItemStack stack) {
     return true;
   }
 }

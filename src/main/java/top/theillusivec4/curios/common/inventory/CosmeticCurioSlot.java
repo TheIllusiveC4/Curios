@@ -31,7 +31,7 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 public class CosmeticCurioSlot extends CurioSlot {
 
   public CosmeticCurioSlot(PlayerEntity player, IDynamicStackHandler handler, int index,
-      String identifier, int xPosition, int yPosition) {
+                           String identifier, int xPosition, int yPosition) {
     super(player, handler, index, identifier, xPosition, yPosition, null);
     this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
         new ResourceLocation(Curios.MODID, "item/empty_cosmetic_slot"));

@@ -19,7 +19,6 @@
 
 package top.theillusivec4.curios.client.gui;
 
-import java.lang.reflect.Method;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -33,7 +32,6 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 
@@ -59,8 +57,9 @@ public class GuiEventHandler {
   @SubscribeEvent
   public void onInventoryGuiDrawBackground(GuiScreenEvent.DrawScreenEvent.Pre evt) {
 
-    if (!(evt.getGui() instanceof InventoryScreen))
-	  return;
+    if (!(evt.getGui() instanceof InventoryScreen)) {
+      return;
+    }
     InventoryScreen gui = (InventoryScreen) evt.getGui();
 
     gui.oldMouseX = evt.getMouseX();
@@ -74,22 +73,17 @@ public class GuiEventHandler {
     boolean isRightShiftDown = InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);
     boolean isShiftDown = isLeftShiftDown || isRightShiftDown;
 
-    if (!(evt.getGui() instanceof CreativeScreen) || !isShiftDown)
-	  return;
+    if (!(evt.getGui() instanceof CreativeScreen) || !isShiftDown) {
+      return;
+    }
 
     CreativeScreen gui = (CreativeScreen) evt.getGui();
 
-    if (gui.getSelectedTabIndex() != ItemGroup.INVENTORY.getIndex())
-	  return;
-    Slot destroyItemSlot = gui.destroyItemSlot;
-    Slot slot = null;
-
-    try {
-      slot = gui.getSelectedSlot(evt.getMouseX(), evt.getMouseY());
-    } catch (Exception err) {
-      // Likely impossibe condition now but whatever
-      Curios.LOGGER.error("Could not get selected slot in Creative gui!");
+    if (gui.getSelectedTabIndex() != ItemGroup.INVENTORY.getIndex()) {
+      return;
     }
+    Slot destroyItemSlot = gui.destroyItemSlot;
+    Slot slot = gui.getSelectedSlot(evt.getMouseX(), evt.getMouseY());
 
     if (destroyItemSlot != null && slot == destroyItemSlot) {
       NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketDestroy());

@@ -3,7 +3,6 @@ package top.theillusivec4.curios.common.objects;
 import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import javax.annotation.Nonnull;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantment;
@@ -35,7 +34,8 @@ public class FortuneBonusModifier extends LootModifier {
   protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
     ItemStack tool = context.get(LootParameters.TOOL);
 
-    if (tool == null || tool.hasTag() && tool.getTag().getBoolean("HasCuriosFortuneBonus")) {
+    if (tool == null || tool.hasTag() && tool.getTag() != null &&
+        tool.getTag().getBoolean("HasCuriosFortuneBonus")) {
       return generatedLoot;
     }
     Entity entity = context.get(LootParameters.THIS_ENTITY);
@@ -70,7 +70,7 @@ public class FortuneBonusModifier extends LootModifier {
 
     @Override
     public FortuneBonusModifier read(ResourceLocation location, JsonObject object,
-        ILootCondition[] conditions) {
+                                     ILootCondition[] conditions) {
       return new FortuneBonusModifier(conditions);
     }
 

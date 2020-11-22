@@ -77,7 +77,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   private boolean isRenderButtonHovered;
 
   public CuriosScreen(CuriosContainer curiosContainer, PlayerInventory playerInventory,
-      ITextComponent title) {
+                      ITextComponent title) {
     super(curiosContainer, playerInventory, title);
     this.passEvents = true;
   }
@@ -299,13 +299,14 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
         playerEntity.closeScreen();
       }
       return true;
-    } else
-	  return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+    } else {
+      return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+    }
   }
 
   @Override
   protected void drawGuiContainerForegroundLayer(@Nonnull MatrixStack matrixStack, int mouseX,
-      int mouseY) {
+                                                 int mouseY) {
 
     if (this.minecraft != null && this.minecraft.player != null) {
       this.font.func_243248_b(matrixStack, this.title, 97, 6, 4210752);
@@ -318,7 +319,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
   @Override
   protected void drawGuiContainerBackgroundLayer(@Nonnull MatrixStack matrixStack,
-      float partialTicks, int mouseX, int mouseY) {
+                                                 float partialTicks, int mouseX, int mouseY) {
 
     if (this.minecraft != null && this.minecraft.player != null) {
       RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -375,10 +376,11 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
    */
   @Override
   protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight,
-      double pointX, double pointY) {
+                                    double pointX, double pointY) {
 
-    if (this.isRenderButtonHovered)
-	  return false;
+    if (this.isRenderButtonHovered) {
+      return false;
+    }
     return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super
         .isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
   }
@@ -389,9 +391,9 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 
-    if (this.recipeBookGui.mouseClicked(mouseX, mouseY, mouseButton))
-	  return true;
-	else if (this.inScrollBar(mouseX, mouseY)) {
+    if (this.recipeBookGui.mouseClicked(mouseX, mouseY, mouseButton)) {
+      return true;
+    } else if (this.inScrollBar(mouseX, mouseY)) {
       this.isScrolling = this.needsScrollBars();
       return true;
     }
@@ -409,13 +411,14 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (this.buttonClicked) {
       this.buttonClicked = false;
       return true;
-    } else
-	  return super.mouseReleased(mouseReleased1, mouseReleased3, mouseReleased5);
+    } else {
+      return super.mouseReleased(mouseReleased1, mouseReleased3, mouseReleased5);
+    }
   }
 
   @Override
   public boolean mouseDragged(double pMouseDragged1, double pMouseDragged3, int pMouseDragged5,
-      double pMouseDragged6, double pMouseDragged8) {
+                              double pMouseDragged6, double pMouseDragged8) {
 
     if (this.isScrolling) {
       int i = this.guiTop + 8;
@@ -424,18 +427,19 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
       this.container.scrollTo(currentScroll);
       return true;
-    } else
-	  return super.mouseDragged(pMouseDragged1, pMouseDragged3, pMouseDragged5, pMouseDragged6,
+    } else {
+      return super.mouseDragged(pMouseDragged1, pMouseDragged3, pMouseDragged5, pMouseDragged6,
           pMouseDragged8);
+    }
   }
 
   @Override
   public boolean mouseScrolled(double pMouseScrolled1, double pMouseScrolled3,
-      double pMouseScrolled5) {
+                               double pMouseScrolled5) {
 
-    if (!this.needsScrollBars())
-	  return false;
-	else {
+    if (!this.needsScrollBars()) {
+      return false;
+    } else {
       int i = (this.container).curiosHandler.map(ICuriosItemHandler::getVisibleSlots).orElse(1);
       currentScroll = (float) (currentScroll - pMouseScrolled5 / i);
       currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
@@ -450,7 +454,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
   @Override
   protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn,
-      int mouseButton) {
+                                      int mouseButton) {
     boolean flag = mouseX < guiLeftIn || mouseY < guiTopIn || mouseX >= guiLeftIn + this.xSize
         || mouseY >= guiTopIn + this.ySize;
     return this.recipeBookGui
@@ -460,7 +464,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
   @Override
   protected void handleMouseClick(@Nonnull Slot slotIn, int slotId, int mouseButton,
-      @Nonnull ClickType type) {
+                                  @Nonnull ClickType type) {
     super.handleMouseClick(slotIn, slotId, mouseButton, type);
     this.recipeBookGui.slotClicked(slotIn);
   }

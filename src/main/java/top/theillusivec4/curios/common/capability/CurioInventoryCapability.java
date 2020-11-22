@@ -64,7 +64,7 @@ public class CurioInventoryCapability {
         .register(ICuriosItemHandler.class, new Capability.IStorage<ICuriosItemHandler>() {
           @Override
           public INBT writeNBT(Capability<ICuriosItemHandler> capability,
-              ICuriosItemHandler instance, Direction side) {
+                               ICuriosItemHandler instance, Direction side) {
             CompoundNBT compound = new CompoundNBT();
 
             ListNBT taglist = new ListNBT();
@@ -87,7 +87,7 @@ public class CurioInventoryCapability {
 
           @Override
           public void readNBT(Capability<ICuriosItemHandler> capability,
-              ICuriosItemHandler instance, Direction side, INBT nbt) {
+                              ICuriosItemHandler instance, Direction side, INBT nbt) {
             ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", NBT.TAG_COMPOUND);
             ListNBT lockedList = ((CompoundNBT) nbt).getList("Locked", NBT.TAG_STRING);
             ISlotHelper slotHelper = CuriosApi.getSlotHelper();
@@ -127,8 +127,9 @@ public class CurioInventoryCapability {
                   sortedCurios.put(type, newStacksHandler);
 
                   for (int j = 0;
-                      j < newStacksHandler.getRenders().size() && j < prevStacksHandler.getRenders()
-                          .size(); j++) {
+                       j < newStacksHandler.getRenders().size() &&
+                           j < prevStacksHandler.getRenders()
+                               .size(); j++) {
                     newStacksHandler.getRenders().set(j, prevStacksHandler.getRenders().get(j));
                   }
                 });
@@ -194,7 +195,8 @@ public class CurioInventoryCapability {
         this.curios.clear();
         this.invalidStacks.clear();
         CuriosApi.getSlotHelper().createSlots().forEach(
-            ((slotType, stacksHandler) -> this.curios.put(slotType.getIdentifier(), stacksHandler)));
+            ((slotType, stacksHandler) -> this.curios
+                .put(slotType.getIdentifier(), stacksHandler)));
       }
     }
 
@@ -344,21 +346,21 @@ public class CurioInventoryCapability {
       }
     }
 
-	@Override
-	public int getFortuneBonus() {
-		return this.fortuneAndLooting.getA();
-	}
+    @Override
+    public int getFortuneBonus() {
+      return this.fortuneAndLooting.getA();
+    }
 
-	@Override
-	public int getLootingBonus() {
-		return this.fortuneAndLooting.getB();
-	}
+    @Override
+    public int getLootingBonus() {
+      return this.fortuneAndLooting.getB();
+    }
 
-	@Override
-	public void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLootingIn) {
-		this.fortuneAndLooting = fortuneAndLootingIn;
-	}
-	
+    @Override
+    public void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLootingIn) {
+      this.fortuneAndLooting = fortuneAndLootingIn;
+    }
+
   }
 
   public static class Provider implements ICapabilitySerializable<INBT> {

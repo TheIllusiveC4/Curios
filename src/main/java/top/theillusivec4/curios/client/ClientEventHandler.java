@@ -21,6 +21,7 @@ package top.theillusivec4.curios.client;
 
 import static net.minecraft.item.ItemStack.DECIMALFORMAT;
 
+
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.List;

@@ -44,7 +44,7 @@ public class SlotTypeManager {
   private static Map<String, Builder> configBuilders = new HashMap<>();
 
   public static void buildImcSlotTypes(Stream<InterModComms.IMCMessage> register,
-      Stream<IMCMessage> modify) {
+                                       Stream<IMCMessage> modify) {
     imcBuilders.clear();
     processImc(register, true);
     processImc(modify, false);

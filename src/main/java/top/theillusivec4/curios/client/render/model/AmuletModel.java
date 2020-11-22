@@ -40,13 +40,13 @@ public class AmuletModel<T extends LivingEntity> extends EntityModel<T> {
 
   @Override
   public void setRotationAngles(@Nonnull T entity, float limbSwing, float limbSwingAmount,
-      float ageInTicks, float netHeadYaw, float netHeadPitch) {
+                                float ageInTicks, float netHeadYaw, float netHeadPitch) {
 
   }
 
   @Override
   public void render(@Nonnull MatrixStack matrixStack, @Nonnull IVertexBuilder vertexBuilder,
-      int light, int overlay, float red, float green, float blue, float alpha) {
+                     int light, int overlay, float red, float green, float blue, float alpha) {
     this.amulet.render(matrixStack, vertexBuilder, light, overlay);
   }
 }

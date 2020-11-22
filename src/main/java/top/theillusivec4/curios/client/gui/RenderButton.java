@@ -36,8 +36,8 @@ public class RenderButton extends ImageButton {
   private final CurioSlot slot;
 
   public RenderButton(CurioSlot slot, int xIn, int yIn, int widthIn, int heightIn, int xTexStartIn,
-      int yTexStartIn, int yDiffTextIn, ResourceLocation resourceLocationIn,
-      Button.IPressable onPressIn) {
+                      int yTexStartIn, int yDiffTextIn, ResourceLocation resourceLocationIn,
+                      Button.IPressable onPressIn) {
     super(xIn, yIn, widthIn, heightIn, xTexStartIn, yTexStartIn, yDiffTextIn, resourceLocationIn,
         256, 256, onPressIn);
     this.resourceLocation = resourceLocationIn;
@@ -52,7 +52,7 @@ public class RenderButton extends ImageButton {
   }
 
   public void renderButtonOverlay(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY,
-      float partialTicks) {
+                                  float partialTicks) {
     Minecraft minecraft = Minecraft.getInstance();
     minecraft.getTextureManager().bindTexture(this.resourceLocation);
     RenderSystem.disableDepthTest();

@@ -21,6 +21,7 @@ package top.theillusivec4.curios.common.item;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -72,9 +73,11 @@ public class CrownItem extends Item {
 
       @Override
       public void render(String identifier, int index, MatrixStack matrixStack,
-          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
-          float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-          float headPitch) {
+                         IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
+                         float limbSwing,
+                         float limbSwingAmount, float partialTicks, float ageInTicks,
+                         float netHeadYaw,
+                         float headPitch) {
 
         if (!(this.model instanceof CrownModel)) {
           model = new CrownModel<>();
@@ -91,7 +94,7 @@ public class CrownItem extends Item {
   }
 
   @Override
-  public boolean hasEffect(ItemStack stack) {
+  public boolean hasEffect(@Nonnull ItemStack stack) {
     return true;
   }
 }

@@ -42,7 +42,7 @@ public class CuriosButton extends ImageButton {
   private boolean isRecipeBookVisible = false;
 
   CuriosButton(ContainerScreen<?> parentGui, int xIn, int yIn, int widthIn, int heightIn,
-      int textureOffsetX, int textureOffsetY, int yDiffText, ResourceLocation resource) {
+               int textureOffsetX, int textureOffsetY, int yDiffText, ResourceLocation resource) {
 
     super(xIn, yIn, widthIn, heightIn, textureOffsetX, textureOffsetY, yDiffText, resource,
         (button) -> {
@@ -74,7 +74,7 @@ public class CuriosButton extends ImageButton {
 
   @Override
   public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY,
-      float partialTicks) {
+                     float partialTicks) {
 
     if (parentGui instanceof InventoryScreen) {
       boolean lastVisible = isRecipeBookVisible;

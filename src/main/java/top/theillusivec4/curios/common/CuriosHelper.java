@@ -90,7 +90,8 @@ public class CuriosHelper implements ICuriosHelper {
 
   @Override
   public Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(Item item,
-      @Nonnull final LivingEntity livingEntity) {
+                                                                                 @Nonnull
+                                                                                 final LivingEntity livingEntity) {
     return findEquippedCurio((stack) -> stack.getItem() == item, livingEntity);
   }
 
@@ -123,7 +124,7 @@ public class CuriosHelper implements ICuriosHelper {
 
   @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier,
-      ItemStack stack) {
+                                                                      ItemStack stack) {
     Multimap<Attribute, AttributeModifier> multimap;
 
     if (stack.getTag() != null && stack.getTag().contains("CurioAttributeModifiers", 9)) {

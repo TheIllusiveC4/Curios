@@ -40,7 +40,7 @@ public class SPacketSyncStack {
   private CompoundNBT compound;
 
   public SPacketSyncStack(int entityId, String curioId, int slotId, ItemStack stack,
-      HandlerType handlerType, CompoundNBT data) {
+                          HandlerType handlerType, CompoundNBT data) {
     this.entityId = entityId;
     this.slotId = slotId;
     this.stack = stack.copy();

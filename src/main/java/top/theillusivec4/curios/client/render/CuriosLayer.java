@@ -39,8 +39,8 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
 
   @Override
   public void render(@Nonnull MatrixStack matrixStack, @Nonnull IRenderTypeBuffer renderTypeBuffer,
-      int light, @Nonnull T livingEntity, float limbSwing, float limbSwingAmount,
-      float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+                     int light, @Nonnull T livingEntity, float limbSwing, float limbSwingAmount,
+                     float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
     matrixStack.push();
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
         .ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {

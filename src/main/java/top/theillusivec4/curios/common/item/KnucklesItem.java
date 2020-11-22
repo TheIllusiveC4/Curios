@@ -24,6 +24,7 @@ import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -38,7 +39,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.client.render.model.KnucklesModel;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
@@ -59,15 +59,16 @@ public class KnucklesItem extends Item {
     return CurioItemCapability.createProvider(new ICurio() {
       private Object model;
 
-	  @Override
-	  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
-		Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
+      @Override
+      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
+        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
-		atts.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(AD_UUID, Curios.MODID + ":attack_damage_bonus", 4,
-			AttributeModifier.Operation.ADDITION));
+        atts.put(Attributes.ATTACK_DAMAGE,
+            new AttributeModifier(AD_UUID, Curios.MODID + ":attack_damage_bonus", 4,
+                AttributeModifier.Operation.ADDITION));
 
-		return atts;
-	  }
+        return atts;
+      }
 
       @Override
       public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
@@ -76,9 +77,11 @@ public class KnucklesItem extends Item {
 
       @Override
       public void render(String identifier, int index, MatrixStack matrixStack,
-          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
-          float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-          float headPitch) {
+                         IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
+                         float limbSwing,
+                         float limbSwingAmount, float partialTicks, float ageInTicks,
+                         float netHeadYaw,
+                         float headPitch) {
 
         if (!(this.model instanceof KnucklesModel)) {
           this.model = new KnucklesModel();
@@ -100,7 +103,7 @@ public class KnucklesItem extends Item {
   }
 
   @Override
-  public boolean hasEffect(ItemStack stack) {
+  public boolean hasEffect(@Nonnull ItemStack stack) {
     return true;
   }
 }

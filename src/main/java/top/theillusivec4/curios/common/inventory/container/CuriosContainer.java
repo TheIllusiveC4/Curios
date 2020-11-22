@@ -32,7 +32,6 @@ import net.minecraft.inventory.CraftResultInventory;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.CraftingResultSlot;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.inventory.container.RecipeBookContainer;
@@ -46,7 +45,6 @@ import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SSetSlotPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -65,10 +63,10 @@ import top.theillusivec4.curios.common.network.server.SPacketScroll;
 
 public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
-  private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[]{
+  private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[] {
       PlayerContainer.EMPTY_ARMOR_SLOT_BOOTS, PlayerContainer.EMPTY_ARMOR_SLOT_LEGGINGS,
       PlayerContainer.EMPTY_ARMOR_SLOT_CHESTPLATE, PlayerContainer.EMPTY_ARMOR_SLOT_HELMET};
-  private static final EquipmentSlotType[] VALID_EQUIPMENT_SLOTS = new EquipmentSlotType[]{
+  private static final EquipmentSlotType[] VALID_EQUIPMENT_SLOTS = new EquipmentSlotType[] {
       EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS,
       EquipmentSlotType.FEET};
 
@@ -112,12 +110,12 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
         }
 
         @Override
-        public boolean isItemValid(ItemStack stack) {
+        public boolean isItemValid(@Nonnull ItemStack stack) {
           return stack.canEquip(equipmentslottype, CuriosContainer.this.player);
         }
 
         @Override
-        public boolean canTakeStack(PlayerEntity playerIn) {
+        public boolean canTakeStack(@Nonnull PlayerEntity playerIn) {
           ItemStack itemstack = this.getStack();
           return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper
               .hasBindingCurse(itemstack)) && super.canTakeStack(playerIn);
@@ -215,7 +213,8 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
                 IDynamicStackHandler cosmeticHandler = stacksHandler.getCosmeticStacks();
                 this.cosmeticColumn = true;
                 this.addSlot(
-                    new CosmeticCurioSlot(this.player, cosmeticHandler, i, identifier, -37, yOffset));
+                    new CosmeticCurioSlot(this.player, cosmeticHandler, i, identifier, -37,
+                        yOffset));
               }
               yOffset += 18;
               slots++;
@@ -244,8 +243,9 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
         j = 0;
       }
 
-      if (j == this.lastScrollIndex)
-		return;
+      if (j == this.lastScrollIndex) {
+        return;
+      }
 
       if (this.isLocalWorld) {
         NetworkHandler.INSTANCE
@@ -255,15 +255,16 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
   }
 
   @Override
-  public void onCraftMatrixChanged(IInventory inventoryIn) {
+  public void onCraftMatrixChanged(@Nonnull IInventory inventoryIn) {
 
     if (!this.player.world.isRemote) {
       ServerPlayerEntity playerMP = (ServerPlayerEntity) this.player;
       ItemStack stack = ItemStack.EMPTY;
       MinecraftServer server = this.player.world.getServer();
 
-      if (server == null)
-		return;
+      if (server == null) {
+        return;
+      }
 
       Optional<ICraftingRecipe> recipe = server.getRecipeManager()
           .getRecipe(IRecipeType.CRAFTING, this.craftMatrix, this.player.world);
@@ -280,7 +281,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
   }
 
   @Override
-  public void onContainerClosed(PlayerEntity playerIn) {
+  public void onContainerClosed(@Nonnull PlayerEntity playerIn) {
     super.onContainerClosed(playerIn);
     this.craftResult.clear();
 
@@ -293,8 +294,9 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
     return this.curiosHandler.map(curios -> {
 
-      if (curios.getVisibleSlots() > 8)
-		return 1;
+      if (curios.getVisibleSlots() > 8) {
+        return 1;
+      }
       return 0;
     }).orElse(0) == 1;
   }
@@ -307,7 +309,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
   @Nonnull
   @Override
-  public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+  public ItemStack transferStackInSlot(@Nonnull PlayerEntity playerIn, int index) {
 
     ItemStack itemstack = ItemStack.EMPTY;
     Slot slot = this.inventorySlots.get(index);
@@ -318,41 +320,50 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
       EquipmentSlotType entityequipmentslot = MobEntity.getSlotForItemStack(itemstack);
       if (index == 0) {
 
-        if (!this.mergeItemStack(itemstack1, 9, 45, true))
-		  return ItemStack.EMPTY;
+        if (!this.mergeItemStack(itemstack1, 9, 45, true)) {
+          return ItemStack.EMPTY;
+        }
         slot.onSlotChange(itemstack1, itemstack);
       } else if (index < 5) {
 
-        if (!this.mergeItemStack(itemstack1, 9, 45, false))
-		  return ItemStack.EMPTY;
+        if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
+          return ItemStack.EMPTY;
+        }
       } else if (index < 9) {
 
-        if (!this.mergeItemStack(itemstack1, 9, 45, false))
-		  return ItemStack.EMPTY;
+        if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
+          return ItemStack.EMPTY;
+        }
       } else if (entityequipmentslot.getSlotType() == EquipmentSlotType.Group.ARMOR
           && !this.inventorySlots.get(8 - entityequipmentslot.getIndex()).getHasStack()) {
         int i = 8 - entityequipmentslot.getIndex();
 
-        if (!this.mergeItemStack(itemstack1, i, i + 1, false))
-		  return ItemStack.EMPTY;
+        if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
+          return ItemStack.EMPTY;
+        }
       } else if (index < 46 && !CuriosApi.getCuriosHelper().getCurioTags(itemstack.getItem())
           .isEmpty()) {
 
-        if (!this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false))
-		  return ItemStack.EMPTY;
+        if (!this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
+          return ItemStack.EMPTY;
+        }
       } else if (entityequipmentslot == EquipmentSlotType.OFFHAND && !(this.inventorySlots.get(45))
           .getHasStack()) {
 
-        if (!this.mergeItemStack(itemstack1, 45, 46, false))
-		  return ItemStack.EMPTY;
+        if (!this.mergeItemStack(itemstack1, 45, 46, false)) {
+          return ItemStack.EMPTY;
+        }
       } else if (index < 36) {
-        if (!this.mergeItemStack(itemstack1, 36, 45, false))
-		  return ItemStack.EMPTY;
+        if (!this.mergeItemStack(itemstack1, 36, 45, false)) {
+          return ItemStack.EMPTY;
+        }
       } else if (index < 45) {
-        if (!this.mergeItemStack(itemstack1, 9, 36, false))
-		  return ItemStack.EMPTY;
-      } else if (!this.mergeItemStack(itemstack1, 9, 45, false))
-		return ItemStack.EMPTY;
+        if (!this.mergeItemStack(itemstack1, 9, 36, false)) {
+          return ItemStack.EMPTY;
+        }
+      } else if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
+        return ItemStack.EMPTY;
+      }
 
       if (itemstack1.isEmpty()) {
         slot.putStack(ItemStack.EMPTY);
@@ -360,8 +371,9 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
         slot.onSlotChanged();
       }
 
-      if (itemstack1.getCount() == itemstack.getCount())
-		return ItemStack.EMPTY;
+      if (itemstack1.getCount() == itemstack.getCount()) {
+        return ItemStack.EMPTY;
+      }
       ItemStack itemstack2 = slot.onTake(playerIn, itemstack1);
 
       if (index == 0) {

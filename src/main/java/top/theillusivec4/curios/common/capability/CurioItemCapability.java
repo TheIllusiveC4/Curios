@@ -42,7 +42,7 @@ public class CurioItemCapability {
 
       @Override
       public void readNBT(Capability<ICurio> capability, ICurio instance, Direction side,
-          INBT nbt) {
+                          INBT nbt) {
       }
     }, CurioItemWrapper::new);
   }

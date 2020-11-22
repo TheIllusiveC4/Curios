@@ -259,7 +259,7 @@ public interface ICurio {
    * Determines whether or not Curios will automatically add tooltip listing attribute modifiers
    * that are returned by {@link ICurio#getAttributeModifiers(String)}.
    *
-   * @param identifier   The identifier of the {@link ISlotType} of the slot
+   * @param identifier The identifier of the {@link ISlotType} of the slot
    * @return True to show attributes tooltip, false to disable
    */
   default boolean showAttributesTooltip(String identifier) {
@@ -271,12 +271,13 @@ public interface ICurio {
    * Default implementation returns level of Fortune enchantment on ItemStack.
    *
    * @param identifier   The identifier of the {@link ISlotType} of the slot
-   * @param curio	ItemStack that is checked
+   * @param curio        ItemStack that is checked
    * @param index        The index of the slot
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    * @return Amount of additional Fortune levels that will be applied when mining
    */
-  default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio, int index) {
+  default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
+                              int index) {
     return EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, curio);
   }
 
@@ -285,12 +286,13 @@ public interface ICurio {
    * Default implementation returns level of Looting enchantment on ItemStack.
    *
    * @param identifier   The identifier of the {@link ISlotType} of the slot
-   * @param curio	ItemStack that is checked
+   * @param curio        ItemStack that is checked
    * @param index        The index of the slot
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    * @return Amount of additional Looting levels that will be applied in LootingLevelEvent
    */
-  default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio, int index) {
+  default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
+                              int index) {
     return EnchantmentHelper.getEnchantmentLevel(Enchantments.LOOTING, curio);
   }
 
@@ -315,9 +317,10 @@ public interface ICurio {
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    */
   default void render(String identifier, int index, MatrixStack matrixStack,
-      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity, float limbSwing,
-      float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-      float headPitch) {
+                      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
+                      float limbSwing,
+                      float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+                      float headPitch) {
 
   }
 
@@ -347,7 +350,7 @@ public interface ICurio {
      * @param livingEntity The wearer of the curio
      */
     public static void translateIfSneaking(final MatrixStack matrixStack,
-        final LivingEntity livingEntity) {
+                                           final LivingEntity livingEntity) {
 
       if (livingEntity.isCrouching()) {
         matrixStack.translate(0.0f, 0.2f, 0.0f);
@@ -362,7 +365,7 @@ public interface ICurio {
      * @param livingEntity The wearer of the curio
      */
     public static void rotateIfSneaking(final MatrixStack matrixStack,
-        final LivingEntity livingEntity) {
+                                        final LivingEntity livingEntity) {
 
       if (livingEntity.isCrouching()) {
         matrixStack.rotate(Vector3f.XP.rotationDegrees(90.0F / (float) Math.PI));
@@ -379,13 +382,14 @@ public interface ICurio {
      * @param renderers    The list of model renderers to align to the head movement
      */
     public static void followHeadRotations(final LivingEntity livingEntity,
-        ModelRenderer... renderers) {
+                                           ModelRenderer... renderers) {
 
       EntityRenderer<? super LivingEntity> render = Minecraft.getInstance().getRenderManager()
           .getRenderer(livingEntity);
 
       if (render instanceof LivingRenderer) {
-        @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>>
+            livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
         EntityModel<LivingEntity> model = livingRenderer.getEntityModel();
 
         if (model instanceof BipedModel) {
@@ -407,13 +411,14 @@ public interface ICurio {
      */
     @SafeVarargs
     public static void followBodyRotations(final LivingEntity livingEntity,
-        final BipedModel<LivingEntity>... models) {
+                                           final BipedModel<LivingEntity>... models) {
 
       EntityRenderer<? super LivingEntity> render = Minecraft.getInstance().getRenderManager()
           .getRenderer(livingEntity);
 
       if (render instanceof LivingRenderer) {
-        @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>> livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>>
+            livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
         EntityModel<LivingEntity> entityModel = livingRenderer.getEntityModel();
 
         if (entityModel instanceof BipedModel) {

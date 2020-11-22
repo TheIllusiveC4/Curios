@@ -39,7 +39,7 @@ public class CuriosContainerProvider implements INamedContainerProvider {
   @Nullable
   @Override
   public Container createMenu(int i, @Nonnull PlayerInventory playerInventory,
-      @Nonnull PlayerEntity playerEntity) {
+                              @Nonnull PlayerEntity playerEntity) {
     return new CuriosContainer(i, playerInventory);
   }
 }

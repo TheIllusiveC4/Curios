@@ -56,7 +56,7 @@ public class CurioDropsEvent extends LivingEvent {
   private final ICuriosItemHandler curioHandler; // Curio handler for the entity
 
   public CurioDropsEvent(LivingEntity entity, ICuriosItemHandler handler, DamageSource source,
-      Collection<ItemEntity> drops, int lootingLevel, boolean recentlyHit) {
+                         Collection<ItemEntity> drops, int lootingLevel, boolean recentlyHit) {
     super(entity);
     this.source = source;
     this.drops = drops;

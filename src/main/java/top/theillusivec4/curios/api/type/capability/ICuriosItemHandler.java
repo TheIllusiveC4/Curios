@@ -135,23 +135,23 @@ public interface ICuriosItemHandler {
    * disabling/removing slots.
    */
   void handleInvalidStacks();
-  
+
   /**
    * Returns the total Fortune bonus of all equipped curios.
    * Recalculated with each LivingUpdateEvent.
    */
   int getFortuneBonus();
-  
+
   /**
    * Returns the total Looting bonus of all equipped curios.
    * Recalculated with each LivingUpdateEvent.
    */
   int getLootingBonus();
-  
-  
+
+
   /**
    * Sets the total Fotrune and Looting bonuses of this handler and therefore it's bearer.
    */
   void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLooting);
-  
+
 }

@@ -282,8 +282,9 @@ public class CuriosEventHandler {
         for (ICurioStacksHandler stacksHandler : curios.values()) {
 
           if (handleMending(player, stacksHandler.getStacks(), evt) || handleMending(player,
-              stacksHandler.getCosmeticStacks(), evt))
-			return;
+              stacksHandler.getCosmeticStacks(), evt)) {
+            return;
+          }
         }
       });
     }
@@ -309,8 +310,11 @@ public class CuriosEventHandler {
                 Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
                 String id = entry.getKey();
 
-                if (present.isEmpty() && ((tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier())) || (!tags.isEmpty() && id == SlotTypePreset.CURIO.getIdentifier())) && curio
-                    .canEquip(id, player)) {
+                if (present.isEmpty() &&
+                    ((tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier())) ||
+                        (!tags.isEmpty() && id.equals(SlotTypePreset.CURIO.getIdentifier()))) &&
+                    curio
+                        .canEquip(id, player)) {
                   stackHandler.setStackInSlot(i, stack.copy());
                   curio.playRightClickEquipSound(player);
 
