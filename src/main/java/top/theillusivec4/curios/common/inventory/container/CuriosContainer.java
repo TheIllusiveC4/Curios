@@ -61,7 +61,7 @@ import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScroll;
 import top.theillusivec4.curios.common.network.server.SPacketScroll;
 
-public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
+public class CuriosContainer extends PlayerContainer {
 
   private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[] {
       PlayerContainer.EMPTY_ARMOR_SLOT_BOOTS, PlayerContainer.EMPTY_ARMOR_SLOT_LEGGINGS,
@@ -85,7 +85,11 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
   }
 
   public CuriosContainer(int windowId, PlayerInventory playerInventory) {
-    super(CuriosRegistry.CONTAINER_TYPE, windowId);
+    super(playerInventory, playerInventory.player.world.isRemote, playerInventory.player);
+    this.containerType = CuriosRegistry.CONTAINER_TYPE;
+    this.windowId = windowId;
+    this.inventoryItemStacks.clear();
+    this.inventorySlots.clear();
     this.player = playerInventory.player;
     this.isLocalWorld = this.player.world.isRemote;
     this.curiosHandler = CuriosApi.getCuriosHelper().getCuriosHandler(this.player);
