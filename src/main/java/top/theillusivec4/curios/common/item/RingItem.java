@@ -70,18 +70,17 @@ public class RingItem extends Item {
             SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL, 1.0f, 1.0f);
       }
 
-      @Override
-      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
-        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
+	  @Override
+	  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
+		Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
-        if (CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).contains(identifier)) {
-          atts.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(SPEED_UUID, "Speed bonus", 0.1,
-              AttributeModifier.Operation.MULTIPLY_TOTAL));
-          atts.put(Attributes.ARMOR, new AttributeModifier(ARMOR_UUID, "Armor bonus", 2,
-              AttributeModifier.Operation.ADDITION));
-        }
-        return atts;
-      }
+		atts.put(Attributes.MOVEMENT_SPEED, new AttributeModifier(SPEED_UUID, Curios.MODID + ":speed_bonus", 0.1,
+			AttributeModifier.Operation.MULTIPLY_TOTAL));
+		atts.put(Attributes.ARMOR,
+			new AttributeModifier(ARMOR_UUID, Curios.MODID + ":armor_bonus", 2, AttributeModifier.Operation.ADDITION));
+
+		return atts;
+	  }
 
       @Nonnull
       @Override

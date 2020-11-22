@@ -30,7 +30,7 @@ import top.theillusivec4.curios.api.SlotTypeMessage.Builder;
 public enum SlotTypePreset {
   HEAD("head", 40), NECKLACE("necklace", 60), BACK("back", 80), BODY("body", 100), BRACELET(
       "bracelet", 120), HANDS("hands", 140), RING("ring", 160), BELT("belt", 180), CHARM("charm",
-      200);
+      200), CURIO("curio", 20);
 
   final String id;
   final int priority;

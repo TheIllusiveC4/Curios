@@ -59,17 +59,15 @@ public class KnucklesItem extends Item {
     return CurioItemCapability.createProvider(new ICurio() {
       private Object model;
 
-      @Override
-      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
-        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
+	  @Override
+	  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
+		Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
-        if (CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).contains(identifier)) {
-          atts.put(Attributes.ATTACK_DAMAGE,
-              new AttributeModifier(AD_UUID, "Attack damage bonus", 4,
-                  AttributeModifier.Operation.ADDITION));
-        }
-        return atts;
-      }
+		atts.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(AD_UUID, Curios.MODID + ":attack_damage_bonus", 4,
+			AttributeModifier.Operation.ADDITION));
+
+		return atts;
+	  }
 
       @Override
       public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
@@ -83,7 +81,7 @@ public class KnucklesItem extends Item {
           float headPitch) {
 
         if (!(this.model instanceof KnucklesModel)) {
-          model = new KnucklesModel();
+          this.model = new KnucklesModel();
         }
 
         KnucklesModel knuckles = (KnucklesModel) this.model;

@@ -51,7 +51,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -90,8 +89,8 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
   public CuriosContainer(int windowId, PlayerInventory playerInventory) {
     super(CuriosRegistry.CONTAINER_TYPE, windowId);
     this.player = playerInventory.player;
-    this.isLocalWorld = player.world.isRemote;
-    this.curiosHandler = CuriosApi.getCuriosHelper().getCuriosHandler(player);
+    this.isLocalWorld = this.player.world.isRemote;
+    this.curiosHandler = CuriosApi.getCuriosHelper().getCuriosHandler(this.player);
     this.addSlot(
         new CraftingResultSlot(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154,
             28));
@@ -114,7 +113,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
         @Override
         public boolean isItemValid(ItemStack stack) {
-          return stack.canEquip(equipmentslottype, player);
+          return stack.canEquip(equipmentslottype, CuriosContainer.this.player);
         }
 
         @Override
@@ -165,14 +164,14 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
         if (stacksHandler.isVisible()) {
 
           for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
-            this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset,
+            this.addSlot(new CurioSlot(this.player, stackHandler, i, identifier, -18, yOffset,
                 stacksHandler.getRenders()));
 
             if (stacksHandler.hasCosmetic()) {
               IDynamicStackHandler cosmeticHandler = stacksHandler.getCosmeticStacks();
               this.cosmeticColumn = true;
               this.addSlot(
-                  new CosmeticCurioSlot(player, cosmeticHandler, i, identifier, -37, yOffset));
+                  new CosmeticCurioSlot(this.player, cosmeticHandler, i, identifier, -37, yOffset));
             }
             yOffset += 18;
             slots++;
@@ -195,11 +194,9 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
       int yOffset = 12;
       int index = 0;
       this.inventorySlots.subList(46, this.inventorySlots.size()).clear();
-      NonNullList<ItemStack> inventoryItemStacks = ObfuscationReflectionHelper
-          .getPrivateValue(Container.class, this, "field_75153_a");
 
-      if (inventoryItemStacks != null) {
-        inventoryItemStacks.subList(46, inventoryItemStacks.size()).clear();
+      if (this.inventoryItemStacks != null) {
+        this.inventoryItemStacks.subList(46, this.inventoryItemStacks.size()).clear();
       }
 
       for (String identifier : curioMap.keySet()) {
@@ -211,14 +208,14 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
           for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
             if (index >= indexIn) {
-              this.addSlot(new CurioSlot(player, stackHandler, i, identifier, -18, yOffset,
+              this.addSlot(new CurioSlot(this.player, stackHandler, i, identifier, -18, yOffset,
                   stacksHandler.getRenders()));
 
               if (stacksHandler.hasCosmetic()) {
                 IDynamicStackHandler cosmeticHandler = stacksHandler.getCosmeticStacks();
                 this.cosmeticColumn = true;
                 this.addSlot(
-                    new CosmeticCurioSlot(player, cosmeticHandler, i, identifier, -37, yOffset));
+                    new CosmeticCurioSlot(this.player, cosmeticHandler, i, identifier, -37, yOffset));
               }
               yOffset += 18;
               slots++;
@@ -230,10 +227,10 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
       if (!this.isLocalWorld) {
         NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player),
+            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) this.player),
                 new SPacketScroll(this.windowId, indexIn));
       }
-      lastScrollIndex = indexIn;
+      this.lastScrollIndex = indexIn;
     });
   }
 
@@ -241,15 +238,14 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
     this.curiosHandler.ifPresent(curios -> {
       int k = (curios.getVisibleSlots() - 8);
-      int j = (int) ((double) (pos * (float) k) + 0.5D);
+      int j = (int) (pos * k + 0.5D);
 
       if (j < 0) {
         j = 0;
       }
 
-      if (j == this.lastScrollIndex) {
-        return;
-      }
+      if (j == this.lastScrollIndex)
+		return;
 
       if (this.isLocalWorld) {
         NetworkHandler.INSTANCE
@@ -266,9 +262,8 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
       ItemStack stack = ItemStack.EMPTY;
       MinecraftServer server = this.player.world.getServer();
 
-      if (server == null) {
-        return;
-      }
+      if (server == null)
+		return;
 
       Optional<ICraftingRecipe> recipe = server.getRecipeManager()
           .getRecipe(IRecipeType.CRAFTING, this.craftMatrix, this.player.world);
@@ -279,7 +274,7 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
           stack = craftingRecipe.getCraftingResult(this.craftMatrix);
         }
       }
-      craftResult.setInventorySlotContents(0, stack);
+      this.craftResult.setInventorySlotContents(0, stack);
       playerMP.connection.sendPacket(new SSetSlotPacket(this.windowId, 0, stack));
     }
   }
@@ -298,9 +293,8 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
 
     return this.curiosHandler.map(curios -> {
 
-      if (curios.getVisibleSlots() > 8) {
-        return 1;
-      }
+      if (curios.getVisibleSlots() > 8)
+		return 1;
       return 0;
     }).orElse(0) == 1;
   }
@@ -324,50 +318,41 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
       EquipmentSlotType entityequipmentslot = MobEntity.getSlotForItemStack(itemstack);
       if (index == 0) {
 
-        if (!this.mergeItemStack(itemstack1, 9, 45, true)) {
-          return ItemStack.EMPTY;
-        }
+        if (!this.mergeItemStack(itemstack1, 9, 45, true))
+		  return ItemStack.EMPTY;
         slot.onSlotChange(itemstack1, itemstack);
       } else if (index < 5) {
 
-        if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
-          return ItemStack.EMPTY;
-        }
+        if (!this.mergeItemStack(itemstack1, 9, 45, false))
+		  return ItemStack.EMPTY;
       } else if (index < 9) {
 
-        if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
-          return ItemStack.EMPTY;
-        }
+        if (!this.mergeItemStack(itemstack1, 9, 45, false))
+		  return ItemStack.EMPTY;
       } else if (entityequipmentslot.getSlotType() == EquipmentSlotType.Group.ARMOR
           && !this.inventorySlots.get(8 - entityequipmentslot.getIndex()).getHasStack()) {
         int i = 8 - entityequipmentslot.getIndex();
 
-        if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
-          return ItemStack.EMPTY;
-        }
+        if (!this.mergeItemStack(itemstack1, i, i + 1, false))
+		  return ItemStack.EMPTY;
       } else if (index < 46 && !CuriosApi.getCuriosHelper().getCurioTags(itemstack.getItem())
           .isEmpty()) {
 
-        if (!this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
-          return ItemStack.EMPTY;
-        }
+        if (!this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false))
+		  return ItemStack.EMPTY;
       } else if (entityequipmentslot == EquipmentSlotType.OFFHAND && !(this.inventorySlots.get(45))
           .getHasStack()) {
 
-        if (!this.mergeItemStack(itemstack1, 45, 46, false)) {
-          return ItemStack.EMPTY;
-        }
+        if (!this.mergeItemStack(itemstack1, 45, 46, false))
+		  return ItemStack.EMPTY;
       } else if (index < 36) {
-        if (!this.mergeItemStack(itemstack1, 36, 45, false)) {
-          return ItemStack.EMPTY;
-        }
+        if (!this.mergeItemStack(itemstack1, 36, 45, false))
+		  return ItemStack.EMPTY;
       } else if (index < 45) {
-        if (!this.mergeItemStack(itemstack1, 9, 36, false)) {
-          return ItemStack.EMPTY;
-        }
-      } else if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
-        return ItemStack.EMPTY;
-      }
+        if (!this.mergeItemStack(itemstack1, 9, 36, false))
+		  return ItemStack.EMPTY;
+      } else if (!this.mergeItemStack(itemstack1, 9, 45, false))
+		return ItemStack.EMPTY;
 
       if (itemstack1.isEmpty()) {
         slot.putStack(ItemStack.EMPTY);
@@ -375,9 +360,8 @@ public class CuriosContainer extends RecipeBookContainer<CraftingInventory> {
         slot.onSlotChanged();
       }
 
-      if (itemstack1.getCount() == itemstack.getCount()) {
-        return ItemStack.EMPTY;
-      }
+      if (itemstack1.getCount() == itemstack.getCount())
+		return ItemStack.EMPTY;
       ItemStack itemstack2 = slot.onTake(playerIn, itemstack1);
 
       if (index == 0) {
