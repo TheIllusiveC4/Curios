@@ -27,10 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
@@ -42,15 +38,12 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -185,27 +178,18 @@ public class CuriosEventHandler {
    */
 
   @SubscribeEvent
-  public void attachStackCabilities(AttachCapabilitiesEvent<ItemStack> evt) {
-	ItemStack stack = evt.getObject();
+  public void attachStackCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
+    ItemStack stack = evt.getObject();
 
-	if (stack.getItem() instanceof IItemCurio) {
-	  IItemCurio itemCurio = (IItemCurio)stack.getItem();
+    if (stack.getItem() instanceof IItemCurio) {
+      IItemCurio itemCurio = (IItemCurio) stack.getItem();
 
-	  if (itemCurio.attachCapability(stack)) {
-		ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(itemCurio, stack);
-
-		evt.addCapability(CuriosCapability.ID_ITEM, new ICapabilityProvider() {
-		LazyOptional<ICurio> curio = LazyOptional.of(() -> itemizedCapability);
-
-		@Nonnull
-		@Override
-		public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-		  return CuriosCapability.ITEM.orEmpty(cap, this.curio);
-		}
-		});
-	  }
-	}
-
+      if (itemCurio.hasCurioCapability(stack)) {
+        ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(itemCurio, stack);
+        evt.addCapability(CuriosCapability.ID_ITEM,
+            CuriosCapability.createSimpleProvider(itemizedCapability));
+      }
+    }
   }
 
   @SubscribeEvent

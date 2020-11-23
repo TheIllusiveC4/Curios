@@ -78,15 +78,12 @@ public class KnucklesItem extends Item {
       @Override
       public void render(String identifier, int index, MatrixStack matrixStack,
                          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
-                         float limbSwing,
-                         float limbSwingAmount, float partialTicks, float ageInTicks,
-                         float netHeadYaw,
-                         float headPitch) {
+                         float limbSwing, float limbSwingAmount, float partialTicks,
+                         float ageInTicks, float netHeadYaw, float headPitch) {
 
         if (!(this.model instanceof KnucklesModel)) {
           this.model = new KnucklesModel();
         }
-
         KnucklesModel knuckles = (KnucklesModel) this.model;
         knuckles.setLivingAnimations(livingEntity, limbSwing, limbSwingAmount, partialTicks);
         knuckles.setRotationAngles(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,

@@ -74,10 +74,8 @@ public class CrownItem extends Item {
       @Override
       public void render(String identifier, int index, MatrixStack matrixStack,
                          IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
-                         float limbSwing,
-                         float limbSwingAmount, float partialTicks, float ageInTicks,
-                         float netHeadYaw,
-                         float headPitch) {
+                         float limbSwing, float limbSwingAmount, float partialTicks,
+                         float ageInTicks, float netHeadYaw, float headPitch) {
 
         if (!(this.model instanceof CrownModel)) {
           model = new CrownModel<>();

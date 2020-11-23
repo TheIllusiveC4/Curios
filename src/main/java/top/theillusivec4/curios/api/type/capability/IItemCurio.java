@@ -19,43 +19,26 @@
 
 package top.theillusivec4.curios.api.type.capability;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.List;
 import javax.annotation.Nonnull;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.LivingRenderer;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.ItemParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
-import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
-import net.minecraft.item.Item;
 
 /**
  * Designed to be directly implemented on {@link Item} objects.<br/><br/>
  * Curios will automatically create and attach {@link ICurio} capability to any ItemStacks that contain items
  * implementing this interface, redirecting all calls made on such capability to respective methods here.
+ *
  * @author Extegral
  */
 
@@ -66,17 +49,19 @@ public interface IItemCurio {
    * of this interface to avoid needlessly copying over code from there.
    */
 
-  public static final ICurio defaultInstance = new ICurio(){};
+  ICurio defaultInstance = new ICurio() {
+  };
 
 
   /**
    * Called during automatic capability attachment to any ItemStack containing this {@link IItemCurio} instance.
+   *
    * @param stack ItemStack in question
    * @return true to allow attach {@link ICurio} capability to this ItemStack; false to prevent attachment.
    */
 
-  default boolean attachCapability(ItemStack stack) {
-	return true;
+  default boolean hasCurioCapability(ItemStack stack) {
+    return true;
   }
 
   /**
@@ -88,7 +73,7 @@ public interface IItemCurio {
    * @param stack        The ItemStack in question
    */
   default void curioTick(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
-	defaultInstance.curioTick(identifier, index, livingEntity);
+    defaultInstance.curioTick(identifier, index, livingEntity);
   }
 
   /**
@@ -99,8 +84,9 @@ public interface IItemCurio {
    * @param livingEntity The wearer of the ItemStack
    * @param stack        The ItemStack in question
    */
-  default void curioAnimate(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
-	defaultInstance.curioAnimate(identifier, index, livingEntity);
+  default void curioAnimate(String identifier, int index, LivingEntity livingEntity,
+                            ItemStack stack) {
+    defaultInstance.curioAnimate(identifier, index, livingEntity);
   }
 
   /**
@@ -113,7 +99,7 @@ public interface IItemCurio {
    * @param stack        The ItemStack in question
    */
   default void onEquip(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
-	defaultInstance.onEquip(identifier, index, livingEntity);;
+    defaultInstance.onEquip(identifier, index, livingEntity);
   }
 
   /**
@@ -126,7 +112,7 @@ public interface IItemCurio {
    * @param stack        The ItemStack in question
    */
   default void onUnequip(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
-	defaultInstance.onUnequip(identifier, index, livingEntity);
+    defaultInstance.onUnequip(identifier, index, livingEntity);
   }
 
   /**
@@ -139,7 +125,7 @@ public interface IItemCurio {
    * @return True if the ItemStack can be equipped/put in, false if not
    */
   default boolean canEquip(String identifier, LivingEntity livingEntity, ItemStack stack) {
-	return defaultInstance.canEquip(identifier, livingEntity);
+    return defaultInstance.canEquip(identifier, livingEntity);
   }
 
   /**
@@ -152,7 +138,7 @@ public interface IItemCurio {
    * @return True if the ItemStack can be unequipped/taken out, false if not
    */
   default boolean canUnequip(String identifier, LivingEntity livingEntity, ItemStack stack) {
-	return defaultInstance.canUnequip(identifier, livingEntity);
+    return defaultInstance.canUnequip(identifier, livingEntity);
   }
 
   /**
@@ -165,8 +151,8 @@ public interface IItemCurio {
    * @param tagTooltips A list of {@link ITextComponent} with every curio tag
    * @return A list of ITextComponent to display as curio tag information
    */
-  default List<ITextComponent> getTagsTooltip(List<ITextComponent> tagTooltips) {
-	return defaultInstance.getTagsTooltip(tagTooltips);
+  default List<ITextComponent> getTagsTooltip(List<ITextComponent> tagTooltips, ItemStack stack) {
+    return defaultInstance.getTagsTooltip(tagTooltips);
   }
 
   /**
@@ -177,8 +163,9 @@ public interface IItemCurio {
    * @param stack      The ItemStack in question
    * @return A map of attribute modifiers to apply
    */
-  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack) {
-	return defaultInstance.getAttributeModifiers(identifier);
+  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier,
+                                                                       ItemStack stack) {
+    return defaultInstance.getAttributeModifiers(identifier);
   }
 
   /**
@@ -186,11 +173,11 @@ public interface IItemCurio {
    * ItemStack in hand. This can be overridden to play nothing, but it is advised
    * to always play something as an auditory feedback for players.
    *
-   * @param identifier Identifier of slot into which stack is equipped
-   * @param stack      The ItemStack in question
+   * @param stack        The ItemStack in question
+   * @param livingEntity The entity that broke the curio
    */
   default void playRightClickEquipSound(LivingEntity livingEntity, ItemStack stack) {
-	defaultInstance.playRightClickEquipSound(livingEntity);
+    defaultInstance.playRightClickEquipSound(livingEntity);
   }
 
   /**
@@ -201,7 +188,7 @@ public interface IItemCurio {
    * @return True to enable right-clicking auto-equip, false to disable
    */
   default boolean canRightClickEquip(ItemStack stack) {
-	return defaultInstance.canRightClickEquip();
+    return defaultInstance.canRightClickEquip();
   }
 
   /**
@@ -212,7 +199,7 @@ public interface IItemCurio {
    * @param livingEntity The entity that broke the curio
    */
   default void curioBreak(ItemStack stack, LivingEntity livingEntity) {
-	defaultInstance.curioBreak(stack, livingEntity);
+    defaultInstance.curioBreak(stack, livingEntity);
   }
 
   /**
@@ -224,33 +211,36 @@ public interface IItemCurio {
    * @param identifier   The identifier of the {@link ISlotType} of the slot
    * @param index        The index of the slot
    * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @param stack        The ItemStack in question
    * @return True to sync the ItemStack change to all tracking clients, false to
-   *         do nothing
+   * do nothing
    */
-  default boolean canSync(String identifier, int index, LivingEntity livingEntity) {
-	return defaultInstance.canSync(identifier, index, livingEntity);
+  default boolean canSync(String identifier, int index, LivingEntity livingEntity,
+                          ItemStack stack) {
+    return defaultInstance.canSync(identifier, index, livingEntity);
   }
 
   /**
    * Gets a tag that is used to sync extra curio data from the server to the
-   * client. Only used when {@link IItemCurio#canSync(String, int, LivingEntity)}
+   * client. Only used when {@link IItemCurio#canSync(String, int, LivingEntity, ItemStack)}
    * returns true.
    *
+   * @param stack The ItemStack in question
    * @return Data to be sent to the client
    */
   @Nonnull
-  default CompoundNBT writeSyncData() {
-	return defaultInstance.writeSyncData();
+  default CompoundNBT writeSyncData(ItemStack stack) {
+    return defaultInstance.writeSyncData();
   }
 
   /**
    * Used client-side to read data tags created by
-   * {@link IItemCurio#writeSyncData()} received from the server.
+   * {@link IItemCurio#writeSyncData(ItemStack)} received from the server.
    *
    * @param compound Data received from the server
    */
-  default void readSyncData(CompoundNBT compound) {
-	defaultInstance.readSyncData(compound);
+  default void readSyncData(CompoundNBT compound, ItemStack stack) {
+    defaultInstance.readSyncData(compound);
   }
 
   /**
@@ -258,26 +248,25 @@ public interface IItemCurio {
    * This will persist the ItemStack in the curio slot to the respawned player if
    * applicable.
    *
-   * @param identifier Identifier of slot into which stack is equipped
-   * @param stack      The ItemStack in question
+   * @param livingEntity The entity that died
    * @return {@link DropRule}
    */
   @Nonnull
   default DropRule getDropRule(LivingEntity livingEntity, ItemStack stack) {
-	return defaultInstance.getDropRule(livingEntity);
+    return defaultInstance.getDropRule(livingEntity);
   }
 
   /**
    * Determines whether or not Curios will automatically add tooltip listing
    * attribute modifiers that are returned by
-   * {@link IItemCurio#getAttributeModifiers(String)}.
+   * {@link IItemCurio#getAttributeModifiers(String, ItemStack)}.
    *
    * @param identifier The identifier of the {@link ISlotType} of the slot
    * @param stack      The ItemStack in question
    * @return True to show attributes tooltip, false to disable
    */
   default boolean showAttributesTooltip(String identifier, ItemStack stack) {
-	return defaultInstance.showAttributesTooltip(identifier);
+    return defaultInstance.showAttributesTooltip(identifier);
   }
 
   /**
@@ -290,8 +279,9 @@ public interface IItemCurio {
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    * @return Amount of additional Fortune levels that will be applied when mining
    */
-  default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio, int index) {
-	return defaultInstance.getFortuneBonus(identifier, livingEntity, curio, index);
+  default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
+                              int index) {
+    return defaultInstance.getFortuneBonus(identifier, livingEntity, curio, index);
   }
 
   /**
@@ -303,10 +293,11 @@ public interface IItemCurio {
    * @param index        The index of the slot
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    * @return Amount of additional Looting levels that will be applied in
-   *         LootingLevelEvent
+   * LootingLevelEvent
    */
-  default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio, int index) {
-	return defaultInstance.getLootingBonus(identifier, livingEntity, curio, index);
+  default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
+                              int index) {
+    return defaultInstance.getLootingBonus(identifier, livingEntity, curio, index);
   }
 
   /**
@@ -318,13 +309,14 @@ public interface IItemCurio {
    * @param stack        The ItemStack in question
    * @return True if the ItemStack has rendering, false if it does not
    */
-  default boolean canRender(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
-	return defaultInstance.canRender(identifier, index, livingEntity);
+  default boolean canRender(String identifier, int index, LivingEntity livingEntity,
+                            ItemStack stack) {
+    return defaultInstance.canRender(identifier, index, livingEntity);
   }
 
   /**
    * Performs rendering of the ItemStack if
-   * {@link IItemCurio#canRender(String, int, LivingEntity)} returns true. Note
+   * {@link IItemCurio#canRender(String, int, LivingEntity, ItemStack)} returns true. Note
    * that vertical sneaking translations are automatically applied before this
    * rendering method is called.
    *
@@ -332,12 +324,13 @@ public interface IItemCurio {
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    * @param stack        The ItemStack in question
    */
-  default void render(String identifier, int index, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer,
-	  int light, LivingEntity livingEntity, float limbSwing, float limbSwingAmount, float partialTicks,
-	  float ageInTicks, float netHeadYaw, float headPitch, ItemStack stack) {
-
-	defaultInstance.render(identifier, index, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing,
-		limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+  default void render(String identifier, int index, MatrixStack matrixStack,
+                      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
+                      float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
+                      float netHeadYaw, float headPitch, ItemStack stack) {
+    defaultInstance
+        .render(identifier, index, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing,
+            limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
   }
 
 }
