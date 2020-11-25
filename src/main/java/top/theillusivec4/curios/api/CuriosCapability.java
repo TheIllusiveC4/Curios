@@ -19,14 +19,9 @@
 
 package top.theillusivec4.curios.api;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
@@ -41,19 +36,6 @@ public class CuriosCapability {
   public static final ResourceLocation ID_INVENTORY = new ResourceLocation(CuriosApi.MODID,
       "inventory");
   public static final ResourceLocation ID_ITEM = new ResourceLocation(CuriosApi.MODID, "item");
-
-  public static ICapabilityProvider createSimpleProvider(ICurio curio) {
-    return new ICapabilityProvider() {
-      final LazyOptional<ICurio> lazyCurio = LazyOptional.of(() -> curio);
-
-      @Nonnull
-      @Override
-      public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable
-          Direction side) {
-        return ITEM.orEmpty(cap, this.lazyCurio);
-      }
-    };
-  }
 
   static {
     INVENTORY = null;

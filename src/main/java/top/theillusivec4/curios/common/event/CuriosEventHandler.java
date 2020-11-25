@@ -71,6 +71,7 @@ import top.theillusivec4.curios.api.type.capability.IItemCurio;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
+import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
@@ -187,7 +188,7 @@ public class CuriosEventHandler {
       if (itemCurio.hasCurioCapability(stack)) {
         ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(itemCurio, stack);
         evt.addCapability(CuriosCapability.ID_ITEM,
-            CuriosCapability.createSimpleProvider(itemizedCapability));
+            CurioItemCapability.createProvider(itemizedCapability));
       }
     }
   }
