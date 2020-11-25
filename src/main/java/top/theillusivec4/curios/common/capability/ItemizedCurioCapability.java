@@ -31,13 +31,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.api.type.capability.IItemCurio;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 public class ItemizedCurioCapability implements ICurio {
   private final ItemStack stackInstance;
-  private final IItemCurio curioItem;
+  private final ICurioItem curioItem;
 
-  public ItemizedCurioCapability(IItemCurio curio, ItemStack stack) {
+  public ItemizedCurioCapability(ICurioItem curio, ItemStack stack) {
     this.curioItem = curio;
     this.stackInstance = stack;
   }

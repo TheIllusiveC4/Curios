@@ -67,7 +67,7 @@ import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
-import top.theillusivec4.curios.api.type.capability.IItemCurio;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
@@ -182,8 +182,8 @@ public class CuriosEventHandler {
   public void attachStackCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
     ItemStack stack = evt.getObject();
 
-    if (stack.getItem() instanceof IItemCurio) {
-      IItemCurio itemCurio = (IItemCurio) stack.getItem();
+    if (stack.getItem() instanceof ICurioItem) {
+      ICurioItem itemCurio = (ICurioItem) stack.getItem();
 
       if (itemCurio.hasCurioCapability(stack)) {
         ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(itemCurio, stack);

@@ -42,7 +42,7 @@ import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
  * @author Extegral
  */
 
-public interface IItemCurio {
+public interface ICurioItem {
 
   /**
    * Default instance of {@link ICurio}, where all calls are redirected by default methods
@@ -54,7 +54,7 @@ public interface IItemCurio {
 
 
   /**
-   * Called during automatic capability attachment to any ItemStack containing this {@link IItemCurio} instance.
+   * Called during automatic capability attachment to any ItemStack containing this {@link ICurioItem} instance.
    *
    * @param stack ItemStack in question
    * @return true to allow attach {@link ICurio} capability to this ItemStack; false to prevent attachment.
@@ -222,7 +222,7 @@ public interface IItemCurio {
 
   /**
    * Gets a tag that is used to sync extra curio data from the server to the
-   * client. Only used when {@link IItemCurio#canSync(String, int, LivingEntity, ItemStack)}
+   * client. Only used when {@link ICurioItem#canSync(String, int, LivingEntity, ItemStack)}
    * returns true.
    *
    * @param stack The ItemStack in question
@@ -235,7 +235,7 @@ public interface IItemCurio {
 
   /**
    * Used client-side to read data tags created by
-   * {@link IItemCurio#writeSyncData(ItemStack)} received from the server.
+   * {@link ICurioItem#writeSyncData(ItemStack)} received from the server.
    *
    * @param compound Data received from the server
    */
@@ -259,7 +259,7 @@ public interface IItemCurio {
   /**
    * Determines whether or not Curios will automatically add tooltip listing
    * attribute modifiers that are returned by
-   * {@link IItemCurio#getAttributeModifiers(String, ItemStack)}.
+   * {@link ICurioItem#getAttributeModifiers(String, ItemStack)}.
    *
    * @param identifier The identifier of the {@link ISlotType} of the slot
    * @param stack      The ItemStack in question
@@ -316,7 +316,7 @@ public interface IItemCurio {
 
   /**
    * Performs rendering of the ItemStack if
-   * {@link IItemCurio#canRender(String, int, LivingEntity, ItemStack)} returns true. Note
+   * {@link ICurioItem#canRender(String, int, LivingEntity, ItemStack)} returns true. Note
    * that vertical sneaking translations are automatically applied before this
    * rendering method is called.
    *

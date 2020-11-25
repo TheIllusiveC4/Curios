@@ -34,10 +34,10 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.api.type.capability.IItemCurio;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.client.render.model.AmuletModel;
 
-public class AmuletItem extends Item implements IItemCurio {
+public class AmuletItem extends Item implements ICurioItem {
   private static final ResourceLocation AMULET_TEXTURE = new ResourceLocation(Curios.MODID,
       "textures/entity/amulet.png");
   private Object model;
