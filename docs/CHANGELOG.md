@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.4-4.0.3.0] - 2020.11.24
+### Added
+- [API] ICurioItem interface for simple hard-dependency item implementations
+### Changed
+- Minor improvements to "Curio" slot type and tag for universal acceptance
+### Fixed
+- Fixed infinite log spam when using recipe book [#91](https://github.com/TheIllusiveC4/Curios/issues/91)
+- Fixed command client crashes [#89](https://github.com/TheIllusiveC4/Curios/issues/89)
+- Fixed overextended texture in Curios GUI
+
 ## [1.16.4-4.0.2.1] - 2020.11.09
 ### Changed
 - Updated to 1.16.4
