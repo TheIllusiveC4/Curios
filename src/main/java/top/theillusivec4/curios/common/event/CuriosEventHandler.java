@@ -430,7 +430,7 @@ public class CuriosEventHandler {
                     livingEntity.getPosY(), livingEntity.getPosZ());
               }
               stackHandler
-                  .setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
+                  .setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack);
             }
             ItemStack cosmeticStack = cosmeticStackHandler.getStackInSlot(i);
             ItemStack prevCosmeticStack = cosmeticStackHandler.getPreviousStackInSlot(i);
@@ -441,7 +441,7 @@ public class CuriosEventHandler {
                   CuriosApi.getCuriosHelper().getCurio(prevCosmeticStack), identifier, index,
                   HandlerType.COSMETIC);
               cosmeticStackHandler.setPreviousStackInSlot(index,
-                  cosmeticStack.isEmpty() ? ItemStack.EMPTY : cosmeticStack.copy());
+                  cosmeticStack.isEmpty() ? ItemStack.EMPTY : cosmeticStack);
             }
           }
         }
