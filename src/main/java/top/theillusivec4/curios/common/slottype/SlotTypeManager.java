@@ -37,6 +37,7 @@ import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosConfig.CuriosSettings.CuriosSetting;
 import top.theillusivec4.curios.common.slottype.SlotType.Builder;
+import top.theillusivec4.curios.server.command.CurioArgumentType;
 
 public class SlotTypeManager {
 
@@ -113,6 +114,7 @@ public class SlotTypeManager {
   public static void buildSlotTypes() {
     Map<String, Builder> builders = !configBuilders.isEmpty() ? configBuilders : imcBuilders;
     builders.values().forEach(builder -> CuriosApi.getSlotHelper().addSlotType(builder.build()));
+    CurioArgumentType.slotIds = CuriosApi.getSlotHelper().getSlotTypeIds();
   }
 
   private static void processImc(Stream<InterModComms.IMCMessage> messages, boolean create) {
