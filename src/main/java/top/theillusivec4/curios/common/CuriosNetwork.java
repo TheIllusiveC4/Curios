@@ -65,7 +65,7 @@ public class CuriosNetwork {
         ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity) playerEntity;
         ItemStack stack = playerEntity.inventory.getCursorStack();
         playerEntity.inventory.setCursorStack(ItemStack.EMPTY);
-        serverPlayerEntity.closeCurrentScreen();
+        serverPlayerEntity.closeScreenHandler();
 
         if (!stack.isEmpty()) {
           playerEntity.inventory.setCursorStack(stack);
