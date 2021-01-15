@@ -127,11 +127,14 @@ public class EventHandlerCurios {
       oldCurios.getCurioMap().forEach((identifier, stackHandler) -> {
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
-          player.getAttributes()
-              .applyAttributeModifiers(CurioUtils.getAttributeModifiers(identifier, stack));
-          CuriosAPI.getCurio(stack).ifPresent(curio -> {
-            curio.onEquipped(identifier, player);
-          });
+
+          if (!stack.isEmpty()) {
+            player.getAttributes()
+                .applyAttributeModifiers(CurioUtils.getAttributeModifiers(identifier, stack));
+            CuriosAPI.getCurio(stack).ifPresent(curio -> {
+              curio.onEquipped(identifier, player);
+            });
+          }
         }
       });
     }));
@@ -354,20 +357,26 @@ public class EventHandlerCurios {
                   new LivingCurioChangeEvent(entitylivingbase, identifier, i, prevStack, stack));
 
               boolean changeEquipped = !ItemStack.areItemsEqualIgnoreDurability(prevStack, stack);
-              entitylivingbase.getAttributes().removeAttributeModifiers(
-                  CurioUtils.getAttributeModifiers(identifier, prevStack));
-              prevCurio.ifPresent(curio -> {
-                if (changeEquipped) {
-                  curio.onUnequipped(identifier, entitylivingbase);
-                }
-              });
-              entitylivingbase.getAttributes()
-                  .applyAttributeModifiers(CurioUtils.getAttributeModifiers(identifier, stack));
-              currentCurio.ifPresent(curio -> {
-                if (changeEquipped) {
-                  curio.onEquipped(identifier, entitylivingbase);
-                }
-              });
+
+              if (!prevStack.isEmpty()) {
+                entitylivingbase.getAttributes().removeAttributeModifiers(
+                    CurioUtils.getAttributeModifiers(identifier, prevStack));
+                prevCurio.ifPresent(curio -> {
+                  if (changeEquipped) {
+                    curio.onUnequipped(identifier, entitylivingbase);
+                  }
+                });
+              }
+
+              if (!stack.isEmpty()) {
+                entitylivingbase.getAttributes()
+                    .applyAttributeModifiers(CurioUtils.getAttributeModifiers(identifier, stack));
+                currentCurio.ifPresent(curio -> {
+                  if (changeEquipped) {
+                    curio.onEquipped(identifier, entitylivingbase);
+                  }
+                });
+              }
               stackHandler
                   .setPreviousStackInSlot(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
             }
