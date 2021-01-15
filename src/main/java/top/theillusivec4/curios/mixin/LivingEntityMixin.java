@@ -123,12 +123,18 @@ public class LivingEntityMixin {
               sync = true;
               CurioChangeCallback.EVENT.invoker()
                   .change(livingEntity, identifier, i, prevStack, stack);
-              livingEntity.getAttributes().removeModifiers(
-                  CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, prevStack));
-              livingEntity.getAttributes().addTemporaryModifiers(
-                  CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
-              prevCurio.ifPresent(curio -> curio.onUnequip(identifier, index, livingEntity));
-              currentCurio.ifPresent(curio -> curio.onEquip(identifier, index, livingEntity));
+
+              if (!prevStack.isEmpty()) {
+                livingEntity.getAttributes().removeModifiers(
+                    CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, prevStack));
+                prevCurio.ifPresent(curio -> curio.onUnequip(identifier, index, livingEntity));
+              }
+
+              if (!stack.isEmpty()) {
+                livingEntity.getAttributes().addTemporaryModifiers(
+                    CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
+                currentCurio.ifPresent(curio -> curio.onEquip(identifier, index, livingEntity));
+              }
               stackHandler.setPreviousStack(i, stack.isEmpty() ? ItemStack.EMPTY : stack.copy());
             }
             ItemStack cosmeticStack = cosmeticStackHandler.getStack(i);
