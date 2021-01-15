@@ -242,16 +242,19 @@ public class CuriosEventHandler {
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
-          player.getAttributeManager().reapplyModifiers(
-              CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
-          int index = i;
-          CuriosApi.getCuriosHelper().getCurio(stack)
-              .ifPresent(curio -> curio.onEquip(identifier, index, player));
 
-          if (player instanceof ServerPlayerEntity) {
-            EquipCurioTrigger.INSTANCE
-                .trigger((ServerPlayerEntity) player, stack, (ServerWorld) player.world,
-                    player.getPosX(), player.getPosY(), player.getPosZ());
+          if (!stack.isEmpty()) {
+            player.getAttributeManager().reapplyModifiers(
+                CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
+            int index = i;
+            CuriosApi.getCuriosHelper().getCurio(stack)
+                .ifPresent(curio -> curio.onEquip(identifier, index, player));
+
+            if (player instanceof ServerPlayerEntity) {
+              EquipCurioTrigger.INSTANCE
+                  .trigger((ServerPlayerEntity) player, stack, (ServerWorld) player.world,
+                      player.getPosX(), player.getPosY(), player.getPosZ());
+            }
           }
         }
       });
@@ -417,17 +420,23 @@ public class CuriosEventHandler {
                   HandlerType.EQUIPMENT);
               MinecraftForge.EVENT_BUS
                   .post(new CurioChangeEvent(livingEntity, identifier, i, prevStack, stack));
-              livingEntity.getAttributeManager().removeModifiers(
-                  CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, prevStack));
-              livingEntity.getAttributeManager().reapplyModifiers(
-                  CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
-              prevCurio.ifPresent(curio -> curio.onUnequip(identifier, index, livingEntity));
-              currentCurio.ifPresent(curio -> curio.onEquip(identifier, index, livingEntity));
 
-              if (livingEntity instanceof ServerPlayerEntity) {
-                EquipCurioTrigger.INSTANCE.trigger((ServerPlayerEntity) livingEntity, stack,
-                    (ServerWorld) livingEntity.world, livingEntity.getPosX(),
-                    livingEntity.getPosY(), livingEntity.getPosZ());
+              if (!prevStack.isEmpty()) {
+                livingEntity.getAttributeManager().removeModifiers(
+                    CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, prevStack));
+                prevCurio.ifPresent(curio -> curio.onUnequip(identifier, index, livingEntity));
+              }
+
+              if (!stack.isEmpty()) {
+                livingEntity.getAttributeManager().reapplyModifiers(
+                    CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
+                currentCurio.ifPresent(curio -> curio.onEquip(identifier, index, livingEntity));
+
+                if (livingEntity instanceof ServerPlayerEntity) {
+                  EquipCurioTrigger.INSTANCE.trigger((ServerPlayerEntity) livingEntity, stack,
+                      (ServerWorld) livingEntity.world, livingEntity.getPosX(),
+                      livingEntity.getPosY(), livingEntity.getPosZ());
+                }
               }
               stackHandler.setPreviousStackInSlot(i, stack.copy());
             }
