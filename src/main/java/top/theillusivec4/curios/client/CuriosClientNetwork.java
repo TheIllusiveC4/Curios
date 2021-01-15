@@ -20,8 +20,10 @@
 package top.theillusivec4.curios.client;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -36,6 +38,7 @@ import top.theillusivec4.curios.api.type.component.ICurio;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 import top.theillusivec4.curios.common.CuriosNetwork;
 import top.theillusivec4.curios.common.inventory.screen.CuriosScreenHandler;
+import top.theillusivec4.curios.server.CurioArgumentType;
 
 public class CuriosClientNetwork {
 
@@ -79,11 +82,14 @@ public class CuriosClientNetwork {
             map.put(packetByteBuf.readString(25), new Identifier(packetByteBuf.readString(100)));
           }
           packetContext.getTaskQueue().execute(() -> {
+            Set<String> slotIds = new HashSet<>();
             CuriosApi.getIconHelper().clearIcons();
 
             for (Map.Entry<String, Identifier> entry : map.entrySet()) {
               CuriosApi.getIconHelper().addIcon(entry.getKey(), entry.getValue());
+              slotIds.add(entry.getKey());
             }
+            CurioArgumentType.slotIds = slotIds;
           });
         })));
 

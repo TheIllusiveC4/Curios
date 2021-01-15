@@ -28,6 +28,7 @@ import top.theillusivec4.curios.api.SlotTypeInfo;
 import top.theillusivec4.curios.api.SlotTypeInfo.BuildScheme;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.common.slottype.SlotType.Builder;
+import top.theillusivec4.curios.server.CurioArgumentType;
 import top.theillusivec4.curios.server.CuriosConfig;
 import top.theillusivec4.curios.server.CuriosConfig.CurioSetting;
 
@@ -132,5 +133,6 @@ public class SlotTypeManager {
   public static void buildSlotTypes() {
     Map<String, Builder> builders = !configBuilders.isEmpty() ? configBuilders : queueBuilders;
     builders.values().forEach(builder -> CuriosApi.getSlotHelper().addSlotType(builder.build()));
+    CurioArgumentType.slotIds = CuriosApi.getSlotHelper().getSlotTypeIds();
   }
 }
