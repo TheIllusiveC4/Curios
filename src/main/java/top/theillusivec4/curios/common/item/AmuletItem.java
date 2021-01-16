@@ -32,7 +32,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.type.ISlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.client.render.model.AmuletModel;
@@ -52,6 +56,18 @@ public class AmuletItem extends Item implements ICurioItem {
     if (!living.getEntityWorld().isRemote && living.ticksExisted % 40 == 0) {
       living.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
     }
+  }
+
+  @Override
+  public void playEquipFromHotbarSound(ISlotContext slot, ItemStack stack) {
+    LivingEntity livingEntity = slot.getWearer();
+    livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
+        SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+  }
+
+  @Override
+  public boolean canEquipFromHotbar(ISlotContext slot, ItemStack stack) {
+    return true;
   }
 
   @Override

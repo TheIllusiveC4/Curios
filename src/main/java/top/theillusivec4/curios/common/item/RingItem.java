@@ -38,6 +38,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.type.ISlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
@@ -64,12 +65,6 @@ public class RingItem extends Item {
       }
 
       @Override
-      public void playRightClickEquipSound(LivingEntity livingEntity) {
-        livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
-            SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL, 1.0f, 1.0f);
-      }
-
-      @Override
       public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
         Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
 
@@ -90,7 +85,14 @@ public class RingItem extends Item {
       }
 
       @Override
-      public boolean canRightClickEquip() {
+      public void playEquipFromHotbarSound(ISlotContext slot) {
+        LivingEntity livingEntity = slot.getWearer();
+        livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
+            SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+      }
+
+      @Override
+      public boolean canEquipFromHotbar(ISlotContext slot) {
         return true;
       }
     });

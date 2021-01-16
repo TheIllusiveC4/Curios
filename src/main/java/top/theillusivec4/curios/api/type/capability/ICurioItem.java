@@ -31,6 +31,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
+import top.theillusivec4.curios.api.type.ISlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
 
@@ -169,26 +170,27 @@ public interface ICurioItem {
   }
 
   /**
-   * Plays a sound server-side when a curio is equipped from right-clicking the
-   * ItemStack in hand. This can be overridden to play nothing, but it is advised
-   * to always play something as an auditory feedback for players.
+   * Plays a sound server-side when a curio is equipped from using the ItemStack in hand.
+   * This can be overridden to play nothing, but it is advised to always play something as an
+   * auditory feedback for players.
    *
-   * @param stack        The ItemStack in question
-   * @param livingEntity The entity that broke the curio
+   * @param slotContext Context about the slot that the ItemStack was just equipped into
+   * @param stack       The ItemStack in question
    */
-  default void playRightClickEquipSound(LivingEntity livingEntity, ItemStack stack) {
-    defaultInstance.playRightClickEquipSound(livingEntity);
+  default void playEquipFromHotbarSound(ISlotContext slotContext, ItemStack stack) {
+    playRightClickEquipSound(slotContext.getWearer(), stack);
   }
 
   /**
-   * Determines if the ItemStack can be automatically equipped into the first
-   * available slot when right-clicked.
+   * Determines if the ItemStack can be automatically equipped into the first available slot when
+   * used from the hotbar.
    *
-   * @param stack The ItemStack in question
+   * @param slotContext Context about the slot that the ItemStack
+   * @param stack       The ItemStack in question
    * @return True to enable right-clicking auto-equip, false to disable
    */
-  default boolean canRightClickEquip(ItemStack stack) {
-    return defaultInstance.canRightClickEquip();
+  default boolean canEquipFromHotbar(ISlotContext slotContext, ItemStack stack) {
+    return canRightClickEquip(stack);
   }
 
   /**
@@ -333,4 +335,21 @@ public interface ICurioItem {
             limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
   }
 
+  /**
+   * @deprecated See {@link ICurioItem#playEquipFromHotbarSound(ISlotContext, ItemStack)} for a more
+   * appropriately named alternative with additional context.
+   */
+  @Deprecated
+  default void playRightClickEquipSound(LivingEntity livingEntity, ItemStack stack) {
+    defaultInstance.playRightClickEquipSound(livingEntity);
+  }
+
+  /**
+   * @deprecated See {@link ICurioItem#canEquipFromHotbar(ISlotContext, ItemStack)} for a more
+   * appropriately named alternative with additional context.
+   */
+  @Deprecated
+  default boolean canRightClickEquip(ItemStack stack) {
+    return defaultInstance.canRightClickEquip();
+  }
 }

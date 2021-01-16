@@ -66,8 +66,8 @@ import top.theillusivec4.curios.api.event.DropRulesEvent;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
-import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
@@ -78,6 +78,7 @@ import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
+import top.theillusivec4.curios.common.slottype.SlotContext;
 import top.theillusivec4.curios.common.triggers.EquipCurioTrigger;
 
 public class CuriosEventHandler {
@@ -319,10 +320,8 @@ public class CuriosEventHandler {
   public void curioRightClick(PlayerInteractEvent.RightClickItem evt) {
     PlayerEntity player = evt.getPlayer();
     ItemStack stack = evt.getItemStack();
-    CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> {
-
-      if (curio.canRightClickEquip()) {
-        CuriosApi.getCuriosHelper().getCuriosHandler(player).ifPresent(handler -> {
+    CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(
+        curio -> CuriosApi.getCuriosHelper().getCuriosHandler(player).ifPresent(handler -> {
 
           if (!player.world.isRemote) {
             Map<String, ICurioStacksHandler> curios = handler.getCurios();
@@ -331,35 +330,32 @@ public class CuriosEventHandler {
               IDynamicStackHandler stackHandler = entry.getValue().getStacks();
 
               for (int i = 0; i < stackHandler.getSlots(); i++) {
-                ItemStack present = stackHandler.getStackInSlot(i);
-                Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
                 String id = entry.getKey();
+                SlotContext slotContext = new SlotContext(id, i, player);
 
-                if (present.isEmpty() &&
-                    ((tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier())) ||
-                        (!tags.isEmpty() && id.equals(SlotTypePreset.CURIO.getIdentifier()))) &&
-                    curio
-                        .canEquip(id, player)) {
-                  stackHandler.setStackInSlot(i, stack.copy());
-                  curio.playRightClickEquipSound(player);
+                if (curio.canEquip(id, player) && curio.canEquipFromHotbar(slotContext)) {
+                  ItemStack present = stackHandler.getStackInSlot(i);
+                  Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
 
-                  if (!player.isCreative()) {
-                    int count = stack.getCount();
-                    stack.shrink(count);
+                  if (present.isEmpty() &&
+                      ((tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier())) ||
+                          (!tags.isEmpty() && id.equals(SlotTypePreset.CURIO.getIdentifier())))) {
+                    stackHandler.setStackInSlot(i, stack.copy());
+                    curio.playEquipFromHotbarSound(slotContext);
+
+                    if (!player.isCreative()) {
+                      int count = stack.getCount();
+                      stack.shrink(count);
+                    }
+                    evt.setCancellationResult(ActionResultType.SUCCESS);
+                    evt.setCanceled(true);
+                    return;
                   }
-                  evt.setCancellationResult(ActionResultType.SUCCESS);
-                  evt.setCanceled(true);
-                  return;
                 }
               }
             }
-          } else {
-            evt.setCancellationResult(ActionResultType.SUCCESS);
-            evt.setCanceled(true);
           }
-        });
-      }
-    });
+        }));
   }
 
   @SubscribeEvent

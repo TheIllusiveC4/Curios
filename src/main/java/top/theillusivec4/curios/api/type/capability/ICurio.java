@@ -46,6 +46,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
+import top.theillusivec4.curios.api.type.ISlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 
 public interface ICurio {
@@ -176,25 +177,26 @@ public interface ICurio {
   }
 
   /**
-   * Plays a sound server-side when a curio is equipped from right-clicking the ItemStack in hand.
-   * This can be overridden to play nothing, but it is advised to always play something as an
-   * auditory feedback for players.
+   * Called server-side when the ItemStack is equipped from the hotbar.
+   * <br>
+   * Default implementation plays an equip sound. This can be overridden to play nothing, but it is
+   * advised to always play something as an auditory feedback for players.
    *
-   * @param livingEntity The wearer of the ItemStack
+   * @param slotContext Context about the slot that the ItemStack was just equipped into
    */
-  default void playRightClickEquipSound(LivingEntity livingEntity) {
-    livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
-        SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+  default void playEquipFromHotbarSound(ISlotContext slotContext) {
+    playRightClickEquipSound(slotContext.getWearer());
   }
 
   /**
    * Determines if the ItemStack can be automatically equipped into the first available slot when
-   * right-clicked.
+   * used from the hotbar.
    *
-   * @return True to enable right-clicking auto-equip, false to disable
+   * @param slotContext Context about the slot that the ItemStack is attempting to equip into
+   * @return True to enable auto-equipping when used from the hotbar, false to disable
    */
-  default boolean canRightClickEquip() {
-    return false;
+  default boolean canEquipFromHotbar(ISlotContext slotContext) {
+    return canRightClickEquip();
   }
 
   /**
@@ -322,6 +324,25 @@ public interface ICurio {
                       float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
                       float headPitch) {
 
+  }
+
+  /**
+   * @deprecated See {@link ICurio#canEquipFromHotbar(ISlotContext)} for a more appropriately named
+   * alternative with additional context.
+   */
+  @Deprecated
+  default boolean canRightClickEquip() {
+    return false;
+  }
+
+  /**
+   * @deprecated See {@link ICurio#playEquipFromHotbarSound(ISlotContext)} for a more appropriately
+   * named alternative with additional context.
+   */
+  @Deprecated
+  default void playRightClickEquipSound(LivingEntity livingEntity) {
+    livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
+        SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.NEUTRAL, 1.0f, 1.0f);
   }
 
   /**

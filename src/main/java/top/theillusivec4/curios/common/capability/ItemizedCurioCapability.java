@@ -30,6 +30,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
+import top.theillusivec4.curios.api.type.ISlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
@@ -50,11 +51,6 @@ public class ItemizedCurioCapability implements ICurio {
   @Override
   public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
     return this.curioItem.canRender(identifier, index, livingEntity, this.stackInstance);
-  }
-
-  @Override
-  public boolean canRightClickEquip() {
-    return this.curioItem.canRightClickEquip(this.stackInstance);
   }
 
   @Override
@@ -121,11 +117,6 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public void playRightClickEquipSound(LivingEntity livingEntity) {
-    this.curioItem.playRightClickEquipSound(livingEntity, this.stackInstance);
-  }
-
-  @Override
   public void readSyncData(CompoundNBT compound) {
     this.curioItem.readSyncData(compound, this.stackInstance);
   }
@@ -151,4 +142,23 @@ public class ItemizedCurioCapability implements ICurio {
     return this.curioItem.writeSyncData(this.stackInstance);
   }
 
+  @Override
+  public void playEquipFromHotbarSound(ISlotContext slotContext) {
+    this.curioItem.playEquipFromHotbarSound(slotContext, this.stackInstance);
+  }
+
+  @Override
+  public boolean canEquipFromHotbar(ISlotContext slotContext) {
+    return this.curioItem.canEquipFromHotbar(slotContext, this.stackInstance);
+  }
+
+  @Override
+  public boolean canRightClickEquip() {
+    return this.curioItem.canRightClickEquip(this.stackInstance);
+  }
+
+  @Override
+  public void playRightClickEquipSound(LivingEntity livingEntity) {
+    this.curioItem.playRightClickEquipSound(livingEntity, this.stackInstance);
+  }
 }
