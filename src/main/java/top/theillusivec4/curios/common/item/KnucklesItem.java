@@ -39,13 +39,13 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.type.ISlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.client.render.model.KnucklesModel;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
 public class KnucklesItem extends Item {
 
-  private static final UUID AD_UUID = UUID.fromString("7ce10414-adcc-4bf2-8804-f5dbd39fadaf");
   private static final ResourceLocation KNUCKLES_TEXTURE = new ResourceLocation(Curios.MODID,
       "textures/entity/knuckles.png");
 
@@ -60,13 +60,12 @@ public class KnucklesItem extends Item {
       private Object model;
 
       @Override
-      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
+      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+                                                                          UUID uuid) {
         Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
-
         atts.put(Attributes.ATTACK_DAMAGE,
-            new AttributeModifier(AD_UUID, Curios.MODID + ":attack_damage_bonus", 4,
+            new AttributeModifier(uuid, Curios.MODID + ":attack_damage_bonus", 4,
                 AttributeModifier.Operation.ADDITION));
-
         return atts;
       }
 

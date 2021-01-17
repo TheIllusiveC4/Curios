@@ -52,6 +52,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
+import top.theillusivec4.curios.common.slottype.SlotContext;
 
 public class ClientEventHandler {
 
@@ -76,8 +77,8 @@ public class ClientEventHandler {
 
   @SubscribeEvent
   public void onTooltip(ItemTooltipEvent evt) {
-
     ItemStack stack = evt.getItemStack();
+    PlayerEntity player = evt.getPlayer();
 
     if (!stack.isEmpty()) {
       List<ITextComponent> tooltip = evt.getToolTip();
@@ -126,12 +127,12 @@ public class ClientEventHandler {
 
         for (String identifier : slots) {
           Multimap<Attribute, AttributeModifier> multimap = CuriosApi.getCuriosHelper()
-              .getAttributeModifiers(identifier, stack);
+              .getAttributeModifiers(new SlotContext(identifier, -1, player), UUID.randomUUID(),
+                  stack);
           boolean addAttributeTooltips = optionalCurio
-              .map(iCurio -> iCurio.showAttributesTooltip(identifier)).orElse(true);
+              .map(curio -> curio.showAttributesTooltip(identifier)).orElse(true);
 
           if (addAttributeTooltips && !multimap.isEmpty() && (i & 2) == 0) {
-            PlayerEntity player = evt.getPlayer();
             tooltip.add(StringTextComponent.EMPTY);
             tooltip.add(new TranslationTextComponent("curios.modifiers." + identifier)
                 .mergeStyle(TextFormatting.GOLD));

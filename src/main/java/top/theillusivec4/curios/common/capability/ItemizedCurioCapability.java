@@ -22,6 +22,7 @@ package top.theillusivec4.curios.common.capability;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.List;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.entity.LivingEntity;
@@ -71,6 +72,12 @@ public class ItemizedCurioCapability implements ICurio {
   @Override
   public void curioBreak(ItemStack stack, LivingEntity livingEntity) {
     this.curioItem.curioBreak(stack, livingEntity);
+  }
+
+  @Override
+  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+                                                                      UUID uuid) {
+    return this.curioItem.getAttributeModifiers(slotContext, uuid, this.stackInstance);
   }
 
   @Override

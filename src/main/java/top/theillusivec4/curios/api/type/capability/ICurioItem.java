@@ -22,6 +22,7 @@ package top.theillusivec4.curios.api.type.capability;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.List;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.entity.LivingEntity;
@@ -157,16 +158,19 @@ public interface ICurioItem {
   }
 
   /**
-   * A map of AttributeModifier associated with the ItemStack and the
-   * {@link ISlotType} identifier.
+   * Retrieves a map of attribute modifiers for the curio.
+   * <br>
+   * Note that only the identifier is guaranteed to be present in the slot context. For instances
+   * where the ItemStack may not be in a curio slot, such as when retrieving item tooltips, the
+   * index is -1 and the wearer may be null.
    *
-   * @param identifier The CurioType identifier for the context
-   * @param stack      The ItemStack in question
+   * @param slotContext Context about the slot that the ItemStack is in
+   * @param uuid        Slot-unique UUID
    * @return A map of attribute modifiers to apply
    */
-  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier,
-                                                                       ItemStack stack) {
-    return defaultInstance.getAttributeModifiers(identifier);
+  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+                                                                       UUID uuid, ItemStack stack) {
+    return getAttributeModifiers(slotContext.getIdentifier(), stack);
   }
 
   /**
@@ -261,7 +265,7 @@ public interface ICurioItem {
   /**
    * Determines whether or not Curios will automatically add tooltip listing
    * attribute modifiers that are returned by
-   * {@link ICurioItem#getAttributeModifiers(String, ItemStack)}.
+   * {@link ICurioItem#getAttributeModifiers(ISlotContext, UUID, ItemStack)}.
    *
    * @param identifier The identifier of the {@link ISlotType} of the slot
    * @param stack      The ItemStack in question
@@ -335,6 +339,8 @@ public interface ICurioItem {
             limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
   }
 
+  // ========== DEPRECATED ================
+
   /**
    * @deprecated See {@link ICurioItem#playEquipFromHotbarSound(ISlotContext, ItemStack)} for a more
    * appropriately named alternative with additional context.
@@ -351,5 +357,15 @@ public interface ICurioItem {
   @Deprecated
   default boolean canRightClickEquip(ItemStack stack) {
     return defaultInstance.canRightClickEquip();
+  }
+
+  /**
+   * @deprecated See {@link ICurioItem#getAttributeModifiers(ISlotContext, UUID, ItemStack)} for an
+   * alternative method with additional context and a slot-unique UUID parameter.
+   */
+  @Deprecated
+  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier,
+                                                                       ItemStack stack) {
+    return defaultInstance.getAttributeModifiers(identifier);
   }
 }

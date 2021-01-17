@@ -24,6 +24,7 @@ import com.google.common.collect.Multimap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -43,11 +44,13 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.type.ISlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
+import top.theillusivec4.curios.common.slottype.SlotContext;
 
 public class CuriosHelper implements ICuriosHelper {
 
@@ -125,11 +128,18 @@ public class CuriosHelper implements ICuriosHelper {
   @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier,
                                                                       ItemStack stack) {
+    return getAttributeModifiers(new SlotContext(identifier, -1, null), UUID.randomUUID(), stack);
+  }
+
+  @Override
+  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+                                                                      UUID uuid, ItemStack stack) {
     Multimap<Attribute, AttributeModifier> multimap;
 
     if (stack.getTag() != null && stack.getTag().contains("CurioAttributeModifiers", 9)) {
       multimap = HashMultimap.create();
       ListNBT listnbt = stack.getTag().getList("CurioAttributeModifiers", 10);
+      String identifier = slotContext.getIdentifier();
 
       for (int i = 0; i < listnbt.size(); ++i) {
         CompoundNBT compoundnbt = listnbt.getCompound(i);
@@ -151,7 +161,7 @@ public class CuriosHelper implements ICuriosHelper {
       }
       return multimap;
     }
-    return getCurio(stack).map(curio -> curio.getAttributeModifiers(identifier))
+    return getCurio(stack).map(curio -> curio.getAttributeModifiers(slotContext, uuid))
         .orElse(HashMultimap.create());
   }
 

@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.common.item;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -44,9 +44,6 @@ import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
 public class RingItem extends Item {
 
-  private static final UUID SPEED_UUID = UUID.fromString("8b7c8fcd-89bc-4794-8bb9-eddeb32753a5");
-  private static final UUID ARMOR_UUID = UUID.fromString("38faf191-bf78-4654-b349-cc1f4f1143bf");
-
   public RingItem() {
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
     this.setRegistryName(Curios.MODID, "ring");
@@ -65,16 +62,15 @@ public class RingItem extends Item {
       }
 
       @Override
-      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
-        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
-
+      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+                                                                          UUID uuid) {
+        Multimap<Attribute, AttributeModifier> atts = LinkedHashMultimap.create();
         atts.put(Attributes.MOVEMENT_SPEED,
-            new AttributeModifier(SPEED_UUID, Curios.MODID + ":speed_bonus", 0.1,
+            new AttributeModifier(uuid, Curios.MODID + ":speed_bonus", 0.1,
                 AttributeModifier.Operation.MULTIPLY_TOTAL));
         atts.put(Attributes.ARMOR,
-            new AttributeModifier(ARMOR_UUID, Curios.MODID + ":armor_bonus", 2,
+            new AttributeModifier(uuid, Curios.MODID + ":armor_bonus", 2,
                 AttributeModifier.Operation.ADDITION));
-
         return atts;
       }
 

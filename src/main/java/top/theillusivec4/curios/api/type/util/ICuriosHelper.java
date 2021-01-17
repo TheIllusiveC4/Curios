@@ -22,6 +22,7 @@ package top.theillusivec4.curios.api.type.util;
 import com.google.common.collect.Multimap;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
@@ -34,6 +35,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
+import top.theillusivec4.curios.api.type.ISlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
@@ -98,7 +100,21 @@ public interface ICuriosHelper {
   Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(
       Predicate<ItemStack> filter, @Nonnull LivingEntity livingEntity);
 
-  Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack);
+  /**
+   * Retrieves a map of attribute modifiers for the ItemStack.
+   * <br>
+   * Note that only the identifier is guaranteed to be present in the slot context. For instances
+   * where the ItemStack may not be in a curio slot, such as when retrieving item tooltips, the
+   * index is -1 and the wearer may be null.
+   *
+   * @param slotContext Context about the slot that the ItemStack is equipped in or may potentially
+   *                    be equipped in
+   * @param uuid        Slot-unique UUID
+   * @param stack       The ItemStack in question
+   * @return A map of attribute modifiers
+   */
+  Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext, UUID uuid,
+                                                               ItemStack stack);
 
   /**
    * Passes three inputs into an internal triple-input consumer that should be used from the
@@ -123,4 +139,13 @@ public interface ICuriosHelper {
    *                 identifier, a slot index, and the wearer as a {@link LivingEntity}
    */
   void setBrokenCurioConsumer(TriConsumer<String, Integer, LivingEntity> consumer);
+
+  // ========= DEPRECATED =============
+
+  /**
+   * @deprecated See {@link ICuriosHelper#getAttributeModifiers(ISlotContext, UUID, ItemStack)} for
+   * an alternative method with additional context and a slot-unique UUID.
+   */
+  @Deprecated
+  Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack);
 }

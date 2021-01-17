@@ -23,6 +23,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.List;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -167,13 +168,19 @@ public interface ICurio {
   }
 
   /**
-   * A map of AttributeModifier associated with the ItemStack and the {@link ISlotType} identifier.
+   * Retrieves a map of attribute modifiers for the curio.
+   * <br>
+   * Note that only the identifier is guaranteed to be present in the slot context. For instances
+   * where the ItemStack may not be in a curio slot, such as when retrieving item tooltips, the
+   * index is -1 and the wearer may be null.
    *
-   * @param identifier The CurioType identifier for the context
+   * @param slotContext Context about the slot that the ItemStack is in
+   * @param uuid        Slot-unique UUID
    * @return A map of attribute modifiers to apply
    */
-  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
-    return HashMultimap.create();
+  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+                                                                       UUID uuid) {
+    return getAttributeModifiers(slotContext.getIdentifier());
   }
 
   /**
@@ -259,7 +266,7 @@ public interface ICurio {
 
   /**
    * Determines whether or not Curios will automatically add tooltip listing attribute modifiers
-   * that are returned by {@link ICurio#getAttributeModifiers(String)}.
+   * that are returned by {@link ICurio#getAttributeModifiers(ISlotContext, UUID)}.
    *
    * @param identifier The identifier of the {@link ISlotType} of the slot
    * @return True to show attributes tooltip, false to disable
@@ -324,25 +331,6 @@ public interface ICurio {
                       float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
                       float headPitch) {
 
-  }
-
-  /**
-   * @deprecated See {@link ICurio#canEquipFromHotbar(ISlotContext)} for a more appropriately named
-   * alternative with additional context.
-   */
-  @Deprecated
-  default boolean canRightClickEquip() {
-    return false;
-  }
-
-  /**
-   * @deprecated See {@link ICurio#playEquipFromHotbarSound(ISlotContext)} for a more appropriately
-   * named alternative with additional context.
-   */
-  @Deprecated
-  default void playRightClickEquipSound(LivingEntity livingEntity) {
-    livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
-        SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.NEUTRAL, 1.0f, 1.0f);
   }
 
   /**
@@ -451,5 +439,35 @@ public interface ICurio {
         }
       }
     }
+  }
+
+  // ============ DEPRECATED ================
+
+  /**
+   * @deprecated See {@link ICurio#canEquipFromHotbar(ISlotContext)} for a more appropriately named
+   * alternative with additional context.
+   */
+  @Deprecated
+  default boolean canRightClickEquip() {
+    return false;
+  }
+
+  /**
+   * @deprecated See {@link ICurio#playEquipFromHotbarSound(ISlotContext)} for a more appropriately
+   * named alternative with additional context.
+   */
+  @Deprecated
+  default void playRightClickEquipSound(LivingEntity livingEntity) {
+    livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
+        SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+  }
+
+  /**
+   * @deprecated See {@link ICurio#getAttributeModifiers(ISlotContext, UUID)} for an updated
+   * alternative with additional context and a slot-unique UUID parameter.
+   */
+  @Deprecated
+  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
+    return HashMultimap.create();
   }
 }

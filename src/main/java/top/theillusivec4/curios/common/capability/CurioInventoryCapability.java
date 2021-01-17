@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.entity.LivingEntity;
@@ -56,6 +57,7 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.api.type.util.ISlotHelper;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
+import top.theillusivec4.curios.common.slottype.SlotContext;
 
 public class CurioInventoryCapability {
 
@@ -317,10 +319,12 @@ public class CurioInventoryCapability {
         for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
           drops.add(stackHandler.getStackInSlot(i));
+          SlotContext slotContext = new SlotContext(identifier, i, this.wearer);
 
           if (!stack.isEmpty()) {
+            UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
             this.wearer.getAttributeManager().removeModifiers(
-                CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
+                CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack));
             int index = i;
             CuriosApi.getCuriosHelper().getCurio(stack)
                 .ifPresent(curio -> curio.onUnequip(identifier, index, this.wearer));

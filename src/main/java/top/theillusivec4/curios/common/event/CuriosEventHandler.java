@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -243,10 +244,12 @@ public class CuriosEventHandler {
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
+          SlotContext slotContext = new SlotContext(identifier, i, player);
 
           if (!stack.isEmpty()) {
+            UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
             player.getAttributeManager().reapplyModifiers(
-                CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
+                CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack));
             int index = i;
             CuriosApi.getCuriosHelper().getCurio(stack)
                 .ifPresent(curio -> curio.onEquip(identifier, index, player));
@@ -387,6 +390,7 @@ public class CuriosEventHandler {
         IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
+          SlotContext slotContext = new SlotContext(identifier, i, livingEntity);
           ItemStack stack = stackHandler.getStackInSlot(i);
           LazyOptional<ICurio> currentCurio = CuriosApi.getCuriosHelper().getCurio(stack);
           final int index = i;
@@ -416,16 +420,18 @@ public class CuriosEventHandler {
                   HandlerType.EQUIPMENT);
               MinecraftForge.EVENT_BUS
                   .post(new CurioChangeEvent(livingEntity, identifier, i, prevStack, stack));
+              UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
 
               if (!prevStack.isEmpty()) {
                 livingEntity.getAttributeManager().removeModifiers(
-                    CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, prevStack));
+                    CuriosApi.getCuriosHelper()
+                        .getAttributeModifiers(slotContext, uuid, prevStack));
                 prevCurio.ifPresent(curio -> curio.onUnequip(identifier, index, livingEntity));
               }
 
               if (!stack.isEmpty()) {
                 livingEntity.getAttributeManager().reapplyModifiers(
-                    CuriosApi.getCuriosHelper().getAttributeModifiers(identifier, stack));
+                    CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack));
                 currentCurio.ifPresent(curio -> curio.onEquip(identifier, index, livingEntity));
 
                 if (livingEntity instanceof ServerPlayerEntity) {
