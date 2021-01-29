@@ -49,10 +49,10 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
-import top.theillusivec4.curios.common.slottype.SlotContext;
 
 public class ClientEventHandler {
 
@@ -127,8 +127,7 @@ public class ClientEventHandler {
 
         for (String identifier : slots) {
           Multimap<Attribute, AttributeModifier> multimap = CuriosApi.getCuriosHelper()
-              .getAttributeModifiers(new SlotContext(identifier, -1, player), UUID.randomUUID(),
-                  stack);
+              .getAttributeModifiers(new SlotContext(identifier, player), UUID.randomUUID(), stack);
           boolean addAttributeTooltips = optionalCurio
               .map(curio -> curio.showAttributesTooltip(identifier)).orElse(true);
 

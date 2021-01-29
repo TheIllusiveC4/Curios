@@ -35,7 +35,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
-import top.theillusivec4.curios.api.type.ISlotContext;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
@@ -113,7 +113,7 @@ public interface ICuriosHelper {
    * @param stack       The ItemStack in question
    * @return A map of attribute modifiers
    */
-  Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext, UUID uuid,
+  Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext, UUID uuid,
                                                                ItemStack stack);
 
   /**
@@ -143,7 +143,7 @@ public interface ICuriosHelper {
   // ========= DEPRECATED =============
 
   /**
-   * @deprecated See {@link ICuriosHelper#getAttributeModifiers(ISlotContext, UUID, ItemStack)} for
+   * @deprecated See {@link ICuriosHelper#getAttributeModifiers(SlotContext, UUID, ItemStack)} for
    * an alternative method with additional context and a slot-unique UUID.
    */
   @Deprecated

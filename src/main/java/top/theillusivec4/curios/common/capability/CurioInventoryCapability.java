@@ -51,13 +51,13 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.api.type.util.ISlotHelper;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
-import top.theillusivec4.curios.common.slottype.SlotContext;
 
 public class CurioInventoryCapability {
 
@@ -319,7 +319,7 @@ public class CurioInventoryCapability {
         for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
           drops.add(stackHandler.getStackInSlot(i));
-          SlotContext slotContext = new SlotContext(identifier, i, this.wearer);
+          SlotContext slotContext = new SlotContext(identifier, this.wearer, i);
 
           if (!stack.isEmpty()) {
             UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());

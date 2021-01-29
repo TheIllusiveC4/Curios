@@ -38,7 +38,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.type.ISlotContext;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
@@ -62,7 +62,7 @@ public class RingItem extends Item {
       }
 
       @Override
-      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                           UUID uuid) {
         Multimap<Attribute, AttributeModifier> atts = LinkedHashMultimap.create();
         atts.put(Attributes.MOVEMENT_SPEED,
@@ -80,15 +80,14 @@ public class RingItem extends Item {
         return DropRule.ALWAYS_KEEP;
       }
 
+      @Nonnull
       @Override
-      public void playEquipFromHotbarSound(ISlotContext slot) {
-        LivingEntity livingEntity = slot.getWearer();
-        livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
-            SoundEvents.ITEM_ARMOR_EQUIP_GOLD, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+      public SoundInfo getEquipSound(SlotContext slotContext) {
+        return new SoundInfo(SoundEvents.ITEM_ARMOR_EQUIP_GOLD, 1.0f, 1.0f);
       }
 
       @Override
-      public boolean canEquipFromHotbar(ISlotContext slot) {
+      public boolean canEquipFromHotbar(SlotContext slot) {
         return true;
       }
     });

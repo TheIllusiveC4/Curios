@@ -31,7 +31,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.ITextComponent;
-import top.theillusivec4.curios.api.type.ISlotContext;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
@@ -75,7 +75,7 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                       UUID uuid) {
     return this.curioItem.getAttributeModifiers(slotContext, uuid, this.stackInstance);
   }
@@ -150,12 +150,12 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public void playEquipFromHotbarSound(ISlotContext slotContext) {
-    this.curioItem.playEquipFromHotbarSound(slotContext, this.stackInstance);
+  public void onEquipFromHotbar(SlotContext slotContext) {
+    this.curioItem.onEquipFromHotbar(slotContext, this.stackInstance);
   }
 
   @Override
-  public boolean canEquipFromHotbar(ISlotContext slotContext) {
+  public boolean canEquipFromHotbar(SlotContext slotContext) {
     return this.curioItem.canEquipFromHotbar(slotContext, this.stackInstance);
   }
 

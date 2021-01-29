@@ -44,13 +44,12 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.type.ISlotContext;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
-import top.theillusivec4.curios.common.slottype.SlotContext;
 
 public class CuriosHelper implements ICuriosHelper {
 
@@ -128,11 +127,11 @@ public class CuriosHelper implements ICuriosHelper {
   @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier,
                                                                       ItemStack stack) {
-    return getAttributeModifiers(new SlotContext(identifier, -1, null), UUID.randomUUID(), stack);
+    return getAttributeModifiers(new SlotContext(identifier), UUID.randomUUID(), stack);
   }
 
   @Override
-  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                       UUID uuid, ItemStack stack) {
     Multimap<Attribute, AttributeModifier> multimap;
 

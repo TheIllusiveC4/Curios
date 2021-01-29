@@ -64,6 +64,7 @@ import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 import top.theillusivec4.curios.api.event.CurioDropsEvent;
 import top.theillusivec4.curios.api.event.DropRulesEvent;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
@@ -79,7 +80,6 @@ import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
-import top.theillusivec4.curios.common.slottype.SlotContext;
 import top.theillusivec4.curios.common.triggers.EquipCurioTrigger;
 
 public class CuriosEventHandler {
@@ -244,7 +244,7 @@ public class CuriosEventHandler {
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
-          SlotContext slotContext = new SlotContext(identifier, i, player);
+          SlotContext slotContext = new SlotContext(identifier, player, i);
 
           if (!stack.isEmpty()) {
             UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
@@ -334,7 +334,7 @@ public class CuriosEventHandler {
 
               for (int i = 0; i < stackHandler.getSlots(); i++) {
                 String id = entry.getKey();
-                SlotContext slotContext = new SlotContext(id, i, player);
+                SlotContext slotContext = new SlotContext(id, player, i);
 
                 if (curio.canEquip(id, player) && curio.canEquipFromHotbar(slotContext)) {
                   ItemStack present = stackHandler.getStackInSlot(i);
@@ -344,7 +344,7 @@ public class CuriosEventHandler {
                       ((tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier())) ||
                           (!tags.isEmpty() && id.equals(SlotTypePreset.CURIO.getIdentifier())))) {
                     stackHandler.setStackInSlot(i, stack.copy());
-                    curio.playEquipFromHotbarSound(slotContext);
+                    curio.onEquipFromHotbar(slotContext);
 
                     if (!player.isCreative()) {
                       int count = stack.getCount();
@@ -390,7 +390,7 @@ public class CuriosEventHandler {
         IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
-          SlotContext slotContext = new SlotContext(identifier, i, livingEntity);
+          SlotContext slotContext = new SlotContext(identifier, livingEntity, i);
           ItemStack stack = stackHandler.getStackInSlot(i);
           LazyOptional<ICurio> currentCurio = CuriosApi.getCuriosHelper().getCurio(stack);
           final int index = i;

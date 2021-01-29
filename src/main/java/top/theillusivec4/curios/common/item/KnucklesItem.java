@@ -39,7 +39,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.type.ISlotContext;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.client.render.model.KnucklesModel;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
@@ -60,7 +60,7 @@ public class KnucklesItem extends Item {
       private Object model;
 
       @Override
-      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                           UUID uuid) {
         Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
         atts.put(Attributes.ATTACK_DAMAGE,
