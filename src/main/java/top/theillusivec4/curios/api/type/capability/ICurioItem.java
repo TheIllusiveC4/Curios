@@ -31,8 +31,9 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
-import top.theillusivec4.curios.api.type.ISlotContext;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
 
@@ -168,21 +169,35 @@ public interface ICurioItem {
    * @param uuid        Slot-unique UUID
    * @return A map of attribute modifiers to apply
    */
-  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                        UUID uuid, ItemStack stack) {
     return getAttributeModifiers(slotContext.getIdentifier(), stack);
   }
 
   /**
-   * Plays a sound server-side when a curio is equipped from using the ItemStack in hand.
-   * This can be overridden to play nothing, but it is advised to always play something as an
-   * auditory feedback for players.
+   * Called server-side when the ItemStack is equipped from the hotbar.
+   * <br>
+   * Default implementation plays the equip sound from {@link ICurioItem#getEquipSound(SlotContext)}.
+   * This can be overridden to avoid that, but it is advised to always play something as an auditory
+   * feedback for players.
    *
    * @param slotContext Context about the slot that the ItemStack was just equipped into
    * @param stack       The ItemStack in question
    */
-  default void playEquipFromHotbarSound(ISlotContext slotContext, ItemStack stack) {
+  default void onEquipFromHotbar(SlotContext slotContext, ItemStack stack) {
     playRightClickEquipSound(slotContext.getWearer(), stack);
+  }
+
+  /**
+   * Retrieves the equip sound information for the given slot context.
+   *
+   * @param slotContext Context about the slot that the ItemStack was just equipped into
+   * @return {@link top.theillusivec4.curios.api.type.capability.ICurio.SoundInfo} containing
+   * information about the sound event, volume, and pitch
+   */
+  @Nonnull
+  default ICurio.SoundInfo getEquipSound(SlotContext slotContext) {
+    return new ICurio.SoundInfo(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 1.0f, 1.0f);
   }
 
   /**
@@ -193,7 +208,7 @@ public interface ICurioItem {
    * @param stack       The ItemStack in question
    * @return True to enable right-clicking auto-equip, false to disable
    */
-  default boolean canEquipFromHotbar(ISlotContext slotContext, ItemStack stack) {
+  default boolean canEquipFromHotbar(SlotContext slotContext, ItemStack stack) {
     return canRightClickEquip(stack);
   }
 
@@ -265,7 +280,7 @@ public interface ICurioItem {
   /**
    * Determines whether or not Curios will automatically add tooltip listing
    * attribute modifiers that are returned by
-   * {@link ICurioItem#getAttributeModifiers(ISlotContext, UUID, ItemStack)}.
+   * {@link ICurioItem#getAttributeModifiers(SlotContext, UUID, ItemStack)}.
    *
    * @param identifier The identifier of the {@link ISlotType} of the slot
    * @param stack      The ItemStack in question
@@ -342,16 +357,19 @@ public interface ICurioItem {
   // ========== DEPRECATED ================
 
   /**
-   * @deprecated See {@link ICurioItem#playEquipFromHotbarSound(ISlotContext, ItemStack)} for a more
+   * @deprecated See {@link ICurioItem#onEquipFromHotbar(SlotContext, ItemStack)} for a more
    * appropriately named alternative with additional context.
    */
   @Deprecated
   default void playRightClickEquipSound(LivingEntity livingEntity, ItemStack stack) {
-    defaultInstance.playRightClickEquipSound(livingEntity);
+    // Not enough context for id and index so we just pass in artificial values with the entity
+    ICurio.SoundInfo soundInfo = getEquipSound(new SlotContext("", livingEntity));
+    livingEntity.world.playSound(null, livingEntity.getPosition(), soundInfo.getSoundEvent(),
+        livingEntity.getSoundCategory(), soundInfo.getVolume(), soundInfo.getPitch());
   }
 
   /**
-   * @deprecated See {@link ICurioItem#canEquipFromHotbar(ISlotContext, ItemStack)} for a more
+   * @deprecated See {@link ICurioItem#canEquipFromHotbar(SlotContext, ItemStack)} for a more
    * appropriately named alternative with additional context.
    */
   @Deprecated
@@ -360,7 +378,7 @@ public interface ICurioItem {
   }
 
   /**
-   * @deprecated See {@link ICurioItem#getAttributeModifiers(ISlotContext, UUID, ItemStack)} for an
+   * @deprecated See {@link ICurioItem#getAttributeModifiers(SlotContext, UUID, ItemStack)} for an
    * alternative method with additional context and a slot-unique UUID parameter.
    */
   @Deprecated

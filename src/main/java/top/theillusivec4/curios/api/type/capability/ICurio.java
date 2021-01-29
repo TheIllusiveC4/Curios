@@ -41,13 +41,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
-import top.theillusivec4.curios.api.type.ISlotContext;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 
 public interface ICurio {
@@ -178,7 +177,7 @@ public interface ICurio {
    * @param uuid        Slot-unique UUID
    * @return A map of attribute modifiers to apply
    */
-  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(ISlotContext slotContext,
+  default Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                        UUID uuid) {
     return getAttributeModifiers(slotContext.getIdentifier());
   }
@@ -186,13 +185,25 @@ public interface ICurio {
   /**
    * Called server-side when the ItemStack is equipped from the hotbar.
    * <br>
-   * Default implementation plays an equip sound. This can be overridden to play nothing, but it is
-   * advised to always play something as an auditory feedback for players.
+   * Default implementation plays the equip sound from {@link ICurio#getEquipSound(SlotContext)}.
+   * This can be overridden to avoid that, but it is advised to always play something as an auditory
+   * feedback for players.
    *
    * @param slotContext Context about the slot that the ItemStack was just equipped into
    */
-  default void playEquipFromHotbarSound(ISlotContext slotContext) {
+  default void onEquipFromHotbar(SlotContext slotContext) {
     playRightClickEquipSound(slotContext.getWearer());
+  }
+
+  /**
+   * Retrieves the equip sound information for the given slot context.
+   *
+   * @param slotContext Context about the slot that the ItemStack was just equipped into
+   * @return {@link SoundInfo} containing information about the sound event, volume, and pitch
+   */
+  @Nonnull
+  default SoundInfo getEquipSound(SlotContext slotContext) {
+    return new SoundInfo(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 1.0f, 1.0f);
   }
 
   /**
@@ -202,7 +213,7 @@ public interface ICurio {
    * @param slotContext Context about the slot that the ItemStack is attempting to equip into
    * @return True to enable auto-equipping when used from the hotbar, false to disable
    */
-  default boolean canEquipFromHotbar(ISlotContext slotContext) {
+  default boolean canEquipFromHotbar(SlotContext slotContext) {
     return canRightClickEquip();
   }
 
@@ -266,7 +277,7 @@ public interface ICurio {
 
   /**
    * Determines whether or not Curios will automatically add tooltip listing attribute modifiers
-   * that are returned by {@link ICurio#getAttributeModifiers(ISlotContext, UUID)}.
+   * that are returned by {@link ICurio#getAttributeModifiers(SlotContext, UUID)}.
    *
    * @param identifier The identifier of the {@link ISlotType} of the slot
    * @return True to show attributes tooltip, false to disable
@@ -327,9 +338,8 @@ public interface ICurio {
    */
   default void render(String identifier, int index, MatrixStack matrixStack,
                       IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
-                      float limbSwing,
-                      float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
-                      float headPitch) {
+                      float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
+                      float netHeadYaw, float headPitch) {
 
   }
 
@@ -346,6 +356,30 @@ public interface ICurio {
    */
   enum DropRule {
     DEFAULT, ALWAYS_DROP, ALWAYS_KEEP, DESTROY
+  }
+
+  final class SoundInfo {
+    final SoundEvent soundEvent;
+    final float volume;
+    final float pitch;
+
+    public SoundInfo(SoundEvent soundEvent, float volume, float pitch) {
+      this.soundEvent = soundEvent;
+      this.volume = volume;
+      this.pitch = pitch;
+    }
+
+    public SoundEvent getSoundEvent() {
+      return soundEvent;
+    }
+
+    public float getVolume() {
+      return volume;
+    }
+
+    public float getPitch() {
+      return pitch;
+    }
   }
 
   /**
@@ -444,7 +478,7 @@ public interface ICurio {
   // ============ DEPRECATED ================
 
   /**
-   * @deprecated See {@link ICurio#canEquipFromHotbar(ISlotContext)} for a more appropriately named
+   * @deprecated See {@link ICurio#canEquipFromHotbar(SlotContext)} for a more appropriately named
    * alternative with additional context.
    */
   @Deprecated
@@ -453,17 +487,19 @@ public interface ICurio {
   }
 
   /**
-   * @deprecated See {@link ICurio#playEquipFromHotbarSound(ISlotContext)} for a more appropriately
+   * @deprecated See {@link ICurio#onEquipFromHotbar(SlotContext)} for a more appropriately
    * named alternative with additional context.
    */
   @Deprecated
   default void playRightClickEquipSound(LivingEntity livingEntity) {
-    livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
-        SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.NEUTRAL, 1.0f, 1.0f);
+    // Not enough context for id and index so we just pass in artificial values with the entity
+    SoundInfo soundInfo = getEquipSound(new SlotContext("", livingEntity));
+    livingEntity.world.playSound(null, livingEntity.getPosition(), soundInfo.getSoundEvent(),
+        livingEntity.getSoundCategory(), soundInfo.getVolume(), soundInfo.getPitch());
   }
 
   /**
-   * @deprecated See {@link ICurio#getAttributeModifiers(ISlotContext, UUID)} for an updated
+   * @deprecated See {@link ICurio#getAttributeModifiers(SlotContext, UUID)} for an updated
    * alternative with additional context and a slot-unique UUID parameter.
    */
   @Deprecated
