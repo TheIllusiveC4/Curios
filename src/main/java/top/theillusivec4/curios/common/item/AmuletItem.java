@@ -58,7 +58,7 @@ public class AmuletItem extends Item implements ICurioItem {
 
   @Nonnull
   @Override
-  public ICurio.SoundInfo getEquipSound(SlotContext slotContext) {
+  public ICurio.SoundInfo getEquipSound(SlotContext slotContext, ItemStack stack) {
     return new ICurio.SoundInfo(SoundEvents.ITEM_ARMOR_EQUIP_GOLD, 1.0f, 1.0f);
   }
 
