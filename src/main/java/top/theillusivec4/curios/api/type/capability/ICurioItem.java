@@ -177,7 +177,7 @@ public interface ICurioItem {
   /**
    * Called server-side when the ItemStack is equipped from the hotbar.
    * <br>
-   * Default implementation plays the equip sound from {@link ICurioItem#getEquipSound(SlotContext)}.
+   * Default implementation plays the equip sound from {@link ICurioItem#getEquipSound(SlotContext, ItemStack)}.
    * This can be overridden to avoid that, but it is advised to always play something as an auditory
    * feedback for players.
    *
@@ -196,7 +196,7 @@ public interface ICurioItem {
    * information about the sound event, volume, and pitch
    */
   @Nonnull
-  default ICurio.SoundInfo getEquipSound(SlotContext slotContext) {
+  default ICurio.SoundInfo getEquipSound(SlotContext slotContext, ItemStack stack) {
     return new ICurio.SoundInfo(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 1.0f, 1.0f);
   }
 
@@ -359,11 +359,13 @@ public interface ICurioItem {
   /**
    * @deprecated See {@link ICurioItem#onEquipFromHotbar(SlotContext, ItemStack)} for a more
    * appropriately named alternative with additional context.
+   * <br>
+   * Also see {@link ICurioItem#getEquipSound(SlotContext, ItemStack)}.
    */
   @Deprecated
   default void playRightClickEquipSound(LivingEntity livingEntity, ItemStack stack) {
     // Not enough context for id and index so we just pass in artificial values with the entity
-    ICurio.SoundInfo soundInfo = getEquipSound(new SlotContext("", livingEntity));
+    ICurio.SoundInfo soundInfo = getEquipSound(new SlotContext("", livingEntity), stack);
     livingEntity.world.playSound(null, livingEntity.getPosition(), soundInfo.getSoundEvent(),
         livingEntity.getSoundCategory(), soundInfo.getVolume(), soundInfo.getPitch());
   }

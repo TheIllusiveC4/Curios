@@ -489,6 +489,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#onEquipFromHotbar(SlotContext)} for a more appropriately
    * named alternative with additional context.
+   * <br>
+   * Also see {@link ICurio#getEquipSound(SlotContext)}.
    */
   @Deprecated
   default void playRightClickEquipSound(LivingEntity livingEntity) {
