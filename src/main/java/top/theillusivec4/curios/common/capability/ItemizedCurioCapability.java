@@ -150,13 +150,13 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public void onEquipFromHotbar(SlotContext slotContext) {
-    this.curioItem.onEquipFromHotbar(slotContext, this.stackInstance);
+  public void onEquipFromUse(SlotContext slotContext) {
+    this.curioItem.onEquipFromUse(slotContext, this.stackInstance);
   }
 
   @Override
-  public boolean canEquipFromHotbar(SlotContext slotContext) {
-    return this.curioItem.canEquipFromHotbar(slotContext, this.stackInstance);
+  public boolean canEquipFromUse(SlotContext slotContext) {
+    return this.curioItem.canEquipFromUse(slotContext, this.stackInstance);
   }
 
   @Override

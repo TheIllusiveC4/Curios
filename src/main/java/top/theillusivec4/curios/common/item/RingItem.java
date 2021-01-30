@@ -87,7 +87,7 @@ public class RingItem extends Item {
       }
 
       @Override
-      public boolean canEquipFromHotbar(SlotContext slot) {
+      public boolean canEquipFromUse(SlotContext slot) {
         return true;
       }
     });

@@ -183,7 +183,8 @@ public interface ICurio {
   }
 
   /**
-   * Called server-side when the ItemStack is equipped from the hotbar.
+   * Called server-side when the ItemStack is equipped by using it (i.e. from the hotbar), after
+   * calling {@link ICurio#canEquipFromUse(SlotContext)}.
    * <br>
    * Default implementation plays the equip sound from {@link ICurio#getEquipSound(SlotContext)}.
    * This can be overridden to avoid that, but it is advised to always play something as an auditory
@@ -191,7 +192,7 @@ public interface ICurio {
    *
    * @param slotContext Context about the slot that the ItemStack was just equipped into
    */
-  default void onEquipFromHotbar(SlotContext slotContext) {
+  default void onEquipFromUse(SlotContext slotContext) {
     playRightClickEquipSound(slotContext.getWearer());
   }
 
@@ -208,12 +209,12 @@ public interface ICurio {
 
   /**
    * Determines if the ItemStack can be automatically equipped into the first available slot when
-   * used from the hotbar.
+   * used.
    *
    * @param slotContext Context about the slot that the ItemStack is attempting to equip into
-   * @return True to enable auto-equipping when used from the hotbar, false to disable
+   * @return True to enable auto-equipping when the item is used, false to disable
    */
-  default boolean canEquipFromHotbar(SlotContext slotContext) {
+  default boolean canEquipFromUse(SlotContext slotContext) {
     return canRightClickEquip();
   }
 
@@ -478,7 +479,7 @@ public interface ICurio {
   // ============ DEPRECATED ================
 
   /**
-   * @deprecated See {@link ICurio#canEquipFromHotbar(SlotContext)} for a more appropriately named
+   * @deprecated See {@link ICurio#canEquipFromUse(SlotContext)} for a more appropriately named
    * alternative with additional context.
    */
   @Deprecated
@@ -487,7 +488,7 @@ public interface ICurio {
   }
 
   /**
-   * @deprecated See {@link ICurio#onEquipFromHotbar(SlotContext)} for a more appropriately
+   * @deprecated See {@link ICurio#onEquipFromUse(SlotContext)} for a more appropriately
    * named alternative with additional context.
    * <br>
    * Also see {@link ICurio#getEquipSound(SlotContext)}.

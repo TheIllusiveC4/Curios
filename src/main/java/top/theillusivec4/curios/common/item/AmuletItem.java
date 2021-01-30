@@ -63,7 +63,7 @@ public class AmuletItem extends Item implements ICurioItem {
   }
 
   @Override
-  public boolean canEquipFromHotbar(SlotContext slot, ItemStack stack) {
+  public boolean canEquipFromUse(SlotContext slot, ItemStack stack) {
     return true;
   }
 

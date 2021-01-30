@@ -336,7 +336,7 @@ public class CuriosEventHandler {
                 String id = entry.getKey();
                 SlotContext slotContext = new SlotContext(id, player, i);
 
-                if (curio.canEquip(id, player) && curio.canEquipFromHotbar(slotContext)) {
+                if (curio.canEquip(id, player) && curio.canEquipFromUse(slotContext)) {
                   ItemStack present = stackHandler.getStackInSlot(i);
                   Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
 
@@ -344,7 +344,7 @@ public class CuriosEventHandler {
                       ((tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier())) ||
                           (!tags.isEmpty() && id.equals(SlotTypePreset.CURIO.getIdentifier())))) {
                     stackHandler.setStackInSlot(i, stack.copy());
-                    curio.onEquipFromHotbar(slotContext);
+                    curio.onEquipFromUse(slotContext);
 
                     if (!player.isCreative()) {
                       int count = stack.getCount();
