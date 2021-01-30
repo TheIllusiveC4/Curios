@@ -5,9 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [1.16.5-4.0.4.0] - 2021.01.29
 ### Added
-### Changed
+- `SlotContext` for providing and retrieving slot context throughout the API
+- `ICurio#getEquipSound(SlotContext)` [#104](https://github.com/TheIllusiveC4/Curios/issues/104)
+- `ICurio#canEquipFromUse(SlotContext)`
+- `ICurio#onEquipFromUse(SlotContext)`
+- `ICurio#getAttributeModifiers(SlotContext, UUID)`
+- `ICurioItem#getEquipSound(SlotContext, ItemStack)`
+- `ICurioItem#canEquipFromUse(SlotContext, ItemStack)`
+- `ICurioItem#onEquipFromUse(SlotContext, ItemStack)`
+- `ICurioItem#getAttributeModifiers(SlotContext, UUID, ItemStack)`
+- `ICuriosHelper#getAttributeModifiers(SlotContext, UUID, ItemStack)`
 ### Deprecated
-- `ICurio#canRightClickEquip` -> `ICurio#canEquipFromHotbar`
+- `ICurio#canRightClickEquip()` [#102](https://github.com/TheIllusiveC4/Curios/issues/102)
+- `ICurio#playRightClickEquipSound(LivingEntity)` [#102](https://github.com/TheIllusiveC4/Curios/issues/102)
+- `ICurio#getAttributeModifiers(String)`
+- `ICurioItem#canRightClickEquip(ItemStack)` [#102](https://github.com/TheIllusiveC4/Curios/issues/102)
+- `ICurioItem#playRightClickEquipSound(LivingEntity, ItemStack)` [#102](https://github.com/TheIllusiveC4/Curios/issues/102)
+- `ICurioItem#getAttributeModifiers(String, ItemStack)`
+- `ICuriosHelper#getAttributeModifiers(String, ItemStack)`
 
 ## [1.16.4-4.0.3.5] - 2021.01.14
 ### Fixed
