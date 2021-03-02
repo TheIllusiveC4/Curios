@@ -43,7 +43,7 @@ public class CurioSlot extends Slot {
   private DefaultedList<Boolean> renderStatuses;
 
   public CurioSlot(PlayerEntity player, IDynamicStackHandler handler, int index, String identifier,
-      int xPosition, int yPosition, DefaultedList<Boolean> renders) {
+                   int xPosition, int yPosition, DefaultedList<Boolean> renders) {
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;
     this.index = index;
@@ -63,7 +63,9 @@ public class CurioSlot extends Slot {
     return this.identifier;
   }
 
-  public int getIndex() { return this.index; }
+  public int getIndex() {
+    return this.index;
+  }
 
   public boolean getRenderStatus() {
     return this.renderStatuses.get(this.index);

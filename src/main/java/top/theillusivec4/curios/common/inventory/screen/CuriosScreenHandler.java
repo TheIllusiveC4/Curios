@@ -24,6 +24,7 @@ import static net.minecraft.screen.PlayerScreenHandler.EMPTY_CHESTPLATE_SLOT_TEX
 import static net.minecraft.screen.PlayerScreenHandler.EMPTY_HELMET_SLOT_TEXTURE;
 import static net.minecraft.screen.PlayerScreenHandler.EMPTY_LEGGINGS_SLOT_TEXTURE;
 
+
 import com.mojang.datafixers.util.Pair;
 import io.netty.buffer.Unpooled;
 import java.util.Map;
@@ -60,10 +61,12 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.component.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+import top.theillusivec4.curios.common.CuriosCommon;
+import top.theillusivec4.curios.common.CuriosNetwork;
 import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.inventory.CosmeticCurioSlot;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
-import top.theillusivec4.curios.common.CuriosNetwork;
+import top.theillusivec4.curios.integration.OriginsIntegration;
 import top.theillusivec4.curios.mixin.IScreenHandlerAccessor;
 
 public class CuriosScreenHandler extends CraftingScreenHandler {
@@ -81,9 +84,9 @@ public class CuriosScreenHandler extends CraftingScreenHandler {
   private boolean cosmeticColumn;
 
   static {
-    EMPTY_ARMOR_SLOT_TEXTURES = new Identifier[]{EMPTY_BOOTS_SLOT_TEXTURE,
+    EMPTY_ARMOR_SLOT_TEXTURES = new Identifier[] {EMPTY_BOOTS_SLOT_TEXTURE,
         EMPTY_LEGGINGS_SLOT_TEXTURE, EMPTY_CHESTPLATE_SLOT_TEXTURE, EMPTY_HELMET_SLOT_TEXTURE};
-    EQUIPMENT_SLOT_ORDER = new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST,
+    EQUIPMENT_SLOT_ORDER = new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST,
         EquipmentSlot.LEGS, EquipmentSlot.FEET};
   }
 
@@ -114,6 +117,11 @@ public class CuriosScreenHandler extends CraftingScreenHandler {
         }
 
         public boolean canInsert(ItemStack stack) {
+
+          if (CuriosCommon.isOriginsLoaded &&
+              !OriginsIntegration.canEquip(stack, playerInventory.player)) {
+            return false;
+          }
           return equipmentSlot == MobEntity.getPreferredEquipmentSlot(stack);
         }
 

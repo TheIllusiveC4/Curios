@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.12] - 2021.03.02
+### Added
+- Added Origins - Elytrian compatibility [#109](https://github.com/TheIllusiveC4/Curios/issues/109)
+
 ## [0.0.11] - 2021.01.14
 ### Added
 - Added French, Korean, and Brazilian Portuguese localizations from Forge branch

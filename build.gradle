@@ -17,8 +17,19 @@ minecraft {
 repositories {
 
     maven {
+        url = "https://jitpack.io"
+    }
+
+    maven {
         name = "Ladysnake Libs"
         url = 'https://dl.bintray.com/ladysnake/libs'
+    }
+
+    maven {
+        url = "https://maven.jamieswhiteshirt.com/libs-release/"
+    }
+    maven {
+        url = "https://dl.bintray.com/adriantodt/maven"
     }
 }
 
@@ -37,6 +48,9 @@ dependencies {
     include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cca_version}"
     modApi "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:${project.cca_version}"
     include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:${project.cca_version}"
+
+    modCompileOnly "com.github.apace100:origins-fabric:${project.origins_version}"
+    modRuntime "com.github.apace100:origins-fabric:${project.origins_version}"
 }
 
 processResources {

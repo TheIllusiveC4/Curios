@@ -28,6 +28,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.command.argument.ArgumentTypes;
 import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.entity.player.PlayerEntity;
@@ -54,8 +55,12 @@ public class CuriosCommon implements ModInitializer {
 
   private static final boolean DEBUG = false;
 
+  public static boolean isOriginsLoaded = false;
+
   @Override
   public void onInitialize() {
+    isOriginsLoaded = FabricLoader.getInstance().isModLoaded("origins");
+
     CuriosApi.setCuriosHelper(new CuriosHelper());
 
     if (DEBUG) {
