@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 ### Changed
 - Items that are invalidated while in a slot, due to modified tags or changed curio behavior, will 
   now automatically eject from its slot and be given to the player
+- Corrected Chinese translation (thanks qsefthuopq!) [#106](https://github.com/TheIllusiveC4/Curios/pull/106)
 ### Deprecated
 - `ICurio#onEquip(String, int, LivingEntity)`
 - `Icurio#onUnequip(String, int, LivingEntity)`
