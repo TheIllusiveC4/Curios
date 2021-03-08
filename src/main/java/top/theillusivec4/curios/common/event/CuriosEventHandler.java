@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -38,6 +37,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
@@ -47,6 +47,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -58,13 +59,13 @@ import net.minecraftforge.event.entity.player.PlayerXpEvent.PickupXp;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.items.ItemHandlerHelper;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.SlotTypePreset;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 import top.theillusivec4.curios.api.event.CurioDropsEvent;
 import top.theillusivec4.curios.api.event.DropRulesEvent;
-import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
@@ -72,6 +73,7 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
@@ -83,6 +85,8 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.Hand
 import top.theillusivec4.curios.common.triggers.EquipCurioTrigger;
 
 public class CuriosEventHandler {
+
+  public static boolean dirtyTags = false;
 
   private static void handleDrops(LivingEntity livingEntity,
                                   List<Tuple<Predicate<ItemStack>, DropRule>> dropRules,
@@ -323,8 +327,9 @@ public class CuriosEventHandler {
   public void curioRightClick(PlayerInteractEvent.RightClickItem evt) {
     PlayerEntity player = evt.getPlayer();
     ItemStack stack = evt.getItemStack();
-    CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(
-        curio -> CuriosApi.getCuriosHelper().getCuriosHandler(player).ifPresent(handler -> {
+    ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
+    curiosHelper.getCurio(stack).ifPresent(
+        curio -> curiosHelper.getCuriosHandler(player).ifPresent(handler -> {
 
           if (!player.world.isRemote) {
             Map<String, ICurioStacksHandler> curios = handler.getCurios();
@@ -336,13 +341,11 @@ public class CuriosEventHandler {
                 String id = entry.getKey();
                 SlotContext slotContext = new SlotContext(id, player, i);
 
-                if (curio.canEquip(id, player) && curio.canEquipFromUse(slotContext)) {
+                if (curiosHelper.isCurioValid(slotContext, stack) &&
+                    curio.canEquipFromUse(slotContext)) {
                   ItemStack present = stackHandler.getStackInSlot(i);
-                  Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
 
-                  if (present.isEmpty() &&
-                      ((tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier())) ||
-                          (!tags.isEmpty() && id.equals(SlotTypePreset.CURIO.getIdentifier())))) {
+                  if (present.isEmpty()) {
                     stackHandler.setStackInSlot(i, stack.copy());
                     curio.onEquipFromUse(slotContext);
 
@@ -359,6 +362,43 @@ public class CuriosEventHandler {
             }
           }
         }));
+  }
+
+  @SubscribeEvent
+  public void worldTick(TickEvent.WorldTickEvent evt) {
+
+    if (evt.world instanceof ServerWorld && dirtyTags) {
+      PlayerList list = ((ServerWorld) evt.world).getServer().getPlayerList();
+      ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
+
+      for (ServerPlayerEntity player : list.getPlayers()) {
+        curiosHelper.getCuriosHandler(player).ifPresent(handler -> {
+
+          for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
+            ICurioStacksHandler stacksHandler = entry.getValue();
+            String id = entry.getKey();
+            IDynamicStackHandler stacks = stacksHandler.getStacks();
+            IDynamicStackHandler cosmeticStacks = stacksHandler.getCosmeticStacks();
+            replaceInvalidStacks(curiosHelper, player, id, stacks);
+            replaceInvalidStacks(curiosHelper, player, id, cosmeticStacks);
+          }
+        });
+      }
+      dirtyTags = false;
+    }
+  }
+
+  private static void replaceInvalidStacks(ICuriosHelper curiosHelper, ServerPlayerEntity player,
+                                           String id, IDynamicStackHandler stacks) {
+    for (int i = 0; i < stacks.getSlots(); i++) {
+      ItemStack stack = stacks.getStackInSlot(i);
+      SlotContext slotContext = new SlotContext(id, player, i);
+
+      if (!stack.isEmpty() && !curiosHelper.isCurioValid(slotContext, stack)) {
+        stacks.setStackInSlot(i, ItemStack.EMPTY);
+        ItemHandlerHelper.giveItemToPlayer(player, stack);
+      }
+    }
   }
 
   @SubscribeEvent

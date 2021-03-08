@@ -19,7 +19,6 @@
 
 package top.theillusivec4.curios.common.inventory;
 
-import java.util.Set;
 import javax.annotation.Nonnull;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -33,13 +32,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.SlotItemHandler;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotTypePreset;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CurioSlot extends SlotItemHandler {
 
   private final String identifier;
   private final PlayerEntity player;
+  private final SlotContext slotContext;
 
   private NonNullList<Boolean> renderStatuses;
 
@@ -49,6 +49,7 @@ public class CurioSlot extends SlotItemHandler {
     this.identifier = identifier;
     this.renderStatuses = renders;
     this.player = player;
+    this.slotContext = new SlotContext(identifier, player, index);
     this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
         player.getEntityWorld().isRemote() ? CuriosApi.getIconHelper().getIcon(identifier)
             : new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
@@ -69,15 +70,7 @@ public class CurioSlot extends SlotItemHandler {
 
   @Override
   public boolean isItemValid(@Nonnull ItemStack stack) {
-    return this.hasValidTag(CuriosApi.getCuriosHelper().getCurioTags(stack.getItem())) && CuriosApi
-        .getCuriosHelper().getCurio(stack)
-        .map(curio -> curio.canEquip(this.identifier, this.player))
-        .orElse(true) && super.isItemValid(stack);
-  }
-
-  protected boolean hasValidTag(Set<String> tags) {
-    return (!tags.isEmpty() && this.identifier.equals(SlotTypePreset.CURIO.getIdentifier())) ||
-        tags.contains(this.identifier) || tags.contains(SlotTypePreset.CURIO.getIdentifier());
+    return CuriosApi.getCuriosHelper().isCurioValid(slotContext, stack) && super.isItemValid(stack);
   }
 
   @Override

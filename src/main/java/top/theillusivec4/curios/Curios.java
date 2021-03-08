@@ -23,18 +23,23 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
+import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.command.arguments.ArgumentSerializer;
 import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.profiler.IProfiler;
+import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -94,6 +99,7 @@ public class Curios {
     MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
     MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
     MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
+    MinecraftForge.EVENT_BUS.addListener(this::reload);
     ModLoadingContext.get().registerConfig(Type.CLIENT, CuriosClientConfig.CLIENT_SPEC);
     ModLoadingContext.get().registerConfig(Type.SERVER, CuriosConfig.SERVER_SPEC);
   }
@@ -134,6 +140,23 @@ public class Curios {
 
   private void registerCommands(RegisterCommandsEvent evt) {
     CuriosCommand.register(evt.getDispatcher());
+  }
+
+  private void reload(final AddReloadListenerEvent evt) {
+    evt.addListener(new ReloadListener<Void>() {
+      @Nonnull
+      @Override
+      protected Void prepare(@Nonnull IResourceManager resourceManagerIn,
+                             @Nonnull IProfiler profilerIn) {
+        return null;
+      }
+
+      @Override
+      protected void apply(@Nonnull Void objectIn, @Nonnull IResourceManager resourceManagerIn,
+                           @Nonnull IProfiler profilerIn) {
+        CuriosEventHandler.dirtyTags = true;
+      }
+    });
   }
 
   private void config(final ModConfig.Loading evt) {

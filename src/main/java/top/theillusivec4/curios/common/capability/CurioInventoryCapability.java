@@ -56,6 +56,7 @@ import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 import top.theillusivec4.curios.api.type.util.ISlotHelper;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 
@@ -93,6 +94,8 @@ public class CurioInventoryCapability {
             ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", NBT.TAG_COMPOUND);
             ListNBT lockedList = ((CompoundNBT) nbt).getList("Locked", NBT.TAG_STRING);
             ISlotHelper slotHelper = CuriosApi.getSlotHelper();
+            ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
+            LivingEntity livingEntity = instance.getWearer();
 
             if (!tagList.isEmpty() && slotHelper != null) {
               Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
@@ -113,10 +116,29 @@ public class CurioInventoryCapability {
 
                   while (index < newStacksHandler.getSlots() && index < prevStacksHandler
                       .getSlots()) {
-                    newStacksHandler.getStacks()
-                        .setStackInSlot(index, prevStacksHandler.getStacks().getStackInSlot(index));
-                    newStacksHandler.getCosmeticStacks().setStackInSlot(index,
-                        prevStacksHandler.getCosmeticStacks().getStackInSlot(index));
+                    ItemStack prevStack = prevStacksHandler.getStacks().getStackInSlot(index);
+                    SlotContext slotContext = new SlotContext(identifier, livingEntity, index);
+
+                    if (!prevStack.isEmpty()) {
+
+                      if (curiosHelper.isCurioValid(slotContext, prevStack)) {
+                        newStacksHandler.getStacks().setStackInSlot(index, prevStack);
+                      } else {
+                        instance.loseInvalidStack(prevStack);
+                      }
+                    }
+                    ItemStack prevCosmetic =
+                        prevStacksHandler.getCosmeticStacks().getStackInSlot(index);
+
+                    if (!prevCosmetic.isEmpty()) {
+
+                      if (curiosHelper.isCurioValid(slotContext, prevCosmetic)) {
+                        newStacksHandler.getCosmeticStacks().setStackInSlot(index,
+                            prevStacksHandler.getCosmeticStacks().getStackInSlot(index));
+                      } else {
+                        instance.loseInvalidStack(prevCosmetic);
+                      }
+                    }
                     index++;
                   }
 

@@ -117,6 +117,16 @@ public interface ICuriosHelper {
                                                                ItemStack stack);
 
   /**
+   * Checks if the ItemStack is valid for a particular stack and slot context including equability
+   * and appropriate curio tags.
+   *
+   * @param slotContext Context about the slot that the ItemStack is being checked for
+   * @param stack       The ItemStack in question
+   * @return True if the ItemStack is valid for the slot, false otherwise
+   */
+  boolean isCurioValid(SlotContext slotContext, ItemStack stack);
+
+  /**
    * Passes three inputs into an internal triple-input consumer that should be used from the
    * single-input consumer in {@link ItemStack#damageItem(int, LivingEntity, Consumer)}
    * <br>

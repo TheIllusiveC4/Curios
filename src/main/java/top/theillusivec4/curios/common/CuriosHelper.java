@@ -45,6 +45,7 @@ import org.apache.logging.log4j.util.TriConsumer;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -162,6 +163,20 @@ public class CuriosHelper implements ICuriosHelper {
     }
     return getCurio(stack).map(curio -> curio.getAttributeModifiers(slotContext, uuid))
         .orElse(HashMultimap.create());
+  }
+
+  @Override
+  public boolean isCurioValid(SlotContext slotContext, ItemStack stack) {
+    String id = slotContext.getIdentifier();
+    ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
+    return hasValidTag(id, curiosHelper.getCurioTags(stack.getItem())) &&
+        curiosHelper.getCurio(stack).map(curio -> curio.canEquip(id, slotContext.getWearer()))
+            .orElse(true);
+  }
+
+  protected boolean hasValidTag(String id, Set<String> tags) {
+    return (!tags.isEmpty() && id.equals(SlotTypePreset.CURIO.getIdentifier())) ||
+        tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier());
   }
 
   @Override
