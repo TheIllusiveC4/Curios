@@ -70,7 +70,7 @@ public class CurioSlot extends SlotItemHandler {
 
   @Override
   public boolean isItemValid(@Nonnull ItemStack stack) {
-    return CuriosApi.getCuriosHelper().isCurioValid(slotContext, stack) && super.isItemValid(stack);
+    return CuriosApi.getCuriosHelper().isStackValid(slotContext, stack) && super.isItemValid(stack);
   }
 
   @Override

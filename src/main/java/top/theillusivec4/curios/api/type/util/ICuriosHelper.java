@@ -124,7 +124,7 @@ public interface ICuriosHelper {
    * @param stack       The ItemStack in question
    * @return True if the ItemStack is valid for the slot, false otherwise
    */
-  boolean isCurioValid(SlotContext slotContext, ItemStack stack);
+  boolean isStackValid(SlotContext slotContext, ItemStack stack);
 
   /**
    * Passes three inputs into an internal triple-input consumer that should be used from the

@@ -340,7 +340,7 @@ public class CuriosEventHandler {
                 String id = entry.getKey();
                 SlotContext slotContext = new SlotContext(id, player, i);
 
-                if (curiosHelper.isCurioValid(slotContext, stack) &&
+                if (curiosHelper.isStackValid(slotContext, stack) &&
                     curio.canEquipFromUse(slotContext)) {
                   ItemStack present = stackHandler.getStackInSlot(i);
 
@@ -393,7 +393,7 @@ public class CuriosEventHandler {
       ItemStack stack = stacks.getStackInSlot(i);
       SlotContext slotContext = new SlotContext(id, player, i);
 
-      if (!stack.isEmpty() && !curiosHelper.isCurioValid(slotContext, stack)) {
+      if (!stack.isEmpty() && !curiosHelper.isStackValid(slotContext, stack)) {
         stacks.setStackInSlot(i, ItemStack.EMPTY);
         ItemHandlerHelper.giveItemToPlayer(player, stack);
       }

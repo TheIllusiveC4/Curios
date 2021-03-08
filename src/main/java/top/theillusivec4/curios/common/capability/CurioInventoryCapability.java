@@ -121,7 +121,7 @@ public class CurioInventoryCapability {
 
                     if (!prevStack.isEmpty()) {
 
-                      if (curiosHelper.isCurioValid(slotContext, prevStack)) {
+                      if (curiosHelper.isStackValid(slotContext, prevStack)) {
                         newStacksHandler.getStacks().setStackInSlot(index, prevStack);
                       } else {
                         instance.loseInvalidStack(prevStack);
@@ -132,7 +132,7 @@ public class CurioInventoryCapability {
 
                     if (!prevCosmetic.isEmpty()) {
 
-                      if (curiosHelper.isCurioValid(slotContext, prevCosmetic)) {
+                      if (curiosHelper.isStackValid(slotContext, prevCosmetic)) {
                         newStacksHandler.getCosmeticStacks().setStackInSlot(index,
                             prevStacksHandler.getCosmeticStacks().getStackInSlot(index));
                       } else {
