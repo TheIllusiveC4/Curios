@@ -254,9 +254,8 @@ public class CuriosEventHandler {
             UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
             player.getAttributeManager().reapplyModifiers(
                 CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack));
-            int index = i;
             CuriosApi.getCuriosHelper().getCurio(stack)
-                .ifPresent(curio -> curio.onEquip(identifier, index, player));
+                .ifPresent(curio -> curio.onEquip(slotContext, ItemStack.EMPTY));
 
             if (player instanceof ServerPlayerEntity) {
               EquipCurioTrigger.INSTANCE
@@ -466,13 +465,13 @@ public class CuriosEventHandler {
                 livingEntity.getAttributeManager().removeModifiers(
                     CuriosApi.getCuriosHelper()
                         .getAttributeModifiers(slotContext, uuid, prevStack));
-                prevCurio.ifPresent(curio -> curio.onUnequip(identifier, index, livingEntity));
+                prevCurio.ifPresent(curio -> curio.onUnequip(slotContext, stack));
               }
 
               if (!stack.isEmpty()) {
                 livingEntity.getAttributeManager().reapplyModifiers(
                     CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack));
-                currentCurio.ifPresent(curio -> curio.onEquip(identifier, index, livingEntity));
+                currentCurio.ifPresent(curio -> curio.onEquip(slotContext, prevStack));
 
                 if (livingEntity instanceof ServerPlayerEntity) {
                   EquipCurioTrigger.INSTANCE.trigger((ServerPlayerEntity) livingEntity, stack,

@@ -109,25 +109,23 @@ public interface ICurio {
   }
 
   /**
-   * Called when the ItemStack is equipped into a slot.
+   * Called when the ItemStack is equipped into a slot or its data changes.
    *
-   * @param identifier   The {@link ISlotType} identifier of the slot being equipped into
-   * @param index        The index of the slot
-   * @param livingEntity The wearer of the ItemStack
+   * @param slotContext Context about the slot that the ItemStack was just unequipped from
+   * @param prevStack   The previous ItemStack in the slot
    */
-  default void onEquip(String identifier, int index, LivingEntity livingEntity) {
-
+  default void onEquip(SlotContext slotContext, ItemStack prevStack) {
+    onEquip(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer());
   }
 
   /**
-   * Called when the ItemStack is unequipped from a slot.
+   * Called when the ItemStack is unequipped from a slot or its data changes.
    *
-   * @param identifier   The {@link ISlotType} identifier of the slot being unequipped from
-   * @param index        The index of the slot
-   * @param livingEntity The wearer of the ItemStack
+   * @param slotContext Context about the slot that the ItemStack was just unequipped from
+   * @param newStack    The new ItemStack in the slot
    */
-  default void onUnequip(String identifier, int index, LivingEntity livingEntity) {
-
+  default void onUnequip(SlotContext slotContext, ItemStack newStack) {
+    onUnequip(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer());
   }
 
   /**
@@ -477,6 +475,22 @@ public interface ICurio {
   }
 
   // ============ DEPRECATED ================
+
+  /**
+   * @deprecated See {@link ICurio#onEquip(SlotContext, ItemStack)}
+   */
+  @Deprecated
+  default void onEquip(String identifier, int index, LivingEntity livingEntity) {
+
+  }
+
+  /**
+   * @deprecated See {@link ICurio#onUnequip(SlotContext, ItemStack)}
+   */
+  @Deprecated
+  default void onUnequip(String identifier, int index, LivingEntity livingEntity) {
+
+  }
 
   /**
    * @deprecated See {@link ICurio#canEquipFromUse(SlotContext)} for a more appropriately named

@@ -114,16 +114,6 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public void onEquip(String identifier, int index, LivingEntity livingEntity) {
-    this.curioItem.onEquip(identifier, index, livingEntity, this.stackInstance);
-  }
-
-  @Override
-  public void onUnequip(String identifier, int index, LivingEntity livingEntity) {
-    this.curioItem.onUnequip(identifier, index, livingEntity, this.stackInstance);
-  }
-
-  @Override
   public void readSyncData(CompoundNBT compound) {
     this.curioItem.readSyncData(compound, this.stackInstance);
   }
@@ -157,6 +147,32 @@ public class ItemizedCurioCapability implements ICurio {
   @Override
   public boolean canEquipFromUse(SlotContext slotContext) {
     return this.curioItem.canEquipFromUse(slotContext, this.stackInstance);
+  }
+
+  @Override
+  public void onEquip(SlotContext slotContext, ItemStack prevStack) {
+    this.curioItem.onEquip(slotContext, prevStack, this.stackInstance);
+  }
+
+  @Override
+  public void onUnequip(SlotContext slotContext, ItemStack newStack) {
+    this.curioItem.onUnequip(slotContext, newStack, this.stackInstance);
+  }
+
+  @Nonnull
+  @Override
+  public SoundInfo getEquipSound(SlotContext slotContext) {
+    return this.curioItem.getEquipSound(slotContext, this.stackInstance);
+  }
+
+  @Override
+  public void onEquip(String identifier, int index, LivingEntity livingEntity) {
+    this.curioItem.onEquip(identifier, index, livingEntity, this.stackInstance);
+  }
+
+  @Override
+  public void onUnequip(String identifier, int index, LivingEntity livingEntity) {
+    this.curioItem.onUnequip(identifier, index, livingEntity, this.stackInstance);
   }
 
   @Override

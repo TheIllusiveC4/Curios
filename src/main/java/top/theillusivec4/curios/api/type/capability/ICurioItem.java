@@ -93,29 +93,25 @@ public interface ICurioItem {
   }
 
   /**
-   * Called when the ItemStack is equipped into a slot.
+   * Called when the ItemStack is equipped into a slot or its data changes.
    *
-   * @param identifier   The {@link ISlotType} identifier of the slot being
-   *                     equipped into
-   * @param index        The index of the slot
-   * @param livingEntity The wearer of the ItemStack
-   * @param stack        The ItemStack in question
+   * @param slotContext Context about the slot that the ItemStack was just unequipped from
+   * @param prevStack   The previous ItemStack in the slot
+   * @param stack       The ItemStack in question
    */
-  default void onEquip(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
-    defaultInstance.onEquip(identifier, index, livingEntity);
+  default void onEquip(SlotContext slotContext, ItemStack prevStack, ItemStack stack) {
+    onEquip(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer(), stack);
   }
 
   /**
-   * Called when the ItemStack is unequipped from a slot.
+   * Called when the ItemStack is unequipped from a slot or its data changes.
    *
-   * @param identifier   The {@link ISlotType} identifier of the slot being
-   *                     unequipped from
-   * @param index        The index of the slot
-   * @param livingEntity The wearer of the ItemStack
-   * @param stack        The ItemStack in question
+   * @param slotContext Context about the slot that the ItemStack was just unequipped from
+   * @param newStack    The new ItemStack in the slot
+   * @param stack       The ItemStack in question
    */
-  default void onUnequip(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
-    defaultInstance.onUnequip(identifier, index, livingEntity);
+  default void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
+    onUnequip(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer(), stack);
   }
 
   /**
@@ -356,6 +352,22 @@ public interface ICurioItem {
   }
 
   // ========== DEPRECATED ================
+
+  /**
+   * @deprecated See {@link ICurioItem#onEquip(SlotContext, ItemStack, ItemStack)}
+   */
+  @Deprecated
+  default void onEquip(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
+    defaultInstance.onEquip(identifier, index, livingEntity);
+  }
+
+  /**
+   * @deprecated See {@link ICurioItem#onUnequip(SlotContext, ItemStack, ItemStack)}
+   */
+  @Deprecated
+  default void onUnequip(String identifier, int index, LivingEntity livingEntity, ItemStack stack) {
+    defaultInstance.onUnequip(identifier, index, livingEntity);
+  }
 
   /**
    * @deprecated See {@link ICurioItem#onEquipFromUse(SlotContext, ItemStack)} for a more
