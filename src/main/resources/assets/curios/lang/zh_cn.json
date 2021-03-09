@@ -36,6 +36,6 @@
   "curios.modifiers.hands": "佩戴手饰时：",
   "curios.modifiers.bracelet": "佩戴手镯时：",
   "key.curios.category": "饰品",
-  "key.curios.open.desc": "打开/关闭饰品栏"
+  "key.curios.open.desc": "打开/关闭饰品栏",
   "gui.curios.toggle": "切换可见性"
 }
