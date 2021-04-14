@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.5-4.0.5.1] - 2021.04.14
+### Changed
+- Reverted some changes from previous version so that invalidation only happens due to tag updates, modified curio
+behavior may cause lingering items but fixes issues with invalidating curios from various mods [#124](https://github.com/TheIllusiveC4/Curios/issues/124)
+### Fixed
+- Fixed button offset with Quark backpack (thanks BookerCatch!) [#119](https://github.com/TheIllusiveC4/Curios/pull/119)
+
 ## [1.16.5-4.0.5.0] - 2021.03.07
 ### Added
 - `ICurio#onEquip(SlotContext, ItemStack)`
