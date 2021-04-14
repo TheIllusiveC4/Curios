@@ -117,8 +117,7 @@ public interface ICuriosHelper {
                                                                ItemStack stack);
 
   /**
-   * Checks if the ItemStack is valid for a particular stack and slot context including equability
-   * and appropriate curio tags.
+   * Checks if the ItemStack is valid for a particular stack and slot context.
    *
    * @param slotContext Context about the slot that the ItemStack is being checked for
    * @param stack       The ItemStack in question

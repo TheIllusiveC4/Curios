@@ -168,13 +168,7 @@ public class CuriosHelper implements ICuriosHelper {
   @Override
   public boolean isStackValid(SlotContext slotContext, ItemStack stack) {
     String id = slotContext.getIdentifier();
-    ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
-    return hasValidTag(id, curiosHelper.getCurioTags(stack.getItem())) &&
-        curiosHelper.getCurio(stack).map(curio -> curio.canEquip(id, slotContext.getWearer()))
-            .orElse(true);
-  }
-
-  protected boolean hasValidTag(String id, Set<String> tags) {
+    Set<String> tags = getCurioTags(stack.getItem());
     return (!tags.isEmpty() && id.equals(SlotTypePreset.CURIO.getIdentifier())) ||
         tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier());
   }
