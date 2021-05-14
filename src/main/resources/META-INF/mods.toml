@@ -12,6 +12,7 @@ authors="${mod_author}"
 description='''
 ${mod_description}
 '''
+itemIcon="curios:ring"
 [[dependencies.curios]]
     modId="forge"
     mandatory=true
