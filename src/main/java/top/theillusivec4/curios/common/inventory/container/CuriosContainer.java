@@ -34,7 +34,6 @@ import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.CraftingResultSlot;
 import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.inventory.container.RecipeBookContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ICraftingRecipe;
@@ -168,6 +167,21 @@ public class CuriosContainer extends PlayerContainer {
           for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
             this.addSlot(new CurioSlot(this.player, stackHandler, i, identifier, -18, yOffset,
                 stacksHandler.getRenders()));
+            yOffset += 18;
+            slots++;
+          }
+        }
+      }
+      yOffset = 12;
+      slots = 0;
+
+      for (String identifier : curioMap.keySet()) {
+        ICurioStacksHandler stacksHandler = curioMap.get(identifier);
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+
+        if (stacksHandler.isVisible()) {
+
+          for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
             if (stacksHandler.hasCosmetic()) {
               IDynamicStackHandler cosmeticHandler = stacksHandler.getCosmeticStacks();
@@ -212,6 +226,26 @@ public class CuriosContainer extends PlayerContainer {
             if (index >= indexIn) {
               this.addSlot(new CurioSlot(this.player, stackHandler, i, identifier, -18, yOffset,
                   stacksHandler.getRenders()));
+              yOffset += 18;
+              slots++;
+            }
+            index++;
+          }
+        }
+      }
+      index = 0;
+      slots = 0;
+      yOffset = 12;
+
+      for (String identifier : curioMap.keySet()) {
+        ICurioStacksHandler stacksHandler = curioMap.get(identifier);
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+
+        if (stacksHandler.isVisible()) {
+
+          for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+
+            if (index >= indexIn) {
 
               if (stacksHandler.hasCosmetic()) {
                 IDynamicStackHandler cosmeticHandler = stacksHandler.getCosmeticStacks();
