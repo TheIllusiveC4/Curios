@@ -309,7 +309,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
                                                  int mouseY) {
 
     if (this.minecraft != null && this.minecraft.player != null) {
-      this.font.func_243248_b(matrixStack, this.title, 97, 6, 4210752);
+      this.font.drawText(matrixStack, this.title, 97, 6, 4210752);
     }
   }
 

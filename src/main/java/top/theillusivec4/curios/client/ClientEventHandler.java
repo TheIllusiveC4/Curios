@@ -106,7 +106,7 @@ public class ClientEventHandler {
           }
 
           type = type.mergeStyle(TextFormatting.YELLOW);
-          slotsTooltip.append(type);
+          slotsTooltip.appendSibling(type);
         }
 
         tagTooltips.add(slotsTooltip);
@@ -172,7 +172,7 @@ public class ClientEventHandler {
                 }
 
                 if (flag) {
-                  tooltip.add((new StringTextComponent(" ")).append(new TranslationTextComponent(
+                  tooltip.add((new StringTextComponent(" ")).appendSibling(new TranslationTextComponent(
                       "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
                       DECIMALFORMAT.format(d1),
                       new TranslationTextComponent(entry.getKey().getAttributeName())))
