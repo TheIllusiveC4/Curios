@@ -359,6 +359,9 @@ public class CuriosEventHandler {
                 }
               }
             }
+          } else {
+            evt.setCancellationResult(ActionResultType.func_233537_a_(player.world.isRemote()));
+            evt.setCanceled(true);
           }
         }));
   }
