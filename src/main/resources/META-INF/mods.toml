@@ -3,6 +3,7 @@ loaderVersion="[34,)"
 license="LGPL-3.0-or-later"
 issueTrackerURL="https://github.com/TheIllusiveC4/Curios/issues"
 logoFile="${mod_icon}"
+logoBlur=false
 [[mods]]
 modId="${mod_id}"
 version="${version}"
@@ -24,3 +25,5 @@ ${mod_description}
     versionRange="[1.16.3,1.17)"
     ordering="NONE"
     side="BOTH"
+[modproperties.curios]
+    catalogueImageIcon="${mod_icon}"
