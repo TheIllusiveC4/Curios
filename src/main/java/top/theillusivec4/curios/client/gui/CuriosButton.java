@@ -75,17 +75,12 @@ public class CuriosButton extends ImageButton {
   @Override
   public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY,
                      float partialTicks) {
+    Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset(parentGui instanceof CreativeScreen);
+    x = parentGui.getGuiLeft() + offsets.getA();
+    int yOffset = parentGui instanceof CreativeScreen ? 68 : 83;
+    y = parentGui.getGuiTop() + offsets.getB() + yOffset;
 
-    if (parentGui instanceof InventoryScreen) {
-      boolean lastVisible = isRecipeBookVisible;
-      isRecipeBookVisible = ((InventoryScreen) parentGui).getRecipeGui().isVisible();
-
-      if (lastVisible != isRecipeBookVisible) {
-        Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset(false);
-        this.setPosition(parentGui.getGuiLeft() + offsets.getA(),
-            parentGui.height / 2 + offsets.getB());
-      }
-    } else if (parentGui instanceof CreativeScreen) {
+    if (parentGui instanceof CreativeScreen) {
       CreativeScreen gui = (CreativeScreen) parentGui;
       boolean isInventoryTab = gui.getSelectedTabIndex() == ItemGroup.INVENTORY.getIndex();
       this.active = isInventoryTab;
