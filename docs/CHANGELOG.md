@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.5-4.0.5.2] - 2021.06.07
+### Added
+- Added Catalogue integration
+- Added Spanish translation (thanks FrannDzs!) [#139](https://github.com/TheIllusiveC4/Curios/pull/139)
+### Changed
+- Slots can now be assigned 0 size
+### Fixed
+- Fixed curio-item use desyncs [#141](https://github.com/TheIllusiveC4/Curios/issues/141)
+- Fixed shift-clicking curio slot priority [#108](https://github.com/TheIllusiveC4/Curios/issues/108)
+- Fixed curio button offsets [#140](https://github.com/TheIllusiveC4/Curios/issues/140)
+
 ## [1.16.5-4.0.5.1] - 2021.04.14
 ### Changed
 - Reverted some changes from previous version so that invalidation only happens due to tag updates, modified curio
