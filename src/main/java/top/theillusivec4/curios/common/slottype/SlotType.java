@@ -37,7 +37,7 @@ public final class SlotType implements ISlotType {
   private SlotType(Builder builder) {
     this.identifier = builder.identifier;
     this.priority = builder.priority != null ? builder.priority : 100;
-    this.size = builder.size;
+    this.size = builder.size != null ? builder.size : 1;
     this.locked = builder.locked;
     this.visible = builder.visible;
     this.cosmetic = builder.cosmetic;
@@ -113,7 +113,7 @@ public final class SlotType implements ISlotType {
 
     private final String identifier;
     private Integer priority;
-    private int size = 1;
+    private Integer size;
     private boolean locked = false;
     private boolean visible = true;
     private boolean cosmetic = false;
@@ -160,7 +160,7 @@ public final class SlotType implements ISlotType {
     }
 
     public Builder size(int size, boolean force) {
-      this.size = force ? size : Math.max(this.size, size);
+      this.size = force || this.size == null ? size : Math.max(this.size, size);
       return this;
     }
 
