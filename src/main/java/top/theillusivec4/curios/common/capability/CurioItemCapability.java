@@ -19,10 +19,9 @@
 
 package top.theillusivec4.curios.common.capability;
 
-import java.util.concurrent.Callable;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
@@ -55,6 +54,10 @@ public class CurioItemCapability {
 
   private static class CurioItemWrapper implements ICurio {
 
+    @Override
+    public ItemStack getStack() {
+      return ItemStack.EMPTY;
+    }
   }
 
   public static class Provider implements ICapabilityProvider {

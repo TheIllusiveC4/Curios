@@ -29,6 +29,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotContext;
 
 public class SPacketSyncStack {
 
@@ -78,8 +79,9 @@ public class SPacketSyncStack {
                 int slot = msg.slotId;
 
                 if (!compoundNBT.isEmpty()) {
-                  CuriosApi.getCuriosHelper().getCurio(stack)
-                      .ifPresent(curio -> curio.readSyncData(compoundNBT));
+                  CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> curio
+                      .readSyncData(new SlotContext(msg.curioId, (LivingEntity) entity, msg.slotId),
+                          compoundNBT));
                 }
 
                 if (HandlerType.fromValue(msg.handlerType) == HandlerType.COSMETIC) {

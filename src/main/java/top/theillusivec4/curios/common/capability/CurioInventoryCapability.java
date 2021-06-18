@@ -347,9 +347,8 @@ public class CurioInventoryCapability {
             UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
             this.wearer.getAttributeManager().removeModifiers(
                 CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack));
-            int index = i;
             CuriosApi.getCuriosHelper().getCurio(stack)
-                .ifPresent(curio -> curio.onUnequip(identifier, index, this.wearer));
+                .ifPresent(curio -> curio.onUnequip(slotContext, stack));
           }
           stackHandler.setStackInSlot(i, ItemStack.EMPTY);
         }

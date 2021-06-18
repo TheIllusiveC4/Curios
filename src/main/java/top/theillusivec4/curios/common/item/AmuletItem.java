@@ -50,7 +50,9 @@ public class AmuletItem extends Item implements ICurioItem {
   }
 
   @Override
-  public void curioTick(String identifier, int index, LivingEntity living, ItemStack stack) {
+  public void curioTick(SlotContext slotContext, ItemStack stack) {
+    LivingEntity living = slotContext.getWearer();
+
     if (!living.getEntityWorld().isRemote && living.ticksExisted % 40 == 0) {
       living.addPotionEffect(new EffectInstance(Effects.REGENERATION, 80, 0, true, true));
     }

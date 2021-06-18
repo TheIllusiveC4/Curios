@@ -33,9 +33,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.SlotContext;
@@ -54,11 +53,17 @@ public class RingItem extends Item {
     return CurioItemCapability.createProvider(new ICurio() {
 
       @Override
-      public void curioTick(String identifier, int index, LivingEntity livingEntity) {
+      public void curioTick(SlotContext slotContext) {
+        LivingEntity livingEntity = slotContext.getWearer();
 
         if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 19 == 0) {
           livingEntity.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));
         }
+      }
+
+      @Override
+      public ItemStack getStack() {
+        return stack;
       }
 
       @Override
@@ -76,7 +81,8 @@ public class RingItem extends Item {
 
       @Nonnull
       @Override
-      public DropRule getDropRule(LivingEntity livingEntity) {
+      public DropRule getDropRule(SlotContext slotContext, DamageSource source, int lootingLevel,
+                                  boolean recentlyHit) {
         return DropRule.ALWAYS_KEEP;
       }
 

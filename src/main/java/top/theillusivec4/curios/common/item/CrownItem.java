@@ -36,6 +36,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.client.render.model.CrownModel;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
@@ -56,13 +57,20 @@ public class CrownItem extends Item {
       private Object model;
 
       @Override
-      public void curioTick(String identifier, int index, LivingEntity livingEntity) {
+      public ItemStack getStack() {
+        return stack;
+      }
+
+      @Override
+      public void curioTick(SlotContext slotContext) {
+        LivingEntity livingEntity = slotContext.getWearer();
 
         if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 20 == 0) {
           livingEntity
               .addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, -1, true, true));
           stack.damageItem(1, livingEntity,
-              damager -> CuriosApi.getCuriosHelper().onBrokenCurio(identifier, index, damager));
+              damager -> CuriosApi.getCuriosHelper()
+                  .onBrokenCurio(slotContext.getIdentifier(), slotContext.getIndex(), damager));
         }
       }
 

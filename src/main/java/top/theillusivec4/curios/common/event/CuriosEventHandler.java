@@ -88,12 +88,13 @@ public class CuriosEventHandler {
 
   public static boolean dirtyTags = false;
 
-  private static void handleDrops(LivingEntity livingEntity,
+  private static void handleDrops(String identifier, LivingEntity livingEntity,
                                   List<Tuple<Predicate<ItemStack>, DropRule>> dropRules,
                                   IDynamicStackHandler stacks, Collection<ItemEntity> drops,
-                                  boolean keepInventory) {
+                                  boolean keepInventory, LivingDropsEvent evt) {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
+      SlotContext slotContext = new SlotContext(identifier, livingEntity, i);
 
       if (!stack.isEmpty()) {
         DropRule dropRuleOverride = null;
@@ -104,9 +105,10 @@ public class CuriosEventHandler {
             dropRuleOverride = override.getB();
           }
         }
-        DropRule dropRule = dropRuleOverride != null ? dropRuleOverride
-            : CuriosApi.getCuriosHelper().getCurio(stack)
-            .map(curio -> curio.getDropRule(livingEntity)).orElse(DropRule.DEFAULT);
+        DropRule dropRule = dropRuleOverride != null ? dropRuleOverride :
+            CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio
+                .getDropRule(slotContext, evt.getSource(), evt.getLootingLevel(),
+                    evt.isRecentlyHit())).orElse(DropRule.DEFAULT);
 
         if ((dropRule == DropRule.DEFAULT && keepInventory) || dropRule == DropRule.ALWAYS_KEEP) {
           continue;
@@ -289,10 +291,10 @@ public class CuriosEventHandler {
             .getBoolean(GameRules.KEEP_INVENTORY);
 
         curios.forEach((id, stacksHandler) -> {
-          handleDrops(livingEntity, dropRules, stacksHandler.getStacks(), curioDrops,
-              keepInventory);
-          handleDrops(livingEntity, dropRules, stacksHandler.getCosmeticStacks(), curioDrops,
-              keepInventory);
+          handleDrops(id, livingEntity, dropRules, stacksHandler.getStacks(), curioDrops,
+              keepInventory, evt);
+          handleDrops(id, livingEntity, dropRules, stacksHandler.getCosmeticStacks(), curioDrops,
+              keepInventory, evt);
         });
 
         if (!MinecraftForge.EVENT_BUS.post(
@@ -340,7 +342,7 @@ public class CuriosEventHandler {
                 String id = entry.getKey();
                 SlotContext slotContext = new SlotContext(id, player, i);
 
-                if (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(id, player) &&
+                if (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(slotContext) &&
                     curio.canEquipFromUse(slotContext)) {
                   ItemStack present = stackHandler.getStackInSlot(i);
 
@@ -439,18 +441,17 @@ public class CuriosEventHandler {
 
           if (!stack.isEmpty()) {
             stack.inventoryTick(livingEntity.world, livingEntity, -1, false);
-            currentCurio.ifPresent(curio -> curio.curioTick(identifier, index, livingEntity));
+            currentCurio.ifPresent(curio -> curio.curioTick(slotContext));
 
+            // todo: Remove in 1.18
             if (livingEntity.world.isRemote) {
               currentCurio.ifPresent(curio -> curio.curioAnimate(identifier, index, livingEntity));
             }
 
-            totalFortuneBonus += currentCurio
-                .map(curio -> curio.getFortuneBonus(identifier, livingEntity, stack, index))
-                .orElse(0);
-            totalLootingBonus += currentCurio
-                .map(curio -> curio.getLootingBonus(identifier, livingEntity, stack, index))
-                .orElse(0);
+            totalFortuneBonus +=
+                currentCurio.map(curio -> curio.getFortuneLevel(slotContext)).orElse(0);
+            totalLootingBonus +=
+                currentCurio.map(curio -> curio.getLootingLevel(slotContext)).orElse(0);
           }
 
           if (!livingEntity.world.isRemote) {
@@ -505,12 +506,12 @@ public class CuriosEventHandler {
   private static void syncCurios(LivingEntity livingEntity, ItemStack stack,
                                  LazyOptional<ICurio> currentCurio, LazyOptional<ICurio> prevCurio,
                                  String identifier, int index, HandlerType type) {
-    boolean syncable =
-        currentCurio.map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false)
-            || prevCurio.map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false);
-    CompoundNBT syncTag =
-        syncable ? currentCurio.map(ICurio::writeSyncData).orElse(new CompoundNBT())
-            : new CompoundNBT();
+    SlotContext slotContext = new SlotContext(identifier, livingEntity, index);
+    boolean syncable = currentCurio.map(curio -> curio.canSync(slotContext)).orElse(false) ||
+        prevCurio.map(curio -> curio.canSync(slotContext)).orElse(false);
+    CompoundNBT syncTag = syncable ?
+        currentCurio.map(curio -> curio.writeSyncData(slotContext)).orElse(new CompoundNBT()) :
+        new CompoundNBT();
     NetworkHandler.INSTANCE
         .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
             new SPacketSyncStack(livingEntity.getEntityId(), identifier, index, stack, type,

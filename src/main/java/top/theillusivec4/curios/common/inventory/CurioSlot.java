@@ -71,16 +71,16 @@ public class CurioSlot extends SlotItemHandler {
   @Override
   public boolean isItemValid(@Nonnull ItemStack stack) {
     return CuriosApi.getCuriosHelper().isStackValid(slotContext, stack) &&
-        CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(identifier, player))
+        CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(slotContext))
             .orElse(true) && super.isItemValid(stack);
   }
 
   @Override
   public boolean canTakeStack(PlayerEntity playerIn) {
     ItemStack stack = this.getStack();
-    return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
-        && CuriosApi.getCuriosHelper().getCurio(stack)
-        .map(curio -> curio.canUnequip(this.identifier, playerIn)).orElse(true) && super
-        .canTakeStack(playerIn);
+    return
+        (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) &&
+            CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio.canUnequip(slotContext))
+                .orElse(true) && super.canTakeStack(playerIn);
   }
 }

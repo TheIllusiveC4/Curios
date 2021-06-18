@@ -30,92 +30,93 @@ import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.ITextComponent;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 public class ItemizedCurioCapability implements ICurio {
-  private final ItemStack stackInstance;
+  private final ItemStack stack;
   private final ICurioItem curioItem;
 
   public ItemizedCurioCapability(ICurioItem curio, ItemStack stack) {
     this.curioItem = curio;
-    this.stackInstance = stack;
+    this.stack = stack;
   }
 
   @Override
-  public boolean canEquip(String identifier, LivingEntity livingEntity) {
-    return this.curioItem.canEquip(identifier, livingEntity, this.stackInstance);
+  public ItemStack getStack() {
+    return this.stack;
   }
 
   @Override
-  public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
-    return this.curioItem.canRender(identifier, index, livingEntity, this.stackInstance);
+  public void curioTick(SlotContext slotContext) {
+    this.curioItem.curioTick(slotContext, this.getStack());
   }
 
   @Override
-  public boolean canSync(String identifier, int index, LivingEntity livingEntity) {
-    return this.curioItem.canSync(identifier, index, livingEntity, this.stackInstance);
+  public boolean canEquip(SlotContext slotContext) {
+    return this.curioItem.canEquip(slotContext, this.getStack());
   }
 
   @Override
-  public boolean canUnequip(String identifier, LivingEntity livingEntity) {
-    return this.curioItem.canUnequip(identifier, livingEntity, this.stackInstance);
+  public boolean canUnequip(SlotContext slotContext) {
+    return this.curioItem.canUnequip(slotContext, this.getStack());
   }
 
   @Override
-  public void curioAnimate(String identifier, int index, LivingEntity livingEntity) {
-    this.curioItem.curioAnimate(identifier, index, livingEntity, this.stackInstance);
+  public List<ITextComponent> getSlotsTooltip(List<ITextComponent> tooltips) {
+    return this.curioItem.getSlotsTooltip(tooltips, this.getStack());
   }
 
   @Override
-  public void curioBreak(ItemStack stack, LivingEntity livingEntity) {
-    this.curioItem.curioBreak(stack, livingEntity);
+  public void curioBreak(SlotContext slotContext) {
+    this.curioItem.curioBreak(slotContext, this.getStack());
   }
 
   @Override
-  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
-                                                                      UUID uuid) {
-    return this.curioItem.getAttributeModifiers(slotContext, uuid, this.stackInstance);
-  }
-
-  @Override
-  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
-    return this.curioItem.getAttributeModifiers(identifier, this.stackInstance);
-  }
-
-  @Override
-  public void curioTick(String identifier, int index, LivingEntity livingEntity) {
-    this.curioItem.curioTick(identifier, index, livingEntity, this.stackInstance);
+  public boolean canSync(SlotContext slotContext) {
+    return this.curioItem.canSync(slotContext, this.getStack());
   }
 
   @Nonnull
   @Override
-  public DropRule getDropRule(LivingEntity livingEntity) {
-    return this.curioItem.getDropRule(livingEntity, this.stackInstance);
+  public CompoundNBT writeSyncData(SlotContext slotContext) {
+    return this.curioItem.writeSyncData(slotContext, this.getStack());
   }
 
   @Override
-  public int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curioStack,
-                             int index) {
-    return this.curioItem.getFortuneBonus(identifier, livingEntity, curioStack, index);
+  public void readSyncData(SlotContext slotContext, CompoundNBT compound) {
+    this.curioItem.readSyncData(slotContext, compound, this.getStack());
+  }
+
+  @Nonnull
+  @Override
+  public DropRule getDropRule(SlotContext slotContext, DamageSource source, int lootingLevel,
+                              boolean recentlyHit) {
+    return this.curioItem
+        .getDropRule(slotContext, source, lootingLevel, recentlyHit, this.getStack());
   }
 
   @Override
-  public int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curioStack,
-                             int index) {
-    return this.curioItem.getLootingBonus(identifier, livingEntity, curioStack, index);
+  public List<ITextComponent> getAttributesTooltip(List<ITextComponent> tooltips) {
+    return this.curioItem.getAttributesTooltip(tooltips, this.getStack());
   }
 
   @Override
-  public List<ITextComponent> getTagsTooltip(List<ITextComponent> tagTooltips) {
-    return this.curioItem.getTagsTooltip(tagTooltips, this.stackInstance);
+  public int getFortuneLevel(SlotContext slotContext) {
+    return this.curioItem.getFortuneLevel(slotContext, this.getStack());
   }
 
   @Override
-  public void readSyncData(CompoundNBT compound) {
-    this.curioItem.readSyncData(compound, this.stackInstance);
+  public int getLootingLevel(SlotContext slotContext) {
+    return this.curioItem.getLootingLevel(slotContext, this.getStack());
+  }
+
+  @Override
+  public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
+    return this.curioItem.canRender(identifier, index, livingEntity, this.getStack());
   }
 
   @Override
@@ -125,63 +126,38 @@ public class ItemizedCurioCapability implements ICurio {
                      float netHeadYaw, float headPitch) {
     this.curioItem
         .render(identifier, index, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing,
-            limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, this.stackInstance);
+            limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, this.getStack());
   }
 
   @Override
-  public boolean showAttributesTooltip(String identifier) {
-    return this.curioItem.showAttributesTooltip(identifier, this.stackInstance);
-  }
-
-  @Nonnull
-  @Override
-  public CompoundNBT writeSyncData() {
-    return this.curioItem.writeSyncData(this.stackInstance);
+  public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
+                                                                      UUID uuid) {
+    return this.curioItem.getAttributeModifiers(slotContext, uuid, this.getStack());
   }
 
   @Override
   public void onEquipFromUse(SlotContext slotContext) {
-    this.curioItem.onEquipFromUse(slotContext, this.stackInstance);
+    this.curioItem.onEquipFromUse(slotContext, this.getStack());
   }
 
   @Override
   public boolean canEquipFromUse(SlotContext slotContext) {
-    return this.curioItem.canEquipFromUse(slotContext, this.stackInstance);
+    return this.curioItem.canEquipFromUse(slotContext, this.getStack());
   }
 
   @Override
   public void onEquip(SlotContext slotContext, ItemStack prevStack) {
-    this.curioItem.onEquip(slotContext, prevStack, this.stackInstance);
+    this.curioItem.onEquip(slotContext, prevStack, this.getStack());
   }
 
   @Override
   public void onUnequip(SlotContext slotContext, ItemStack newStack) {
-    this.curioItem.onUnequip(slotContext, newStack, this.stackInstance);
+    this.curioItem.onUnequip(slotContext, newStack, this.getStack());
   }
 
   @Nonnull
   @Override
   public SoundInfo getEquipSound(SlotContext slotContext) {
-    return this.curioItem.getEquipSound(slotContext, this.stackInstance);
-  }
-
-  @Override
-  public void onEquip(String identifier, int index, LivingEntity livingEntity) {
-    this.curioItem.onEquip(identifier, index, livingEntity, this.stackInstance);
-  }
-
-  @Override
-  public void onUnequip(String identifier, int index, LivingEntity livingEntity) {
-    this.curioItem.onUnequip(identifier, index, livingEntity, this.stackInstance);
-  }
-
-  @Override
-  public boolean canRightClickEquip() {
-    return this.curioItem.canRightClickEquip(this.stackInstance);
-  }
-
-  @Override
-  public void playRightClickEquipSound(LivingEntity livingEntity) {
-    this.curioItem.playRightClickEquipSound(livingEntity, this.stackInstance);
+    return this.curioItem.getEquipSound(slotContext, this.getStack());
   }
 }

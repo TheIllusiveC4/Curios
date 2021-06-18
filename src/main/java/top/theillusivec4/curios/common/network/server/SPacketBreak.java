@@ -29,6 +29,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public class SPacketBreak {
@@ -68,7 +69,8 @@ public class SPacketBreak {
                 .map(stacksHandler -> stacksHandler.getStacks().getStackInSlot(msg.slotId))
                 .orElse(ItemStack.EMPTY);
             LazyOptional<ICurio> possibleCurio = CuriosApi.getCuriosHelper().getCurio(stack);
-            possibleCurio.ifPresent(curio -> curio.curioBreak(stack, livingEntity));
+            possibleCurio.ifPresent(
+                curio -> curio.curioBreak(new SlotContext(msg.curioId, livingEntity, msg.slotId)));
 
             if (!possibleCurio.isPresent()) {
               ICurio.playBreakAnimation(stack, livingEntity);

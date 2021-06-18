@@ -21,7 +21,6 @@ package top.theillusivec4.curios.client;
 
 import static net.minecraft.item.ItemStack.DECIMALFORMAT;
 
-
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,32 +107,29 @@ public class ClientEventHandler {
           type = type.mergeStyle(TextFormatting.YELLOW);
           slotsTooltip.appendSibling(type);
         }
-
         tagTooltips.add(slotsTooltip);
 
         LazyOptional<ICurio> optionalCurio = CuriosApi.getCuriosHelper().getCurio(stack);
         optionalCurio.ifPresent(curio -> {
-          List<ITextComponent> curioTagsTooltip = curio.getTagsTooltip(tagTooltips);
+          List<ITextComponent> actualSlotsTooltip = curio.getSlotsTooltip(tagTooltips);
 
-          if (!curioTagsTooltip.isEmpty()) {
-            tooltip.addAll(1, curio.getTagsTooltip(tagTooltips));
+          if (!actualSlotsTooltip.isEmpty()) {
+            tooltip.addAll(1, actualSlotsTooltip);
           }
-
         });
 
         if (!optionalCurio.isPresent()) {
           tooltip.addAll(1, tagTooltips);
         }
+        List<ITextComponent> attributeTooltip = new ArrayList<>();
 
         for (String identifier : slots) {
           Multimap<Attribute, AttributeModifier> multimap = CuriosApi.getCuriosHelper()
               .getAttributeModifiers(new SlotContext(identifier, player), UUID.randomUUID(), stack);
-          boolean addAttributeTooltips = optionalCurio
-              .map(curio -> curio.showAttributesTooltip(identifier)).orElse(true);
 
-          if (addAttributeTooltips && !multimap.isEmpty() && (i & 2) == 0) {
-            tooltip.add(StringTextComponent.EMPTY);
-            tooltip.add(new TranslationTextComponent("curios.modifiers." + identifier)
+          if (!multimap.isEmpty() && (i & 2) == 0) {
+            attributeTooltip.add(StringTextComponent.EMPTY);
+            attributeTooltip.add(new TranslationTextComponent("curios.modifiers." + identifier)
                 .mergeStyle(TextFormatting.GOLD));
 
             for (Map.Entry<Attribute, AttributeModifier> entry : multimap.entries()) {
@@ -172,20 +168,21 @@ public class ClientEventHandler {
                 }
 
                 if (flag) {
-                  tooltip.add((new StringTextComponent(" ")).appendSibling(new TranslationTextComponent(
-                      "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
-                      DECIMALFORMAT.format(d1),
-                      new TranslationTextComponent(entry.getKey().getAttributeName())))
-                      .mergeStyle(TextFormatting.DARK_GREEN));
+                  attributeTooltip.add(
+                      (new StringTextComponent(" ")).appendSibling(new TranslationTextComponent(
+                          "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
+                          DECIMALFORMAT.format(d1),
+                          new TranslationTextComponent(entry.getKey().getAttributeName())))
+                          .mergeStyle(TextFormatting.DARK_GREEN));
                 } else if (amount > 0.0D) {
-                  tooltip.add((new TranslationTextComponent(
+                  attributeTooltip.add((new TranslationTextComponent(
                       "attribute.modifier.plus." + attributemodifier.getOperation().getId(),
                       DECIMALFORMAT.format(d1),
                       new TranslationTextComponent(entry.getKey().getAttributeName())))
                       .mergeStyle(TextFormatting.BLUE));
                 } else if (amount < 0.0D) {
                   d1 = d1 * -1.0D;
-                  tooltip.add((new TranslationTextComponent(
+                  attributeTooltip.add((new TranslationTextComponent(
                       "attribute.modifier.take." + attributemodifier.getOperation().getId(),
                       DECIMALFORMAT.format(d1),
                       new TranslationTextComponent(entry.getKey().getAttributeName())))
@@ -194,6 +191,18 @@ public class ClientEventHandler {
               }
             }
           }
+        }
+        optionalCurio.ifPresent(curio -> {
+          List<ITextComponent> actualAttributeTooltips =
+              curio.getAttributesTooltip(attributeTooltip);
+
+          if (!actualAttributeTooltips.isEmpty()) {
+            tooltip.addAll(actualAttributeTooltips);
+          }
+        });
+
+        if (!optionalCurio.isPresent()) {
+          tooltip.addAll(attributeTooltip);
         }
       }
     }

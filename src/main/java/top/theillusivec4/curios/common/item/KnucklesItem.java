@@ -60,6 +60,11 @@ public class KnucklesItem extends Item {
       private Object model;
 
       @Override
+      public ItemStack getStack() {
+        return stack;
+      }
+
+      @Override
       public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                           UUID uuid) {
         Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();

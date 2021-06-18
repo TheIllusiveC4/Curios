@@ -22,6 +22,7 @@ package top.theillusivec4.curios.api.type.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -41,6 +42,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector3d;
@@ -51,61 +53,20 @@ import top.theillusivec4.curios.api.type.ISlotType;
 
 public interface ICurio {
 
-  /*
-   * Copy of vanilla implementation for breaking items client-side
+  /**
+   * Gets the ItemStack associated with the instance
+   *
+   * @return The ItemStack associated with the instance
    */
-  static void playBreakAnimation(ItemStack stack, LivingEntity livingEntity) {
-
-    if (!stack.isEmpty()) {
-
-      if (!livingEntity.isSilent()) {
-        livingEntity.world
-            .playSound(livingEntity.getPosX(), livingEntity.getPosY(), livingEntity.getPosZ(),
-                SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(), 0.8F,
-                0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
-      }
-
-      for (int i = 0; i < 5; ++i) {
-        Vector3d vec3d = new Vector3d((livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
-            Math.random() * 0.1D + 0.1D, 0.0D);
-        vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
-        vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        double d0 = (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
-
-        Vector3d vec3d1 = new Vector3d((livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D,
-            d0, 0.6D);
-        vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
-        vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        vec3d1 = vec3d1.add(livingEntity.getPosX(),
-            livingEntity.getPosY() + livingEntity.getEyeHeight(), livingEntity.getPosZ());
-
-        livingEntity.world
-            .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
-                vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
-      }
-    }
-  }
+  ItemStack getStack();
 
   /**
    * Called every tick on both client and server while the ItemStack is equipped.
    *
-   * @param identifier   The {@link ISlotType} identifier of the ItemStack's slot
-   * @param index        The index of the slot
-   * @param livingEntity The wearer of the ItemStack
+   * @param slotContext Context about the slot that the ItemStack is in
    */
-  default void curioTick(String identifier, int index, LivingEntity livingEntity) {
-
-  }
-
-  /**
-   * Called every tick only on the client while the ItemStack is equipped.
-   *
-   * @param identifier   The {@link ISlotType} identifier of the ItemStack's slot
-   * @param index        The index of the slot
-   * @param livingEntity The wearer of the ItemStack
-   */
-  default void curioAnimate(String identifier, int index, LivingEntity livingEntity) {
-
+  default void curioTick(SlotContext slotContext) {
+    curioTick(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer());
   }
 
   /**
@@ -131,37 +92,35 @@ public interface ICurio {
   /**
    * Determines if the ItemStack can be equipped into a slot.
    *
-   * @param identifier   The {@link ISlotType} identifier of the slot being equipped into
-   * @param livingEntity The wearer of the ItemStack
+   * @param slotContext Context about the slot that the ItemStack is attempting to equip into
    * @return True if the ItemStack can be equipped/put in, false if not
    */
-  default boolean canEquip(String identifier, LivingEntity livingEntity) {
+  default boolean canEquip(SlotContext slotContext) {
     return true;
   }
 
   /**
    * Determines if the ItemStack can be unequipped from a slot.
    *
-   * @param identifier   The {@link ISlotType} identifier of the slot being unequipped from
-   * @param livingEntity The wearer of the ItemStack
+   * @param slotContext Context about the slot that the ItemStack is attempting to unequip from
    * @return True if the ItemStack can be unequipped/taken out, false if not
    */
-  default boolean canUnequip(String identifier, LivingEntity livingEntity) {
+  default boolean canUnequip(SlotContext slotContext) {
     return true;
   }
 
   /**
-   * Retrieves a list of tooltips when displaying curio tag information. By default, this will be a
-   * list of each tag identifier, translated and in gold text, associated with the curio.
+   * Retrieves a list of tooltips when displaying curio slot information. By default, this will be a
+   * list of each slot identifier, translated and in gold text, associated with the curio.
    * <br>
-   * If overriding, make sure the user has some indication which tags are associated with the
+   * If overriding, make sure the user has some indication which slots are associated with the
    * curio.
    *
-   * @param tagTooltips A list of {@link ITextComponent} with every curio tag
-   * @return A list of ITextComponent to display as curio tag information
+   * @param tooltips A list of {@link ITextComponent} with every slot valid for this curio
+   * @return A list of ITextComponent to display as curio slot information
    */
-  default List<ITextComponent> getTagsTooltip(List<ITextComponent> tagTooltips) {
-    return tagTooltips;
+  default List<ITextComponent> getSlotsTooltip(List<ITextComponent> tooltips) {
+    return getTagsTooltip(tooltips);
   }
 
   /**
@@ -220,11 +179,10 @@ public interface ICurio {
    * Called when rendering break animations and sounds client-side when a worn curio item is
    * broken.
    *
-   * @param stack        The ItemStack that was broken
-   * @param livingEntity The entity that broke the curio
+   * @param slotContext Context about the slot that the ItemStack broke in
    */
-  default void curioBreak(ItemStack stack, LivingEntity livingEntity) {
-    playBreakAnimation(stack, livingEntity);
+  default void curioBreak(SlotContext slotContext) {
+    curioBreak(getStack(), slotContext.getWearer());
   }
 
   /**
@@ -232,87 +190,86 @@ public interface ICurio {
    * returns true if the change should be synced to all tracking clients. Note that this check
    * occurs every tick so implementations need to code their own timers for other intervals.
    *
-   * @param identifier   The identifier of the {@link ISlotType} of the slot
-   * @param index        The index of the slot
-   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @param slotContext Context about the slot that the ItemStack is in
    * @return True to sync the ItemStack change to all tracking clients, false to do nothing
    */
-  default boolean canSync(String identifier, int index, LivingEntity livingEntity) {
-    return false;
+  default boolean canSync(SlotContext slotContext) {
+    return canSync(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer());
   }
 
   /**
    * Gets a tag that is used to sync extra curio data from the server to the client. Only used when
    * {@link ICurio#canSync(String, int, LivingEntity)} returns true.
    *
+   * @param slotContext Context about the slot that the ItemStack is in
    * @return Data to be sent to the client
    */
   @Nonnull
-  default CompoundNBT writeSyncData() {
-    return new CompoundNBT();
+  default CompoundNBT writeSyncData(SlotContext slotContext) {
+    return writeSyncData();
   }
 
   /**
    * Used client-side to read data tags created by {@link ICurio#writeSyncData()} received from the
    * server.
    *
-   * @param compound Data received from the server
+   * @param slotContext Context about the slot that the ItemStack is in
+   * @param compound    Data received from the server
    */
-  default void readSyncData(CompoundNBT compound) {
-
+  default void readSyncData(SlotContext slotContext, CompoundNBT compound) {
+    readSyncData(compound);
   }
 
   /**
    * Determines if the ItemStack should drop on death and persist through respawn. This will persist
    * the ItemStack in the curio slot to the respawned player if applicable.
    *
-   * @param livingEntity The entity that died
-   * @return {@link DropRule}
+   * @param slotContext  Context about the slot that the ItemStack is attempting to equip into
+   * @param source       The damage source that killed the wearer and triggered the drop
+   * @param lootingLevel The level of looting that triggered the drop
+   * @param recentlyHit  Whether or not the wearer was recently hit
+   * @return The {@link DropRule} that applies to this curio
    */
   @Nonnull
-  default DropRule getDropRule(LivingEntity livingEntity) {
-    return DropRule.DEFAULT;
+  default DropRule getDropRule(SlotContext slotContext, DamageSource source, int lootingLevel,
+                               boolean recentlyHit) {
+    return getDropRule(slotContext.getWearer());
   }
 
   /**
-   * Determines whether or not Curios will automatically add tooltip listing attribute modifiers
-   * that are returned by {@link ICurio#getAttributeModifiers(SlotContext, UUID)}.
+   * Retrieves a list of tooltips when displaying curio attribute modifier information returned by
+   * {@link ICurio#getAttributeModifiers(SlotContext, UUID)}. By default, this will display a list
+   * similar to the vanilla attribute modifier tooltips.
    *
-   * @param identifier The identifier of the {@link ISlotType} of the slot
-   * @return True to show attributes tooltip, false to disable
+   * @param tooltips A list of {@link ITextComponent} with the attribute modifier information
+   * @return A list of ITextComponent to display as curio attribute modifier information
    */
-  default boolean showAttributesTooltip(String identifier) {
-    return true;
+  default List<ITextComponent> getAttributesTooltip(List<ITextComponent> tooltips) {
+    return showAttributesTooltip("") ? tooltips : new ArrayList<>();
   }
 
   /**
-   * Allows to set the amount of bonus Fortune levels that are provided by curio.
+   * Get the amount of bonus Fortune levels that are provided by curio.
    * Default implementation returns level of Fortune enchantment on ItemStack.
    *
-   * @param identifier   The identifier of the {@link ISlotType} of the slot
-   * @param curio        ItemStack that is checked
-   * @param index        The index of the slot
-   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @param slotContext Context about the slot that the ItemStack is in
    * @return Amount of additional Fortune levels that will be applied when mining
    */
-  default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
-                              int index) {
-    return EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, curio);
+  default int getFortuneLevel(SlotContext slotContext) {
+    return getFortuneBonus(slotContext.getIdentifier(), slotContext.getWearer(), getStack(),
+        slotContext.getIndex());
   }
 
   /**
-   * Allows to set the amount of bonus Looting levels that are provided by curio.
+   * Get the amount of bonus Looting levels that are provided by curio.
    * Default implementation returns level of Looting enchantment on ItemStack.
    *
-   * @param identifier   The identifier of the {@link ISlotType} of the slot
-   * @param curio        ItemStack that is checked
-   * @param index        The index of the slot
-   * @param livingEntity The LivingEntity that is wearing the ItemStack
+   * @param slotContext Context about the slot that the ItemStack is in
    * @return Amount of additional Looting levels that will be applied in LootingLevelEvent
    */
-  default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
-                              int index) {
-    return EnchantmentHelper.getEnchantmentLevel(Enchantments.LOOTING, curio);
+  default int getLootingLevel(SlotContext slotContext) {
+    return getLootingBonus(slotContext.getIdentifier(), slotContext.getWearer(), getStack(),
+        slotContext.getIndex());
   }
 
   /**
@@ -474,7 +431,66 @@ public interface ICurio {
     }
   }
 
+  /*
+   * Copy of vanilla implementation for breaking items client-side
+   */
+  static void playBreakAnimation(ItemStack stack, LivingEntity livingEntity) {
+
+    if (!stack.isEmpty()) {
+
+      if (!livingEntity.isSilent()) {
+        livingEntity.world
+            .playSound(livingEntity.getPosX(), livingEntity.getPosY(), livingEntity.getPosZ(),
+                SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(), 0.8F,
+                0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
+      }
+
+      for (int i = 0; i < 5; ++i) {
+        Vector3d vec3d = new Vector3d((livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
+            Math.random() * 0.1D + 0.1D, 0.0D);
+        vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
+        vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
+        double d0 = (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
+
+        Vector3d vec3d1 = new Vector3d((livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D,
+            d0, 0.6D);
+        vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
+        vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
+        vec3d1 = vec3d1.add(livingEntity.getPosX(),
+            livingEntity.getPosY() + livingEntity.getEyeHeight(), livingEntity.getPosZ());
+
+        livingEntity.world
+            .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
+                vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
+      }
+    }
+  }
+
   // ============ DEPRECATED ================
+
+  /**
+   * @deprecated See {@link ICurio#curioTick(SlotContext)}
+   */
+  @Deprecated
+  default void curioTick(String identifier, int index, LivingEntity livingEntity) {
+
+  }
+
+  /**
+   * @deprecated See {@link ICurio#curioTick(SlotContext)}
+   */
+  @Deprecated
+  default void curioAnimate(String identifier, int index, LivingEntity livingEntity) {
+
+  }
+
+  /**
+   * @deprecated See {@link ICurio#curioBreak(SlotContext)}
+   */
+  @Deprecated
+  default void curioBreak(ItemStack stack, LivingEntity livingEntity) {
+    playBreakAnimation(stack, livingEntity);
+  }
 
   /**
    * @deprecated See {@link ICurio#onEquip(SlotContext, ItemStack)}
@@ -489,6 +505,90 @@ public interface ICurio {
    */
   @Deprecated
   default void onUnequip(String identifier, int index, LivingEntity livingEntity) {
+
+  }
+
+  /**
+   * @deprecated See {@link ICurio#canEquip(SlotContext)}
+   */
+  @Deprecated
+  default boolean canEquip(String identifier, LivingEntity livingEntity) {
+    return true;
+  }
+
+  /**
+   * @deprecated See {@link ICurio#canUnequip(SlotContext)}
+   */
+  @Deprecated
+  default boolean canUnequip(String identifier, LivingEntity livingEntity) {
+    return true;
+  }
+
+  /**
+   * @deprecated See {@link ICurio#getSlotsTooltip(List)}
+   */
+  @Deprecated
+  default List<ITextComponent> getTagsTooltip(List<ITextComponent> tagTooltips) {
+    return tagTooltips;
+  }
+
+  /**
+   * @deprecated See {@link ICurio#getFortuneLevel(SlotContext)}
+   */
+  @Deprecated
+  default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
+                              int index) {
+    return EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, curio);
+  }
+
+  /**
+   * @deprecated See {@link ICurio#getLootingLevel(SlotContext)}
+   */
+  @Deprecated
+  default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
+                              int index) {
+    return EnchantmentHelper.getEnchantmentLevel(Enchantments.LOOTING, curio);
+  }
+
+  /**
+   * @deprecated See {@link ICurio#getAttributesTooltip(List)}
+   */
+  @Deprecated
+  default boolean showAttributesTooltip(String identifier) {
+    return true;
+  }
+
+  /**
+   * @deprecated See {@link ICurio#getDropRule(SlotContext, DamageSource, int, boolean)}
+   */
+  @Nonnull
+  @Deprecated
+  default DropRule getDropRule(LivingEntity livingEntity) {
+    return DropRule.DEFAULT;
+  }
+
+  /**
+   * @deprecated See {@link ICurio#canSync(SlotContext)}
+   */
+  @Deprecated
+  default boolean canSync(String identifier, int index, LivingEntity livingEntity) {
+    return false;
+  }
+
+  /**
+   * @deprecated See {@link ICurio#writeSyncData(SlotContext)}
+   */
+  @Nonnull
+  @Deprecated
+  default CompoundNBT writeSyncData() {
+    return new CompoundNBT();
+  }
+
+  /**
+   * @deprecated See {@link ICurio#readSyncData(SlotContext, CompoundNBT)}
+   */
+  @Deprecated
+  default void readSyncData(CompoundNBT compound) {
 
   }
 
