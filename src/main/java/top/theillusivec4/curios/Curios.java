@@ -20,9 +20,7 @@
 package top.theillusivec4.curios;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Minecraft;
@@ -43,7 +41,6 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -52,7 +49,6 @@ import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
@@ -88,13 +84,10 @@ public class Curios {
   public static final String MODID = CuriosApi.MODID;
   public static final Logger LOGGER = LogManager.getLogger();
 
-  private static final boolean DEBUG = false;
-
   public Curios() {
     final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::setup);
     eventBus.addListener(this::config);
-    eventBus.addListener(this::enqueue);
     eventBus.addListener(this::process);
     MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
     MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
@@ -113,15 +106,6 @@ public class Curios {
     ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
         new ArgumentSerializer<>(CurioArgumentType::slot));
     CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
-  }
-
-  private void enqueue(InterModEnqueueEvent evt) {
-
-    if (DEBUG) {
-      InterModComms.sendTo(MODID, SlotTypeMessage.REGISTER_TYPE,
-          () -> Arrays.stream(SlotTypePreset.values())
-              .map(preset -> preset.getMessageBuilder().build()).collect(Collectors.toList()));
-    }
   }
 
   private void process(InterModProcessEvent evt) {

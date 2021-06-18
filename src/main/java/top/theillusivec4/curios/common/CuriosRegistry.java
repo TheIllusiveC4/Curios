@@ -20,7 +20,6 @@
 package top.theillusivec4.curios.common;
 
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
@@ -31,42 +30,16 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
-import top.theillusivec4.curios.common.item.AmuletItem;
-import top.theillusivec4.curios.common.item.CrownItem;
-import top.theillusivec4.curios.common.item.KnucklesItem;
-import top.theillusivec4.curios.common.item.RingItem;
 import top.theillusivec4.curios.common.objects.FortuneBonusModifier;
 
 @Mod.EventBusSubscriber(modid = Curios.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CuriosRegistry {
 
-  @ObjectHolder("curios:ring")
-  public static final Item RING;
-
-  @ObjectHolder("curios:amulet")
-  public static final Item AMULET;
-
-  @ObjectHolder("curios:crown")
-  public static final Item CROWN;
-
-  @ObjectHolder("curios:knuckles")
-  public static final Item KNUCKLES;
-
   @ObjectHolder("curios:curios_container")
   public static final ContainerType<CuriosContainer> CONTAINER_TYPE;
 
   static {
-    RING = null;
-    AMULET = null;
-    CROWN = null;
-    KNUCKLES = null;
     CONTAINER_TYPE = null;
-  }
-
-  @SubscribeEvent
-  public static void registerItems(RegistryEvent.Register<Item> evt) {
-    evt.getRegistry()
-        .registerAll(new RingItem(), new AmuletItem(), new CrownItem(), new KnucklesItem());
   }
 
   @SubscribeEvent

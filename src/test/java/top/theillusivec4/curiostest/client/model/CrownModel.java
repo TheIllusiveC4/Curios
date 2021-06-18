@@ -17,7 +17,7 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.client.render.model;
+package top.theillusivec4.curiostest.client.model;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;

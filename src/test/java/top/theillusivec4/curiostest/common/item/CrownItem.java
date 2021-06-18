@@ -17,41 +17,38 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.common.item;
+package top.theillusivec4.curiostest.common.item;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import java.util.UUID;
 import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.client.render.model.KnucklesModel;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
+import top.theillusivec4.curiostest.CuriosTest;
+import top.theillusivec4.curiostest.client.model.CrownModel;
 
-public class KnucklesItem extends Item {
+public class CrownItem extends Item {
 
-  private static final ResourceLocation KNUCKLES_TEXTURE = new ResourceLocation(Curios.MODID,
-      "textures/entity/knuckles.png");
+  private static final ResourceLocation CROWN_TEXTURE = new ResourceLocation(CuriosTest.MODID,
+      "textures/entity/crown.png");
 
-  public KnucklesItem() {
-    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1));
-    this.setRegistryName(Curios.MODID, "knuckles");
+  public CrownItem() {
+    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(2000));
+    this.setRegistryName(CuriosTest.MODID, "crown");
   }
 
   @Override
@@ -65,13 +62,16 @@ public class KnucklesItem extends Item {
       }
 
       @Override
-      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
-                                                                          UUID uuid) {
-        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
-        atts.put(Attributes.ATTACK_DAMAGE,
-            new AttributeModifier(uuid, Curios.MODID + ":attack_damage_bonus", 4,
-                AttributeModifier.Operation.ADDITION));
-        return atts;
+      public void curioTick(SlotContext slotContext) {
+        LivingEntity livingEntity = slotContext.getWearer();
+
+        if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 20 == 0) {
+          livingEntity
+              .addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, -1, true, true));
+          stack.damageItem(1, livingEntity,
+              damager -> CuriosApi.getCuriosHelper()
+                  .onBrokenCurio(slotContext.getIdentifier(), slotContext.getIndex(), damager));
+        }
       }
 
       @Override
@@ -85,20 +85,16 @@ public class KnucklesItem extends Item {
                          float limbSwing, float limbSwingAmount, float partialTicks,
                          float ageInTicks, float netHeadYaw, float headPitch) {
 
-        if (!(this.model instanceof KnucklesModel)) {
-          this.model = new KnucklesModel();
+        if (!(this.model instanceof CrownModel)) {
+          model = new CrownModel<>();
         }
-        KnucklesModel knuckles = (KnucklesModel) this.model;
-        knuckles.setLivingAnimations(livingEntity, limbSwing, limbSwingAmount, partialTicks);
-        knuckles.setRotationAngles(livingEntity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
-            headPitch);
-        ICurio.RenderHelper.followBodyRotations(livingEntity, knuckles);
+        CrownModel<?> crown = (CrownModel<?>) this.model;
+        ICurio.RenderHelper.followHeadRotations(livingEntity, crown.crown);
         IVertexBuilder vertexBuilder = ItemRenderer
-            .getBuffer(renderTypeBuffer, knuckles.getRenderType(KNUCKLES_TEXTURE), false,
+            .getBuffer(renderTypeBuffer, crown.getRenderType(CROWN_TEXTURE), false,
                 stack.hasEffect());
-        knuckles
-            .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
-                1.0F);
+        crown.render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
+            1.0F);
       }
     });
   }

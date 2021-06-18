@@ -17,7 +17,7 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.common.item;
+package top.theillusivec4.curiostest.common.item;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -33,20 +33,20 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
-import top.theillusivec4.curios.client.render.model.AmuletModel;
+import top.theillusivec4.curiostest.CuriosTest;
+import top.theillusivec4.curiostest.client.model.AmuletModel;
 
 public class AmuletItem extends Item implements ICurioItem {
-  private static final ResourceLocation AMULET_TEXTURE = new ResourceLocation(Curios.MODID,
+  private static final ResourceLocation AMULET_TEXTURE = new ResourceLocation(CuriosTest.MODID,
       "textures/entity/amulet.png");
   private Object model;
 
   public AmuletItem() {
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
-    this.setRegistryName(Curios.MODID, "amulet");
+    this.setRegistryName(CuriosTest.MODID, "amulet");
   }
 
   @Override

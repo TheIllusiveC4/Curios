@@ -2,7 +2,6 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url 'https://plugins.gradle.org/m2/' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -36,6 +35,9 @@ minecraft {
                 curios {
                     source sourceSets.main
                 }
+                curiostest {
+                    source sourceSets.test
+                }
             }
         }
 
@@ -48,6 +50,9 @@ minecraft {
             mods {
                 curios {
                     source sourceSets.main
+                }
+                curiostest {
+                    source sourceSets.test
                 }
             }
         }

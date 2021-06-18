@@ -17,7 +17,7 @@
  * License along with Curios.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curios.common.item;
+package top.theillusivec4.curiostest.common.item;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -36,16 +36,16 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
+import top.theillusivec4.curiostest.CuriosTest;
 
 public class RingItem extends Item {
 
   public RingItem() {
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
-    this.setRegistryName(Curios.MODID, "ring");
+    this.setRegistryName(CuriosTest.MODID, "ring");
   }
 
   @Override
@@ -71,10 +71,10 @@ public class RingItem extends Item {
                                                                           UUID uuid) {
         Multimap<Attribute, AttributeModifier> atts = LinkedHashMultimap.create();
         atts.put(Attributes.MOVEMENT_SPEED,
-            new AttributeModifier(uuid, Curios.MODID + ":speed_bonus", 0.1,
+            new AttributeModifier(uuid, CuriosTest.MODID + ":speed_bonus", 0.1,
                 AttributeModifier.Operation.MULTIPLY_TOTAL));
         atts.put(Attributes.ARMOR,
-            new AttributeModifier(uuid, Curios.MODID + ":armor_bonus", 2,
+            new AttributeModifier(uuid, CuriosTest.MODID + ":armor_bonus", 2,
                 AttributeModifier.Operation.ADDITION));
         return atts;
       }
