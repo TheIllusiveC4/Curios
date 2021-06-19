@@ -273,33 +273,6 @@ public interface ICurio {
   }
 
   /**
-   * Determines if the ItemStack has rendering.
-   *
-   * @param identifier   The identifier of the {@link ISlotType} of the slot
-   * @param index        The index of the slot
-   * @param livingEntity The LivingEntity that is wearing the ItemStack
-   * @return True if the ItemStack has rendering, false if it does not
-   */
-  default boolean canRender(String identifier, int index, LivingEntity livingEntity) {
-    return false;
-  }
-
-  /**
-   * Performs rendering of the ItemStack if {@link ICurio#canRender(String, int, LivingEntity)}
-   * returns true. Note that vertical sneaking translations are automatically applied before this
-   * rendering method is called.
-   *
-   * @param identifier   The identifier of the {@link ISlotType} of the slot
-   * @param livingEntity The LivingEntity that is wearing the ItemStack
-   */
-  default void render(String identifier, int index, MatrixStack matrixStack,
-                      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
-                      float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
-                      float netHeadYaw, float headPitch) {
-
-  }
-
-  /**
    * Used by {@link ICurio#getDropRule(LivingEntity)} to determine drop on death behavior.
    * <br>
    * DEFAULT - normal vanilla behavior with drops dictated by the Keep Inventory game rule
@@ -335,99 +308,6 @@ public interface ICurio {
 
     public float getPitch() {
       return pitch;
-    }
-  }
-
-  /**
-   * Some helper methods for rendering curios.
-   */
-  final class RenderHelper {
-
-    /**
-     * Translates the rendering for the curio if the entity is sneaking.
-     *
-     * @param livingEntity The wearer of the curio
-     */
-    public static void translateIfSneaking(final MatrixStack matrixStack,
-                                           final LivingEntity livingEntity) {
-
-      if (livingEntity.isCrouching()) {
-        matrixStack.translate(0.0f, 0.2f, 0.0f);
-      }
-    }
-
-    /**
-     * Rotates the rendering for the curio if the entity is sneaking. The rotation angle is based on
-     * the body of a player model when sneaking, so this is typically used for items being rendered
-     * on the body.
-     *
-     * @param livingEntity The wearer of the curio
-     */
-    public static void rotateIfSneaking(final MatrixStack matrixStack,
-                                        final LivingEntity livingEntity) {
-
-      if (livingEntity.isCrouching()) {
-        matrixStack.rotate(Vector3f.XP.rotationDegrees(90.0F / (float) Math.PI));
-      }
-    }
-
-    /**
-     * Rotates the rendering for the model renderers based on the entity's head movement. This will
-     * align the model renderers with the movements and rotations of the head. This will do nothing
-     * if the entity render object does not implement {@link LivingRenderer} or if the model does
-     * not have a head (does not implement {@link BipedModel}).
-     *
-     * @param livingEntity The wearer of the curio
-     * @param renderers    The list of model renderers to align to the head movement
-     */
-    public static void followHeadRotations(final LivingEntity livingEntity,
-                                           ModelRenderer... renderers) {
-
-      EntityRenderer<? super LivingEntity> render = Minecraft.getInstance().getRenderManager()
-          .getRenderer(livingEntity);
-
-      if (render instanceof LivingRenderer) {
-        @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>>
-            livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
-        EntityModel<LivingEntity> model = livingRenderer.getEntityModel();
-
-        if (model instanceof BipedModel) {
-
-          for (ModelRenderer renderer : renderers) {
-            renderer.copyModelAngles(((BipedModel<LivingEntity>) model).bipedHead);
-          }
-        }
-      }
-    }
-
-    /**
-     * Rotates the rendering for the models based on the entity's poses and movements. This will do
-     * nothing if the entity render object does not implement {@link LivingRenderer} or if the model
-     * does not implement {@link BipedModel}).
-     *
-     * @param livingEntity The wearer of the curio
-     * @param models       The list of models to align to the body movement
-     */
-    @SafeVarargs
-    public static void followBodyRotations(final LivingEntity livingEntity,
-                                           final BipedModel<LivingEntity>... models) {
-
-      EntityRenderer<? super LivingEntity> render = Minecraft.getInstance().getRenderManager()
-          .getRenderer(livingEntity);
-
-      if (render instanceof LivingRenderer) {
-        @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>>
-            livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
-        EntityModel<LivingEntity> entityModel = livingRenderer.getEntityModel();
-
-        if (entityModel instanceof BipedModel) {
-
-          for (BipedModel<LivingEntity> model : models) {
-            BipedModel<LivingEntity> bipedModel = (BipedModel<LivingEntity>) entityModel;
-            bipedModel.setModelAttributes(model);
-          }
-        }
-      }
     }
   }
 

@@ -24,6 +24,8 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.entity.IEntityRenderer;
+import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
@@ -34,12 +36,13 @@ import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.client.ICurioRenderer;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curiostest.CuriosTest;
 import top.theillusivec4.curiostest.client.model.AmuletModel;
 
-public class AmuletItem extends Item implements ICurioItem {
+public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
   private static final ResourceLocation AMULET_TEXTURE = new ResourceLocation(CuriosTest.MODID,
       "textures/entity/amulet.png");
   private Object model;
@@ -70,17 +73,24 @@ public class AmuletItem extends Item implements ICurioItem {
   }
 
   @Override
-  public boolean canRender(String identifier, int index, LivingEntity living, ItemStack stack) {
+  public boolean hasEffect(@Nonnull ItemStack stack) {
     return true;
   }
 
   @Override
-  public void render(String identifier, int index, MatrixStack matrixStack,
-                     IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity living,
-                     float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
-                     float netHeadYaw, float headPitch, ItemStack stack) {
-    ICurio.RenderHelper.translateIfSneaking(matrixStack, living);
-    ICurio.RenderHelper.rotateIfSneaking(matrixStack, living);
+  public <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack,
+                                                                        SlotContext slotContext,
+                                                                        IEntityRenderer<T, M> entityRenderer,
+                                                                        MatrixStack matrixStack,
+                                                                        IRenderTypeBuffer renderTypeBuffer,
+                                                                        int light, float limbSwing,
+                                                                        float limbSwingAmount,
+                                                                        float partialTicks,
+                                                                        float ageInTicks,
+                                                                        float netHeadYaw,
+                                                                        float headPitch) {
+    ICurioRenderer.translateIfSneaking(matrixStack, slotContext.getWearer());
+    ICurioRenderer.rotateIfSneaking(matrixStack, slotContext.getWearer());
 
     if (!(this.model instanceof AmuletModel)) {
       this.model = new AmuletModel<>();
@@ -93,10 +103,4 @@ public class AmuletItem extends Item implements ICurioItem {
         .render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
             1.0F);
   }
-
-  @Override
-  public boolean hasEffect(@Nonnull ItemStack stack) {
-    return true;
-  }
-
 }

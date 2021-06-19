@@ -31,6 +31,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
+import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
+import top.theillusivec4.curiostest.client.renderer.CrownRenderer;
+import top.theillusivec4.curiostest.client.renderer.KnucklesRenderer;
+import top.theillusivec4.curiostest.common.CuriosTestRegistry;
+import top.theillusivec4.curiostest.common.item.AmuletItem;
 
 @Mod(CuriosTest.MODID)
 public class CuriosTest {
@@ -45,7 +50,9 @@ public class CuriosTest {
   }
 
   private void clientSetup(final FMLClientSetupEvent evt) {
-
+    CuriosRendererRegistry.register(CuriosTestRegistry.AMULET, (AmuletItem) CuriosTestRegistry.AMULET);
+    CuriosRendererRegistry.register(CuriosTestRegistry.CROWN, new CrownRenderer());
+    CuriosRendererRegistry.register(CuriosTestRegistry.KNUCKLES, new KnucklesRenderer());
   }
 
   private void enqueue(final InterModEnqueueEvent evt) {

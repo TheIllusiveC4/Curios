@@ -298,39 +298,6 @@ public interface ICurioItem {
         slotContext.getIndex());
   }
 
-  /**
-   * Determines if the ItemStack has rendering.
-   *
-   * @param identifier   The identifier of the {@link ISlotType} of the slot
-   * @param index        The index of the slot
-   * @param livingEntity The LivingEntity that is wearing the ItemStack
-   * @param stack        The ItemStack in question
-   * @return True if the ItemStack has rendering, false if it does not
-   */
-  default boolean canRender(String identifier, int index, LivingEntity livingEntity,
-                            ItemStack stack) {
-    return defaultInstance.canRender(identifier, index, livingEntity);
-  }
-
-  /**
-   * Performs rendering of the ItemStack if
-   * {@link ICurioItem#canRender(String, int, LivingEntity, ItemStack)} returns true. Note
-   * that vertical sneaking translations are automatically applied before this
-   * rendering method is called.
-   *
-   * @param identifier   The identifier of the {@link ISlotType} of the slot
-   * @param livingEntity The LivingEntity that is wearing the ItemStack
-   * @param stack        The ItemStack in question
-   */
-  default void render(String identifier, int index, MatrixStack matrixStack,
-                      IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
-                      float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
-                      float netHeadYaw, float headPitch, ItemStack stack) {
-    defaultInstance
-        .render(identifier, index, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing,
-            limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
-  }
-
   // ========== DEPRECATED ================
 
   /**

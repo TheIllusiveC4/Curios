@@ -28,13 +28,18 @@ import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> extends
     LayerRenderer<T, M> {
 
+  private final IEntityRenderer<T, M> entityRenderer;
+
   public CuriosLayer(IEntityRenderer<T, M> renderer) {
     super(renderer);
+    this.entityRenderer = renderer;
   }
 
   @Override
@@ -55,17 +60,13 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
             }
 
             if (!stack.isEmpty()) {
-              int index = i;
-
-              CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> {
-
-                if (curio.canRender(id, index, livingEntity)) {
-                  matrixStack.push();
-                  curio.render(id, index, matrixStack, renderTypeBuffer, light, livingEntity,
-                      limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
-                  matrixStack.pop();
-                }
-              });
+              SlotContext slotContext = new SlotContext(id, livingEntity, i);
+              ItemStack finalStack = stack;
+              CuriosRendererRegistry.getRenderer(stack.getItem()).ifPresent(
+                  renderer -> renderer
+                      .render(finalStack, slotContext, this.entityRenderer, matrixStack,
+                          renderTypeBuffer, light, limbSwing, limbSwingAmount, partialTicks,
+                          ageInTicks, netHeadYaw, headPitch));
             }
           }
         }));

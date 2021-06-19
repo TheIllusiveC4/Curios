@@ -19,12 +19,7 @@
 
 package top.theillusivec4.curiostest.common.item;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
 import javax.annotation.Nonnull;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -32,19 +27,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curiostest.CuriosTest;
-import top.theillusivec4.curiostest.client.model.CrownModel;
 
 public class CrownItem extends Item {
-
-  private static final ResourceLocation CROWN_TEXTURE = new ResourceLocation(CuriosTest.MODID,
-      "textures/entity/crown.png");
 
   public CrownItem() {
     super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(2000));
@@ -54,7 +44,6 @@ public class CrownItem extends Item {
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
     return CurioItemCapability.createProvider(new ICurio() {
-      private Object model;
 
       @Override
       public ItemStack getStack() {
@@ -72,29 +61,6 @@ public class CrownItem extends Item {
               damager -> CuriosApi.getCuriosHelper()
                   .onBrokenCurio(slotContext.getIdentifier(), slotContext.getIndex(), damager));
         }
-      }
-
-      @Override
-      public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
-        return true;
-      }
-
-      @Override
-      public void render(String identifier, int index, MatrixStack matrixStack,
-                         IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
-                         float limbSwing, float limbSwingAmount, float partialTicks,
-                         float ageInTicks, float netHeadYaw, float headPitch) {
-
-        if (!(this.model instanceof CrownModel)) {
-          model = new CrownModel<>();
-        }
-        CrownModel<?> crown = (CrownModel<?>) this.model;
-        ICurio.RenderHelper.followHeadRotations(livingEntity, crown.crown);
-        IVertexBuilder vertexBuilder = ItemRenderer
-            .getBuffer(renderTypeBuffer, crown.getRenderType(CROWN_TEXTURE), false,
-                stack.hasEffect());
-        crown.render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
-            1.0F);
       }
     });
   }

@@ -115,21 +115,6 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public boolean canRender(String identifier, int index, LivingEntity livingEntity) {
-    return this.curioItem.canRender(identifier, index, livingEntity, this.getStack());
-  }
-
-  @Override
-  public void render(String identifier, int index, MatrixStack matrixStack,
-                     IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
-                     float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
-                     float netHeadYaw, float headPitch) {
-    this.curioItem
-        .render(identifier, index, matrixStack, renderTypeBuffer, light, livingEntity, limbSwing,
-            limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, this.getStack());
-  }
-
-  @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                       UUID uuid) {
     return this.curioItem.getAttributeModifiers(slotContext, uuid, this.getStack());
