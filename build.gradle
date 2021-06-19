@@ -2,16 +2,21 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url 'https://plugins.gradle.org/m2/' }
+        maven {
+            url "https://repo.spongepowered.org/repository/maven-public/"
+            content { includeGroup "org.spongepowered" }
+        }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version:'1.4.0'
     }
 }
-apply plugin: 'eclipse'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.matthewprenger.cursegradle'
+apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'maven-publish'
 
 version = "${mod_version}"
@@ -28,8 +33,10 @@ minecraft {
         client {
             workingDirectory project.file('run')
 
+            arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
 
             mods {
                 curios {
@@ -44,8 +51,10 @@ minecraft {
         server {
             workingDirectory project.file('run')
 
+            arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
 
             mods {
                 curios {
@@ -61,8 +70,15 @@ minecraft {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+
     compileOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}")
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
 }
 
 repositories {
@@ -94,7 +110,8 @@ jar {
                     "Implementation-Title"    : "${mod_name}",
                     "Implementation-Version"  : "${getArchiveVersion()}",
                     "Implementation-Vendor"   : "${mod_author}",
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    "MixinConfigs"            : "${mod_id}.mixins.json"],)
     }
 }
 

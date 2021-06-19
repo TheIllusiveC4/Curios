@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "package": "top.theillusivec4.curios.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "curios.refmap.json",
+  "mixins": [],
+  "minVersion": "0.8"
+}
