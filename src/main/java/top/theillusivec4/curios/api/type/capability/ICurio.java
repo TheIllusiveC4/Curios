@@ -272,6 +272,10 @@ public interface ICurio {
         slotContext.getIndex());
   }
 
+  default boolean makesPiglinsNeutral(SlotContext slotContext) {
+    return getStack().makesPiglinsNeutral(slotContext.getWearer());
+  }
+
   /**
    * Used by {@link ICurio#getDropRule(LivingEntity)} to determine drop on death behavior.
    * <br>

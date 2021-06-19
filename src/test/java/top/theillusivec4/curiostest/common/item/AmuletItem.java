@@ -78,6 +78,11 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
   }
 
   @Override
+  public boolean makesPiglinsNeutral(SlotContext slotContext, ItemStack stack) {
+    return true;
+  }
+
+  @Override
   public <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack,
                                                                         SlotContext slotContext,
                                                                         IEntityRenderer<T, M> entityRenderer,

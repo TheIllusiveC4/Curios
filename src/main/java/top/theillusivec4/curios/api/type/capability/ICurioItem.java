@@ -20,12 +20,10 @@
 package top.theillusivec4.curios.api.type.capability;
 
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -36,7 +34,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
 
 /**
@@ -296,6 +293,10 @@ public interface ICurioItem {
   default int getLootingLevel(SlotContext slotContext, ItemStack stack) {
     return getLootingBonus(slotContext.getIdentifier(), slotContext.getWearer(), stack,
         slotContext.getIndex());
+  }
+
+  default boolean makesPiglinsNeutral(SlotContext slotContext, ItemStack stack) {
+    return stack.makesPiglinsNeutral(slotContext.getWearer());
   }
 
   // ========== DEPRECATED ================

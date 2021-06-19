@@ -145,4 +145,9 @@ public class ItemizedCurioCapability implements ICurio {
   public SoundInfo getEquipSound(SlotContext slotContext) {
     return this.curioItem.getEquipSound(slotContext, this.getStack());
   }
+
+  @Override
+  public boolean makesPiglinsNeutral(SlotContext slotContext) {
+    return this.curioItem.makesPiglinsNeutral(slotContext, this.getStack());
+  }
 }
