@@ -21,12 +21,10 @@ package top.theillusivec4.curios.common.capability;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -38,7 +36,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.Tuple;
@@ -78,13 +75,6 @@ public class CurioInventoryCapability {
               taglist.add(tag);
             });
             compound.put("Curios", taglist);
-
-            ListNBT taglist1 = new ListNBT();
-
-            for (String identifier : instance.getLockedSlots()) {
-              taglist1.add(StringNBT.valueOf(identifier));
-            }
-            compound.put("Locked", taglist1);
             return compound;
           }
 
@@ -92,7 +82,6 @@ public class CurioInventoryCapability {
           public void readNBT(Capability<ICuriosItemHandler> capability,
                               ICuriosItemHandler instance, Direction side, INBT nbt) {
             ListNBT tagList = ((CompoundNBT) nbt).getList("Curios", NBT.TAG_COMPOUND);
-            ListNBT lockedList = ((CompoundNBT) nbt).getList("Locked", NBT.TAG_STRING);
             ISlotHelper slotHelper = CuriosApi.getSlotHelper();
             ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
             LivingEntity livingEntity = instance.getWearer();
@@ -180,10 +169,6 @@ public class CurioInventoryCapability {
               sortedCurios.forEach(
                   (slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler));
               instance.setCurios(curios);
-
-              for (int k = 0; k < lockedList.size(); k++) {
-                instance.lockSlotType(lockedList.getString(k));
-              }
             }
           }
         }, CurioInventoryWrapper::new);
@@ -195,11 +180,8 @@ public class CurioInventoryCapability {
 
   public static class CurioInventoryWrapper implements ICuriosItemHandler {
     Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
-    Set<String> locked = new HashSet<>();
     NonNullList<ItemStack> invalidStacks = NonNullList.create();
     PlayerEntity wearer;
-    Set<String> toLock = new HashSet<>();
-    List<UnlockState> toUnlock = new ArrayList<>();
     Tuple<Integer, Integer> fortuneAndLooting = new Tuple<>(0, 0);
 
     CurioInventoryWrapper() {
@@ -215,7 +197,6 @@ public class CurioInventoryCapability {
     public void reset() {
 
       if (!this.wearer.getEntityWorld().isRemote() && this.wearer instanceof ServerPlayerEntity) {
-        this.locked.clear();
         this.curios.clear();
         this.invalidStacks.clear();
         CuriosApi.getSlotHelper().createSlots().forEach(
@@ -248,11 +229,6 @@ public class CurioInventoryCapability {
     }
 
     @Override
-    public Set<String> getLockedSlots() {
-      return Collections.unmodifiableSet(this.locked);
-    }
-
-    @Override
     public Optional<ICurioStacksHandler> getStacksHandler(String identifier) {
       return Optional.ofNullable(this.curios.get(identifier));
     }
@@ -265,32 +241,6 @@ public class CurioInventoryCapability {
     @Override
     public void setCurios(Map<String, ICurioStacksHandler> curios) {
       this.curios = curios;
-    }
-
-    @Override
-    public void unlockSlotType(String identifier, int amount, boolean visible, boolean cosmetic) {
-      this.toUnlock.add(new UnlockState(identifier, amount, visible, cosmetic));
-    }
-
-    @Override
-    public void lockSlotType(String identifier) {
-      this.toLock.add(identifier);
-    }
-
-    @Override
-    public void processSlots() {
-      this.toLock.forEach(id -> this.getStacksHandler(id).ifPresent(stackHandler -> {
-        this.curios.remove(id);
-        this.locked.add(id);
-        this.loseStacks(stackHandler.getStacks(), id, stackHandler.getSlots());
-      }));
-      this.toUnlock.forEach(state -> {
-        this.curios.putIfAbsent(state.identifier,
-            new CurioStacksHandler(state.amount, 0, state.visible, state.cosmetic));
-        this.locked.remove(state.identifier);
-      });
-      this.toLock.clear();
-      this.toUnlock.clear();
     }
 
     @Override
@@ -353,21 +303,6 @@ public class CurioInventoryCapability {
           stackHandler.setStackInSlot(i, ItemStack.EMPTY);
         }
         drops.forEach(drop -> ItemHandlerHelper.giveItemToPlayer(this.wearer, drop));
-      }
-    }
-
-    public static class UnlockState {
-
-      final String identifier;
-      final int amount;
-      final boolean visible;
-      final boolean cosmetic;
-
-      UnlockState(String identifier, int amount, boolean visible, boolean cosmetic) {
-        this.identifier = identifier;
-        this.amount = amount;
-        this.visible = visible;
-        this.cosmetic = cosmetic;
       }
     }
 

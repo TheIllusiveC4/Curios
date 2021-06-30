@@ -77,7 +77,7 @@ public class SlotTypeManager {
         if (preset != null) {
           SlotTypeMessage msg = preset.build();
           builder.icon(msg.getIcon()).priority(msg.getPriority()).size(msg.getSize())
-              .locked(msg.isLocked()).visible(msg.isVisible()).hasCosmetic(msg.hasCosmetic());
+              .visible(msg.isVisible()).hasCosmetic(msg.hasCosmetic());
         }
       } else {
         builder = new Builder(id).copyFrom(builder);
@@ -94,10 +94,6 @@ public class SlotTypeManager {
 
       if (setting.size != null) {
         builder.size(setting.size, force);
-      }
-
-      if (setting.locked != null) {
-        builder.locked(setting.locked, force);
       }
 
       if (setting.visible != null) {
@@ -156,8 +152,7 @@ public class SlotTypeManager {
       }
 
       if (builder != null) {
-        builder.size(msg.getSize()).locked(msg.isLocked()).visible(msg.isVisible())
-            .hasCosmetic(msg.hasCosmetic());
+        builder.size(msg.getSize()).visible(msg.isVisible()).hasCosmetic(msg.hasCosmetic());
         SlotTypeMessage.Builder preset = SlotTypePreset.findPreset(id)
             .map(SlotTypePreset::getMessageBuilder).orElse(null);
         SlotTypeMessage presetMsg = preset != null ? preset.build() : null;

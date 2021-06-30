@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.api.type.capability;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -51,16 +52,14 @@ public interface ICuriosItemHandler {
    */
   int getSlots();
 
+  /**
+   * Gets the number of visible slots across all {@link ISlotType} identifiers.
+   *
+   * @return The number of visible slots
+   */
   default int getVisibleSlots() {
     return this.getSlots();
   }
-
-  /**
-   * Gets the identifiers of slot types locked for this handler.
-   *
-   * @return A set of {@link ISlotType} identifiers
-   */
-  Set<String> getLockedSlots();
 
   /**
    * Resets the current curios map to default values.
@@ -75,27 +74,6 @@ public interface ICuriosItemHandler {
    * @return The stack handler
    */
   Optional<ICurioStacksHandler> getStacksHandler(String identifier);
-
-  /**
-   * Enables the {@link ISlotType} for a given identifier, adding the default settings to the curio
-   * map.
-   *
-   * @param identifier The identifier for the {@link ISlotType}
-   * @param amount     The amount of slots to unlock
-   */
-  void unlockSlotType(String identifier, int amount, boolean visible, boolean cosmetic);
-
-  /**
-   * Disables the {@link ISlotType} for a given identifier, removing it from the curio map.
-   *
-   * @param identifier The identifier for the {@link ISlotType}
-   */
-  void lockSlotType(String identifier);
-
-  /**
-   * Processes the lock/unlock slot states that are enqueued
-   */
-  void processSlots();
 
   /**
    * Adds an amount of slots to the {@link ICurioStacksHandler} of a {@link ISlotType} associated
@@ -154,4 +132,37 @@ public interface ICuriosItemHandler {
    */
   void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLooting);
 
+  // =============== DEPRECATED =================
+
+  /**
+   * @deprecated Locked slots no longer exist
+   */
+  @Deprecated
+  default Set<String> getLockedSlots() {
+    return new HashSet<>();
+  }
+
+  /**
+   * @deprecated Unlock slots by using {@link ICuriosItemHandler#growSlotType(String, int)}
+   */
+  @Deprecated
+  default void unlockSlotType(String identifier, int amount, boolean visible, boolean cosmetic) {
+    growSlotType(identifier, amount);
+  }
+
+  /**
+   * @deprecated Lock slots by using {@link ICuriosItemHandler#shrinkSlotType(String, int)}
+   */
+  @Deprecated
+  default void lockSlotType(String identifier) {
+    shrinkSlotType(identifier, 1);
+  }
+
+  /**
+   * @deprecated Lock states are no longer used
+   */
+  @Deprecated
+  default void processSlots() {
+    // NO-OP
+  }
 }

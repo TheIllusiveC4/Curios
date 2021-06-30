@@ -86,9 +86,7 @@ public interface ISlotHelper {
 
   /**
    * /** Adds a single slot to the {@link ISlotType} with the associated identifier. If the slot to
-   * be added is for a type that is not enabled on the entity, it will not be added. For adding
-   * slot(s) for types that are not yet available, there must first be a call to {@link
-   * ISlotHelper#unlockSlotType(String, LivingEntity)}
+   * be added is for a type that is not enabled on the entity, it will not be added.
    *
    * @param id           The identifier of the {@link ISlotType}
    * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
@@ -97,9 +95,7 @@ public interface ISlotHelper {
 
   /**
    * Adds multiple slots to the {@link ISlotType} with the associated identifier. If the slot to be
-   * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
-   * for types that are not yet available, there must first be a call to {@link
-   * ISlotHelper#unlockSlotType(String, LivingEntity)}
+   * added is for a type that is not enabled on the entity, it will not be added.
    *
    * @param id           The identifier of the {@link ISlotType}
    * @param amount       The number of slots to add
@@ -108,9 +104,7 @@ public interface ISlotHelper {
   void growSlotType(String id, int amount, LivingEntity livingEntity);
 
   /**
-   * Removes a single slot to the {@link ISlotType} with the associated identifier. If the slot to
-   * be removed is the last slot available, it will not be removed. For the removal of the last
-   * slot, please see {@link ISlotHelper#lockSlotType(String, LivingEntity)}
+   * Removes a single slot to the {@link ISlotType} with the associated identifier.
    *
    * @param id           The identifier of the {@link ISlotType}
    * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
@@ -118,28 +112,28 @@ public interface ISlotHelper {
   void shrinkSlotType(String id, LivingEntity livingEntity);
 
   /**
-   * Removes multiple slots from the {@link ISlotType} with the associated identifier. If the slot
-   * to be removed is the last slot available, it will not be removed. For the removal of the last
-   * slot, please see {@link ISlotHelper#lockSlotType(String, LivingEntity)}
+   * Removes multiple slots from the {@link ISlotType} with the associated identifier.
    *
    * @param id           The identifier of the {@link ISlotType}
    * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
    */
   void shrinkSlotType(String id, int amount, LivingEntity livingEntity);
 
-  /**
-   * Adds a {@link ISlotType} to the entity with default settings.
-   *
-   * @param id           The identifier of the {@link ISlotType}
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   */
-  void unlockSlotType(String id, LivingEntity livingEntity);
+  // ============ DEPRECATED ==================
 
   /**
-   * Removes a {@link ISlotType} from the entity.
-   *
-   * @param id           The identifier of the {@link ISlotType}
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
+   * @deprecated Unlock slots by using {@link ISlotHelper#growSlotType(String, int, LivingEntity)}
    */
-  void lockSlotType(String id, final LivingEntity livingEntity);
+  @Deprecated
+  default void unlockSlotType(String id, LivingEntity livingEntity) {
+    growSlotType(id, 1, livingEntity);
+  }
+
+  /**
+   * @deprecated Lock slots by using {@link ISlotHelper#shrinkSlotType(String, int, LivingEntity)}
+   */
+  @Deprecated
+  default void lockSlotType(String id, final LivingEntity livingEntity) {
+    shrinkSlotType(id, 1, livingEntity);
+  }
 }

@@ -90,12 +90,6 @@ public class SPacketSyncOperation {
               case SHRINK:
                 handler.shrinkSlotType(id, amount);
                 break;
-              case LOCK:
-                handler.lockSlotType(id);
-                break;
-              case UNLOCK:
-                handler.unlockSlotType(id, amount, msg.visible, msg.cosmetic);
-                break;
             }
           });
         }
@@ -105,7 +99,7 @@ public class SPacketSyncOperation {
   }
 
   public enum Operation {
-    LOCK, UNLOCK, SHRINK, GROW;
+    SHRINK, GROW;
 
     public static Operation fromValue(int value) {
       try {

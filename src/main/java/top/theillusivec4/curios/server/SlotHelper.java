@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -63,9 +62,8 @@ public class SlotHelper implements ISlotHelper {
   @Override
   public SortedMap<ISlotType, ICurioStacksHandler> createSlots() {
     SortedMap<ISlotType, ICurioStacksHandler> curios = new TreeMap<>();
-    this.getSlotTypes().stream().filter(type -> !type.isLocked()).collect(Collectors.toSet())
-        .forEach(type -> curios.put(type,
-            new CurioStacksHandler(type.getSize(), 0, type.isVisible(), type.hasCosmetic())));
+    this.getSlotTypes().forEach(type -> curios.put(type,
+        new CurioStacksHandler(type.getSize(), 0, type.isVisible(), type.hasCosmetic())));
     return curios;
   }
 
@@ -125,35 +123,6 @@ public class SlotHelper implements ISlotHelper {
         NetworkHandler.INSTANCE
             .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) livingEntity),
                 new SPacketSyncOperation(livingEntity.getEntityId(), id, Operation.SHRINK, amount));
-      }
-    });
-  }
-
-
-  @Override
-  public void unlockSlotType(String id, final LivingEntity livingEntity) {
-    CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
-        .ifPresent(handler -> this.getSlotType(id).ifPresent(type -> {
-          handler.unlockSlotType(id, type.getSize(), type.isVisible(), type.hasCosmetic());
-
-          if (livingEntity instanceof ServerPlayerEntity) {
-            NetworkHandler.INSTANCE
-                .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) livingEntity),
-                    new SPacketSyncOperation(livingEntity.getEntityId(), id, Operation.UNLOCK,
-                        type.getSize(), type.isVisible(), type.hasCosmetic()));
-          }
-        }));
-  }
-
-  @Override
-  public void lockSlotType(String id, final LivingEntity livingEntity) {
-    CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
-      handler.lockSlotType(id);
-
-      if (livingEntity instanceof ServerPlayerEntity) {
-        NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) livingEntity),
-                new SPacketSyncOperation(livingEntity.getEntityId(), id, Operation.LOCK));
       }
     });
   }

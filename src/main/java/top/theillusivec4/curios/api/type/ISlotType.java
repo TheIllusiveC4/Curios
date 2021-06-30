@@ -44,10 +44,12 @@ public interface ISlotType extends Comparable<ISlotType> {
   int getSize();
 
   /**
-   * @return True if the slot type should be locked by default and not usable until unlocked, false
-   * otherwise
+   * @deprecated Check if {@link ISlotType#getSize()} returns 0
    */
-  boolean isLocked();
+  @Deprecated
+  default boolean isLocked() {
+    return getSize() == 0;
+  }
 
   /**
    * @return True if the slot type should be visible, false otherwise

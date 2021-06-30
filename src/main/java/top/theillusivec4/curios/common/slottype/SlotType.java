@@ -29,7 +29,6 @@ public final class SlotType implements ISlotType {
   private final String identifier;
   private final int priority;
   private final int size;
-  private final boolean locked;
   private final boolean visible;
   private final boolean cosmetic;
   private final ResourceLocation icon;
@@ -38,7 +37,6 @@ public final class SlotType implements ISlotType {
     this.identifier = builder.identifier;
     this.priority = builder.priority != null ? builder.priority : 100;
     this.size = builder.size != null ? builder.size : 1;
-    this.locked = builder.locked;
     this.visible = builder.visible;
     this.cosmetic = builder.cosmetic;
     this.icon = builder.icon != null ? builder.icon
@@ -63,11 +61,6 @@ public final class SlotType implements ISlotType {
   @Override
   public int getSize() {
     return this.size;
-  }
-
-  @Override
-  public boolean isLocked() {
-    return this.locked;
   }
 
   @Override
@@ -114,7 +107,6 @@ public final class SlotType implements ISlotType {
     private final String identifier;
     private Integer priority;
     private Integer size;
-    private boolean locked = false;
     private boolean visible = true;
     private boolean cosmetic = false;
     private ResourceLocation icon = null;
@@ -126,7 +118,6 @@ public final class SlotType implements ISlotType {
     public Builder copyFrom(Builder builder) {
       this.priority = builder.priority;
       this.size = builder.size;
-      this.locked = builder.locked;
       this.visible = builder.visible;
       this.cosmetic = builder.cosmetic;
       this.icon = builder.icon;
@@ -161,15 +152,6 @@ public final class SlotType implements ISlotType {
 
     public Builder size(int size, boolean force) {
       this.size = force || this.size == null ? size : Math.max(this.size, size);
-      return this;
-    }
-
-    public Builder locked(boolean locked) {
-      return locked(locked, false);
-    }
-
-    public Builder locked(boolean locked, boolean force) {
-      this.locked = force ? locked : this.locked || locked;
       return this;
     }
 

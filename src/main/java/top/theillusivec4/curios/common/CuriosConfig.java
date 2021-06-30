@@ -66,7 +66,6 @@ public class CuriosConfig {
       public String icon;
       public Integer priority;
       public Integer size;
-      public Boolean locked;
       public Boolean visible;
       public Boolean hasCosmetic;
       public Boolean override;

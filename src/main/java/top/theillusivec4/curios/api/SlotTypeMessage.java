@@ -29,7 +29,6 @@ public final class SlotTypeMessage {
   private final String identifier;
   private final Integer priority;
   private final int size;
-  private final boolean locked;
   private final boolean visible;
   private final boolean cosmetic;
   private final ResourceLocation icon;
@@ -38,7 +37,6 @@ public final class SlotTypeMessage {
     this.identifier = builder.identifier;
     this.priority = builder.priority;
     this.size = builder.size;
-    this.locked = builder.locked;
     this.visible = builder.visible;
     this.cosmetic = builder.cosmetic;
     this.icon = builder.icon;
@@ -60,8 +58,12 @@ public final class SlotTypeMessage {
     return this.size;
   }
 
+  /**
+   * @deprecated Check if {@link SlotTypeMessage#getSize()} returns 0 instead
+   */
+  @Deprecated
   public boolean isLocked() {
-    return this.locked;
+    return getSize() == 0;
   }
 
   public boolean isVisible() {
@@ -77,7 +79,6 @@ public final class SlotTypeMessage {
     private final String identifier;
     private Integer priority;
     private int size = 1;
-    private boolean locked = false;
     private boolean visible = true;
     private boolean cosmetic = false;
     private ResourceLocation icon = null;
@@ -101,8 +102,12 @@ public final class SlotTypeMessage {
       return this;
     }
 
+    /**
+     * @deprecated Lock slots by setting size to 0 using {@link SlotTypeMessage.Builder#size(int)}
+     */
+    @Deprecated
     public Builder lock() {
-      this.locked = true;
+      this.size = 0;
       return this;
     }
 

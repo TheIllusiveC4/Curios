@@ -498,7 +498,6 @@ public class CuriosEventHandler {
           }
         }
       }
-      handler.processSlots();
       handler.setEnchantmentBonuses(new Tuple<>(totalFortuneBonus, totalLootingBonus));
     });
   }
