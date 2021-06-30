@@ -20,15 +20,13 @@
 package top.theillusivec4.curios.common.capability;
 
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.ITextComponent;
@@ -105,13 +103,13 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public int getFortuneLevel(SlotContext slotContext) {
-    return this.curioItem.getFortuneLevel(slotContext, this.getStack());
+  public int getFortuneLevel(SlotContext slotContext, LootContext lootContext) {
+    return this.curioItem.getFortuneLevel(slotContext, lootContext, this.getStack());
   }
 
   @Override
-  public int getLootingLevel(SlotContext slotContext) {
-    return this.curioItem.getLootingLevel(slotContext, this.getStack());
+  public int getLootingLevel(SlotContext slotContext, DamageSource source) {
+    return this.curioItem.getLootingLevel(slotContext, source, this.getStack());
   }
 
   @Override

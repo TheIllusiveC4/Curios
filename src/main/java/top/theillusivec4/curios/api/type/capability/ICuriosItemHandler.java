@@ -25,7 +25,9 @@ import java.util.Optional;
 import java.util.Set;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Tuple;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
@@ -114,24 +116,6 @@ public interface ICuriosItemHandler {
    */
   void handleInvalidStacks();
 
-  /**
-   * Returns the total Fortune bonus of all equipped curios.
-   * Recalculated with each LivingUpdateEvent.
-   */
-  int getFortuneBonus();
-
-  /**
-   * Returns the total Looting bonus of all equipped curios.
-   * Recalculated with each LivingUpdateEvent.
-   */
-  int getLootingBonus();
-
-
-  /**
-   * Sets the total Fotrune and Looting bonuses of this handler and therefore it's bearer.
-   */
-  void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLooting);
-
   // =============== DEPRECATED =================
 
   /**
@@ -163,6 +147,33 @@ public interface ICuriosItemHandler {
    */
   @Deprecated
   default void processSlots() {
+    // NO-OP
+  }
+
+  /**
+   * @deprecated No longer used for fortune calculations, see {@link ICurio#getFortuneLevel(SlotContext, net.minecraft.loot.LootContext)}
+   */
+  @Deprecated
+  default int getFortuneBonus() {
+    return 0;
+  }
+
+  /**
+   * @deprecated No longer used for looting calculations, see {@link ICurio#getLootingLevel(SlotContext, DamageSource)}
+   */
+  @Deprecated
+  default int getLootingBonus() {
+    return 0;
+  }
+
+
+  /**
+   * @see ICurio#getLootingLevel(SlotContext, DamageSource)
+   * @see ICurio#getFortuneLevel(SlotContext, net.minecraft.loot.LootContext)
+   * @deprecated No longer used for fortune/looting calculations
+   */
+  @Deprecated
+  default void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLooting) {
     // NO-OP
   }
 }

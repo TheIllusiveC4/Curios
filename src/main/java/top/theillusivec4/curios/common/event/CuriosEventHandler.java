@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -39,6 +40,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
@@ -56,6 +58,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent.PickupXp;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -406,15 +409,55 @@ public class CuriosEventHandler {
   }
 
   @SubscribeEvent
-  public void looting(LootingLevelEvent event) {
-    if (event.getDamageSource() != null) {
-      if (event.getDamageSource().getTrueSource() instanceof LivingEntity) {
-        LivingEntity living = (LivingEntity) event.getDamageSource().getTrueSource();
+  public void looting(LootingLevelEvent evt) {
+    DamageSource source = evt.getDamageSource();
 
-        CuriosApi.getCuriosHelper().getCuriosHandler(living).ifPresent(
-            handler -> event.setLootingLevel(event.getLootingLevel() + handler.getLootingBonus()));
-      }
+    if (source != null && source.getTrueSource() instanceof LivingEntity) {
+      LivingEntity living = (LivingEntity) source.getTrueSource();
+      AtomicInteger lootingLevel = new AtomicInteger();
+      ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
+      curiosHelper.getCuriosHandler(living).ifPresent(handler -> {
+
+        for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
+          IDynamicStackHandler stacks = entry.getValue().getStacks();
+
+          for (int i = 0; i < stacks.getSlots(); i++) {
+            int index = i;
+            lootingLevel.addAndGet(curiosHelper.getCurio(stacks.getStackInSlot(i)).map(
+                curio -> curio
+                    .getLootingLevel(new SlotContext(entry.getKey(), living, index), source))
+                .orElse(0));
+          }
+        }
+      });
+      evt.setLootingLevel(evt.getLootingLevel() + lootingLevel.get());
     }
+  }
+
+  @SubscribeEvent(priority = EventPriority.HIGHEST)
+  public void onBreakBlock(BlockEvent.BreakEvent evt) {
+    PlayerEntity player = evt.getPlayer();
+    AtomicInteger fortuneLevel = new AtomicInteger();
+    ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
+    curiosHelper.getCuriosHandler(player).ifPresent(handler -> {
+
+      for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
+        IDynamicStackHandler stacks = entry.getValue().getStacks();
+
+        for (int i = 0; i < stacks.getSlots(); i++) {
+          int index = i;
+          fortuneLevel.addAndGet(curiosHelper.getCurio(stacks.getStackInSlot(i)).map(
+              curio -> curio.getFortuneLevel(new SlotContext(entry.getKey(), player, index), null))
+              .orElse(0));
+        }
+      }
+    });
+    int bonusLevel =
+        EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, player.getHeldItemMainhand());
+    int silklevel = EnchantmentHelper
+        .getEnchantmentLevel(Enchantments.SILK_TOUCH, player.getHeldItemMainhand());
+    evt.setExpToDrop(evt.getState()
+        .getExpDrop(evt.getWorld(), evt.getPos(), bonusLevel + fortuneLevel.get(), silklevel));
   }
 
   @SubscribeEvent
@@ -424,8 +467,6 @@ public class CuriosEventHandler {
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
       handler.handleInvalidStacks();
       Map<String, ICurioStacksHandler> curios = handler.getCurios();
-      int totalFortuneBonus = 0;
-      int totalLootingBonus = 0;
 
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
         ICurioStacksHandler stacksHandler = entry.getValue();
@@ -447,11 +488,6 @@ public class CuriosEventHandler {
             if (livingEntity.world.isRemote) {
               currentCurio.ifPresent(curio -> curio.curioAnimate(identifier, index, livingEntity));
             }
-
-            totalFortuneBonus +=
-                currentCurio.map(curio -> curio.getFortuneLevel(slotContext)).orElse(0);
-            totalLootingBonus +=
-                currentCurio.map(curio -> curio.getLootingLevel(slotContext)).orElse(0);
           }
 
           if (!livingEntity.world.isRemote) {
@@ -498,7 +534,6 @@ public class CuriosEventHandler {
           }
         }
       }
-      handler.setEnchantmentBonuses(new Tuple<>(totalFortuneBonus, totalLootingBonus));
     });
   }
 

@@ -29,6 +29,7 @@ import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
@@ -274,10 +275,11 @@ public interface ICurioItem {
    * Default implementation returns level of Fortune enchantment on ItemStack.
    *
    * @param slotContext Context about the slot that the ItemStack is in
+   * @param lootContext Context for the loot drops
    * @param stack       The ItemStack in question
    * @return Amount of additional Fortune levels that will be applied when mining
    */
-  default int getFortuneLevel(SlotContext slotContext, ItemStack stack) {
+  default int getFortuneLevel(SlotContext slotContext, LootContext lootContext, ItemStack stack) {
     return getFortuneBonus(slotContext.getIdentifier(), slotContext.getWearer(), stack,
         slotContext.getIndex());
   }
@@ -287,10 +289,11 @@ public interface ICurioItem {
    * Default implementation returns level of Looting enchantment on ItemStack.
    *
    * @param slotContext Context about the slot that the ItemStack is in
+   * @param source      Damage source that triggers the looting
    * @param stack       The ItemStack in question
    * @return Amount of additional Looting levels that will be applied in LootingLevelEvent
    */
-  default int getLootingLevel(SlotContext slotContext, ItemStack stack) {
+  default int getLootingLevel(SlotContext slotContext, DamageSource source, ItemStack stack) {
     return getLootingBonus(slotContext.getIdentifier(), slotContext.getWearer(), stack,
         slotContext.getIndex());
   }
@@ -440,7 +443,7 @@ public interface ICurioItem {
   }
 
   /**
-   * @deprecated See {@link ICurioItem#getFortuneLevel(SlotContext, ItemStack)}
+   * @deprecated See {@link ICurioItem#getFortuneLevel(SlotContext, LootContext, ItemStack)}
    */
   @Deprecated
   default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
@@ -449,7 +452,7 @@ public interface ICurioItem {
   }
 
   /**
-   * @deprecated See {@link ICurioItem#getLootingLevel(SlotContext, ItemStack)}
+   * @deprecated See {@link ICurioItem#getLootingLevel(SlotContext, DamageSource, ItemStack)}
    */
   @Deprecated
   default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,

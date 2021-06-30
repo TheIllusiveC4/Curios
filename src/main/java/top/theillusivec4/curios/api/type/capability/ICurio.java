@@ -21,24 +21,18 @@ package top.theillusivec4.curios.api.type.capability;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.LivingRenderer;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import javax.annotation.Nullable;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.particles.ItemParticleData;
 import net.minecraft.particles.ParticleTypes;
@@ -46,10 +40,8 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
 import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.type.ISlotType;
 
 public interface ICurio {
 
@@ -253,9 +245,10 @@ public interface ICurio {
    * Default implementation returns level of Fortune enchantment on ItemStack.
    *
    * @param slotContext Context about the slot that the ItemStack is in
+   * @param lootContext Context for the loot drops
    * @return Amount of additional Fortune levels that will be applied when mining
    */
-  default int getFortuneLevel(SlotContext slotContext) {
+  default int getFortuneLevel(SlotContext slotContext, @Nullable LootContext lootContext) {
     return getFortuneBonus(slotContext.getIdentifier(), slotContext.getWearer(), getStack(),
         slotContext.getIndex());
   }
@@ -265,13 +258,21 @@ public interface ICurio {
    * Default implementation returns level of Looting enchantment on ItemStack.
    *
    * @param slotContext Context about the slot that the ItemStack is in
+   * @param source      Damage source that triggers the looting
    * @return Amount of additional Looting levels that will be applied in LootingLevelEvent
    */
-  default int getLootingLevel(SlotContext slotContext) {
+  default int getLootingLevel(SlotContext slotContext, DamageSource source) {
     return getLootingBonus(slotContext.getIdentifier(), slotContext.getWearer(), getStack(),
         slotContext.getIndex());
   }
 
+  /**
+   * Whether or not the curio can make Piglins neutral.
+   * Default implementation delegates to {@link net.minecraftforge.common.extensions.IForgeItemStack#makesPiglinsNeutral(LivingEntity)}
+   *
+   * @param slotContext Context about the slot that the ItemStack is in
+   * @return True if the curio can make
+   */
   default boolean makesPiglinsNeutral(SlotContext slotContext) {
     return getStack().makesPiglinsNeutral(slotContext.getWearer());
   }
@@ -417,7 +418,7 @@ public interface ICurio {
   }
 
   /**
-   * @deprecated See {@link ICurio#getFortuneLevel(SlotContext)}
+   * @deprecated See {@link ICurio#getFortuneLevel(SlotContext, LootContext)}
    */
   @Deprecated
   default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
@@ -426,7 +427,7 @@ public interface ICurio {
   }
 
   /**
-   * @deprecated See {@link ICurio#getLootingLevel(SlotContext)}
+   * @deprecated See {@link ICurio#getLootingLevel(SlotContext, DamageSource)}
    */
   @Deprecated
   default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,

@@ -4,7 +4,9 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "curios.refmap.json",
   "mixins": [
-    "MixinPiglinTasks"
+    "MixinApplyBonus",
+    "MixinPiglinTasks",
+    "MixinShearsItem"
   ],
   "minVersion": "0.8"
 }
