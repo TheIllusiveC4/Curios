@@ -23,6 +23,7 @@ import com.google.common.collect.Multimap;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
@@ -108,8 +109,10 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public int getLootingLevel(SlotContext slotContext, DamageSource source) {
-    return this.curioItem.getLootingLevel(slotContext, source, this.getStack());
+  public int getLootingLevel(SlotContext slotContext, DamageSource source, LivingEntity target,
+                             int baseLooting) {
+    return this.curioItem
+        .getLootingLevel(slotContext, source, target, baseLooting, this.getStack());
   }
 
   @Override
@@ -142,10 +145,5 @@ public class ItemizedCurioCapability implements ICurio {
   @Override
   public SoundInfo getEquipSound(SlotContext slotContext) {
     return this.curioItem.getEquipSound(slotContext, this.getStack());
-  }
-
-  @Override
-  public boolean makesPiglinsNeutral(SlotContext slotContext) {
-    return this.curioItem.makesPiglinsNeutral(slotContext, this.getStack());
   }
 }

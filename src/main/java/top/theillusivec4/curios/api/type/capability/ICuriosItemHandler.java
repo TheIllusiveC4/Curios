@@ -23,8 +23,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Tuple;
 import top.theillusivec4.curios.api.SlotContext;
@@ -116,6 +118,16 @@ public interface ICuriosItemHandler {
    */
   void handleInvalidStacks();
 
+  /**
+   * Get the amount of Fortune levels that are provided by curios.
+   */
+  int getFortuneLevel(@Nullable LootContext lootContext);
+
+  /**
+   * Get the amount of Looting levels that are provided by curios.
+   */
+  int getLootingLevel(DamageSource source, LivingEntity target, int baseLooting);
+
   // =============== DEPRECATED =================
 
   /**
@@ -151,7 +163,7 @@ public interface ICuriosItemHandler {
   }
 
   /**
-   * @deprecated No longer used for fortune calculations, see {@link ICurio#getFortuneLevel(SlotContext, net.minecraft.loot.LootContext)}
+   * @deprecated No longer used for fortune calculations, see {@link ICuriosItemHandler#getFortuneLevel(LootContext)}
    */
   @Deprecated
   default int getFortuneBonus() {
@@ -159,7 +171,7 @@ public interface ICuriosItemHandler {
   }
 
   /**
-   * @deprecated No longer used for looting calculations, see {@link ICurio#getLootingLevel(SlotContext, DamageSource)}
+   * @deprecated No longer used for looting calculations, see {@link ICuriosItemHandler#getLootingLevel(DamageSource, LivingEntity, int)}
    */
   @Deprecated
   default int getLootingBonus() {
@@ -168,8 +180,8 @@ public interface ICuriosItemHandler {
 
 
   /**
-   * @see ICurio#getLootingLevel(SlotContext, DamageSource)
-   * @see ICurio#getFortuneLevel(SlotContext, net.minecraft.loot.LootContext)
+   * @see ICuriosItemHandler#getLootingLevel(DamageSource, LivingEntity, int)
+   * @see ICuriosItemHandler#getFortuneLevel(LootContext)
    * @deprecated No longer used for fortune/looting calculations
    */
   @Deprecated

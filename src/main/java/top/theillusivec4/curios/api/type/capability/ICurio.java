@@ -259,22 +259,13 @@ public interface ICurio {
    *
    * @param slotContext Context about the slot that the ItemStack is in
    * @param source      Damage source that triggers the looting
+   * @param target      The target that drops the loot
+   * @param baseLooting The original looting level before bonuses
    * @return Amount of additional Looting levels that will be applied in LootingLevelEvent
    */
-  default int getLootingLevel(SlotContext slotContext, DamageSource source) {
+  default int getLootingLevel(SlotContext slotContext, DamageSource source, LivingEntity target, int baseLooting) {
     return getLootingBonus(slotContext.getIdentifier(), slotContext.getWearer(), getStack(),
         slotContext.getIndex());
-  }
-
-  /**
-   * Whether or not the curio can make Piglins neutral.
-   * Default implementation delegates to {@link net.minecraftforge.common.extensions.IForgeItemStack#makesPiglinsNeutral(LivingEntity)}
-   *
-   * @param slotContext Context about the slot that the ItemStack is in
-   * @return True if the curio can make
-   */
-  default boolean makesPiglinsNeutral(SlotContext slotContext) {
-    return getStack().makesPiglinsNeutral(slotContext.getWearer());
   }
 
   /**
@@ -427,7 +418,7 @@ public interface ICurio {
   }
 
   /**
-   * @deprecated See {@link ICurio#getLootingLevel(SlotContext, DamageSource)}
+   * @deprecated See {@link ICurio#getLootingLevel(SlotContext, DamageSource, LivingEntity, int)}
    */
   @Deprecated
   default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,

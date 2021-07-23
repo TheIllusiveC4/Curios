@@ -1,4 +1,4 @@
-package top.theillusivec4.curios.common.triggers;
+package top.theillusivec4.curios.common.util;
 
 import com.google.gson.JsonObject;
 import javax.annotation.Nonnull;

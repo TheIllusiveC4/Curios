@@ -73,7 +73,7 @@ import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.slottype.SlotTypeManager;
-import top.theillusivec4.curios.common.triggers.EquipCurioTrigger;
+import top.theillusivec4.curios.common.util.EquipCurioTrigger;
 import top.theillusivec4.curios.server.SlotHelper;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;

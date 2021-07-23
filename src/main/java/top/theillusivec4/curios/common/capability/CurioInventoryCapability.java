@@ -33,9 +33,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.Tuple;
@@ -283,6 +285,39 @@ public class CurioInventoryCapability {
       }
     }
 
+    @Override
+    public int getFortuneLevel(@Nullable LootContext lootContext) {
+      int fortuneLevel = 0;
+      for (Map.Entry<String, ICurioStacksHandler> entry : getCurios().entrySet()) {
+        IDynamicStackHandler stacks = entry.getValue().getStacks();
+
+        for (int i = 0; i < stacks.getSlots(); i++) {
+          final int index = i;
+          fortuneLevel += CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(
+              curio -> curio.getFortuneLevel(new SlotContext(entry.getKey(), this.wearer, index),
+                  lootContext)).orElse(0);
+        }
+      }
+      return fortuneLevel;
+    }
+
+    @Override
+    public int getLootingLevel(DamageSource source, LivingEntity target, int baseLooting) {
+      int lootingLevel = 0;
+      for (Map.Entry<String, ICurioStacksHandler> entry : getCurios().entrySet()) {
+        IDynamicStackHandler stacks = entry.getValue().getStacks();
+
+        for (int i = 0; i < stacks.getSlots(); i++) {
+          int index = i;
+          lootingLevel += CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(
+              curio -> curio
+                  .getLootingLevel(new SlotContext(entry.getKey(), this.wearer, index), source,
+                      target, baseLooting)).orElse(0);
+        }
+      }
+      return lootingLevel;
+    }
+
     private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
 
       if (this.wearer != null && !this.wearer.getEntityWorld().isRemote()) {
@@ -305,22 +340,6 @@ public class CurioInventoryCapability {
         drops.forEach(drop -> ItemHandlerHelper.giveItemToPlayer(this.wearer, drop));
       }
     }
-
-    @Override
-    public int getFortuneBonus() {
-      return this.fortuneAndLooting.getA();
-    }
-
-    @Override
-    public int getLootingBonus() {
-      return this.fortuneAndLooting.getB();
-    }
-
-    @Override
-    public void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLootingIn) {
-      this.fortuneAndLooting = fortuneAndLootingIn;
-    }
-
   }
 
   public static class Provider implements ICapabilitySerializable<INBT> {

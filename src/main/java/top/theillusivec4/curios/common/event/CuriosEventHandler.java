@@ -85,7 +85,7 @@ import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
-import top.theillusivec4.curios.common.triggers.EquipCurioTrigger;
+import top.theillusivec4.curios.common.util.EquipCurioTrigger;
 
 public class CuriosEventHandler {
 
@@ -414,23 +414,9 @@ public class CuriosEventHandler {
 
     if (source != null && source.getTrueSource() instanceof LivingEntity) {
       LivingEntity living = (LivingEntity) source.getTrueSource();
-      AtomicInteger lootingLevel = new AtomicInteger();
-      ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
-      curiosHelper.getCuriosHandler(living).ifPresent(handler -> {
-
-        for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
-          IDynamicStackHandler stacks = entry.getValue().getStacks();
-
-          for (int i = 0; i < stacks.getSlots(); i++) {
-            int index = i;
-            lootingLevel.addAndGet(curiosHelper.getCurio(stacks.getStackInSlot(i)).map(
-                curio -> curio
-                    .getLootingLevel(new SlotContext(entry.getKey(), living, index), source))
-                .orElse(0));
-          }
-        }
-      });
-      evt.setLootingLevel(evt.getLootingLevel() + lootingLevel.get());
+      evt.setLootingLevel(evt.getLootingLevel() +
+          CuriosApi.getCuriosHelper().getCuriosHandler(living).map(handler -> handler
+              .getLootingLevel(source, evt.getEntityLiving(), evt.getLootingLevel())).orElse(0));
     }
   }
 

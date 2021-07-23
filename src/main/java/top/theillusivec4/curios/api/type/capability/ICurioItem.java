@@ -290,10 +290,13 @@ public interface ICurioItem {
    *
    * @param slotContext Context about the slot that the ItemStack is in
    * @param source      Damage source that triggers the looting
+   * @param target      The target that drops the loot
+   * @param baseLooting The original looting level before bonuses
    * @param stack       The ItemStack in question
    * @return Amount of additional Looting levels that will be applied in LootingLevelEvent
    */
-  default int getLootingLevel(SlotContext slotContext, DamageSource source, ItemStack stack) {
+  default int getLootingLevel(SlotContext slotContext, DamageSource source, LivingEntity target,
+                              int baseLooting, ItemStack stack) {
     return getLootingBonus(slotContext.getIdentifier(), slotContext.getWearer(), stack,
         slotContext.getIndex());
   }
@@ -452,7 +455,7 @@ public interface ICurioItem {
   }
 
   /**
-   * @deprecated See {@link ICurioItem#getLootingLevel(SlotContext, DamageSource, ItemStack)}
+   * @deprecated See {@link ICurioItem#getLootingLevel(SlotContext, DamageSource, LivingEntity, int, ItemStack)}
    */
   @Deprecated
   default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
