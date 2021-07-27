@@ -51,7 +51,7 @@ public class CuriosTest {
   public CuriosTest() {
     final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::enqueue);
-    eventBus.addListener(this::registerRenderers);
+    eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::registerLayers);
   }
 
@@ -61,11 +61,11 @@ public class CuriosTest {
             .map(preset -> preset.getMessageBuilder().build()).collect(Collectors.toList()));
   }
 
-  private void registerRenderers(final EntityRenderersEvent.AddLayers evt) {
+  private void clientSetup(final FMLClientSetupEvent evt) {
     CuriosRendererRegistry
-        .register(CuriosTestRegistry.AMULET, (AmuletItem) CuriosTestRegistry.AMULET);
-    CuriosRendererRegistry.register(CuriosTestRegistry.CROWN, new CrownRenderer<>());
-    CuriosRendererRegistry.register(CuriosTestRegistry.KNUCKLES, new KnucklesRenderer());
+        .register(CuriosTestRegistry.AMULET, () -> (AmuletItem) CuriosTestRegistry.AMULET);
+    CuriosRendererRegistry.register(CuriosTestRegistry.CROWN, CrownRenderer::new);
+    CuriosRendererRegistry.register(CuriosTestRegistry.KNUCKLES, KnucklesRenderer::new);
   }
 
   private void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions evt) {

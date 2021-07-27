@@ -196,6 +196,7 @@ public class Curios {
     public static void addLayers(EntityRenderersEvent.AddLayers evt) {
       addPlayerLayer(evt, "default");
       addPlayerLayer(evt, "slim");
+      CuriosRendererRegistry.load();
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
