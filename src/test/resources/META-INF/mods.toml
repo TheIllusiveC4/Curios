@@ -1,23 +1,23 @@
 modLoader="javafml"
-loaderVersion="[34,)"
+loaderVersion="[37,)"
 license="LGPL-3.0-or-later"
 [[mods]]
-modId="curios-test"
+modId="curiostest"
 version="1"
 displayName="Curios Test Mod"
 authors="C4"
 description='''
 A test mod for Curios
 '''
-[[dependencies.curios-test]]
+[[dependencies.curiostest]]
     modId="forge"
     mandatory=true
-    versionRange="[34,)"
+    versionRange="[37,)"
     ordering="NONE"
     side="BOTH"
-[[dependencies.curios-test]]
+[[dependencies.curiostest]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.3,1.17)"
+    versionRange="[1.17.1,1.18)"
     ordering="NONE"
     side="BOTH"

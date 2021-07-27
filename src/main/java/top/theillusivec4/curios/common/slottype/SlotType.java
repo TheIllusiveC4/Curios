@@ -20,7 +20,7 @@
 package top.theillusivec4.curios.common.slottype;
 
 import java.util.Objects;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
 

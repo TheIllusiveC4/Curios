@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 

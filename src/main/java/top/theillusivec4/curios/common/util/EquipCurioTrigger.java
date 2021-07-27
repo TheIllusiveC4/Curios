@@ -2,16 +2,16 @@ package top.theillusivec4.curios.common.util;
 
 import com.google.gson.JsonObject;
 import javax.annotation.Nonnull;
-import net.minecraft.advancements.criterion.AbstractCriterionTrigger;
-import net.minecraft.advancements.criterion.CriterionInstance;
-import net.minecraft.advancements.criterion.EntityPredicate;
-import net.minecraft.advancements.criterion.ItemPredicate;
-import net.minecraft.advancements.criterion.LocationPredicate;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.ConditionArrayParser;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
+import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
+import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.critereon.LocationPredicate;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.advancements.critereon.DeserializationContext;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import top.theillusivec4.curios.Curios;
 
 /**
@@ -22,7 +22,7 @@ import top.theillusivec4.curios.Curios;
  * Current implementation allows to perform item and location tests in criteria.
  */
 
-public class EquipCurioTrigger extends AbstractCriterionTrigger<EquipCurioTrigger.Instance> {
+public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.Instance> {
 
   public static final ResourceLocation ID = new ResourceLocation(Curios.MODID, "equip_curio");
   public static final EquipCurioTrigger INSTANCE = new EquipCurioTrigger();
@@ -38,25 +38,25 @@ public class EquipCurioTrigger extends AbstractCriterionTrigger<EquipCurioTrigge
 
   @Nonnull
   @Override
-  public EquipCurioTrigger.Instance deserializeTrigger(@Nonnull JsonObject json,
+  public EquipCurioTrigger.Instance createInstance(@Nonnull JsonObject json,
                                                        @Nonnull
-                                                           EntityPredicate.AndPredicate playerPred,
-                                                       @Nonnull ConditionArrayParser conditions) {
-    return new EquipCurioTrigger.Instance(playerPred, ItemPredicate.deserialize(json.get("item")),
-        LocationPredicate.deserialize(json.get("location")));
+                                                           EntityPredicate.Composite playerPred,
+                                                       @Nonnull DeserializationContext conditions) {
+    return new EquipCurioTrigger.Instance(playerPred, ItemPredicate.fromJson(json.get("item")),
+        LocationPredicate.fromJson(json.get("location")));
   }
 
-  public void trigger(ServerPlayerEntity player, ItemStack stack, ServerWorld world, double x,
+  public void trigger(ServerPlayer player, ItemStack stack, ServerLevel world, double x,
                       double y, double z) {
-    this.triggerListeners(player, instance -> instance.test(stack, world, x, y, z));
+    this.trigger(player, instance -> instance.test(stack, world, x, y, z));
   }
 
-  static class Instance extends CriterionInstance {
+  static class Instance extends AbstractCriterionTriggerInstance {
 
     private final ItemPredicate item;
     private final LocationPredicate location;
 
-    Instance(EntityPredicate.AndPredicate playerPred, ItemPredicate count,
+    Instance(EntityPredicate.Composite playerPred, ItemPredicate count,
              LocationPredicate indexPos) {
       super(ID, playerPred);
       this.item = count;
@@ -65,12 +65,12 @@ public class EquipCurioTrigger extends AbstractCriterionTrigger<EquipCurioTrigge
 
     @Nonnull
     @Override
-    public ResourceLocation getId() {
+    public ResourceLocation getCriterion() {
       return ID;
     }
 
-    boolean test(ItemStack stack, ServerWorld world, double x, double y, double z) {
-      return this.item.test(stack) && this.location.test(world, x, y, z);
+    boolean test(ItemStack stack, ServerLevel world, double x, double y, double z) {
+      return this.item.matches(stack) && this.location.matches(world, x, y, z);
     }
   }
 }

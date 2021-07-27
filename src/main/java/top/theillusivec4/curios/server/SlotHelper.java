@@ -28,9 +28,9 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.annotation.Nonnull;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -100,10 +100,10 @@ public class SlotHelper implements ISlotHelper {
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
       handler.growSlotType(id, amount);
 
-      if (livingEntity instanceof ServerPlayerEntity) {
+      if (livingEntity instanceof ServerPlayer) {
         NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) livingEntity),
-                new SPacketSyncOperation(livingEntity.getEntityId(), id, Operation.GROW, amount));
+            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) livingEntity),
+                new SPacketSyncOperation(livingEntity.getId(), id, Operation.GROW, amount));
       }
     });
   }
@@ -119,10 +119,10 @@ public class SlotHelper implements ISlotHelper {
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
       handler.shrinkSlotType(id, amount);
 
-      if (livingEntity instanceof ServerPlayerEntity) {
+      if (livingEntity instanceof ServerPlayer) {
         NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) livingEntity),
-                new SPacketSyncOperation(livingEntity.getEntityId(), id, Operation.SHRINK, amount));
+            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) livingEntity),
+                new SPacketSyncOperation(livingEntity.getId(), id, Operation.SHRINK, amount));
       }
     });
   }

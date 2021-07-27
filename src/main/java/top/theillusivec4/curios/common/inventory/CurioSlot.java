@@ -20,13 +20,13 @@
 package top.theillusivec4.curios.common.inventory;
 
 import javax.annotation.Nonnull;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.SlotItemHandler;
@@ -38,20 +38,20 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 public class CurioSlot extends SlotItemHandler {
 
   private final String identifier;
-  private final PlayerEntity player;
+  private final Player player;
   private final SlotContext slotContext;
 
   private NonNullList<Boolean> renderStatuses;
 
-  public CurioSlot(PlayerEntity player, IDynamicStackHandler handler, int index, String identifier,
+  public CurioSlot(Player player, IDynamicStackHandler handler, int index, String identifier,
                    int xPosition, int yPosition, NonNullList<Boolean> renders) {
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;
     this.renderStatuses = renders;
     this.player = player;
     this.slotContext = new SlotContext(identifier, player, index);
-    this.setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
-        player.getEntityWorld().isRemote() ? CuriosApi.getIconHelper().getIcon(identifier)
+    this.setBackground(InventoryMenu.BLOCK_ATLAS,
+        player.getCommandSenderWorld().isClientSide() ? CuriosApi.getIconHelper().getIcon(identifier)
             : new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
   }
 
@@ -65,22 +65,22 @@ public class CurioSlot extends SlotItemHandler {
 
   @OnlyIn(Dist.CLIENT)
   public String getSlotName() {
-    return I18n.format("curios.identifier." + this.identifier);
+    return I18n.get("curios.identifier." + this.identifier);
   }
 
   @Override
-  public boolean isItemValid(@Nonnull ItemStack stack) {
+  public boolean mayPlace(@Nonnull ItemStack stack) {
     return CuriosApi.getCuriosHelper().isStackValid(slotContext, stack) &&
         CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(slotContext))
-            .orElse(true) && super.isItemValid(stack);
+            .orElse(true) && super.mayPlace(stack);
   }
 
   @Override
-  public boolean canTakeStack(PlayerEntity playerIn) {
-    ItemStack stack = this.getStack();
+  public boolean mayPickup(Player playerIn) {
+    ItemStack stack = this.getItem();
     return
         (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) &&
             CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio.canUnequip(slotContext))
-                .orElse(true) && super.canTakeStack(playerIn);
+                .orElse(true) && super.mayPickup(playerIn);
   }
 }

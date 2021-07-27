@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.client;
 
-import static net.minecraft.item.ItemStack.DECIMALFORMAT;
+import static net.minecraft.world.item.ItemStack.ATTRIBUTE_MODIFIER_FORMAT;
 
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
@@ -27,26 +27,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -69,7 +69,7 @@ public class ClientEventHandler {
 
     Minecraft mc = Minecraft.getInstance();
 
-    if (KeyRegistry.openCurios.isPressed() && mc.isGameFocused()) {
+    if (KeyRegistry.openCurios.consumeClick() && mc.isWindowActive()) {
       NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios());
     }
   }
@@ -77,11 +77,11 @@ public class ClientEventHandler {
   @SubscribeEvent
   public void onTooltip(ItemTooltipEvent evt) {
     ItemStack stack = evt.getItemStack();
-    PlayerEntity player = evt.getPlayer();
+    Player player = evt.getPlayer();
 
     if (!stack.isEmpty()) {
-      List<ITextComponent> tooltip = evt.getToolTip();
-      CompoundNBT tag = stack.getTag();
+      List<Component> tooltip = evt.getToolTip();
+      CompoundTag tag = stack.getTag();
       int i = 0;
 
       if (tag != null && tag.contains("HideFlags", 99)) {
@@ -92,26 +92,26 @@ public class ClientEventHandler {
       List<String> slots = new ArrayList<>(curioTags);
 
       if (!slots.isEmpty()) {
-        List<ITextComponent> tagTooltips = new ArrayList<>();
-        IFormattableTextComponent slotsTooltip = new TranslationTextComponent("curios.slot")
-            .appendString(": ").mergeStyle(TextFormatting.GOLD);
+        List<Component> tagTooltips = new ArrayList<>();
+        MutableComponent slotsTooltip = new TranslatableComponent("curios.slot")
+            .append(": ").withStyle(ChatFormatting.GOLD);
 
         for (int j = 0; j < slots.size(); j++) {
           String key = "curios.identifier." + slots.get(j);
-          IFormattableTextComponent type = new TranslationTextComponent(key);
+          MutableComponent type = new TranslatableComponent(key);
 
           if (j < slots.size() - 1) {
-            type = type.appendString(", ");
+            type = type.append(", ");
           }
 
-          type = type.mergeStyle(TextFormatting.YELLOW);
-          slotsTooltip.appendSibling(type);
+          type = type.withStyle(ChatFormatting.YELLOW);
+          slotsTooltip.append(type);
         }
         tagTooltips.add(slotsTooltip);
 
         LazyOptional<ICurio> optionalCurio = CuriosApi.getCuriosHelper().getCurio(stack);
         optionalCurio.ifPresent(curio -> {
-          List<ITextComponent> actualSlotsTooltip = curio.getSlotsTooltip(tagTooltips);
+          List<Component> actualSlotsTooltip = curio.getSlotsTooltip(tagTooltips);
 
           if (!actualSlotsTooltip.isEmpty()) {
             tooltip.addAll(1, actualSlotsTooltip);
@@ -121,16 +121,16 @@ public class ClientEventHandler {
         if (!optionalCurio.isPresent()) {
           tooltip.addAll(1, tagTooltips);
         }
-        List<ITextComponent> attributeTooltip = new ArrayList<>();
+        List<Component> attributeTooltip = new ArrayList<>();
 
         for (String identifier : slots) {
           Multimap<Attribute, AttributeModifier> multimap = CuriosApi.getCuriosHelper()
               .getAttributeModifiers(new SlotContext(identifier, player), UUID.randomUUID(), stack);
 
           if (!multimap.isEmpty() && (i & 2) == 0) {
-            attributeTooltip.add(StringTextComponent.EMPTY);
-            attributeTooltip.add(new TranslationTextComponent("curios.modifiers." + identifier)
-                .mergeStyle(TextFormatting.GOLD));
+            attributeTooltip.add(TextComponent.EMPTY);
+            attributeTooltip.add(new TranslatableComponent("curios.modifiers." + identifier)
+                .withStyle(ChatFormatting.GOLD));
 
             for (Map.Entry<Attribute, AttributeModifier> entry : multimap.entries()) {
               AttributeModifier attributemodifier = entry.getValue();
@@ -139,17 +139,17 @@ public class ClientEventHandler {
 
               if (player != null) {
 
-                if (attributemodifier.getID() == ATTACK_DAMAGE_MODIFIER) {
-                  ModifiableAttributeInstance att = player.getAttribute(Attributes.ATTACK_DAMAGE);
+                if (attributemodifier.getId() == ATTACK_DAMAGE_MODIFIER) {
+                  AttributeInstance att = player.getAttribute(Attributes.ATTACK_DAMAGE);
 
                   if (att != null) {
                     amount = amount + att.getBaseValue();
                   }
                   amount = amount + EnchantmentHelper
-                      .getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
+                      .getDamageBonus(stack, MobType.UNDEFINED);
                   flag = true;
-                } else if (attributemodifier.getID() == ATTACK_SPEED_MODIFIER) {
-                  ModifiableAttributeInstance att = player.getAttribute(Attributes.ATTACK_SPEED);
+                } else if (attributemodifier.getId() == ATTACK_SPEED_MODIFIER) {
+                  AttributeInstance att = player.getAttribute(Attributes.ATTACK_SPEED);
 
                   if (att != null) {
                     amount += att.getBaseValue();
@@ -169,31 +169,31 @@ public class ClientEventHandler {
 
                 if (flag) {
                   attributeTooltip.add(
-                      (new StringTextComponent(" ")).appendSibling(new TranslationTextComponent(
-                          "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
-                          DECIMALFORMAT.format(d1),
-                          new TranslationTextComponent(entry.getKey().getAttributeName())))
-                          .mergeStyle(TextFormatting.DARK_GREEN));
+                      (new TextComponent(" ")).append(new TranslatableComponent(
+                          "attribute.modifier.equals." + attributemodifier.getOperation().toValue(),
+                          ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                          new TranslatableComponent(entry.getKey().getDescriptionId())))
+                          .withStyle(ChatFormatting.DARK_GREEN));
                 } else if (amount > 0.0D) {
-                  attributeTooltip.add((new TranslationTextComponent(
-                      "attribute.modifier.plus." + attributemodifier.getOperation().getId(),
-                      DECIMALFORMAT.format(d1),
-                      new TranslationTextComponent(entry.getKey().getAttributeName())))
-                      .mergeStyle(TextFormatting.BLUE));
+                  attributeTooltip.add((new TranslatableComponent(
+                      "attribute.modifier.plus." + attributemodifier.getOperation().toValue(),
+                      ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                      new TranslatableComponent(entry.getKey().getDescriptionId())))
+                      .withStyle(ChatFormatting.BLUE));
                 } else if (amount < 0.0D) {
                   d1 = d1 * -1.0D;
-                  attributeTooltip.add((new TranslationTextComponent(
-                      "attribute.modifier.take." + attributemodifier.getOperation().getId(),
-                      DECIMALFORMAT.format(d1),
-                      new TranslationTextComponent(entry.getKey().getAttributeName())))
-                      .mergeStyle(TextFormatting.RED));
+                  attributeTooltip.add((new TranslatableComponent(
+                      "attribute.modifier.take." + attributemodifier.getOperation().toValue(),
+                      ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                      new TranslatableComponent(entry.getKey().getDescriptionId())))
+                      .withStyle(ChatFormatting.RED));
                 }
               }
             }
           }
         }
         optionalCurio.ifPresent(curio -> {
-          List<ITextComponent> actualAttributeTooltips =
+          List<Component> actualAttributeTooltips =
               curio.getAttributesTooltip(attributeTooltip);
 
           if (!actualAttributeTooltips.isEmpty()) {

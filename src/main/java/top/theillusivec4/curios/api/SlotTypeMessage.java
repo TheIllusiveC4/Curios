@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.api;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public final class SlotTypeMessage {
 

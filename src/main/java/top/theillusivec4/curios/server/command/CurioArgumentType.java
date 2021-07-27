@@ -31,9 +31,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class CurioArgumentType implements ArgumentType<String> {
 
@@ -41,20 +41,20 @@ public class CurioArgumentType implements ArgumentType<String> {
 
   private static final Collection<String> EXAMPLES = Arrays.asList("ring", "head");
   private static final DynamicCommandExceptionType UNKNOWN_TYPE = new DynamicCommandExceptionType(
-      type -> new TranslationTextComponent("argument.curios.type.unknown", type));
+      type -> new TranslatableComponent("argument.curios.type.unknown", type));
 
   public static CurioArgumentType slot() {
     return new CurioArgumentType();
   }
 
-  public static String getSlot(CommandContext<CommandSource> context, String name) {
+  public static String getSlot(CommandContext<CommandSourceStack> context, String name) {
     return context.getArgument(name, String.class);
   }
 
   @Override
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                             SuggestionsBuilder builder) {
-    return ISuggestionProvider.suggest(slotIds, builder);
+    return SharedSuggestionProvider.suggest(slotIds, builder);
   }
 
   @Override

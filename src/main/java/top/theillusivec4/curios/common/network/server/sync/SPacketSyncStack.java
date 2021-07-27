@@ -21,13 +21,13 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 
@@ -38,10 +38,10 @@ public class SPacketSyncStack {
   private String curioId;
   private ItemStack stack;
   private int handlerType;
-  private CompoundNBT compound;
+  private CompoundTag compound;
 
   public SPacketSyncStack(int entityId, String curioId, int slotId, ItemStack stack,
-                          HandlerType handlerType, CompoundNBT data) {
+                          HandlerType handlerType, CompoundTag data) {
     this.entityId = entityId;
     this.slotId = slotId;
     this.stack = stack.copy();
@@ -50,32 +50,32 @@ public class SPacketSyncStack {
     this.compound = data;
   }
 
-  public static void encode(SPacketSyncStack msg, PacketBuffer buf) {
+  public static void encode(SPacketSyncStack msg, FriendlyByteBuf buf) {
     buf.writeInt(msg.entityId);
-    buf.writeString(msg.curioId);
+    buf.writeUtf(msg.curioId);
     buf.writeInt(msg.slotId);
-    buf.writeItemStack(msg.stack);
+    buf.writeItem(msg.stack);
     buf.writeInt(msg.handlerType);
-    buf.writeCompoundTag(msg.compound);
+    buf.writeNbt(msg.compound);
   }
 
-  public static SPacketSyncStack decode(PacketBuffer buf) {
-    return new SPacketSyncStack(buf.readInt(), buf.readString(25), buf.readInt(),
-        buf.readItemStack(), HandlerType.fromValue(buf.readInt()), buf.readCompoundTag());
+  public static SPacketSyncStack decode(FriendlyByteBuf buf) {
+    return new SPacketSyncStack(buf.readInt(), buf.readUtf(25), buf.readInt(),
+        buf.readItem(), HandlerType.fromValue(buf.readInt()), buf.readNbt());
   }
 
   public static void handle(SPacketSyncStack msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      ClientWorld world = Minecraft.getInstance().world;
+      ClientLevel world = Minecraft.getInstance().level;
 
       if (world != null) {
-        Entity entity = world.getEntityByID(msg.entityId);
+        Entity entity = world.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity) {
           CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity).ifPresent(
               handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacksHandler -> {
                 ItemStack stack = msg.stack;
-                CompoundNBT compoundNBT = msg.compound;
+                CompoundTag compoundNBT = msg.compound;
                 int slot = msg.slotId;
 
                 if (!compoundNBT.isEmpty()) {

@@ -24,12 +24,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.util.DamageSource;
+import net.minecraft.nbt.Tag;
 import net.minecraft.util.Tuple;
-import top.theillusivec4.curios.api.SlotContext;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
@@ -127,6 +127,16 @@ public interface ICuriosItemHandler {
    * Get the amount of Looting levels that are provided by curios.
    */
   int getLootingLevel(DamageSource source, LivingEntity target, int baseLooting);
+
+  /**
+   * Serializes the curios inventory data
+   */
+  Tag writeTag();
+
+  /**
+   * Deserializes the curios inventory data
+   */
+  void readTag(Tag tag);
 
   // =============== DEPRECATED =================
 

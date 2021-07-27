@@ -23,14 +23,13 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -40,12 +39,11 @@ import top.theillusivec4.curiostest.CuriosTest;
 public class KnucklesItem extends Item {
 
   public KnucklesItem() {
-    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1));
-    this.setRegistryName(CuriosTest.MODID, "knuckles");
+    super(new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1));
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
+  public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag unused) {
     return CurioItemCapability.createProvider(new ICurio() {
 
       @Override
@@ -66,7 +64,7 @@ public class KnucklesItem extends Item {
   }
 
   @Override
-  public boolean hasEffect(@Nonnull ItemStack stack) {
+  public boolean isFoil(@Nonnull ItemStack stack) {
     return true;
   }
 }

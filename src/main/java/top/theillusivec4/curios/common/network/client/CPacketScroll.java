@@ -20,10 +20,10 @@
 package top.theillusivec4.curios.common.network.client;
 
 import java.util.function.Supplier;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 public class CPacketScroll {
@@ -36,23 +36,23 @@ public class CPacketScroll {
     this.index = index;
   }
 
-  public static void encode(CPacketScroll msg, PacketBuffer buf) {
+  public static void encode(CPacketScroll msg, FriendlyByteBuf buf) {
     buf.writeInt(msg.windowId);
     buf.writeInt(msg.index);
   }
 
-  public static CPacketScroll decode(PacketBuffer buf) {
+  public static CPacketScroll decode(FriendlyByteBuf buf) {
     return new CPacketScroll(buf.readInt(), buf.readInt());
   }
 
   public static void handle(CPacketScroll msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      ServerPlayerEntity sender = ctx.get().getSender();
+      ServerPlayer sender = ctx.get().getSender();
 
       if (sender != null) {
-        Container container = sender.openContainer;
+        AbstractContainerMenu container = sender.containerMenu;
 
-        if (container instanceof CuriosContainer && container.windowId == msg.windowId) {
+        if (container instanceof CuriosContainer && container.containerId == msg.windowId) {
           ((CuriosContainer) container).scrollToIndex(msg.index);
         }
       }

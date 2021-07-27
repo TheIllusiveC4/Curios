@@ -20,8 +20,8 @@
 package top.theillusivec4.curios.common.inventory;
 
 import javax.annotation.Nonnull;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.NonNullList;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 

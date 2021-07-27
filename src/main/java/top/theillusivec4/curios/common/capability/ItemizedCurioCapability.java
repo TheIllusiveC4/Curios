@@ -23,17 +23,20 @@ import com.google.common.collect.Multimap;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.network.chat.Component;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
+
+import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
+import top.theillusivec4.curios.api.type.capability.ICurio.SoundInfo;
 
 public class ItemizedCurioCapability implements ICurio {
   private final ItemStack stack;
@@ -65,7 +68,7 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public List<ITextComponent> getSlotsTooltip(List<ITextComponent> tooltips) {
+  public List<Component> getSlotsTooltip(List<Component> tooltips) {
     return this.curioItem.getSlotsTooltip(tooltips, this.getStack());
   }
 
@@ -81,12 +84,12 @@ public class ItemizedCurioCapability implements ICurio {
 
   @Nonnull
   @Override
-  public CompoundNBT writeSyncData(SlotContext slotContext) {
+  public CompoundTag writeSyncData(SlotContext slotContext) {
     return this.curioItem.writeSyncData(slotContext, this.getStack());
   }
 
   @Override
-  public void readSyncData(SlotContext slotContext, CompoundNBT compound) {
+  public void readSyncData(SlotContext slotContext, CompoundTag compound) {
     this.curioItem.readSyncData(slotContext, compound, this.getStack());
   }
 
@@ -99,7 +102,7 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public List<ITextComponent> getAttributesTooltip(List<ITextComponent> tooltips) {
+  public List<Component> getAttributesTooltip(List<Component> tooltips) {
     return this.curioItem.getAttributesTooltip(tooltips, this.getStack());
   }
 

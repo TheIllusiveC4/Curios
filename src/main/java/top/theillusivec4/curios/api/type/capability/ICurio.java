@@ -26,21 +26,21 @@ import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.ItemParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
 import top.theillusivec4.curios.api.SlotContext;
 
 public interface ICurio {
@@ -108,10 +108,10 @@ public interface ICurio {
    * If overriding, make sure the user has some indication which slots are associated with the
    * curio.
    *
-   * @param tooltips A list of {@link ITextComponent} with every slot valid for this curio
+   * @param tooltips A list of {@link Component} with every slot valid for this curio
    * @return A list of ITextComponent to display as curio slot information
    */
-  default List<ITextComponent> getSlotsTooltip(List<ITextComponent> tooltips) {
+  default List<Component> getSlotsTooltip(List<Component> tooltips) {
     return getTagsTooltip(tooltips);
   }
 
@@ -153,7 +153,7 @@ public interface ICurio {
    */
   @Nonnull
   default SoundInfo getEquipSound(SlotContext slotContext) {
-    return new SoundInfo(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 1.0f, 1.0f);
+    return new SoundInfo(SoundEvents.ARMOR_EQUIP_GENERIC, 1.0f, 1.0f);
   }
 
   /**
@@ -197,7 +197,7 @@ public interface ICurio {
    * @return Data to be sent to the client
    */
   @Nonnull
-  default CompoundNBT writeSyncData(SlotContext slotContext) {
+  default CompoundTag writeSyncData(SlotContext slotContext) {
     return writeSyncData();
   }
 
@@ -208,7 +208,7 @@ public interface ICurio {
    * @param slotContext Context about the slot that the ItemStack is in
    * @param compound    Data received from the server
    */
-  default void readSyncData(SlotContext slotContext, CompoundNBT compound) {
+  default void readSyncData(SlotContext slotContext, CompoundTag compound) {
     readSyncData(compound);
   }
 
@@ -233,10 +233,10 @@ public interface ICurio {
    * {@link ICurio#getAttributeModifiers(SlotContext, UUID)}. By default, this will display a list
    * similar to the vanilla attribute modifier tooltips.
    *
-   * @param tooltips A list of {@link ITextComponent} with the attribute modifier information
+   * @param tooltips A list of {@link Component} with the attribute modifier information
    * @return A list of ITextComponent to display as curio attribute modifier information
    */
-  default List<ITextComponent> getAttributesTooltip(List<ITextComponent> tooltips) {
+  default List<Component> getAttributesTooltip(List<Component> tooltips) {
     return showAttributesTooltip("") ? tooltips : new ArrayList<>();
   }
 
@@ -311,35 +311,36 @@ public interface ICurio {
    * Copy of vanilla implementation for breaking items client-side
    */
   static void playBreakAnimation(ItemStack stack, LivingEntity livingEntity) {
+  // todo: re-implement
 
-    if (!stack.isEmpty()) {
-
-      if (!livingEntity.isSilent()) {
-        livingEntity.world
-            .playSound(livingEntity.getPosX(), livingEntity.getPosY(), livingEntity.getPosZ(),
-                SoundEvents.ENTITY_ITEM_BREAK, livingEntity.getSoundCategory(), 0.8F,
-                0.8F + livingEntity.world.rand.nextFloat() * 0.4F, false);
-      }
-
-      for (int i = 0; i < 5; ++i) {
-        Vector3d vec3d = new Vector3d((livingEntity.getRNG().nextFloat() - 0.5D) * 0.1D,
-            Math.random() * 0.1D + 0.1D, 0.0D);
-        vec3d = vec3d.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
-        vec3d = vec3d.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        double d0 = (-livingEntity.getRNG().nextFloat()) * 0.6D - 0.3D;
-
-        Vector3d vec3d1 = new Vector3d((livingEntity.getRNG().nextFloat() - 0.5D) * 0.3D,
-            d0, 0.6D);
-        vec3d1 = vec3d1.rotatePitch(-livingEntity.rotationPitch * ((float) Math.PI / 180F));
-        vec3d1 = vec3d1.rotateYaw(-livingEntity.rotationYaw * ((float) Math.PI / 180F));
-        vec3d1 = vec3d1.add(livingEntity.getPosX(),
-            livingEntity.getPosY() + livingEntity.getEyeHeight(), livingEntity.getPosZ());
-
-        livingEntity.world
-            .addParticle(new ItemParticleData(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
-                vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
-      }
-    }
+//    if (!stack.isEmpty()) {
+//
+//      if (!livingEntity.isSilent()) {
+//        livingEntity.level
+//            .playLocalSound(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(),
+//                SoundEvents.ITEM_BREAK, livingEntity.getSoundSource(), 0.8F,
+//                0.8F + livingEntity.level.random.nextFloat() * 0.4F, false);
+//      }
+//
+//      for (int i = 0; i < 5; ++i) {
+//        Vec3 vec3d = new Vec3((livingEntity.getRandom().nextFloat() - 0.5D) * 0.1D,
+//            Math.random() * 0.1D + 0.1D, 0.0D);
+//        vec3d = vec3d.xRot(-livingEntity.xRot * ((float) Math.PI / 180F));
+//        vec3d = vec3d.yRot(-livingEntity.yRot * ((float) Math.PI / 180F));
+//        double d0 = (-livingEntity.getRandom().nextFloat()) * 0.6D - 0.3D;
+//
+//        Vec3 vec3d1 = new Vec3((livingEntity.getRandom().nextFloat() - 0.5D) * 0.3D,
+//            d0, 0.6D);
+//        vec3d1 = vec3d1.xRot(-livingEntity.xRot * ((float) Math.PI / 180F));
+//        vec3d1 = vec3d1.yRot(-livingEntity.yRot * ((float) Math.PI / 180F));
+//        vec3d1 = vec3d1.add(livingEntity.getX(),
+//            livingEntity.getY() + livingEntity.getEyeHeight(), livingEntity.getZ());
+//
+//        livingEntity.level
+//            .addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
+//                vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
+//      }
+//    }
   }
 
   // ============ DEPRECATED ================
@@ -404,7 +405,7 @@ public interface ICurio {
    * @deprecated See {@link ICurio#getSlotsTooltip(List)}
    */
   @Deprecated
-  default List<ITextComponent> getTagsTooltip(List<ITextComponent> tagTooltips) {
+  default List<Component> getTagsTooltip(List<Component> tagTooltips) {
     return tagTooltips;
   }
 
@@ -414,7 +415,7 @@ public interface ICurio {
   @Deprecated
   default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
                               int index) {
-    return EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, curio);
+    return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, curio);
   }
 
   /**
@@ -423,7 +424,7 @@ public interface ICurio {
   @Deprecated
   default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
                               int index) {
-    return EnchantmentHelper.getEnchantmentLevel(Enchantments.LOOTING, curio);
+    return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.MOB_LOOTING, curio);
   }
 
   /**
@@ -456,15 +457,15 @@ public interface ICurio {
    */
   @Nonnull
   @Deprecated
-  default CompoundNBT writeSyncData() {
-    return new CompoundNBT();
+  default CompoundTag writeSyncData() {
+    return new CompoundTag();
   }
 
   /**
-   * @deprecated See {@link ICurio#readSyncData(SlotContext, CompoundNBT)}
+   * @deprecated See {@link ICurio#readSyncData(SlotContext, CompoundTag)}
    */
   @Deprecated
-  default void readSyncData(CompoundNBT compound) {
+  default void readSyncData(CompoundTag compound) {
 
   }
 
@@ -487,8 +488,8 @@ public interface ICurio {
   default void playRightClickEquipSound(LivingEntity livingEntity) {
     // Not enough context for id and index so we just pass in artificial values with the entity
     SoundInfo soundInfo = getEquipSound(new SlotContext("", livingEntity));
-    livingEntity.world.playSound(null, livingEntity.getPosition(), soundInfo.getSoundEvent(),
-        livingEntity.getSoundCategory(), soundInfo.getVolume(), soundInfo.getPitch());
+    livingEntity.level.playSound(null, livingEntity.blockPosition(), soundInfo.getSoundEvent(),
+        livingEntity.getSoundSource(), soundInfo.getVolume(), soundInfo.getPitch());
   }
 
   /**

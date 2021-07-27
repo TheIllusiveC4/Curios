@@ -1,17 +1,19 @@
 package top.theillusivec4.curios.api.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.IEntityRenderer;
-import net.minecraft.client.renderer.entity.LivingRenderer;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.api.SlotContext;
 
 public interface ICurioRenderer {
@@ -25,9 +27,9 @@ public interface ICurioRenderer {
    */
   <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack,
                                                                  SlotContext slotContext,
-                                                                 IEntityRenderer<T, M> entityRenderer,
-                                                                 MatrixStack matrixStack,
-                                                                 IRenderTypeBuffer renderTypeBuffer,
+                                                                 PoseStack matrixStack,
+                                                                 RenderLayerParent<T, M> renderLayerParent,
+                                                                 MultiBufferSource renderTypeBuffer,
                                                                  int light, float limbSwing,
                                                                  float limbSwingAmount,
                                                                  float partialTicks,
@@ -39,10 +41,10 @@ public interface ICurioRenderer {
    *
    * @param livingEntity The wearer of the curio
    */
-  static void translateIfSneaking(final MatrixStack matrixStack, final LivingEntity livingEntity) {
+  static void translateIfSneaking(final PoseStack matrixStack, final LivingEntity livingEntity) {
 
     if (livingEntity.isCrouching()) {
-      matrixStack.translate(0.0f, 0.2f, 0.0f);
+      matrixStack.translate(0.0F, 0.1875F, 0.0F);
     }
   }
 
@@ -53,37 +55,38 @@ public interface ICurioRenderer {
    *
    * @param livingEntity The wearer of the curio
    */
-  static void rotateIfSneaking(final MatrixStack matrixStack, final LivingEntity livingEntity) {
+  static void rotateIfSneaking(final PoseStack matrixStack, final LivingEntity livingEntity) {
 
     if (livingEntity.isCrouching()) {
-      matrixStack.rotate(Vector3f.XP.rotationDegrees(90.0F / (float) Math.PI));
+      matrixStack.mulPose(Vector3f.XP.rotationDegrees(90.0F / (float) Math.PI));
     }
   }
 
   /**
    * Rotates the rendering for the model renderers based on the entity's head movement. This will
    * align the model renderers with the movements and rotations of the head. This will do nothing
-   * if the entity render object does not implement {@link LivingRenderer} or if the model does
-   * not have a head (does not implement {@link BipedModel}).
+   * if the entity render object does not implement {@link LivingEntityRenderer} or if the model
+   * does not have a head (does not implement {@link HumanoidModel}).
    *
    * @param livingEntity The wearer of the curio
    * @param renderers    The list of model renderers to align to the head movement
    */
   static void followHeadRotations(final LivingEntity livingEntity,
-                                  final ModelRenderer... renderers) {
+                                  final ModelPart... renderers) {
 
-    EntityRenderer<? super LivingEntity> render = Minecraft.getInstance().getRenderManager()
-        .getRenderer(livingEntity);
+    EntityRenderer<? super LivingEntity> render =
+        Minecraft.getInstance().getEntityRenderDispatcher()
+            .getRenderer(livingEntity);
 
-    if (render instanceof LivingRenderer) {
-      @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>>
-          livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
-      EntityModel<LivingEntity> model = livingRenderer.getEntityModel();
+    if (render instanceof LivingEntityRenderer) {
+      @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>
+          livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+      EntityModel<LivingEntity> model = livingRenderer.getModel();
 
-      if (model instanceof BipedModel) {
+      if (model instanceof HumanoidModel) {
 
-        for (ModelRenderer renderer : renderers) {
-          renderer.copyModelAngles(((BipedModel<LivingEntity>) model).bipedHead);
+        for (ModelPart renderer : renderers) {
+          renderer.copyFrom(((HumanoidModel<LivingEntity>) model).head);
         }
       }
     }
@@ -91,29 +94,30 @@ public interface ICurioRenderer {
 
   /**
    * Rotates the rendering for the models based on the entity's poses and movements. This will do
-   * nothing if the entity render object does not implement {@link LivingRenderer} or if the model
-   * does not implement {@link BipedModel}).
+   * nothing if the entity render object does not implement {@link LivingEntityRenderer} or if the
+   * model does not implement {@link HumanoidModel}).
    *
    * @param livingEntity The wearer of the curio
    * @param models       The list of models to align to the body movement
    */
   @SafeVarargs
   static void followBodyRotations(final LivingEntity livingEntity,
-                                  final BipedModel<LivingEntity>... models) {
+                                  final HumanoidModel<LivingEntity>... models) {
 
-    EntityRenderer<? super LivingEntity> render = Minecraft.getInstance().getRenderManager()
-        .getRenderer(livingEntity);
+    EntityRenderer<? super LivingEntity> render =
+        Minecraft.getInstance().getEntityRenderDispatcher()
+            .getRenderer(livingEntity);
 
-    if (render instanceof LivingRenderer) {
-      @SuppressWarnings("unchecked") LivingRenderer<LivingEntity, EntityModel<LivingEntity>>
-          livingRenderer = (LivingRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
-      EntityModel<LivingEntity> entityModel = livingRenderer.getEntityModel();
+    if (render instanceof LivingEntityRenderer) {
+      @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>
+          livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+      EntityModel<LivingEntity> entityModel = livingRenderer.getModel();
 
-      if (entityModel instanceof BipedModel) {
+      if (entityModel instanceof HumanoidModel) {
 
-        for (BipedModel<LivingEntity> model : models) {
-          BipedModel<LivingEntity> bipedModel = (BipedModel<LivingEntity>) entityModel;
-          bipedModel.setModelAttributes(model);
+        for (HumanoidModel<LivingEntity> model : models) {
+          HumanoidModel<LivingEntity> bipedModel = (HumanoidModel<LivingEntity>) entityModel;
+          bipedModel.copyPropertiesTo(model);
         }
       }
     }

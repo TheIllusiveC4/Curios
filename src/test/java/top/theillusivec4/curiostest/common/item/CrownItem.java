@@ -20,29 +20,27 @@
 package top.theillusivec4.curiostest.common.item;
 
 import javax.annotation.Nonnull;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
-import top.theillusivec4.curiostest.CuriosTest;
 
 public class CrownItem extends Item {
 
   public CrownItem() {
-    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(2000));
-    this.setRegistryName(CuriosTest.MODID, "crown");
+    super(new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).defaultDurability(2000));
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
+  public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag unused) {
     return CurioItemCapability.createProvider(new ICurio() {
 
       @Override
@@ -54,19 +52,18 @@ public class CrownItem extends Item {
       public void curioTick(SlotContext slotContext) {
         LivingEntity livingEntity = slotContext.getWearer();
 
-        if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 20 == 0) {
+        if (!livingEntity.level.isClientSide() && livingEntity.tickCount % 20 == 0) {
           livingEntity
-              .addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, 300, -1, true, true));
-          stack.damageItem(1, livingEntity,
-              damager -> CuriosApi.getCuriosHelper()
-                  .onBrokenCurio(slotContext.getIdentifier(), slotContext.getIndex(), damager));
+              .addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, -1, true, true));
+          stack.hurtAndBreak(1, livingEntity, damager -> CuriosApi.getCuriosHelper()
+              .onBrokenCurio(slotContext.getIdentifier(), slotContext.getIndex(), damager));
         }
       }
     });
   }
 
   @Override
-  public boolean hasEffect(@Nonnull ItemStack stack) {
+  public boolean isFoil(@Nonnull ItemStack stack) {
     return true;
   }
 }

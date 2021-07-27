@@ -23,32 +23,32 @@ import com.mojang.datafixers.util.Pair;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.CraftResultInventory;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.CraftingResultSlot;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ICraftingRecipe;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.RecipeBookCategory;
-import net.minecraft.item.crafting.RecipeItemHelper;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.server.SSetSlotPacket;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.RecipeBookType;
+import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.inventory.ResultSlot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -60,40 +60,40 @@ import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScroll;
 import top.theillusivec4.curios.common.network.server.SPacketScroll;
 
-public class CuriosContainer extends PlayerContainer {
+public class CuriosContainer extends InventoryMenu {
 
   private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[] {
-      PlayerContainer.EMPTY_ARMOR_SLOT_BOOTS, PlayerContainer.EMPTY_ARMOR_SLOT_LEGGINGS,
-      PlayerContainer.EMPTY_ARMOR_SLOT_CHESTPLATE, PlayerContainer.EMPTY_ARMOR_SLOT_HELMET};
-  private static final EquipmentSlotType[] VALID_EQUIPMENT_SLOTS = new EquipmentSlotType[] {
-      EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS,
-      EquipmentSlotType.FEET};
+      InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS, InventoryMenu.EMPTY_ARMOR_SLOT_LEGGINGS,
+      InventoryMenu.EMPTY_ARMOR_SLOT_CHESTPLATE, InventoryMenu.EMPTY_ARMOR_SLOT_HELMET};
+  private static final EquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EquipmentSlot[] {
+      EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS,
+      EquipmentSlot.FEET};
 
   public final LazyOptional<ICuriosItemHandler> curiosHandler;
+  public final Player player;
 
-  private final PlayerEntity player;
   private final boolean isLocalWorld;
 
-  private CraftingInventory craftMatrix = new CraftingInventory(this, 2, 2);
-  private CraftResultInventory craftResult = new CraftResultInventory();
+  private CraftingContainer craftMatrix = new CraftingContainer(this, 2, 2);
+  private ResultContainer craftResult = new ResultContainer();
   private int lastScrollIndex;
   private boolean cosmeticColumn;
 
-  public CuriosContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packetBuffer) {
+  public CuriosContainer(int windowId, Inventory playerInventory, FriendlyByteBuf packetBuffer) {
     this(windowId, playerInventory);
   }
 
-  public CuriosContainer(int windowId, PlayerInventory playerInventory) {
-    super(playerInventory, playerInventory.player.world.isRemote, playerInventory.player);
-    this.containerType = CuriosRegistry.CONTAINER_TYPE;
-    this.windowId = windowId;
-    this.inventoryItemStacks.clear();
-    this.inventorySlots.clear();
+  public CuriosContainer(int windowId, Inventory playerInventory) {
+    super(playerInventory, playerInventory.player.level.isClientSide, playerInventory.player);
+    this.menuType = CuriosRegistry.CONTAINER_TYPE;
+    this.containerId = windowId;
+    this.lastSlots.clear();
+    this.slots.clear();
     this.player = playerInventory.player;
-    this.isLocalWorld = this.player.world.isRemote;
+    this.isLocalWorld = this.player.level.isClientSide;
     this.curiosHandler = CuriosApi.getCuriosHelper().getCuriosHandler(this.player);
     this.addSlot(
-        new CraftingResultSlot(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154,
+        new ResultSlot(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154,
             28));
 
     for (int i = 0; i < 2; ++i) {
@@ -104,31 +104,31 @@ public class CuriosContainer extends PlayerContainer {
     }
 
     for (int k = 0; k < 4; ++k) {
-      final EquipmentSlotType equipmentslottype = VALID_EQUIPMENT_SLOTS[k];
+      final EquipmentSlot equipmentslottype = VALID_EQUIPMENT_SLOTS[k];
       this.addSlot(new Slot(playerInventory, 36 + (3 - k), 8, 8 + k * 18) {
 
         @Override
-        public int getSlotStackLimit() {
+        public int getMaxStackSize() {
           return 1;
         }
 
         @Override
-        public boolean isItemValid(@Nonnull ItemStack stack) {
+        public boolean mayPlace(@Nonnull ItemStack stack) {
           return stack.canEquip(equipmentslottype, CuriosContainer.this.player);
         }
 
         @Override
-        public boolean canTakeStack(@Nonnull PlayerEntity playerIn) {
-          ItemStack itemstack = this.getStack();
+        public boolean mayPickup(@Nonnull Player playerIn) {
+          ItemStack itemstack = this.getItem();
           return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper
-              .hasBindingCurse(itemstack)) && super.canTakeStack(playerIn);
+              .hasBindingCurse(itemstack)) && super.mayPickup(playerIn);
         }
 
 
         @OnlyIn(Dist.CLIENT)
         @Override
-        public Pair<ResourceLocation, ResourceLocation> getBackground() {
-          return Pair.of(PlayerContainer.LOCATION_BLOCKS_TEXTURE,
+        public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
+          return Pair.of(InventoryMenu.BLOCK_ATLAS,
               ARMOR_SLOT_TEXTURES[equipmentslottype.getIndex()]);
         }
       });
@@ -147,9 +147,9 @@ public class CuriosContainer extends PlayerContainer {
     this.addSlot(new Slot(playerInventory, 40, 77, 62) {
       @OnlyIn(Dist.CLIENT)
       @Override
-      public Pair<ResourceLocation, ResourceLocation> getBackground() {
+      public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
         return Pair
-            .of(PlayerContainer.LOCATION_BLOCKS_TEXTURE, PlayerContainer.EMPTY_ARMOR_SLOT_SHIELD);
+            .of(InventoryMenu.BLOCK_ATLAS, InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD);
       }
     });
 
@@ -209,11 +209,9 @@ public class CuriosContainer extends PlayerContainer {
       int slots = 0;
       int yOffset = 12;
       int index = 0;
-      this.inventorySlots.subList(46, this.inventorySlots.size()).clear();
-
-      if (this.inventoryItemStacks != null) {
-        this.inventoryItemStacks.subList(46, this.inventoryItemStacks.size()).clear();
-      }
+      this.slots.subList(46, this.slots.size()).clear();
+      this.lastSlots.subList(46, this.lastSlots.size()).clear();
+      this.remoteSlots.subList(46, this.remoteSlots.size()).clear();
 
       for (String identifier : curioMap.keySet()) {
         ICurioStacksHandler stacksHandler = curioMap.get(identifier);
@@ -264,8 +262,8 @@ public class CuriosContainer extends PlayerContainer {
 
       if (!this.isLocalWorld) {
         NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) this.player),
-                new SPacketScroll(this.windowId, indexIn));
+            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.player),
+                new SPacketScroll(this.containerId, indexIn));
       }
       this.lastScrollIndex = indexIn;
     });
@@ -287,44 +285,46 @@ public class CuriosContainer extends PlayerContainer {
 
       if (this.isLocalWorld) {
         NetworkHandler.INSTANCE
-            .send(PacketDistributor.SERVER.noArg(), new CPacketScroll(this.windowId, j));
+            .send(PacketDistributor.SERVER.noArg(), new CPacketScroll(this.containerId, j));
       }
     });
   }
 
   @Override
-  public void onCraftMatrixChanged(@Nonnull IInventory inventoryIn) {
+  public void slotsChanged(@Nonnull Container inventoryIn) {
 
-    if (!this.player.world.isRemote) {
-      ServerPlayerEntity playerMP = (ServerPlayerEntity) this.player;
+    if (!this.player.level.isClientSide) {
+      ServerPlayer playerMP = (ServerPlayer) this.player;
       ItemStack stack = ItemStack.EMPTY;
-      MinecraftServer server = this.player.world.getServer();
+      MinecraftServer server = this.player.level.getServer();
 
       if (server == null) {
         return;
       }
-
-      Optional<ICraftingRecipe> recipe = server.getRecipeManager()
-          .getRecipe(IRecipeType.CRAFTING, this.craftMatrix, this.player.world);
+      Optional<CraftingRecipe> recipe = server.getRecipeManager()
+          .getRecipeFor(RecipeType.CRAFTING, this.craftMatrix, this.player.level);
 
       if (recipe.isPresent()) {
-        ICraftingRecipe craftingRecipe = recipe.get();
-        if (this.craftResult.canUseRecipe(this.player.world, playerMP, craftingRecipe)) {
-          stack = craftingRecipe.getCraftingResult(this.craftMatrix);
+        CraftingRecipe craftingRecipe = recipe.get();
+        if (this.craftResult.setRecipeUsed(this.player.level, playerMP, craftingRecipe)) {
+          stack = craftingRecipe.assemble(this.craftMatrix);
         }
       }
-      this.craftResult.setInventorySlotContents(0, stack);
-      playerMP.connection.sendPacket(new SSetSlotPacket(this.windowId, 0, stack));
+      this.craftResult.setItem(0, stack);
+      this.setRemoteSlot(0, stack);
+      playerMP.connection.send(
+          new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), 0,
+              stack));
     }
   }
 
   @Override
-  public void onContainerClosed(@Nonnull PlayerEntity playerIn) {
-    super.onContainerClosed(playerIn);
-    this.craftResult.clear();
+  public void removed(@Nonnull Player playerIn) {
+    super.removed(playerIn);
+    this.craftResult.clearContent();
 
-    if (!playerIn.world.isRemote) {
-      this.clearContainer(playerIn, playerIn.world, this.craftMatrix);
+    if (!playerIn.level.isClientSide) {
+      this.clearContainer(playerIn, this.craftMatrix);
     }
   }
 
@@ -340,82 +340,81 @@ public class CuriosContainer extends PlayerContainer {
   }
 
   @Override
-  public boolean canInteractWith(@Nonnull PlayerEntity playerIn) {
+  public boolean stillValid(@Nonnull Player playerIn) {
 
     return true;
   }
 
   @Nonnull
   @Override
-  public ItemStack transferStackInSlot(@Nonnull PlayerEntity playerIn, int index) {
-
+  public ItemStack quickMoveStack(@Nonnull Player playerIn, int index) {
     ItemStack itemstack = ItemStack.EMPTY;
-    Slot slot = this.inventorySlots.get(index);
+    Slot slot = this.slots.get(index);
 
-    if (slot != null && slot.getHasStack()) {
-      ItemStack itemstack1 = slot.getStack();
+    if (slot != null && slot.hasItem()) {
+      ItemStack itemstack1 = slot.getItem();
       itemstack = itemstack1.copy();
-      EquipmentSlotType entityequipmentslot = MobEntity.getSlotForItemStack(itemstack);
+      EquipmentSlot entityequipmentslot = Mob.getEquipmentSlotForItem(itemstack);
       if (index == 0) {
 
-        if (!this.mergeItemStack(itemstack1, 9, 45, true)) {
+        if (!this.moveItemStackTo(itemstack1, 9, 45, true)) {
           return ItemStack.EMPTY;
         }
-        slot.onSlotChange(itemstack1, itemstack);
+        slot.onQuickCraft(itemstack1, itemstack);
       } else if (index < 5) {
 
-        if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
+        if (!this.moveItemStackTo(itemstack1, 9, 45, false)) {
           return ItemStack.EMPTY;
         }
       } else if (index < 9) {
 
-        if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
+        if (!this.moveItemStackTo(itemstack1, 9, 45, false)) {
           return ItemStack.EMPTY;
         }
-      } else if (entityequipmentslot.getSlotType() == EquipmentSlotType.Group.ARMOR
-          && !this.inventorySlots.get(8 - entityequipmentslot.getIndex()).getHasStack()) {
+      } else if (entityequipmentslot.getType() == EquipmentSlot.Type.ARMOR
+          && !this.slots.get(8 - entityequipmentslot.getIndex()).hasItem()) {
         int i = 8 - entityequipmentslot.getIndex();
 
-        if (!this.mergeItemStack(itemstack1, i, i + 1, false)) {
+        if (!this.moveItemStackTo(itemstack1, i, i + 1, false)) {
           return ItemStack.EMPTY;
         }
       } else if (index < 46 && !CuriosApi.getCuriosHelper().getCurioTags(itemstack.getItem())
           .isEmpty()) {
 
-        if (!this.mergeItemStack(itemstack1, 46, this.inventorySlots.size(), false)) {
+        if (!this.moveItemStackTo(itemstack1, 46, this.slots.size(), false)) {
           return ItemStack.EMPTY;
         }
-      } else if (entityequipmentslot == EquipmentSlotType.OFFHAND && !(this.inventorySlots.get(45))
-          .getHasStack()) {
+      } else if (entityequipmentslot == EquipmentSlot.OFFHAND && !(this.slots.get(45))
+          .hasItem()) {
 
-        if (!this.mergeItemStack(itemstack1, 45, 46, false)) {
+        if (!this.moveItemStackTo(itemstack1, 45, 46, false)) {
           return ItemStack.EMPTY;
         }
       } else if (index < 36) {
-        if (!this.mergeItemStack(itemstack1, 36, 45, false)) {
+        if (!this.moveItemStackTo(itemstack1, 36, 45, false)) {
           return ItemStack.EMPTY;
         }
       } else if (index < 45) {
-        if (!this.mergeItemStack(itemstack1, 9, 36, false)) {
+        if (!this.moveItemStackTo(itemstack1, 9, 36, false)) {
           return ItemStack.EMPTY;
         }
-      } else if (!this.mergeItemStack(itemstack1, 9, 45, false)) {
+      } else if (!this.moveItemStackTo(itemstack1, 9, 45, false)) {
         return ItemStack.EMPTY;
       }
 
       if (itemstack1.isEmpty()) {
-        slot.putStack(ItemStack.EMPTY);
+        slot.set(ItemStack.EMPTY);
       } else {
-        slot.onSlotChanged();
+        slot.setChanged();
       }
 
       if (itemstack1.getCount() == itemstack.getCount()) {
         return ItemStack.EMPTY;
       }
-      ItemStack itemstack2 = slot.onTake(playerIn, itemstack1);
+      slot.onTake(playerIn, itemstack1);
 
       if (index == 0) {
-        playerIn.dropItem(itemstack2, false);
+        playerIn.drop(itemstack1, false);
       }
     }
 
@@ -424,38 +423,38 @@ public class CuriosContainer extends PlayerContainer {
 
   @Nonnull
   @Override
-  public RecipeBookCategory func_241850_m() {
-    return RecipeBookCategory.CRAFTING;
+  public RecipeBookType getRecipeBookType() {
+    return RecipeBookType.CRAFTING;
   }
 
   @Override
-  public void fillStackedContents(@Nonnull RecipeItemHelper itemHelperIn) {
+  public void fillCraftSlotsStackedContents(@Nonnull StackedContents itemHelperIn) {
     this.craftMatrix.fillStackedContents(itemHelperIn);
   }
 
   @Override
-  public void clear() {
-    this.craftMatrix.clear();
-    this.craftResult.clear();
+  public void clearCraftingContent() {
+    this.craftMatrix.clearContent();
+    this.craftResult.clearContent();
   }
 
   @Override
-  public boolean matches(IRecipe<? super CraftingInventory> recipeIn) {
-    return recipeIn.matches(this.craftMatrix, this.player.world);
+  public boolean recipeMatches(Recipe<? super CraftingContainer> recipeIn) {
+    return recipeIn.matches(this.craftMatrix, this.player.level);
   }
 
   @Override
-  public int getOutputSlot() {
+  public int getResultSlotIndex() {
     return 0;
   }
 
   @Override
-  public int getWidth() {
+  public int getGridWidth() {
     return this.craftMatrix.getWidth();
   }
 
   @Override
-  public int getHeight() {
+  public int getGridHeight() {
     return this.craftMatrix.getHeight();
   }
 

@@ -21,11 +21,11 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 
 public class SPacketSyncOperation {
@@ -55,27 +55,27 @@ public class SPacketSyncOperation {
     this.cosmetic = cosmetic;
   }
 
-  public static void encode(SPacketSyncOperation msg, PacketBuffer buf) {
+  public static void encode(SPacketSyncOperation msg, FriendlyByteBuf buf) {
     buf.writeInt(msg.entityId);
-    buf.writeString(msg.curioId);
+    buf.writeUtf(msg.curioId);
     buf.writeInt(msg.operation);
     buf.writeInt(msg.amount);
     buf.writeBoolean(msg.visible);
     buf.writeBoolean(msg.cosmetic);
   }
 
-  public static SPacketSyncOperation decode(PacketBuffer buf) {
-    return new SPacketSyncOperation(buf.readInt(), buf.readString(25),
+  public static SPacketSyncOperation decode(FriendlyByteBuf buf) {
+    return new SPacketSyncOperation(buf.readInt(), buf.readUtf(25),
         Operation.fromValue(buf.readInt()), buf.readInt(), buf.readBoolean(), buf.readBoolean());
   }
 
   public static void handle(SPacketSyncOperation msg, Supplier<NetworkEvent.Context> ctx) {
 
     ctx.get().enqueueWork(() -> {
-      ClientWorld world = Minecraft.getInstance().world;
+      ClientLevel world = Minecraft.getInstance().level;
 
       if (world != null) {
-        Entity entity = world.getEntityByID(msg.entityId);
+        Entity entity = world.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity) {
           CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {

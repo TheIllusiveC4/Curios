@@ -19,8 +19,8 @@
 
 package top.theillusivec4.curios.common;
 
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.event.RegistryEvent;
@@ -36,14 +36,14 @@ import top.theillusivec4.curios.common.util.FortuneBonusModifier;
 public class CuriosRegistry {
 
   @ObjectHolder("curios:curios_container")
-  public static final ContainerType<CuriosContainer> CONTAINER_TYPE;
+  public static final MenuType<CuriosContainer> CONTAINER_TYPE;
 
   static {
     CONTAINER_TYPE = null;
   }
 
   @SubscribeEvent
-  public static void registerContainer(RegistryEvent.Register<ContainerType<?>> evt) {
+  public static void registerContainer(RegistryEvent.Register<MenuType<?>> evt) {
     evt.getRegistry().register(
         IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
   }

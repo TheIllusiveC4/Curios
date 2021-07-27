@@ -23,18 +23,18 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -44,20 +44,19 @@ import top.theillusivec4.curiostest.CuriosTest;
 public class RingItem extends Item {
 
   public RingItem() {
-    super(new Item.Properties().group(ItemGroup.TOOLS).maxStackSize(1).defaultMaxDamage(0));
-    this.setRegistryName(CuriosTest.MODID, "ring");
+    super(new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).defaultDurability(0));
   }
 
   @Override
-  public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT unused) {
+  public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag unused) {
     return CurioItemCapability.createProvider(new ICurio() {
 
       @Override
       public void curioTick(SlotContext slotContext) {
         LivingEntity livingEntity = slotContext.getWearer();
 
-        if (!livingEntity.getEntityWorld().isRemote && livingEntity.ticksExisted % 19 == 0) {
-          livingEntity.addPotionEffect(new EffectInstance(Effects.HASTE, 20, 0, true, true));
+        if (!livingEntity.level.isClientSide() && livingEntity.tickCount % 19 == 0) {
+          livingEntity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 20, 0, true, true));
         }
       }
 
@@ -89,7 +88,7 @@ public class RingItem extends Item {
       @Nonnull
       @Override
       public SoundInfo getEquipSound(SlotContext slotContext) {
-        return new SoundInfo(SoundEvents.ITEM_ARMOR_EQUIP_GOLD, 1.0f, 1.0f);
+        return new SoundInfo(SoundEvents.ARMOR_EQUIP_GOLD, 1.0f, 1.0f);
       }
 
       @Override
@@ -100,7 +99,7 @@ public class RingItem extends Item {
   }
 
   @Override
-  public boolean hasEffect(@Nonnull ItemStack stack) {
+  public boolean isFoil(@Nonnull ItemStack stack) {
     return true;
   }
 }

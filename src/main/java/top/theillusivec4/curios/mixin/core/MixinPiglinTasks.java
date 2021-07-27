@@ -11,7 +11,7 @@
 //@Mixin(PiglinTasks.class)
 //public class MixinPiglinTasks {
 //
-//  @Inject(at = @At("HEAD"), method = "func_234460_a_", cancellable = true)
+//  @Inject(at = @At("HEAD"), method = "isWearingGold", cancellable = true)
 //  private static void curios$isNeutral(LivingEntity livingEntity, CallbackInfoReturnable<Boolean> cir) {
 //
 //    if (CuriosMixinHooks.canNeutralizePiglins(livingEntity)) {

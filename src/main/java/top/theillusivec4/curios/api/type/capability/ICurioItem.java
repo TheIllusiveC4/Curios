@@ -24,16 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.network.chat.Component;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
 
@@ -126,11 +126,11 @@ public interface ICurioItem {
    * If overriding, make sure the user has some indication which slots are associated with the
    * curio.
    *
-   * @param tooltips A list of {@link ITextComponent} with every slot valid for this curio
+   * @param tooltips A list of {@link Component} with every slot valid for this curio
    * @param stack    The ItemStack in question
    * @return A list of ITextComponent to display as curio slot information
    */
-  default List<ITextComponent> getSlotsTooltip(List<ITextComponent> tooltips, ItemStack stack) {
+  default List<Component> getSlotsTooltip(List<Component> tooltips, ItemStack stack) {
     return getTagsTooltip(tooltips, stack);
   }
 
@@ -174,7 +174,7 @@ public interface ICurioItem {
    */
   @Nonnull
   default ICurio.SoundInfo getEquipSound(SlotContext slotContext, ItemStack stack) {
-    return new ICurio.SoundInfo(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 1.0f, 1.0f);
+    return new ICurio.SoundInfo(SoundEvents.ARMOR_EQUIP_GENERIC, 1.0f, 1.0f);
   }
 
   /**
@@ -223,7 +223,7 @@ public interface ICurioItem {
    * @return Data to be sent to the client
    */
   @Nonnull
-  default CompoundNBT writeSyncData(SlotContext slotContext, ItemStack stack) {
+  default CompoundTag writeSyncData(SlotContext slotContext, ItemStack stack) {
     return writeSyncData(stack);
   }
 
@@ -235,7 +235,7 @@ public interface ICurioItem {
    * @param compound    Data received from the server
    * @param stack       The ItemStack in question
    */
-  default void readSyncData(SlotContext slotContext, CompoundNBT compound, ItemStack stack) {
+  default void readSyncData(SlotContext slotContext, CompoundTag compound, ItemStack stack) {
     readSyncData(compound, stack);
   }
 
@@ -261,11 +261,11 @@ public interface ICurioItem {
    * {@link ICurio#getAttributeModifiers(SlotContext, UUID)}. By default, this will display a list
    * similar to the vanilla attribute modifier tooltips.
    *
-   * @param tooltips A list of {@link ITextComponent} with the attribute modifier information
+   * @param tooltips A list of {@link Component} with the attribute modifier information
    * @param stack    The ItemStack in question
    * @return A list of ITextComponent to display as curio attribute modifier information
    */
-  default List<ITextComponent> getAttributesTooltip(List<ITextComponent> tooltips,
+  default List<Component> getAttributesTooltip(List<Component> tooltips,
                                                     ItemStack stack) {
     return showAttributesTooltip("", stack) ? tooltips : new ArrayList<>();
   }
@@ -360,7 +360,7 @@ public interface ICurioItem {
    * @deprecated See {@link ICurioItem#getSlotsTooltip(List, ItemStack)}
    */
   @Deprecated
-  default List<ITextComponent> getTagsTooltip(List<ITextComponent> tagTooltips, ItemStack stack) {
+  default List<Component> getTagsTooltip(List<Component> tagTooltips, ItemStack stack) {
     return defaultInstance.getTagsTooltip(tagTooltips);
   }
 
@@ -416,15 +416,15 @@ public interface ICurioItem {
    */
   @Nonnull
   @Deprecated
-  default CompoundNBT writeSyncData(ItemStack stack) {
+  default CompoundTag writeSyncData(ItemStack stack) {
     return defaultInstance.writeSyncData();
   }
 
   /**
-   * @deprecated See {@link ICurioItem#readSyncData(SlotContext, CompoundNBT, ItemStack)}
+   * @deprecated See {@link ICurioItem#readSyncData(SlotContext, CompoundTag, ItemStack)}
    */
   @Deprecated
-  default void readSyncData(CompoundNBT compound, ItemStack stack) {
+  default void readSyncData(CompoundTag compound, ItemStack stack) {
     defaultInstance.readSyncData(compound);
   }
 

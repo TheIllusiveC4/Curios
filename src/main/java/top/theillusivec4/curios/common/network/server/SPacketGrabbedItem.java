@@ -21,10 +21,10 @@ package top.theillusivec4.curios.common.network.server;
 
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 public class SPacketGrabbedItem {
 
@@ -34,21 +34,21 @@ public class SPacketGrabbedItem {
     this.stack = stackIn;
   }
 
-  public static void encode(SPacketGrabbedItem msg, PacketBuffer buf) {
-    buf.writeItemStack(msg.stack);
+  public static void encode(SPacketGrabbedItem msg, FriendlyByteBuf buf) {
+    buf.writeItem(msg.stack);
   }
 
-  public static SPacketGrabbedItem decode(PacketBuffer buf) {
-    return new SPacketGrabbedItem(buf.readItemStack());
+  public static SPacketGrabbedItem decode(FriendlyByteBuf buf) {
+    return new SPacketGrabbedItem(buf.readItem());
   }
 
-  public static void handle(SPacketGrabbedItem msg, Supplier<Context> ctx) {
+  public static void handle(SPacketGrabbedItem msg, Supplier<NetworkEvent.Context> ctx) {
 
     ctx.get().enqueueWork(() -> {
-      ClientPlayerEntity clientPlayer = Minecraft.getInstance().player;
+      LocalPlayer clientPlayer = Minecraft.getInstance().player;
 
       if (clientPlayer != null) {
-        clientPlayer.inventory.setItemStack(msg.stack);
+        clientPlayer.inventoryMenu.setCarried(msg.stack);
       }
     });
     ctx.get().setPacketHandled(true);

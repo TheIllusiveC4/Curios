@@ -19,9 +19,9 @@
 
 package top.theillusivec4.curios.common.inventory;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.core.NonNullList;
 import net.minecraftforge.common.util.Constants;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
@@ -125,20 +125,20 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   @Override
-  public CompoundNBT serializeNBT() {
-    CompoundNBT compoundNBT = new CompoundNBT();
+  public CompoundTag serializeNBT() {
+    CompoundTag compoundNBT = new CompoundTag();
     compoundNBT.put("Stacks", this.stackHandler.serializeNBT());
     compoundNBT.put("Cosmetics", this.cosmeticStackHandler.serializeNBT());
 
-    ListNBT nbtTagList = new ListNBT();
+    ListTag nbtTagList = new ListTag();
 
     for (int i = 0; i < this.renderHandler.size(); i++) {
-      CompoundNBT tag = new CompoundNBT();
+      CompoundTag tag = new CompoundTag();
       tag.putInt("Slot", i);
       tag.putBoolean("Render", this.renderHandler.get(i));
       nbtTagList.add(tag);
     }
-    CompoundNBT nbt = new CompoundNBT();
+    CompoundTag nbt = new CompoundTag();
     nbt.put("Renders", nbtTagList);
     nbt.putInt("Size", this.renderHandler.size());
     compoundNBT.put("Renders", nbt);
@@ -149,7 +149,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   @Override
-  public void deserializeNBT(CompoundNBT nbt) {
+  public void deserializeNBT(CompoundTag nbt) {
 
     if (nbt.contains("Stacks")) {
       this.stackHandler.deserializeNBT(nbt.getCompound("Stacks"));
@@ -160,14 +160,14 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     }
 
     if (nbt.contains("Renders")) {
-      CompoundNBT tag = nbt.getCompound("Renders");
+      CompoundTag tag = nbt.getCompound("Renders");
       this.renderHandler = NonNullList.withSize(
           nbt.contains("Size", Constants.NBT.TAG_INT) ? nbt.getInt("Size")
               : this.stackHandler.getSlots(), true);
-      ListNBT tagList = tag.getList("Renders", Constants.NBT.TAG_COMPOUND);
+      ListTag tagList = tag.getList("Renders", Constants.NBT.TAG_COMPOUND);
 
       for (int i = 0; i < tagList.size(); i++) {
-        CompoundNBT tags = tagList.getCompound(i);
+        CompoundTag tags = tagList.getCompound(i);
         int slot = tags.getInt("Slot");
 
         if (slot >= 0 && slot < this.renderHandler.size()) {

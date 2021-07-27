@@ -25,10 +25,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 
@@ -42,28 +42,28 @@ public class SPacketSetIcons {
     this.map = map;
   }
 
-  public static void encode(SPacketSetIcons msg, PacketBuffer buf) {
+  public static void encode(SPacketSetIcons msg, FriendlyByteBuf buf) {
     buf.writeInt(msg.entrySize);
 
     for (Map.Entry<String, ResourceLocation> entry : msg.map.entrySet()) {
-      buf.writeString(entry.getKey());
-      buf.writeString(entry.getValue().toString());
+      buf.writeUtf(entry.getKey());
+      buf.writeUtf(entry.getValue().toString());
     }
   }
 
-  public static SPacketSetIcons decode(PacketBuffer buf) {
+  public static SPacketSetIcons decode(FriendlyByteBuf buf) {
     int entrySize = buf.readInt();
     Map<String, ResourceLocation> map = new HashMap<>();
 
     for (int i = 0; i < entrySize; i++) {
-      map.put(buf.readString(25), new ResourceLocation(buf.readString(100)));
+      map.put(buf.readUtf(25), new ResourceLocation(buf.readUtf(100)));
     }
     return new SPacketSetIcons(map);
   }
 
   public static void handle(SPacketSetIcons msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      ClientWorld world = Minecraft.getInstance().world;
+      ClientLevel world = Minecraft.getInstance().level;
       Set<String> slotIds = new HashSet<>();
 
       if (world != null) {

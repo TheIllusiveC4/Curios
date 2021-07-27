@@ -1,29 +1,29 @@
 modLoader="javafml"
-loaderVersion="[34,)"
+loaderVersion="[37,)"
 license="LGPL-3.0-or-later"
 issueTrackerURL="https://github.com/TheIllusiveC4/Curios/issues"
-logoFile="${mod_icon}"
+logoFile="curios_icon.png"
 logoBlur=false
 [[mods]]
-modId="${mod_id}"
-version="${version}"
-displayName="${mod_name}"
-displayURL="${mod_url}"
-authors="${mod_author}"
+modId="curios"
+version="${file.jarVersion}"
+displayName="Curios API"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/curios"
+authors="C4"
 description='''
-${mod_description}
+A flexible and expandable accessory/equipment API for users and developers.
 '''
 [[dependencies.curios]]
     modId="forge"
     mandatory=true
-    versionRange="[34,)"
+    versionRange="[37,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curios]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.3,1.17)"
+    versionRange="[1.17.1,1.18)"
     ordering="NONE"
     side="BOTH"
 [modproperties.curios]
-    catalogueImageIcon="${mod_icon}"
+    catalogueImageIcon="curios_icon.png"

@@ -26,11 +26,11 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
@@ -127,7 +127,7 @@ public interface ICuriosHelper {
 
   /**
    * Passes three inputs into an internal triple-input consumer that should be used from the
-   * single-input consumer in {@link ItemStack#damageItem(int, LivingEntity, Consumer)}
+   * single-input consumer in {@link ItemStack#hurtAndBreak(int, LivingEntity, Consumer)}
    * <br>
    * This will be necessary in order to trigger break animations in curio slots
    * <br>
@@ -141,7 +141,7 @@ public interface ICuriosHelper {
   void onBrokenCurio(String id, int index, LivingEntity damager);
 
   /**
-   * Sets the {@link TriConsumer} that should be used with {@link ItemStack#damageItem(int,
+   * Sets the {@link TriConsumer} that should be used with {@link ItemStack#hurtAndBreak(int,
    * LivingEntity, Consumer)} when triggering break animations in curio slots
    *
    * @param consumer The {@link TriConsumer} taking an {@link top.theillusivec4.curios.api.type.ISlotType}

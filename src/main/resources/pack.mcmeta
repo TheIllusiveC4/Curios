@@ -1,6 +1,6 @@
 {
     "pack": {
-        "description": "Curios resources",
-        "pack_format": 6
+        "description": "Resources for Curios API",
+        "pack_format": 7
     }
 }

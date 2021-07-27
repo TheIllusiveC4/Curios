@@ -1,43 +1,52 @@
 package top.theillusivec4.curiostest.client.renderer;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.entity.IEntityRenderer;
-import net.minecraft.client.renderer.entity.model.EntityModel;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 import top.theillusivec4.curiostest.CuriosTest;
+import top.theillusivec4.curiostest.client.CuriosLayerDefinitions;
 import top.theillusivec4.curiostest.client.model.CrownModel;
 
-public class CrownRenderer implements ICurioRenderer {
+public class CrownRenderer<L extends LivingEntity> implements ICurioRenderer {
 
   private static final ResourceLocation CROWN_TEXTURE = new ResourceLocation(CuriosTest.MODID,
       "textures/entity/crown.png");
+  private final CrownModel<L> model;
 
-  private static final CrownModel<LivingEntity> MODEL = new CrownModel<>();
+  public CrownRenderer() {
+    this.model = new CrownModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(CuriosLayerDefinitions.CROWN));
+  }
 
   @Override
   public <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack,
                                                                         SlotContext slotContext,
-                                                                        IEntityRenderer<T, M> entityRenderer,
-                                                                        MatrixStack matrixStack,
-                                                                        IRenderTypeBuffer renderTypeBuffer,
+                                                                        PoseStack matrixStack,
+                                                                        RenderLayerParent<T, M> renderLayerParent,
+                                                                        MultiBufferSource renderTypeBuffer,
                                                                         int light, float limbSwing,
                                                                         float limbSwingAmount,
                                                                         float partialTicks,
                                                                         float ageInTicks,
                                                                         float netHeadYaw,
                                                                         float headPitch) {
-    ICurioRenderer.followHeadRotations(slotContext.getWearer(), MODEL.crown);
-    IVertexBuilder vertexBuilder = ItemRenderer
-        .getBuffer(renderTypeBuffer, MODEL.getRenderType(CROWN_TEXTURE), false, stack.hasEffect());
-    MODEL.render(matrixStack, vertexBuilder, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F,
-        1.0F);
+    ICurioRenderer.followHeadRotations(slotContext.getWearer(), this.model.crown);
+    VertexConsumer vertexconsumer = ItemRenderer
+        .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(CROWN_TEXTURE), false,
+            stack.hasFoil());
+    this.model
+        .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F,
+            1.0F, 1.0F);
   }
 }

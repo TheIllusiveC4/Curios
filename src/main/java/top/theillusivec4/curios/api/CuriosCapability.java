@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios.api;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import top.theillusivec4.curios.api.type.capability.ICurio;

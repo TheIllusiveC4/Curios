@@ -28,14 +28,14 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -138,22 +138,22 @@ public class CuriosHelper implements ICuriosHelper {
 
     if (stack.getTag() != null && stack.getTag().contains("CurioAttributeModifiers", 9)) {
       multimap = HashMultimap.create();
-      ListNBT listnbt = stack.getTag().getList("CurioAttributeModifiers", 10);
+      ListTag listnbt = stack.getTag().getList("CurioAttributeModifiers", 10);
       String identifier = slotContext.getIdentifier();
 
       for (int i = 0; i < listnbt.size(); ++i) {
-        CompoundNBT compoundnbt = listnbt.getCompound(i);
+        CompoundTag compoundnbt = listnbt.getCompound(i);
 
         if (!compoundnbt.contains("Slot", 8) || compoundnbt.getString("Slot").equals(identifier)) {
           Attribute attribute = ForgeRegistries.ATTRIBUTES
-              .getValue(ResourceLocation.tryCreate(compoundnbt.getString("AttributeName")));
+              .getValue(ResourceLocation.tryParse(compoundnbt.getString("AttributeName")));
 
           if (attribute != null) {
-            AttributeModifier attributemodifier = AttributeModifier.read(compoundnbt);
+            AttributeModifier attributemodifier = AttributeModifier.load(compoundnbt);
 
             if (attributemodifier != null
-                && attributemodifier.getID().getLeastSignificantBits() != 0L
-                && attributemodifier.getID().getMostSignificantBits() != 0L) {
+                && attributemodifier.getId().getLeastSignificantBits() != 0L
+                && attributemodifier.getId().getMostSignificantBits() != 0L) {
               multimap.put(attribute, attributemodifier);
             }
           }

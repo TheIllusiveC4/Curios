@@ -20,7 +20,7 @@
 package top.theillusivec4.curios.api;
 
 import java.util.Optional;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.api.SlotTypeMessage.Builder;
 
 /**

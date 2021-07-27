@@ -21,10 +21,7 @@ package top.theillusivec4.curios.common.capability;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -35,29 +32,11 @@ import top.theillusivec4.curios.api.type.capability.ICurio;
 public class CurioItemCapability {
 
   public static void register() {
-    CapabilityManager.INSTANCE.register(ICurio.class, new Capability.IStorage<ICurio>() {
-      @Override
-      public INBT writeNBT(Capability<ICurio> capability, ICurio instance, Direction side) {
-        return new CompoundNBT();
-      }
-
-      @Override
-      public void readNBT(Capability<ICurio> capability, ICurio instance, Direction side,
-                          INBT nbt) {
-      }
-    }, CurioItemWrapper::new);
+    CapabilityManager.INSTANCE.register(ICurio.class);
   }
 
   public static ICapabilityProvider createProvider(final ICurio curio) {
     return new Provider(curio);
-  }
-
-  private static class CurioItemWrapper implements ICurio {
-
-    @Override
-    public ItemStack getStack() {
-      return ItemStack.EMPTY;
-    }
   }
 
   public static class Provider implements ICapabilityProvider {

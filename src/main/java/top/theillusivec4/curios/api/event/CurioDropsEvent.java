@@ -20,9 +20,9 @@
 package top.theillusivec4.curios.api.event;
 
 import java.util.Collection;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.util.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
@@ -30,7 +30,7 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 /**
  * LivingCurioDropsEvent is fired when an Entity's death causes dropped curios to appear.<br> This
- * event is fired whenever an Entity dies and drops items in {@link LivingEntity#onDeath(DamageSource)}.<br>
+ * event is fired whenever an Entity dies and drops items in {@link LivingEntity#die(DamageSource)}.<br>
  * <br>
  * This event is fired inside the {@link net.minecraftforge.event.entity.living.LivingDropsEvent}.<br>
  * <br>

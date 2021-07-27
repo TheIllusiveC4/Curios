@@ -19,8 +19,8 @@
 
 package top.theillusivec4.curios.api.type.inventory;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.NonNullList;
 
 public interface ICurioStacksHandler {
 
@@ -101,14 +101,14 @@ public interface ICurioStacksHandler {
   /**
    * Writes the data for this handler.
    *
-   * @return A {@link CompoundNBT} representing the serialized data
+   * @return A {@link CompoundTag} representing the serialized data
    */
-  CompoundNBT serializeNBT();
+  CompoundTag serializeNBT();
 
   /**
    * Reads the data into this handler.
    *
-   * @param nbt A {@link CompoundNBT} representing the serialized data
+   * @param nbt A {@link CompoundTag} representing the serialized data
    */
-  void deserializeNBT(CompoundNBT nbt);
+  void deserializeNBT(CompoundTag nbt);
 }

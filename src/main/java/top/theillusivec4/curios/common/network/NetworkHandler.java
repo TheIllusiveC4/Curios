@@ -22,12 +22,12 @@ package top.theillusivec4.curios.common.network;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkRegistry;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.network.client.CPacketDestroy;
@@ -90,11 +90,11 @@ public class NetworkHandler {
     // Assignment of curio breaking to the network instance
     CuriosApi.getCuriosHelper().setBrokenCurioConsumer((id, index, livingEntity) -> INSTANCE
         .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-            new SPacketBreak(livingEntity.getEntityId(), id, index)));
+            new SPacketBreak(livingEntity.getId(), id, index)));
   }
 
-  private static <M> void register(Class<M> messageType, BiConsumer<M, PacketBuffer> encoder,
-                                   Function<PacketBuffer, M> decoder,
+  private static <M> void register(Class<M> messageType, BiConsumer<M, FriendlyByteBuf> encoder,
+                                   Function<FriendlyByteBuf, M> decoder,
                                    BiConsumer<M, Supplier<NetworkEvent.Context>> messageConsumer) {
     INSTANCE.registerMessage(id++, messageType, encoder, decoder, messageConsumer);
   }

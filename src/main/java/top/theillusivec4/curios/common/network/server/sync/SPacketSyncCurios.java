@@ -23,12 +23,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
@@ -45,25 +45,25 @@ public class SPacketSyncCurios {
     this.map = map;
   }
 
-  public static void encode(SPacketSyncCurios msg, PacketBuffer buf) {
+  public static void encode(SPacketSyncCurios msg, FriendlyByteBuf buf) {
     buf.writeInt(msg.entityId);
     buf.writeInt(msg.entrySize);
 
     for (Map.Entry<String, ICurioStacksHandler> entry : msg.map.entrySet()) {
-      buf.writeString(entry.getKey());
-      buf.writeCompoundTag(entry.getValue().serializeNBT());
+      buf.writeUtf(entry.getKey());
+      buf.writeNbt(entry.getValue().serializeNBT());
     }
   }
 
-  public static SPacketSyncCurios decode(PacketBuffer buf) {
+  public static SPacketSyncCurios decode(FriendlyByteBuf buf) {
     int entityId = buf.readInt();
     int entrySize = buf.readInt();
     Map<String, ICurioStacksHandler> map = new LinkedHashMap<>();
 
     for (int i = 0; i < entrySize; i++) {
-      String key = buf.readString(25);
+      String key = buf.readUtf(25);
       CurioStacksHandler stacksHandler = new CurioStacksHandler();
-      CompoundNBT compound = buf.readCompoundTag();
+      CompoundTag compound = buf.readNbt();
 
       if (compound != null) {
         stacksHandler.deserializeNBT(compound);
@@ -75,10 +75,10 @@ public class SPacketSyncCurios {
 
   public static void handle(SPacketSyncCurios msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      ClientWorld world = Minecraft.getInstance().world;
+      ClientLevel world = Minecraft.getInstance().level;
 
       if (world != null) {
-        Entity entity = world.getEntityByID(msg.entityId);
+        Entity entity = world.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity) {
           CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity)

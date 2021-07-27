@@ -20,25 +20,25 @@
 package top.theillusivec4.curios.common.network.client;
 
 import java.util.function.Supplier;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CPacketDestroy {
 
-  public static void encode(CPacketDestroy msg, PacketBuffer buf) {
+  public static void encode(CPacketDestroy msg, FriendlyByteBuf buf) {
   }
 
-  public static CPacketDestroy decode(PacketBuffer buf) {
+  public static CPacketDestroy decode(FriendlyByteBuf buf) {
     return new CPacketDestroy();
   }
 
   public static void handle(CPacketDestroy msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      ServerPlayerEntity sender = ctx.get().getSender();
+      ServerPlayer sender = ctx.get().getSender();
 
       if (sender != null) {
         CuriosApi.getCuriosHelper().getCuriosHandler(sender)

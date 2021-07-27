@@ -9,7 +9,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
 //        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
         classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version:'1.4.0'
     }
@@ -20,13 +20,13 @@ apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'maven-publish'
 
 version = "${mod_version}"
-group = "${mod_group}"
+group = "top.theillusivec4.${mod_id}"
 archivesBaseName = "${mod_id}-forge"
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 minecraft {
-    mappings channel: 'snapshot', version: "${version_mcp}"
+    mappings channel: 'official', version: "${version_mc}"
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -73,8 +73,8 @@ dependencies {
 
 //    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
 
-    compileOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}")
+//    compileOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}:api")
+//    runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}")
 }
 
 //mixin {
@@ -104,11 +104,11 @@ sourceSets {
 
 jar {
     manifest {
-        attributes(["Specification-Title"     : "${mod_name}",
+        attributes(["Specification-Title"     : "${mod_id}",
                     "Specification-Vendor"    : "${mod_author}",
-                    "Specification-Version"   : "${getArchiveVersion()}",
-                    "Implementation-Title"    : "${mod_name}",
-                    "Implementation-Version"  : "${getArchiveVersion()}",
+                    "Specification-Version"   : "1",
+                    "Implementation-Title"    : "${mod_id}",
+                    "Implementation-Version"  : "${mod_version}",
                     "Implementation-Vendor"   : "${mod_author}",
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
 //                    "MixinConfigs"            : "${mod_id}.mixins.json"],)
@@ -129,24 +129,17 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
 }
 
-tasks.build.dependsOn apiJar, sourcesJar
-
-processResources {
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-        expand 'version': project.version, 'mod_id': mod_id, 'mod_name': mod_name, 'mod_url': mod_url, 'mod_author': mod_author, 'mod_description': mod_description, 'mod_icon': mod_icon
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
-    }
+artifacts {
+    apiJar
+    sourcesJar
 }
 
+jar.finalizedBy('reobfJar')
+
 curseforge {
+    apiKey = findProperty('curseKey') ?: 0
 
     project {
-        apiKey = findProperty('curseKey') ?: 0
         id = "${curse_id}"
         releaseType = "${curse_release}"
         changelogType = 'markdown'
@@ -160,7 +153,7 @@ curseforge {
 }
 
 publishing {
-    tasks.publish.dependsOn 'build'
+
     publications {
 
         mavenJava(MavenPublication) {

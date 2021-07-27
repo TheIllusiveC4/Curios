@@ -21,13 +21,13 @@ package top.theillusivec4.curios.common.network.server;
 
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -44,22 +44,22 @@ public class SPacketBreak {
     this.curioId = curioId;
   }
 
-  public static void encode(SPacketBreak msg, PacketBuffer buf) {
+  public static void encode(SPacketBreak msg, FriendlyByteBuf buf) {
     buf.writeInt(msg.entityId);
-    buf.writeString(msg.curioId);
+    buf.writeUtf(msg.curioId);
     buf.writeInt(msg.slotId);
   }
 
-  public static SPacketBreak decode(PacketBuffer buf) {
-    return new SPacketBreak(buf.readInt(), buf.readString(25), buf.readInt());
+  public static SPacketBreak decode(FriendlyByteBuf buf) {
+    return new SPacketBreak(buf.readInt(), buf.readUtf(25), buf.readInt());
   }
 
   public static void handle(SPacketBreak msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      ClientWorld world = Minecraft.getInstance().world;
+      ClientLevel world = Minecraft.getInstance().level;
 
       if (world != null) {
-        Entity entity = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+        Entity entity = Minecraft.getInstance().level.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity) {
           LivingEntity livingEntity = (LivingEntity) entity;

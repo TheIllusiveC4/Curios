@@ -21,11 +21,11 @@ package top.theillusivec4.curios.common.network.server;
 
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
@@ -39,25 +39,25 @@ public class SPacketScroll {
     this.index = index;
   }
 
-  public static void encode(SPacketScroll msg, PacketBuffer buf) {
+  public static void encode(SPacketScroll msg, FriendlyByteBuf buf) {
     buf.writeInt(msg.windowId);
     buf.writeInt(msg.index);
   }
 
-  public static SPacketScroll decode(PacketBuffer buf) {
+  public static SPacketScroll decode(FriendlyByteBuf buf) {
     return new SPacketScroll(buf.readInt(), buf.readInt());
   }
 
   public static void handle(SPacketScroll msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
       Minecraft mc = Minecraft.getInstance();
-      ClientPlayerEntity clientPlayer = mc.player;
-      Screen screen = mc.currentScreen;
+      LocalPlayer clientPlayer = mc.player;
+      Screen screen = mc.screen;
 
       if (clientPlayer != null) {
-        Container container = clientPlayer.openContainer;
+        AbstractContainerMenu container = clientPlayer.containerMenu;
 
-        if (container instanceof CuriosContainer && container.windowId == msg.windowId) {
+        if (container instanceof CuriosContainer && container.containerId == msg.windowId) {
           ((CuriosContainer) container).scrollToIndex(msg.index);
         }
       }

@@ -20,36 +20,36 @@
 package top.theillusivec4.curios.common.network.client;
 
 import java.util.function.Supplier;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.NetworkHooks;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainerProvider;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
 
 public class CPacketOpenCurios {
 
-  public static void encode(CPacketOpenCurios msg, PacketBuffer buf) {
+  public static void encode(CPacketOpenCurios msg, FriendlyByteBuf buf) {
   }
 
-  public static CPacketOpenCurios decode(PacketBuffer buf) {
+  public static CPacketOpenCurios decode(FriendlyByteBuf buf) {
     return new CPacketOpenCurios();
   }
 
   public static void handle(CPacketOpenCurios msg, Supplier<NetworkEvent.Context> ctx) {
     ctx.get().enqueueWork(() -> {
-      ServerPlayerEntity sender = ctx.get().getSender();
+      ServerPlayer sender = ctx.get().getSender();
 
       if (sender != null) {
-        ItemStack stack = sender.inventory.getItemStack();
-        sender.inventory.setItemStack(ItemStack.EMPTY);
+        ItemStack stack = sender.inventoryMenu.getCarried();
+        sender.inventoryMenu.setCarried(ItemStack.EMPTY);
         NetworkHooks.openGui(sender, new CuriosContainerProvider());
 
         if (!stack.isEmpty()) {
-          sender.inventory.setItemStack(stack);
+          sender.inventoryMenu.setCarried(stack);
           NetworkHandler.INSTANCE
               .send(PacketDistributor.PLAYER.with(() -> sender), new SPacketGrabbedItem(stack));
         }

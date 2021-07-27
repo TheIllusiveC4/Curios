@@ -1,6 +1,6 @@
 package top.theillusivec4.curios.api;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 
 public final class SlotContext {
 

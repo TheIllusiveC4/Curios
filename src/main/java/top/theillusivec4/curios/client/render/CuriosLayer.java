@@ -19,34 +19,34 @@
 
 package top.theillusivec4.curios.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nonnull;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.IEntityRenderer;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> extends
-    LayerRenderer<T, M> {
+    RenderLayer<T, M> {
 
-  private final IEntityRenderer<T, M> entityRenderer;
+  private final RenderLayerParent<T, M> renderLayerParent;
 
-  public CuriosLayer(IEntityRenderer<T, M> renderer) {
+  public CuriosLayer(RenderLayerParent<T, M> renderer) {
     super(renderer);
-    this.entityRenderer = renderer;
+    this.renderLayerParent = renderer;
   }
 
   @Override
-  public void render(@Nonnull MatrixStack matrixStack, @Nonnull IRenderTypeBuffer renderTypeBuffer,
+  public void render(@Nonnull PoseStack matrixStack, @Nonnull MultiBufferSource renderTypeBuffer,
                      int light, @Nonnull T livingEntity, float limbSwing, float limbSwingAmount,
                      float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-    matrixStack.push();
+    matrixStack.pushPose();
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
         .ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {
           IDynamicStackHandler stackHandler = stacksHandler.getStacks();
@@ -64,12 +64,12 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
               ItemStack finalStack = stack;
               CuriosRendererRegistry.getRenderer(stack.getItem()).ifPresent(
                   renderer -> renderer
-                      .render(finalStack, slotContext, this.entityRenderer, matrixStack,
+                      .render(finalStack, slotContext, matrixStack, renderLayerParent,
                           renderTypeBuffer, light, limbSwing, limbSwingAmount, partialTicks,
                           ageInTicks, netHeadYaw, headPitch));
             }
           }
         }));
-    matrixStack.pop();
+    matrixStack.popPose();
   }
 }

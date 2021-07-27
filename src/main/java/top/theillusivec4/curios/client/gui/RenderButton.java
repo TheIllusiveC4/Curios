@@ -19,13 +19,12 @@
 
 package top.theillusivec4.curios.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nonnull;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.button.ImageButton;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 
 public class RenderButton extends ImageButton {
@@ -37,7 +36,7 @@ public class RenderButton extends ImageButton {
 
   public RenderButton(CurioSlot slot, int xIn, int yIn, int widthIn, int heightIn, int xTexStartIn,
                       int yTexStartIn, int yDiffTextIn, ResourceLocation resourceLocationIn,
-                      Button.IPressable onPressIn) {
+                      Button.OnPress onPressIn) {
     super(xIn, yIn, widthIn, heightIn, xTexStartIn, yTexStartIn, yDiffTextIn, resourceLocationIn,
         256, 256, onPressIn);
     this.resourceLocation = resourceLocationIn;
@@ -47,14 +46,13 @@ public class RenderButton extends ImageButton {
   }
 
   @Override
-  public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     // NO-OP
   }
 
-  public void renderButtonOverlay(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY,
+  public void renderButtonOverlay(@Nonnull PoseStack matrixStack, int mouseX, int mouseY,
                                   float partialTicks) {
-    Minecraft minecraft = Minecraft.getInstance();
-    minecraft.getTextureManager().bindTexture(this.resourceLocation);
+    RenderSystem.setShaderTexture(0, this.resourceLocation);
     RenderSystem.disableDepthTest();
     int j = this.xTexStart;
 

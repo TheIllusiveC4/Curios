@@ -19,28 +19,28 @@
 
 package top.theillusivec4.curios.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.recipebook.IRecipeShownListener;
-import net.minecraft.client.gui.recipebook.RecipeBookGui;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.ImageButton;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -54,7 +54,8 @@ import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketToggleRender;
 
-public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IRecipeShownListener {
+public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
+    implements RecipeUpdateListener {
 
   static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID,
       "textures/gui/inventory.png");
@@ -66,7 +67,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
 
   private static float currentScroll;
 
-  private final RecipeBookGui recipeBookGui = new RecipeBookGui();
+  private final RecipeBookComponent recipeBookGui = new RecipeBookComponent();
 
   public boolean hasScrollBar;
   public boolean widthTooNarrow;
@@ -76,8 +77,8 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   private boolean buttonClicked;
   private boolean isRenderButtonHovered;
 
-  public CuriosScreen(CuriosContainer curiosContainer, PlayerInventory playerInventory,
-                      ITextComponent title) {
+  public CuriosScreen(CuriosContainer curiosContainer, Inventory playerInventory,
+                      Component title) {
     super(curiosContainer, playerInventory, title);
     this.passEvents = true;
   }
@@ -109,7 +110,7 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
             .map(handler -> handler.getVisibleSlots() > 8).orElse(false);
 
         if (this.hasScrollBar) {
-          this.container.scrollTo(currentScroll);
+          this.menu.scrollTo(currentScroll);
         }
       }
       int neededWidth = 431;
@@ -118,15 +119,15 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
         neededWidth += 30;
       }
 
-      if (this.container.hasCosmeticColumn()) {
+      if (this.menu.hasCosmeticColumn()) {
         neededWidth += 40;
       }
       this.widthTooNarrow = this.width < neededWidth;
       this.recipeBookGui
-          .init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.container);
+          .init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
       this.updateScreenPosition();
-      this.children.add(this.recipeBookGui);
-      this.setFocusedDefault(this.recipeBookGui);
+      this.addWidget(this.recipeBookGui);
+      this.setInitialFocus(this.recipeBookGui);
 
       /*
         This may not be a perfect workaround as it doesn't return the book upon switching back
@@ -147,17 +148,16 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       Tuple<Integer, Integer> offsets = getButtonOffset(false);
       this.buttonCurios = new CuriosButton(this, this.getGuiLeft() + offsets.getA(),
           this.height / 2 + offsets.getB(), 14, 14, 50, 0, 14, CURIO_INVENTORY);
-      this.addButton(this.buttonCurios);
+      this.addRenderableWidget(this.buttonCurios);
 
-      if (!this.playerInventory.player.isCreative()) {
-        this.addButton(new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19,
+      if (!this.menu.player.isCreative()) {
+        this.addRenderableWidget(new ImageButton(this.leftPos + 104, this.height / 2 - 22, 20, 18, 0, 0, 19,
             RECIPE_BUTTON_TEXTURE, (button) -> {
-          this.recipeBookGui.initSearchBar(this.widthTooNarrow);
           this.recipeBookGui.toggleVisibility();
           this.updateScreenPosition();
-          ((ImageButton) button).setPosition(this.guiLeft + 104, this.height / 2 - 22);
+          ((ImageButton) button).setPosition(this.leftPos + 104, this.height / 2 - 22);
           this.buttonCurios
-              .setPosition(this.guiLeft + offsets.getA(), this.height / 2 + offsets.getB());
+              .setPosition(this.leftPos + offsets.getA(), this.height / 2 + offsets.getB());
         }));
       }
 
@@ -166,15 +166,16 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   }
 
   public void updateRenderButtons() {
-    this.buttons.removeIf(widget -> widget instanceof RenderButton);
+    this.narratables.removeIf(widget -> widget instanceof RenderButton);
     this.children.removeIf(widget -> widget instanceof RenderButton);
+    this.renderables.removeIf(widget -> widget instanceof RenderButton);
 
-    for (Slot inventorySlot : this.container.inventorySlots) {
+    for (Slot inventorySlot : this.menu.slots) {
 
       if (inventorySlot instanceof CurioSlot && !(inventorySlot instanceof CosmeticCurioSlot)) {
-        this.addButton(
-            new RenderButton((CurioSlot) inventorySlot, this.guiLeft + inventorySlot.xPos + 11,
-                this.guiTop + inventorySlot.yPos - 3, 8, 8, 75, 0, 8, CURIO_INVENTORY,
+        this.addRenderableWidget(
+            new RenderButton((CurioSlot) inventorySlot, this.leftPos + inventorySlot.x + 11,
+                this.topPos + inventorySlot.y - 3, 8, 8, 75, 0, 8, CURIO_INVENTORY,
                 (button) -> NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
                     new CPacketToggleRender(((CurioSlot) inventorySlot).getIdentifier(),
                         inventorySlot.getSlotIndex()))));
@@ -192,32 +193,32 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
         offset -= 30;
       }
 
-      if (this.container.hasCosmeticColumn()) {
+      if (this.menu.hasCosmeticColumn()) {
         offset -= 40;
       }
-      i = 177 + (this.width - this.xSize - offset) / 2;
+      i = 177 + (this.width - this.imageWidth - offset) / 2;
     } else {
-      i = (this.width - this.xSize) / 2;
+      i = (this.width - this.imageWidth) / 2;
     }
-    this.guiLeft = i;
+    this.leftPos = i;
     this.updateRenderButtons();
   }
 
   @Override
-  public void tick() {
-    super.tick();
+  public void containerTick() {
+    super.containerTick();
     this.recipeBookGui.tick();
   }
 
   private boolean inScrollBar(double mouseX, double mouseY) {
-    int i = this.guiLeft;
-    int j = this.guiTop;
+    int i = this.leftPos;
+    int j = this.topPos;
     int k = i - 34;
     int l = j + 12;
     int i1 = k + 14;
     int j1 = l + 139;
 
-    if (this.container.hasCosmeticColumn()) {
+    if (this.menu.hasCosmeticColumn()) {
       i1 -= 19;
       k -= 19;
     }
@@ -225,60 +226,61 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   }
 
   @Override
-  public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     this.renderBackground(matrixStack);
 
     if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
-      this.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
+      this.renderBg(matrixStack, partialTicks, mouseX, mouseY);
       this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
     } else {
       this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
       super.render(matrixStack, mouseX, mouseY, partialTicks);
-      this.recipeBookGui.func_230477_a_(matrixStack, this.guiLeft, this.guiTop, true, partialTicks);
+      this.recipeBookGui
+          .renderGhostRecipe(matrixStack, this.leftPos, this.topPos, true, partialTicks);
 
       boolean isButtonHovered = false;
 
-      for (Widget button : this.buttons) {
+      for (Widget button : this.renderables) {
 
         if (button instanceof RenderButton) {
           ((RenderButton) button).renderButtonOverlay(matrixStack, mouseX, mouseY, partialTicks);
 
-          if (button.isHovered()) {
+          if (((RenderButton) button).isHovered()) {
             isButtonHovered = true;
           }
         }
       }
       this.isRenderButtonHovered = isButtonHovered;
-      ClientPlayerEntity clientPlayer = Minecraft.getInstance().player;
+      LocalPlayer clientPlayer = Minecraft.getInstance().player;
 
-      if (!this.isRenderButtonHovered && clientPlayer != null && clientPlayer.inventory
-          .getItemStack().isEmpty() && this.getSlotUnderMouse() != null) {
+      if (!this.isRenderButtonHovered && clientPlayer != null && clientPlayer.inventoryMenu
+          .getCarried().isEmpty() && this.getSlotUnderMouse() != null) {
         Slot slot = this.getSlotUnderMouse();
 
-        if (slot instanceof CurioSlot && !slot.getHasStack()) {
+        if (slot instanceof CurioSlot && !slot.hasItem()) {
           CurioSlot slotCurio = (CurioSlot) slot;
-          this.renderTooltip(matrixStack, new StringTextComponent(slotCurio.getSlotName()), mouseX,
+          this.renderTooltip(matrixStack, new TextComponent(slotCurio.getSlotName()), mouseX,
               mouseY);
         }
       }
     }
-    this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+    this.renderTooltip(matrixStack, mouseX, mouseY);
   }
 
   @Override
-  protected void renderHoveredTooltip(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY) {
+  protected void renderTooltip(@Nonnull PoseStack matrixStack, int mouseX, int mouseY) {
     Minecraft mc = this.minecraft;
 
     if (mc != null) {
-      ClientPlayerEntity clientPlayer = mc.player;
+      LocalPlayer clientPlayer = mc.player;
 
-      if (clientPlayer != null && clientPlayer.inventory.getItemStack().isEmpty()) {
+      if (clientPlayer != null && clientPlayer.inventoryMenu.getCarried().isEmpty()) {
 
         if (this.isRenderButtonHovered) {
-          this.renderTooltip(matrixStack, new TranslationTextComponent("gui.curios.toggle"), mouseX,
+          this.renderTooltip(matrixStack, new TranslatableComponent("gui.curios.toggle"), mouseX,
               mouseY);
-        } else if (this.hoveredSlot != null && this.hoveredSlot.getHasStack()) {
-          this.renderTooltip(matrixStack, this.hoveredSlot.getStack(), mouseX, mouseY);
+        } else if (this.hoveredSlot != null && this.hoveredSlot.hasItem()) {
+          this.renderTooltip(matrixStack, this.hoveredSlot.getItem(), mouseX, mouseY);
         }
       }
     }
@@ -292,11 +294,11 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
       this.updateScreenPosition();
       return true;
     } else if (KeyRegistry.openCurios
-        .isActiveAndMatches(InputMappings.getInputByCode(p_keyPressed_1_, p_keyPressed_2_))) {
-      ClientPlayerEntity playerEntity = this.getMinecraft().player;
+        .isActiveAndMatches(InputConstants.getKey(p_keyPressed_1_, p_keyPressed_2_))) {
+      LocalPlayer playerEntity = this.getMinecraft().player;
 
       if (playerEntity != null) {
-        playerEntity.closeScreen();
+        playerEntity.closeContainer();
       }
       return true;
     } else {
@@ -305,11 +307,11 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   }
 
   @Override
-  protected void drawGuiContainerForegroundLayer(@Nonnull MatrixStack matrixStack, int mouseX,
-                                                 int mouseY) {
+  protected void renderLabels(@Nonnull PoseStack matrixStack, int mouseX,
+                              int mouseY) {
 
     if (this.minecraft != null && this.minecraft.player != null) {
-      this.font.drawText(matrixStack, this.title, 97, 6, 4210752);
+      this.font.draw(matrixStack, this.title, 97, 6, 4210752);
     }
   }
 
@@ -318,29 +320,29 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
    */
 
   @Override
-  protected void drawGuiContainerBackgroundLayer(@Nonnull MatrixStack matrixStack,
-                                                 float partialTicks, int mouseX, int mouseY) {
+  protected void renderBg(@Nonnull PoseStack matrixStack,
+                          float partialTicks, int mouseX, int mouseY) {
 
     if (this.minecraft != null && this.minecraft.player != null) {
-      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-      this.minecraft.getTextureManager().bindTexture(INVENTORY_BACKGROUND);
-      int i = this.guiLeft;
-      int j = this.guiTop;
-      this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
-      InventoryScreen.drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - mouseX,
+      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+      RenderSystem.setShaderTexture(0, INVENTORY_LOCATION);
+      int i = this.leftPos;
+      int j = this.topPos;
+      this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+      InventoryScreen.renderEntityInInventory(i + 51, j + 75, 30, (float) (i + 51) - mouseX,
           (float) (j + 75 - 50) - mouseY, this.minecraft.player);
       CuriosApi.getCuriosHelper().getCuriosHandler(this.minecraft.player).ifPresent(handler -> {
         int slotCount = handler.getVisibleSlots();
 
         if (slotCount > 0) {
           int upperHeight = 7 + Math.min(slotCount, 9) * 18;
-          RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-          this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
+          RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+          RenderSystem.setShaderTexture(0, CURIO_INVENTORY);
           int xTexOffset = 0;
           int width = 27;
           int xOffset = -26;
 
-          if (this.container.hasCosmeticColumn()) {
+          if (this.menu.hasCosmeticColumn()) {
             xTexOffset = 92;
             width = 46;
             xOffset -= 19;
@@ -351,17 +353,17 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
             this.blit(matrixStack, i + xOffset, j + 4 + upperHeight, xTexOffset, 151, width, 7);
           } else {
             this.blit(matrixStack, i + xOffset - 16, j + 4, 27, 0, 23, 158);
-            this.getMinecraft().getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
+            RenderSystem.setShaderTexture(0, CREATIVE_INVENTORY_TABS);
             this.blit(matrixStack, i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 232, 0,
                 12, 15);
           }
 
-          for (Slot slot : this.container.inventorySlots) {
+          for (Slot slot : this.menu.slots) {
 
             if (slot instanceof CosmeticCurioSlot) {
-              int x = this.guiLeft + slot.xPos - 1;
-              int y = this.guiTop + slot.yPos - 1;
-              this.getMinecraft().getTextureManager().bindTexture(CURIO_INVENTORY);
+              int x = this.leftPos + slot.x - 1;
+              int y = this.topPos + slot.y - 1;
+              RenderSystem.setShaderTexture(0, CURIO_INVENTORY);
               this.blit(matrixStack, x, y, 138, 0, 18, 18);
             }
           }
@@ -375,14 +377,14 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
    * rectHeight, pointX, pointY
    */
   @Override
-  protected boolean isPointInRegion(int rectX, int rectY, int rectWidth, int rectHeight,
-                                    double pointX, double pointY) {
+  protected boolean isHovering(int rectX, int rectY, int rectWidth, int rectHeight,
+                               double pointX, double pointY) {
 
     if (this.isRenderButtonHovered) {
       return false;
     }
     return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super
-        .isPointInRegion(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
+        .isHovering(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
   }
 
   /**
@@ -421,11 +423,11 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
                               double pMouseDragged6, double pMouseDragged8) {
 
     if (this.isScrolling) {
-      int i = this.guiTop + 8;
+      int i = this.topPos + 8;
       int j = i + 148;
       currentScroll = ((float) pMouseDragged3 - i - 7.5F) / (j - i - 15.0F);
-      currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
-      this.container.scrollTo(currentScroll);
+      currentScroll = Mth.clamp(currentScroll, 0.0F, 1.0F);
+      this.menu.scrollTo(currentScroll);
       return true;
     } else {
       return super.mouseDragged(pMouseDragged1, pMouseDragged3, pMouseDragged5, pMouseDragged6,
@@ -440,32 +442,33 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
     if (!this.needsScrollBars()) {
       return false;
     } else {
-      int i = (this.container).curiosHandler.map(ICuriosItemHandler::getVisibleSlots).orElse(1);
+      int i = (this.menu).curiosHandler.map(ICuriosItemHandler::getVisibleSlots).orElse(1);
       currentScroll = (float) (currentScroll - pMouseScrolled5 / i);
-      currentScroll = MathHelper.clamp(currentScroll, 0.0F, 1.0F);
-      this.container.scrollTo(currentScroll);
+      currentScroll = Mth.clamp(currentScroll, 0.0F, 1.0F);
+      this.menu.scrollTo(currentScroll);
       return true;
     }
   }
 
   private boolean needsScrollBars() {
-    return this.container.canScroll();
+    return this.menu.canScroll();
   }
 
   @Override
   protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn,
                                       int mouseButton) {
-    boolean flag = mouseX < guiLeftIn || mouseY < guiTopIn || mouseX >= guiLeftIn + this.xSize
-        || mouseY >= guiTopIn + this.ySize;
+    boolean flag = mouseX < guiLeftIn || mouseY < guiTopIn || mouseX >= guiLeftIn + this.imageWidth
+        || mouseY >= guiTopIn + this.imageHeight;
     return this.recipeBookGui
-        .func_195604_a(mouseX, mouseY, this.guiLeft, this.guiTop, this.xSize, this.ySize,
+        .hasClickedOutside(mouseX, mouseY, this.leftPos, this.topPos, this.imageWidth,
+            this.imageHeight,
             mouseButton) && flag;
   }
 
   @Override
-  protected void handleMouseClick(@Nonnull Slot slotIn, int slotId, int mouseButton,
-                                  @Nonnull ClickType type) {
-    super.handleMouseClick(slotIn, slotId, mouseButton, type);
+  protected void slotClicked(@Nonnull Slot slotIn, int slotId, int mouseButton,
+                             @Nonnull ClickType type) {
+    super.slotClicked(slotIn, slotId, mouseButton, type);
     this.recipeBookGui.slotClicked(slotIn);
   }
 
@@ -475,14 +478,14 @@ public class CuriosScreen extends ContainerScreen<CuriosContainer> implements IR
   }
 
   @Override
-  public void onClose() {
+  public void removed() {
     this.recipeBookGui.removed();
-    super.onClose();
+    super.removed();
   }
 
   @Nonnull
   @Override
-  public RecipeBookGui getRecipeGui() {
+  public RecipeBookComponent getRecipeBookComponent() {
     return this.recipeBookGui;
   }
 }
