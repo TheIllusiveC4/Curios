@@ -196,7 +196,7 @@ public interface ICurio {
    * @param slotContext Context about the slot that the ItemStack is in
    * @return Data to be sent to the client
    */
-  @Nonnull
+  @Nullable
   default CompoundTag writeSyncData(SlotContext slotContext) {
     return writeSyncData();
   }
@@ -447,8 +447,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#writeSyncData(SlotContext)}
    */
-  @Nonnull
   @Deprecated
+  @Nullable
   default CompoundTag writeSyncData() {
     return new CompoundTag();
   }

@@ -542,9 +542,10 @@ public class CuriosEventHandler {
     SlotContext slotContext = new SlotContext(identifier, livingEntity, index, cosmetic, visible);
     boolean syncable = currentCurio.map(curio -> curio.canSync(slotContext)).orElse(false) ||
         prevCurio.map(curio -> curio.canSync(slotContext)).orElse(false);
-    CompoundTag syncTag = syncable ?
-        currentCurio.map(curio -> curio.writeSyncData(slotContext)).orElse(new CompoundTag()) :
-        new CompoundTag();
+    CompoundTag syncTag = syncable ? currentCurio.map(curio -> {
+      CompoundTag tag = curio.writeSyncData(slotContext);
+      return tag != null ? tag : new CompoundTag();
+    }).orElse(new CompoundTag()) : new CompoundTag();
     NetworkHandler.INSTANCE
         .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
             new SPacketSyncStack(livingEntity.getId(), identifier, index, stack, type,

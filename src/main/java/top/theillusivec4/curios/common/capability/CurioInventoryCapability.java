@@ -73,7 +73,7 @@ public class CurioInventoryCapability {
     NonNullList<ItemStack> invalidStacks = NonNullList.create();
     Player wearer;
 
-    CurioInventoryWrapper(final Player playerEntity) {
+    public CurioInventoryWrapper(final Player playerEntity) {
       this.wearer = playerEntity;
       this.reset();
     }
