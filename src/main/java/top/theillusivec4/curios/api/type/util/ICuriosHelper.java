@@ -126,30 +126,39 @@ public interface ICuriosHelper {
   boolean isStackValid(SlotContext slotContext, ItemStack stack);
 
   /**
-   * Passes three inputs into an internal triple-input consumer that should be used from the
-   * single-input consumer in {@link ItemStack#hurtAndBreak(int, LivingEntity, Consumer)}
+   * Performs breaking behavior used from the single-input consumer in {@link ItemStack#hurtAndBreak(int, LivingEntity, Consumer)}
    * <br>
    * This will be necessary in order to trigger break animations in curio slots
    * <br>
-   * Example: { stack.damageItem(amount, entity, damager -> CuriosApi.getCuriosHelper().onBrokenCurio(id,
-   * index, damager)); }
+   * Example: { stack.damageItem(amount, entity, damager -> CuriosApi.getCuriosHelper().onBrokenCurio(slotContext)); }
    *
-   * @param id      The {@link top.theillusivec4.curios.api.type.ISlotType} String identifier
-   * @param index   The slot index of the identifier
-   * @param damager The entity that is breaking the item
+   * @param slotContext Context about the slot that the curio is in
    */
+  void onBrokenCurio(SlotContext slotContext);
+
+  /**
+   * Sets the {@link Consumer} that should be used with {@link ItemStack#hurtAndBreak(int,
+   * LivingEntity, Consumer)} when triggering break animations in curio slots
+   *
+   * @param consumer The {@link Consumer} taking a {@link SlotContext}
+   */
+  void setBrokenCurioConsumer(Consumer<SlotContext> consumer);
+
+  // ========= DEPRECATED =============
+
+  /**
+   * @deprecated See {@link ICuriosHelper#onBrokenCurio(SlotContext)} for a slot context-sensitive
+   * alternative
+   */
+  @Deprecated
   void onBrokenCurio(String id, int index, LivingEntity damager);
 
   /**
-   * Sets the {@link TriConsumer} that should be used with {@link ItemStack#hurtAndBreak(int,
-   * LivingEntity, Consumer)} when triggering break animations in curio slots
-   *
-   * @param consumer The {@link TriConsumer} taking an {@link top.theillusivec4.curios.api.type.ISlotType}
-   *                 identifier, a slot index, and the wearer as a {@link LivingEntity}
+   * @deprecated See {@link ICuriosHelper#setBrokenCurioConsumer(Consumer)} for a slot
+   * context-sensitive alternative
    */
+  @Deprecated
   void setBrokenCurioConsumer(TriConsumer<String, Integer, LivingEntity> consumer);
-
-  // ========= DEPRECATED =============
 
   /**
    * @deprecated See {@link ICuriosHelper#getAttributeModifiers(SlotContext, UUID, ItemStack)} for

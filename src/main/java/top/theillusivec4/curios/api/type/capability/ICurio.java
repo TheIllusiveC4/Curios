@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -38,6 +40,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.Vec3;
 import top.theillusivec4.curios.api.SlotContext;
 
 public interface ICurio {
@@ -303,36 +306,33 @@ public interface ICurio {
    * Copy of vanilla implementation for breaking items client-side
    */
   static void playBreakAnimation(ItemStack stack, LivingEntity livingEntity) {
-    // todo: re-implement
 
-//    if (!stack.isEmpty()) {
-//
-//      if (!livingEntity.isSilent()) {
-//        livingEntity.level
-//            .playLocalSound(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(),
-//                SoundEvents.ITEM_BREAK, livingEntity.getSoundSource(), 0.8F,
-//                0.8F + livingEntity.level.random.nextFloat() * 0.4F, false);
-//      }
-//
-//      for (int i = 0; i < 5; ++i) {
-//        Vec3 vec3d = new Vec3((livingEntity.getRandom().nextFloat() - 0.5D) * 0.1D,
-//            Math.random() * 0.1D + 0.1D, 0.0D);
-//        vec3d = vec3d.xRot(-livingEntity.xRot * ((float) Math.PI / 180F));
-//        vec3d = vec3d.yRot(-livingEntity.yRot * ((float) Math.PI / 180F));
-//        double d0 = (-livingEntity.getRandom().nextFloat()) * 0.6D - 0.3D;
-//
-//        Vec3 vec3d1 = new Vec3((livingEntity.getRandom().nextFloat() - 0.5D) * 0.3D,
-//            d0, 0.6D);
-//        vec3d1 = vec3d1.xRot(-livingEntity.xRot * ((float) Math.PI / 180F));
-//        vec3d1 = vec3d1.yRot(-livingEntity.yRot * ((float) Math.PI / 180F));
-//        vec3d1 = vec3d1.add(livingEntity.getX(),
-//            livingEntity.getY() + livingEntity.getEyeHeight(), livingEntity.getZ());
-//
-//        livingEntity.level
-//            .addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
-//                vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
-//      }
-//    }
+    if (!stack.isEmpty()) {
+
+      if (!livingEntity.isSilent()) {
+        livingEntity.level
+            .playLocalSound(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(),
+                SoundEvents.ITEM_BREAK, livingEntity.getSoundSource(), 0.8F,
+                0.8F + livingEntity.level.random.nextFloat() * 0.4F, false);
+      }
+
+      for (int i = 0; i < 5; ++i) {
+        Vec3 vec3d = new Vec3((livingEntity.getRandom().nextFloat() - 0.5D) * 0.1D,
+            Math.random() * 0.1D + 0.1D, 0.0D);
+        vec3d = vec3d.xRot(-livingEntity.getXRot() * ((float) Math.PI / 180F));
+        vec3d = vec3d.yRot(-livingEntity.getYRot() * ((float) Math.PI / 180F));
+        double d0 = (-livingEntity.getRandom().nextFloat()) * 0.6D - 0.3D;
+        Vec3 vec3d1 = new Vec3((livingEntity.getRandom().nextFloat() - 0.5D) * 0.3D,
+            d0, 0.6D);
+        vec3d1 = vec3d1.xRot(-livingEntity.getXRot() * ((float) Math.PI / 180F));
+        vec3d1 = vec3d1.yRot(-livingEntity.getYRot() * ((float) Math.PI / 180F));
+        vec3d1 = vec3d1.add(livingEntity.getX(),
+            livingEntity.getY() + livingEntity.getEyeHeight(), livingEntity.getZ());
+        livingEntity.level
+            .addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
+                vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
+      }
+    }
   }
 
   // ============ DEPRECATED ================

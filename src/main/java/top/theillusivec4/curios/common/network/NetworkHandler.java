@@ -88,9 +88,10 @@ public class NetworkHandler {
         SPacketSyncRender::handle);
 
     // Assignment of curio breaking to the network instance
-    CuriosApi.getCuriosHelper().setBrokenCurioConsumer((id, index, livingEntity) -> INSTANCE
-        .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-            new SPacketBreak(livingEntity.getId(), id, index)));
+    CuriosApi.getCuriosHelper().setBrokenCurioConsumer((slotContext) -> INSTANCE
+        .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(slotContext::entity),
+            new SPacketBreak(slotContext.entity().getId(), slotContext.identifier(),
+                slotContext.index())));
   }
 
   private static <M> void register(Class<M> messageType, BiConsumer<M, FriendlyByteBuf> encoder,
