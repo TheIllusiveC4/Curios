@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -54,7 +55,8 @@ import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 
 public class CuriosHelper implements ICuriosHelper {
 
-  private static TriConsumer<String, Integer, LivingEntity> brokenCurioConsumer;
+  private static TriConsumer<String, Integer, LivingEntity> brokenCurioConsumerLegacy;
+  private static Consumer<SlotContext> brokenCurioConsumer;
 
   @Override
   public LazyOptional<ICurio> getCurio(ItemStack stack) {
@@ -175,15 +177,28 @@ public class CuriosHelper implements ICuriosHelper {
   }
 
   @Override
+  public void onBrokenCurio(SlotContext slotContext) {
+    brokenCurioConsumer.accept(slotContext);
+  }
+
+  @Override
+  public void setBrokenCurioConsumer(Consumer<SlotContext> consumer) {
+
+    if (brokenCurioConsumer == null) {
+      brokenCurioConsumer = consumer;
+    }
+  }
+
+  @Override
   public void onBrokenCurio(String id, int index, LivingEntity damager) {
-    brokenCurioConsumer.accept(id, index, damager);
+    brokenCurioConsumerLegacy.accept(id, index, damager);
   }
 
   @Override
   public void setBrokenCurioConsumer(TriConsumer<String, Integer, LivingEntity> consumer) {
 
-    if (brokenCurioConsumer == null) {
-      brokenCurioConsumer = consumer;
+    if (brokenCurioConsumerLegacy == null) {
+      brokenCurioConsumerLegacy = consumer;
     }
   }
 }
