@@ -115,8 +115,6 @@ jar {
     }
 }
 
-jar.finalizedBy('reobfJar')
-
 task apiJar(type: Jar) {
     archiveClassifier.set('api')
     include 'top/theillusivec4/curios/api/**/*'
@@ -130,8 +128,8 @@ task sourcesJar(type: Jar) {
 }
 
 artifacts {
-    apiJar
-    sourcesJar
+    archives apiJar
+    archives sourcesJar
 }
 
 jar.finalizedBy('reobfJar')
