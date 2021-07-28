@@ -20,8 +20,6 @@ public interface ICurioRenderer {
 
   /**
    * Performs rendering of the curio.
-   * Note that vertical sneaking translations are automatically applied before this rendering method
-   * is called.
    *
    * @param slotContext The slot context of the curio that is being rendered
    */
