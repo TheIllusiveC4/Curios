@@ -50,13 +50,13 @@ public class CrownItem extends Item {
 
       @Override
       public void curioTick(SlotContext slotContext) {
-        LivingEntity livingEntity = slotContext.getWearer();
+        LivingEntity livingEntity = slotContext.entity();
 
         if (!livingEntity.level.isClientSide() && livingEntity.tickCount % 20 == 0) {
           livingEntity
               .addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, -1, true, true));
           stack.hurtAndBreak(1, livingEntity, damager -> CuriosApi.getCuriosHelper()
-              .onBrokenCurio(slotContext.getIdentifier(), slotContext.getIndex(), damager));
+              .onBrokenCurio(slotContext.identifier(), slotContext.index(), damager));
         }
       }
     });

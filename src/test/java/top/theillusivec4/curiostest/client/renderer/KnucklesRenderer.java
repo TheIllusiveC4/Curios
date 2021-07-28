@@ -42,11 +42,10 @@ public class KnucklesRenderer implements ICurioRenderer {
                                                                         float ageInTicks,
                                                                         float netHeadYaw,
                                                                         float headPitch) {
-    this.model.prepareMobModel(slotContext.getWearer(), limbSwing, limbSwingAmount, partialTicks);
-    this.model
-        .setupAnim(slotContext.getWearer(), limbSwing, limbSwingAmount, ageInTicks, netHeadYaw,
-            headPitch);
-    ICurioRenderer.followBodyRotations(slotContext.getWearer(), this.model);
+    LivingEntity entity = slotContext.entity();
+    this.model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
+    this.model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+    ICurioRenderer.followBodyRotations(entity, this.model);
     VertexConsumer vertexconsumer = ItemRenderer
         .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(KNUCKLES_TEXTURE), false,
             stack.hasFoil());

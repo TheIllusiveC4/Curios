@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -93,11 +94,13 @@ public class CuriosEventHandler {
 
   private static void handleDrops(String identifier, LivingEntity livingEntity,
                                   List<Tuple<Predicate<ItemStack>, DropRule>> dropRules,
-                                  IDynamicStackHandler stacks, Collection<ItemEntity> drops,
+                                  NonNullList<Boolean> renders, IDynamicStackHandler stacks,
+                                  boolean cosmetic, Collection<ItemEntity> drops,
                                   boolean keepInventory, LivingDropsEvent evt) {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
-      SlotContext slotContext = new SlotContext(identifier, livingEntity, i);
+      SlotContext slotContext =
+          new SlotContext(identifier, livingEntity, i, cosmetic, renders.get(i));
 
       if (!stack.isEmpty()) {
         DropRule dropRuleOverride = null;
@@ -254,7 +257,8 @@ public class CuriosEventHandler {
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
-          SlotContext slotContext = new SlotContext(identifier, player, i);
+          SlotContext slotContext =
+              new SlotContext(identifier, player, i, false, stacksHandler.getRenders().get(i));
 
           if (!stack.isEmpty()) {
             UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
@@ -295,10 +299,10 @@ public class CuriosEventHandler {
             .getBoolean(GameRules.RULE_KEEPINVENTORY);
 
         curios.forEach((id, stacksHandler) -> {
-          handleDrops(id, livingEntity, dropRules, stacksHandler.getStacks(), curioDrops,
-              keepInventory, evt);
-          handleDrops(id, livingEntity, dropRules, stacksHandler.getCosmeticStacks(), curioDrops,
-              keepInventory, evt);
+          handleDrops(id, livingEntity, dropRules, stacksHandler.getRenders(),
+              stacksHandler.getStacks(), false, curioDrops, keepInventory, evt);
+          handleDrops(id, livingEntity, dropRules, stacksHandler.getRenders(),
+              stacksHandler.getCosmeticStacks(), true, curioDrops, keepInventory, evt);
         });
 
         if (!MinecraftForge.EVENT_BUS.post(
@@ -344,7 +348,8 @@ public class CuriosEventHandler {
 
               for (int i = 0; i < stackHandler.getSlots(); i++) {
                 String id = entry.getKey();
-                SlotContext slotContext = new SlotContext(id, player, i);
+                SlotContext slotContext =
+                    new SlotContext(id, player, i, false, entry.getValue().getRenders().get(i));
 
                 if (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(slotContext) &&
                     curio.canEquipFromUse(slotContext)) {
@@ -387,8 +392,10 @@ public class CuriosEventHandler {
             String id = entry.getKey();
             IDynamicStackHandler stacks = stacksHandler.getStacks();
             IDynamicStackHandler cosmeticStacks = stacksHandler.getCosmeticStacks();
-            replaceInvalidStacks(curiosHelper, player, id, stacks);
-            replaceInvalidStacks(curiosHelper, player, id, cosmeticStacks);
+            replaceInvalidStacks(curiosHelper, player, id, stacks, false,
+                stacksHandler.getRenders());
+            replaceInvalidStacks(curiosHelper, player, id, cosmeticStacks, true,
+                stacksHandler.getRenders());
           }
         });
       }
@@ -397,10 +404,11 @@ public class CuriosEventHandler {
   }
 
   private static void replaceInvalidStacks(ICuriosHelper curiosHelper, ServerPlayer player,
-                                           String id, IDynamicStackHandler stacks) {
+                                           String id, IDynamicStackHandler stacks, boolean cosmetic,
+                                           NonNullList<Boolean> renders) {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
-      SlotContext slotContext = new SlotContext(id, player, i);
+      SlotContext slotContext = new SlotContext(id, player, i, cosmetic, renders.get(i));
 
       if (!stack.isEmpty() && !curiosHelper.isStackValid(slotContext, stack)) {
         stacks.setStackInSlot(i, ItemStack.EMPTY);
@@ -432,9 +440,10 @@ public class CuriosEventHandler {
         IDynamicStackHandler stacks = entry.getValue().getStacks();
 
         for (int i = 0; i < stacks.getSlots(); i++) {
-          int index = i;
+          SlotContext slotContext = new SlotContext(entry.getKey(), player, i, false,
+              entry.getValue().getRenders().get(i));
           fortuneLevel.addAndGet(curiosHelper.getCurio(stacks.getStackInSlot(i)).map(
-              curio -> curio.getFortuneLevel(new SlotContext(entry.getKey(), player, index), null))
+              curio -> curio.getFortuneLevel(slotContext, null))
               .orElse(0));
         }
       }
@@ -463,7 +472,8 @@ public class CuriosEventHandler {
         IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
-          SlotContext slotContext = new SlotContext(identifier, livingEntity, i);
+          SlotContext slotContext = new SlotContext(identifier, livingEntity, i, false,
+              stacksHandler.getRenders().get(i));
           ItemStack stack = stackHandler.getStackInSlot(i);
           LazyOptional<ICurio> currentCurio = CuriosApi.getCuriosHelper().getCurio(stack);
           final int index = i;
@@ -483,8 +493,8 @@ public class CuriosEventHandler {
 
             if (!ItemStack.matches(stack, prevStack)) {
               LazyOptional<ICurio> prevCurio = CuriosApi.getCuriosHelper().getCurio(prevStack);
-              syncCurios(livingEntity, stack, currentCurio, prevCurio, identifier, index,
-                  HandlerType.EQUIPMENT);
+              syncCurios(livingEntity, stack, currentCurio, prevCurio, identifier, index, false,
+                  stacksHandler.getRenders().get(index), HandlerType.EQUIPMENT);
               MinecraftForge.EVENT_BUS
                   .post(new CurioChangeEvent(livingEntity, identifier, i, prevStack, stack));
               UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
@@ -515,8 +525,8 @@ public class CuriosEventHandler {
             if (!ItemStack.matches(cosmeticStack, prevCosmeticStack)) {
               syncCurios(livingEntity, cosmeticStack,
                   CuriosApi.getCuriosHelper().getCurio(cosmeticStack),
-                  CuriosApi.getCuriosHelper().getCurio(prevCosmeticStack), identifier, index,
-                  HandlerType.COSMETIC);
+                  CuriosApi.getCuriosHelper().getCurio(prevCosmeticStack), identifier, index, true,
+                  true, HandlerType.COSMETIC);
               cosmeticStackHandler.setPreviousStackInSlot(index, cosmeticStack.copy());
             }
           }
@@ -527,8 +537,9 @@ public class CuriosEventHandler {
 
   private static void syncCurios(LivingEntity livingEntity, ItemStack stack,
                                  LazyOptional<ICurio> currentCurio, LazyOptional<ICurio> prevCurio,
-                                 String identifier, int index, HandlerType type) {
-    SlotContext slotContext = new SlotContext(identifier, livingEntity, index);
+                                 String identifier, int index, boolean cosmetic, boolean visible,
+                                 HandlerType type) {
+    SlotContext slotContext = new SlotContext(identifier, livingEntity, index, cosmetic, visible);
     boolean syncable = currentCurio.map(curio -> curio.canSync(slotContext)).orElse(false) ||
         prevCurio.map(curio -> curio.canSync(slotContext)).orElse(false);
     CompoundTag syncTag = syncable ?

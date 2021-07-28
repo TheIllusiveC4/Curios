@@ -28,14 +28,14 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -128,7 +128,8 @@ public class CuriosHelper implements ICuriosHelper {
   @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier,
                                                                       ItemStack stack) {
-    return getAttributeModifiers(new SlotContext(identifier), UUID.randomUUID(), stack);
+    return getAttributeModifiers(new SlotContext(identifier, null, 0, false, true),
+        UUID.randomUUID(), stack);
   }
 
   @Override
@@ -139,7 +140,7 @@ public class CuriosHelper implements ICuriosHelper {
     if (stack.getTag() != null && stack.getTag().contains("CurioAttributeModifiers", 9)) {
       multimap = HashMultimap.create();
       ListTag listnbt = stack.getTag().getList("CurioAttributeModifiers", 10);
-      String identifier = slotContext.getIdentifier();
+      String identifier = slotContext.identifier();
 
       for (int i = 0; i < listnbt.size(); ++i) {
         CompoundTag compoundnbt = listnbt.getCompound(i);
@@ -167,7 +168,7 @@ public class CuriosHelper implements ICuriosHelper {
 
   @Override
   public boolean isStackValid(SlotContext slotContext, ItemStack stack) {
-    String id = slotContext.getIdentifier();
+    String id = slotContext.identifier();
     Set<String> tags = getCurioTags(stack.getItem());
     return (!tags.isEmpty() && id.equals(SlotTypePreset.CURIO.getIdentifier())) ||
         tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier());

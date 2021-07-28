@@ -77,14 +77,15 @@ public class SPacketSyncStack {
                 ItemStack stack = msg.stack;
                 CompoundTag compoundNBT = msg.compound;
                 int slot = msg.slotId;
+                boolean cosmetic = HandlerType.fromValue(msg.handlerType) == HandlerType.COSMETIC;
 
                 if (!compoundNBT.isEmpty()) {
-                  CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> curio
-                      .readSyncData(new SlotContext(msg.curioId, (LivingEntity) entity, msg.slotId),
-                          compoundNBT));
+                  CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> curio.readSyncData(
+                      new SlotContext(msg.curioId, (LivingEntity) entity, slot, cosmetic,
+                          stacksHandler.getRenders().get(slot)), compoundNBT));
                 }
 
-                if (HandlerType.fromValue(msg.handlerType) == HandlerType.COSMETIC) {
+                if (cosmetic) {
                   stacksHandler.getCosmeticStacks().setStackInSlot(slot, stack);
                 } else {
                   stacksHandler.getStacks().setStackInSlot(slot, stack);

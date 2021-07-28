@@ -56,7 +56,7 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
 
   @Override
   public void curioTick(SlotContext slotContext, ItemStack stack) {
-    LivingEntity living = slotContext.getWearer();
+    LivingEntity living = slotContext.entity();
 
     if (!living.level.isClientSide() && living.tickCount % 40 == 0) {
       living.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 80, 0, true, true));
@@ -80,11 +80,6 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
   }
 
   @Override
-  public boolean makesPiglinsNeutral(SlotContext slotContext, ItemStack stack) {
-    return true;
-  }
-
-  @Override
   public <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack,
                                                                         SlotContext slotContext,
                                                                         PoseStack matrixStack,
@@ -103,8 +98,8 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
     }
 
     if (this.model instanceof AmuletModel) {
-      ICurioRenderer.translateIfSneaking(matrixStack, slotContext.getWearer());
-      ICurioRenderer.rotateIfSneaking(matrixStack, slotContext.getWearer());
+      ICurioRenderer.translateIfSneaking(matrixStack, slotContext.entity());
+      ICurioRenderer.rotateIfSneaking(matrixStack, slotContext.entity());
       VertexConsumer vertexconsumer = ItemRenderer
           .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(AMULET_TEXTURE), false,
               stack.hasFoil());

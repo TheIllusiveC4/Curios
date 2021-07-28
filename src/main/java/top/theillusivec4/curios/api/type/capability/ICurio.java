@@ -26,21 +26,18 @@ import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.particles.ItemParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.Component;
 import top.theillusivec4.curios.api.SlotContext;
 
 public interface ICurio {
@@ -58,7 +55,7 @@ public interface ICurio {
    * @param slotContext Context about the slot that the ItemStack is in
    */
   default void curioTick(SlotContext slotContext) {
-    curioTick(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer());
+    curioTick(slotContext.identifier(), slotContext.index(), slotContext.entity());
   }
 
   /**
@@ -68,7 +65,7 @@ public interface ICurio {
    * @param prevStack   The previous ItemStack in the slot
    */
   default void onEquip(SlotContext slotContext, ItemStack prevStack) {
-    onEquip(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer());
+    onEquip(slotContext.identifier(), slotContext.index(), slotContext.entity());
   }
 
   /**
@@ -78,7 +75,7 @@ public interface ICurio {
    * @param newStack    The new ItemStack in the slot
    */
   default void onUnequip(SlotContext slotContext, ItemStack newStack) {
-    onUnequip(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer());
+    onUnequip(slotContext.identifier(), slotContext.index(), slotContext.entity());
   }
 
   /**
@@ -128,7 +125,7 @@ public interface ICurio {
    */
   default Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                        UUID uuid) {
-    return getAttributeModifiers(slotContext.getIdentifier());
+    return getAttributeModifiers(slotContext.identifier());
   }
 
   /**
@@ -142,7 +139,7 @@ public interface ICurio {
    * @param slotContext Context about the slot that the ItemStack was just equipped into
    */
   default void onEquipFromUse(SlotContext slotContext) {
-    playRightClickEquipSound(slotContext.getWearer());
+    playRightClickEquipSound(slotContext.entity());
   }
 
   /**
@@ -174,7 +171,7 @@ public interface ICurio {
    * @param slotContext Context about the slot that the ItemStack broke in
    */
   default void curioBreak(SlotContext slotContext) {
-    curioBreak(getStack(), slotContext.getWearer());
+    curioBreak(getStack(), slotContext.entity());
   }
 
   /**
@@ -186,7 +183,7 @@ public interface ICurio {
    * @return True to sync the ItemStack change to all tracking clients, false to do nothing
    */
   default boolean canSync(SlotContext slotContext) {
-    return canSync(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer());
+    return canSync(slotContext.identifier(), slotContext.index(), slotContext.entity());
   }
 
   /**
@@ -225,7 +222,7 @@ public interface ICurio {
   @Nonnull
   default DropRule getDropRule(SlotContext slotContext, DamageSource source, int lootingLevel,
                                boolean recentlyHit) {
-    return getDropRule(slotContext.getWearer());
+    return getDropRule(slotContext.entity());
   }
 
   /**
@@ -249,8 +246,8 @@ public interface ICurio {
    * @return Amount of additional Fortune levels that will be applied when mining
    */
   default int getFortuneLevel(SlotContext slotContext, @Nullable LootContext lootContext) {
-    return getFortuneBonus(slotContext.getIdentifier(), slotContext.getWearer(), getStack(),
-        slotContext.getIndex());
+    return getFortuneBonus(slotContext.identifier(), slotContext.entity(), getStack(),
+        slotContext.index());
   }
 
   /**
@@ -263,9 +260,10 @@ public interface ICurio {
    * @param baseLooting The original looting level before bonuses
    * @return Amount of additional Looting levels that will be applied in LootingLevelEvent
    */
-  default int getLootingLevel(SlotContext slotContext, DamageSource source, LivingEntity target, int baseLooting) {
-    return getLootingBonus(slotContext.getIdentifier(), slotContext.getWearer(), getStack(),
-        slotContext.getIndex());
+  default int getLootingLevel(SlotContext slotContext, DamageSource source, LivingEntity target,
+                              int baseLooting) {
+    return getLootingBonus(slotContext.identifier(), slotContext.entity(), getStack(),
+        slotContext.index());
   }
 
   /**
@@ -283,25 +281,19 @@ public interface ICurio {
     DEFAULT, ALWAYS_DROP, ALWAYS_KEEP, DESTROY
   }
 
-  final class SoundInfo {
-    final SoundEvent soundEvent;
-    final float volume;
-    final float pitch;
+  record SoundInfo(SoundEvent soundEvent, float volume, float pitch) {
 
-    public SoundInfo(SoundEvent soundEvent, float volume, float pitch) {
-      this.soundEvent = soundEvent;
-      this.volume = volume;
-      this.pitch = pitch;
-    }
-
+    @Deprecated
     public SoundEvent getSoundEvent() {
       return soundEvent;
     }
 
+    @Deprecated
     public float getVolume() {
       return volume;
     }
 
+    @Deprecated
     public float getPitch() {
       return pitch;
     }
@@ -311,7 +303,7 @@ public interface ICurio {
    * Copy of vanilla implementation for breaking items client-side
    */
   static void playBreakAnimation(ItemStack stack, LivingEntity livingEntity) {
-  // todo: re-implement
+    // todo: re-implement
 
 //    if (!stack.isEmpty()) {
 //
@@ -487,7 +479,7 @@ public interface ICurio {
   @Deprecated
   default void playRightClickEquipSound(LivingEntity livingEntity) {
     // Not enough context for id and index so we just pass in artificial values with the entity
-    SoundInfo soundInfo = getEquipSound(new SlotContext("", livingEntity));
+    SoundInfo soundInfo = getEquipSound(new SlotContext("", livingEntity, 0, false, true));
     livingEntity.level.playSound(null, livingEntity.blockPosition(), soundInfo.getSoundEvent(),
         livingEntity.getSoundSource(), soundInfo.getVolume(), soundInfo.getPitch());
   }

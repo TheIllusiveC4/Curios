@@ -2,42 +2,21 @@ package top.theillusivec4.curios.api;
 
 import net.minecraft.world.entity.LivingEntity;
 
-public final class SlotContext {
+public record SlotContext(String identifier, LivingEntity entity, int index, boolean cosmetic,
+                          boolean visible) {
 
-  // The identifier of the slot
-  final String id;
-  // The index of the slot within its slot type
-  final int index;
-  // The owner of the slot
-  final LivingEntity wearer;
-
-  public SlotContext() {
-    this("", null, -1);
-  }
-
-  public SlotContext(String id) {
-    this(id, null, -1);
-  }
-
-  public SlotContext(String id, LivingEntity wearer) {
-    this(id, wearer, -1);
-  }
-
-  public SlotContext(String id, LivingEntity wearer, int index) {
-    this.id = id;
-    this.index = index;
-    this.wearer = wearer;
-  }
-
+  @Deprecated
   public String getIdentifier() {
-    return id;
+    return identifier;
   }
 
+  @Deprecated
   public int getIndex() {
     return index;
   }
 
+  @Deprecated
   public LivingEntity getWearer() {
-    return wearer;
+    return entity;
   }
 }

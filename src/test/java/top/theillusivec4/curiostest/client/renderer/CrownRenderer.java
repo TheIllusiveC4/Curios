@@ -41,7 +41,7 @@ public class CrownRenderer<L extends LivingEntity> implements ICurioRenderer {
                                                                         float ageInTicks,
                                                                         float netHeadYaw,
                                                                         float headPitch) {
-    ICurioRenderer.followHeadRotations(slotContext.getWearer(), this.model.crown);
+    ICurioRenderer.followHeadRotations(slotContext.entity(), this.model.crown);
     VertexConsumer vertexconsumer = ItemRenderer
         .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(CROWN_TEXTURE), false,
             stack.hasFoil());

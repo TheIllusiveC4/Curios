@@ -54,13 +54,16 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
 
           for (int i = 0; i < stackHandler.getSlots(); i++) {
             ItemStack stack = cosmeticStacksHandler.getStackInSlot(i);
+            boolean cosmetic = true;
 
             if (stack.isEmpty() && stacksHandler.getRenders().get(i)) {
               stack = stackHandler.getStackInSlot(i);
+              cosmetic = false;
             }
 
             if (!stack.isEmpty()) {
-              SlotContext slotContext = new SlotContext(id, livingEntity, i);
+              SlotContext slotContext =
+                  new SlotContext(id, livingEntity, i, cosmetic, stacksHandler.getRenders().get(i));
               ItemStack finalStack = stack;
               CuriosRendererRegistry.getRenderer(stack.getItem()).ifPresent(
                   renderer -> renderer

@@ -72,7 +72,7 @@ public interface ICurioItem {
    * @param stack       The ItemStack in question
    */
   default void curioTick(SlotContext slotContext, ItemStack stack) {
-    curioTick(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer(), stack);
+    curioTick(slotContext.identifier(), slotContext.index(), slotContext.entity(), stack);
   }
 
   /**
@@ -83,7 +83,7 @@ public interface ICurioItem {
    * @param stack       The ItemStack in question
    */
   default void onEquip(SlotContext slotContext, ItemStack prevStack, ItemStack stack) {
-    onEquip(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer(), stack);
+    onEquip(slotContext.identifier(), slotContext.index(), slotContext.entity(), stack);
   }
 
   /**
@@ -94,7 +94,7 @@ public interface ICurioItem {
    * @param stack       The ItemStack in question
    */
   default void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
-    onUnequip(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer(), stack);
+    onUnequip(slotContext.identifier(), slotContext.index(), slotContext.entity(), stack);
   }
 
   /**
@@ -105,7 +105,7 @@ public interface ICurioItem {
    * @return True if the ItemStack can be equipped/put in, false if not
    */
   default boolean canEquip(SlotContext slotContext, ItemStack stack) {
-    return canEquip(slotContext.getIdentifier(), slotContext.getWearer(), stack);
+    return canEquip(slotContext.identifier(), slotContext.entity(), stack);
   }
 
   /**
@@ -116,7 +116,7 @@ public interface ICurioItem {
    * @return True if the ItemStack can be unequipped/taken out, false if not
    */
   default boolean canUnequip(SlotContext slotContext, ItemStack stack) {
-    return canUnequip(slotContext.getIdentifier(), slotContext.getWearer(), stack);
+    return canUnequip(slotContext.identifier(), slotContext.entity(), stack);
   }
 
   /**
@@ -147,7 +147,7 @@ public interface ICurioItem {
    */
   default Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                        UUID uuid, ItemStack stack) {
-    return getAttributeModifiers(slotContext.getIdentifier(), stack);
+    return getAttributeModifiers(slotContext.identifier(), stack);
   }
 
   /**
@@ -162,7 +162,7 @@ public interface ICurioItem {
    * @param stack       The ItemStack in question
    */
   default void onEquipFromUse(SlotContext slotContext, ItemStack stack) {
-    playRightClickEquipSound(slotContext.getWearer(), stack);
+    playRightClickEquipSound(slotContext.entity(), stack);
   }
 
   /**
@@ -197,7 +197,7 @@ public interface ICurioItem {
    * @param stack       The ItemStack in question
    */
   default void curioBreak(SlotContext slotContext, ItemStack stack) {
-    curioBreak(stack, slotContext.getWearer());
+    curioBreak(stack, slotContext.entity());
   }
 
   /**
@@ -210,8 +210,7 @@ public interface ICurioItem {
    * @return True to sync the ItemStack change to all tracking clients, false to do nothing
    */
   default boolean canSync(SlotContext slotContext, ItemStack stack) {
-    return canSync(slotContext.getIdentifier(), slotContext.getIndex(), slotContext.getWearer(),
-        stack);
+    return canSync(slotContext.identifier(), slotContext.index(), slotContext.entity(), stack);
   }
 
   /**
@@ -253,7 +252,7 @@ public interface ICurioItem {
   @Nonnull
   default DropRule getDropRule(SlotContext slotContext, DamageSource source, int lootingLevel,
                                boolean recentlyHit, ItemStack stack) {
-    return getDropRule(slotContext.getWearer(), stack);
+    return getDropRule(slotContext.entity(), stack);
   }
 
   /**
@@ -280,8 +279,7 @@ public interface ICurioItem {
    * @return Amount of additional Fortune levels that will be applied when mining
    */
   default int getFortuneLevel(SlotContext slotContext, LootContext lootContext, ItemStack stack) {
-    return getFortuneBonus(slotContext.getIdentifier(), slotContext.getWearer(), stack,
-        slotContext.getIndex());
+    return getFortuneBonus(slotContext.identifier(), slotContext.entity(), stack, slotContext.index());
   }
 
   /**
@@ -297,12 +295,7 @@ public interface ICurioItem {
    */
   default int getLootingLevel(SlotContext slotContext, DamageSource source, LivingEntity target,
                               int baseLooting, ItemStack stack) {
-    return getLootingBonus(slotContext.getIdentifier(), slotContext.getWearer(), stack,
-        slotContext.getIndex());
-  }
-
-  default boolean makesPiglinsNeutral(SlotContext slotContext, ItemStack stack) {
-    return stack.makesPiglinsNeutral(slotContext.getWearer());
+    return getLootingBonus(slotContext.identifier(), slotContext.entity(), stack, slotContext.index());
   }
 
   // ========== DEPRECATED ================

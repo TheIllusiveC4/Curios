@@ -21,12 +21,12 @@ package top.theillusivec4.curios.common.inventory;
 
 import javax.annotation.Nonnull;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.SlotItemHandler;
@@ -49,9 +49,11 @@ public class CurioSlot extends SlotItemHandler {
     this.identifier = identifier;
     this.renderStatuses = renders;
     this.player = player;
-    this.slotContext = new SlotContext(identifier, player, index);
+    this.slotContext = new SlotContext(identifier, player, index, this instanceof CosmeticCurioSlot,
+        renders.get(index));
     this.setBackground(InventoryMenu.BLOCK_ATLAS,
-        player.getCommandSenderWorld().isClientSide() ? CuriosApi.getIconHelper().getIcon(identifier)
+        player.getCommandSenderWorld().isClientSide() ?
+            CuriosApi.getIconHelper().getIcon(identifier)
             : new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
   }
 

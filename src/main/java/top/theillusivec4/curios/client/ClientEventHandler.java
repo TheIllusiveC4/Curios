@@ -125,7 +125,8 @@ public class ClientEventHandler {
 
         for (String identifier : slots) {
           Multimap<Attribute, AttributeModifier> multimap = CuriosApi.getCuriosHelper()
-              .getAttributeModifiers(new SlotContext(identifier, player), UUID.randomUUID(), stack);
+              .getAttributeModifiers(new SlotContext(identifier, player, 0, false, true),
+                  UUID.randomUUID(), stack);
 
           if (!multimap.isEmpty() && (i & 2) == 0) {
             attributeTooltip.add(TextComponent.EMPTY);

@@ -61,20 +61,19 @@ public class SPacketBreak {
       if (world != null) {
         Entity entity = Minecraft.getInstance().level.getEntity(msg.entityId);
 
-        if (entity instanceof LivingEntity) {
-          LivingEntity livingEntity = (LivingEntity) entity;
-
+        if (entity instanceof LivingEntity livingEntity) {
           CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
-            ItemStack stack = handler.getStacksHandler(msg.curioId)
-                .map(stacksHandler -> stacksHandler.getStacks().getStackInSlot(msg.slotId))
-                .orElse(ItemStack.EMPTY);
-            LazyOptional<ICurio> possibleCurio = CuriosApi.getCuriosHelper().getCurio(stack);
-            possibleCurio.ifPresent(
-                curio -> curio.curioBreak(new SlotContext(msg.curioId, livingEntity, msg.slotId)));
+            handler.getStacksHandler(msg.curioId).ifPresent(stacks -> {
+              ItemStack stack = stacks.getStacks().getStackInSlot(msg.slotId);
+              LazyOptional<ICurio> possibleCurio = CuriosApi.getCuriosHelper().getCurio(stack);
+              possibleCurio.ifPresent(curio -> curio.curioBreak(
+                  new SlotContext(msg.curioId, livingEntity, msg.slotId, false,
+                      stacks.getRenders().get(msg.slotId))));
 
-            if (!possibleCurio.isPresent()) {
-              ICurio.playBreakAnimation(stack, livingEntity);
-            }
+              if (!possibleCurio.isPresent()) {
+                ICurio.playBreakAnimation(stack, livingEntity);
+              }
+            });
           });
         }
       }

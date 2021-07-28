@@ -143,7 +143,7 @@ public class CurioInventoryCapability {
       if (amount > 0) {
         this.getStacksHandler(identifier).ifPresent(stackHandler -> {
           int toShrink = Math.min(stackHandler.getSlots() - 1, amount);
-          this.loseStacks(stackHandler.getStacks(), identifier, toShrink);
+          this.loseStacks(stackHandler.getStacks(), identifier, toShrink, stackHandler);
           stackHandler.shrink(amount);
         });
       }
@@ -178,8 +178,9 @@ public class CurioInventoryCapability {
         for (int i = 0; i < stacks.getSlots(); i++) {
           final int index = i;
           fortuneLevel += CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(
-              curio -> curio.getFortuneLevel(new SlotContext(entry.getKey(), this.wearer, index),
-                  lootContext)).orElse(0);
+              curio -> curio.getFortuneLevel(
+                  new SlotContext(entry.getKey(), this.wearer, index, false,
+                      entry.getValue().getRenders().get(index)), lootContext)).orElse(0);
         }
       }
       return fortuneLevel;
@@ -194,9 +195,10 @@ public class CurioInventoryCapability {
         for (int i = 0; i < stacks.getSlots(); i++) {
           int index = i;
           lootingLevel += CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(
-              curio -> curio
-                  .getLootingLevel(new SlotContext(entry.getKey(), this.wearer, index), source,
-                      target, baseLooting)).orElse(0);
+              curio -> curio.getLootingLevel(
+                  new SlotContext(entry.getKey(), this.wearer, index, false,
+                      entry.getValue().getRenders().get(index)), source, target, baseLooting))
+              .orElse(0);
         }
       }
       return lootingLevel;
@@ -244,7 +246,8 @@ public class CurioInventoryCapability {
             while (index < newStacksHandler.getSlots() && index < prevStacksHandler
                 .getSlots()) {
               ItemStack prevStack = prevStacksHandler.getStacks().getStackInSlot(index);
-              SlotContext slotContext = new SlotContext(identifier, livingEntity, index);
+              SlotContext slotContext = new SlotContext(identifier, livingEntity, index, false,
+                  newStacksHandler.getRenders().get(index));
 
               if (!prevStack.isEmpty()) {
 
@@ -256,6 +259,7 @@ public class CurioInventoryCapability {
               }
               ItemStack prevCosmetic =
                   prevStacksHandler.getCosmeticStacks().getStackInSlot(index);
+              slotContext = new SlotContext(identifier, livingEntity, index, true, true);
 
               if (!prevCosmetic.isEmpty()) {
 
@@ -310,7 +314,8 @@ public class CurioInventoryCapability {
       }
     }
 
-    private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
+    private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount,
+                            ICurioStacksHandler curioStacks) {
 
       if (this.wearer != null && !this.wearer.getCommandSenderWorld().isClientSide()) {
         List<ItemStack> drops = new ArrayList<>();
@@ -318,7 +323,8 @@ public class CurioInventoryCapability {
         for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
           drops.add(stackHandler.getStackInSlot(i));
-          SlotContext slotContext = new SlotContext(identifier, this.wearer, i);
+          SlotContext slotContext =
+              new SlotContext(identifier, this.wearer, i, false, curioStacks.getRenders().get(i));
 
           if (!stack.isEmpty()) {
             UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
