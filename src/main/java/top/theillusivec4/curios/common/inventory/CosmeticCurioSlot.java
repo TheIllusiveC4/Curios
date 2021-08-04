@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.common.inventory;
 
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.resources.ResourceLocation;
@@ -32,7 +33,7 @@ public class CosmeticCurioSlot extends CurioSlot {
 
   public CosmeticCurioSlot(Player player, IDynamicStackHandler handler, int index,
                            String identifier, int xPosition, int yPosition) {
-    super(player, handler, index, identifier, xPosition, yPosition, null);
+    super(player, handler, index, identifier, xPosition, yPosition, NonNullList.create());
     this.setBackground(InventoryMenu.BLOCK_ATLAS,
         new ResourceLocation(Curios.MODID, "item/empty_cosmetic_slot"));
   }

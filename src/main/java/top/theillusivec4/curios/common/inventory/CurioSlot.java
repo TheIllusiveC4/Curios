@@ -50,7 +50,7 @@ public class CurioSlot extends SlotItemHandler {
     this.renderStatuses = renders;
     this.player = player;
     this.slotContext = new SlotContext(identifier, player, index, this instanceof CosmeticCurioSlot,
-        renders.get(index));
+        this instanceof CosmeticCurioSlot || renders.get(index));
     this.setBackground(InventoryMenu.BLOCK_ATLAS,
         player.getCommandSenderWorld().isClientSide() ?
             CuriosApi.getIconHelper().getIcon(identifier)

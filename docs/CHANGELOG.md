@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.17.1-5.0.0.1] - 2021.08.04
+### Fixed
+- Fixed NPE when using cosmetic slots [#157](https://github.com/TheIllusiveC4/Curios/issues/157)
+
 ## [1.17.1-5.0.0.0] - 2021.07.27
 ### Added
 - Added `getStack` method to `ICurio`
