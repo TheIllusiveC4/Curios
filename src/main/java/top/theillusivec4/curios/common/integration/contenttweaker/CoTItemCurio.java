@@ -61,7 +61,7 @@ public class CoTItemCurio extends CoTItemAdvanced {
     /**
      * Sets what will happen when the curio is equipped. The second parameter of the function is
      * the previous {@link IItemStack} in the slot
-     * @param func ion an IEquipCallback function
+     * @param func an IEquipCallback function
      * @return the CoTItemCurio, used for method chaining
      */
     @ZenCodeType.Method
