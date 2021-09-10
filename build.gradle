@@ -58,6 +58,14 @@ dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
     compileOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}")
+    compileOnly fg.deobf("com.blamejared.crafttweaker:CraftTweaker-1.16.5:${version_crafttweaker}")
+    runtimeOnly fg.deobf("com.blamejared.crafttweaker:CraftTweaker-1.16.5:${version_crafttweaker}")
+    annotationProcessor fg.deobf("com.blamejared.crafttweaker:CraftTweaker-1.16.5:${version_crafttweaker}")
+    annotationProcessor "com.blamejared.crafttweaker:Crafttweaker_Annotation_Processors-1.16.5:${version_crafttweaker_ap}"
+    compileOnly fg.deobf("com.blamejared.contenttweaker:ContentTweaker-1.16:${version_contenttweaker}")
+    runtimeOnly fg.deobf("com.blamejared.contenttweaker:ContentTweaker-1.16:${version_contenttweaker}")
+    annotationProcessor "org.reflections:reflections:0.9.10"
+    annotationProcessor "com.google.code.gson:gson:2.8.0"
 }
 
 repositories {
@@ -70,6 +78,11 @@ repositories {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
+    }
+    maven {
+        // location of the maven that hosts crafttweaker and contenttweaker
+        name = "BlameJared"
+        url = "https://maven.blamejared.com/"
     }
 }
 
