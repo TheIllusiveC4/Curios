@@ -38,6 +38,9 @@ public class ExpandDynamicStackHandler {
      *
      * @param slot  The slot index
      * @param stack The {@link IItemStack} to assign as the current stack
+     *
+     * @docParam slot 0
+     * @docParam stack <item:minecraft:iron_ingot>
      */
     @ZenCodeType.Method
     public static void setStackInSlot(IDynamicStackHandler internal, int slot, IItemStack stack) {
@@ -49,6 +52,8 @@ public class ExpandDynamicStackHandler {
      *
      * @param slot The slot index
      * @return The {@link IItemStack} assigned as the current stack
+     *
+     * @docParam slot 0
      */
     @ZenCodeType.Method
     public static IItemStack getStackInSlot(IDynamicStackHandler internal, int slot) {
@@ -60,6 +65,8 @@ public class ExpandDynamicStackHandler {
      *
      * @param slot The slot index
      * @return The {@link IItemStack} assigned as the previous stack
+     *
+     * @docParam slot 0
      */
     @ZenCodeType.Method
     public static IItemStack getPreviousStackInSlot(IDynamicStackHandler internal, int slot) {
@@ -72,6 +79,9 @@ public class ExpandDynamicStackHandler {
      *
      * @param slot  The slot index
      * @param stack The {@link IItemStack} to assign as the previous stack
+     *
+     * @docParam slot 0
+     * @docParam stack <item:minecraft:iron_ingot>
      */
     @ZenCodeType.Method
     public static void setPreviousStackInSlot(IDynamicStackHandler internal, int slot, IItemStack stack) {
@@ -91,6 +101,8 @@ public class ExpandDynamicStackHandler {
      * Increases the number of slots by the given amount.
      *
      * @param amount The number of slots to add
+     *
+     * @docParam amount 1
      */
     @ZenCodeType.Method
     public static void grow(IDynamicStackHandler internal, int amount) {
@@ -101,6 +113,8 @@ public class ExpandDynamicStackHandler {
      * Decreases the number of slots by the given amount.
      *
      * @param amount The number of slots to remove
+     *
+     * @docParam amount 1
      */
     @ZenCodeType.Method
     public static void shrink(IDynamicStackHandler internal, int amount) {

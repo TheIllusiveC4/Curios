@@ -8,7 +8,7 @@ import com.blamejared.crafttweaker_annotations.annotations.Document;
 import net.minecraft.util.ResourceLocation;
 import org.openzen.zencode.java.ZenCodeType;
 
-@ZenRegister
+@ZenRegister(modDeps = "contenttweaker")
 @ZenCodeType.Name("mods.curios.contenttweaker.ItemBuilderCurio")
 @Document("mods/Curios/Contenttweaker/ItemBuilderCurio")
 public class ItemBuilderCurio extends ItemTypeBuilder {

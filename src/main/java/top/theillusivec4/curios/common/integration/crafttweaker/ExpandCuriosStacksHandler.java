@@ -109,6 +109,8 @@ public class ExpandCuriosStacksHandler {
      * Increases the number of slots by the given amount.
      *
      * @param amount The number of slots to add to the handler
+     *
+     * @docParam amount 1
      */
     @ZenCodeType.Method
     public static void grow(ICurioStacksHandler internal, int amount) {
@@ -120,6 +122,8 @@ public class ExpandCuriosStacksHandler {
      * slots below 1.
      *
      * @param amount The number of slots to remove from the handler
+     *
+     * @docParam amount 1
      */
     @ZenCodeType.Method
     public static void shrink(ICurioStacksHandler internal, int amount) {

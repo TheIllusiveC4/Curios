@@ -24,10 +24,10 @@ import com.blamejared.crafttweaker_annotations.annotations.Document;
 import net.minecraft.entity.LivingEntity;
 import org.openzen.zencode.java.ZenCodeType;
 
-@ZenRegister
+@ZenRegister(modDeps = "contenttweaker")
 @FunctionalInterface
-@Document("mods/Curio/ContentTweaker/ICurioTick")
-@ZenCodeType.Name("mods.curio.contenttweaker.ICurioTick")
+@Document("mods/Curios/ContentTweaker/ICurioTick")
+@ZenCodeType.Name("mods.curios.contenttweaker.ICurioTick")
 public interface ICurioTick extends ICotFunction {
     @ZenCodeType.Method
     void tick(String identifier, int index, LivingEntity wearer);

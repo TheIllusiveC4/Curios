@@ -23,6 +23,7 @@ import com.blamejared.crafttweaker.api.annotations.ZenRegister;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
 import com.blamejared.crafttweaker_annotations.annotations.NativeTypeRegistration;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import org.openzen.zencode.java.ZenCodeType;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -32,6 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Handles all item stacks of curios. You can get it by calling `curiosItemHandler` getter of {@link PlayerEntity}
+ *
+ * @docParam this player.curiosItemHandler
+ */
 @ZenRegister
 @Document("mods/Curios/ICuriosItemHandler")
 @NativeTypeRegistration(value = ICuriosItemHandler.class, zenCodeName = "mods.curios.ICuriosItemHandler")
@@ -85,7 +91,7 @@ public class ExpandCuriosItemHandler {
      * Returns null if it it doesn't exist
      *
      * @return The stack handler
-     * @docParam <curiosslottype:belt>
+     * @docParam slotType <curiosslottype:belt>
      */
     @ZenCodeType.Method
     @ZenCodeType.Nullable
@@ -106,6 +112,11 @@ public class ExpandCuriosItemHandler {
      *
      * @param slotType The {@link ISlotType} to unlock
      * @param amount   The amount of slots to unlock
+     *
+     * @docParam slotType <curiosslottype:belt>
+     * @docParam amount 1
+     * @docParam visible true
+     * @docParam cosmetic true
      */
     @ZenCodeType.Method
     public static void unlockSlotType(ICuriosItemHandler internal, ISlotType slotType, int amount, boolean visible, boolean cosmetic) {
@@ -114,6 +125,8 @@ public class ExpandCuriosItemHandler {
 
     /**
      * Disables the {@link ISlotType}, removing it from the curio map.
+     *
+     * @docParam slotType <curiosslottype:belt>
      */
     @ZenCodeType.Method
     public static void lockSlotType(ICuriosItemHandler internal, ISlotType slotType) {
@@ -124,6 +137,9 @@ public class ExpandCuriosItemHandler {
      * Removes an amount of slots from the {@link ICurioStacksHandler} of an {@link ISlotType}
      *
      * @param amount The number of slots to remove, must be non-negative
+     *
+     * @docParam slotType <curiosslottype:belt>
+     * @docParam amount 1
      */
     @ZenCodeType.Method
     public static void growSlotType(ICuriosItemHandler internal, ISlotType slotType, int amount) {

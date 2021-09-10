@@ -19,18 +19,17 @@
 
 package top.theillusivec4.curios.common.integration.contenttweaker;
 
-import com.blamejared.contenttweaker.api.functions.ICotFunction;
-import com.blamejared.crafttweaker.api.annotations.ZenRegister;
-import com.blamejared.crafttweaker.api.item.IItemStack;
 import com.blamejared.crafttweaker_annotations.annotations.Document;
 import org.openzen.zencode.java.ZenCodeType;
-import top.theillusivec4.curios.api.SlotContext;
 
-@ZenRegister(modDeps = "contenttweaker")
-@FunctionalInterface
-@Document("mods/Curios/ContentTweaker/IEquipCallback")
-@ZenCodeType.Name("mods.curios.contenttweaker.IEquipCallback")
-public interface IEquipCallback extends ICotFunction {
-    @ZenCodeType.Method
-    void apply(SlotContext context, IItemStack stack);
+// Hack class to solve some super classes are not found by crafttweaker annotation processor
+@SuppressWarnings("unused")
+class AnnotationProcessorDummies {
+    @ZenCodeType.Name("mods.contenttweaker.item.advance.CoTItemAdvanced")
+    @Document("mods/contenttweaker/API/item/advance/CoTItemAdvanced")
+    private static class AdvancedItem {}
+
+    @Document("mods/contenttweaker/API/item/ItemTypeBuilder")
+    @ZenCodeType.Name("mods.contenttweaker.item.ItemTypeBuilder")
+    private static class ItemTypeBuilder {}
 }

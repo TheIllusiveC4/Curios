@@ -60,12 +60,14 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}")
     compileOnly fg.deobf("com.blamejared.crafttweaker:CraftTweaker-1.16.5:${version_crafttweaker}")
     runtimeOnly fg.deobf("com.blamejared.crafttweaker:CraftTweaker-1.16.5:${version_crafttweaker}")
-    annotationProcessor fg.deobf("com.blamejared.crafttweaker:CraftTweaker-1.16.5:${version_crafttweaker}")
-    annotationProcessor "com.blamejared.crafttweaker:Crafttweaker_Annotation_Processors-1.16.5:${version_crafttweaker_ap}"
     compileOnly fg.deobf("com.blamejared.contenttweaker:ContentTweaker-1.16:${version_contenttweaker}")
     runtimeOnly fg.deobf("com.blamejared.contenttweaker:ContentTweaker-1.16:${version_contenttweaker}")
+    compileOnly "com.blamejared.crafttweaker:Crafttweaker_Annotation_Processors-1.16.5:${version_crafttweaker_ap}"
     annotationProcessor "org.reflections:reflections:0.9.10"
     annotationProcessor "com.google.code.gson:gson:2.8.0"
+    annotationProcessor "com.blamejared.crafttweaker:CraftTweaker-1.16.5:${version_crafttweaker}"
+    annotationProcessor "com.blamejared.contenttweaker:ContentTweaker-1.16:${version_contenttweaker}"
+    annotationProcessor "com.blamejared.crafttweaker:Crafttweaker_Annotation_Processors-1.16.5:${version_crafttweaker_ap}"
 }
 
 repositories {

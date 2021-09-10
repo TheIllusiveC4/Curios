@@ -37,7 +37,7 @@ import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
 import javax.annotation.Nullable;
 
-@ZenRegister
+@ZenRegister(modDeps = "contenttweaker")
 @ZenCodeType.Name("mods.curios.contenttweaker.CoTItemCurio")
 @Document("mods/Curios/ContentTweaker/CoTItemCurio")
 public class CoTItemCurio extends CoTItemAdvanced {

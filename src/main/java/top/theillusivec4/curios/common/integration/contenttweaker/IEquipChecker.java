@@ -25,10 +25,10 @@ import com.blamejared.crafttweaker_annotations.annotations.Document;
 import net.minecraft.entity.LivingEntity;
 import org.openzen.zencode.java.ZenCodeType;
 
-@ZenRegister
+@ZenRegister(modDeps = "contenttweaker")
 @FunctionalInterface
-@Document("mods/Curio/ContentTweaker/IEquipChecker")
-@ZenCodeType.Name("mods.curio.contenttweaker.IEquipChecker")
+@Document("mods/Curios/ContentTweaker/IEquipChecker")
+@ZenCodeType.Name("mods.curios.contenttweaker.IEquipChecker")
 public interface IEquipChecker extends ICotFunction {
     @ZenCodeType.Method
     boolean check(String identifier, LivingEntity wearer);
