@@ -33,6 +33,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
@@ -327,6 +329,7 @@ public interface ICurioItem {
    * @param stack        The ItemStack in question
    * @return True if the ItemStack has rendering, false if it does not
    */
+  @OnlyIn(Dist.CLIENT)
   default boolean canRender(String identifier, int index, LivingEntity livingEntity,
                             ItemStack stack) {
     return defaultInstance.canRender(identifier, index, livingEntity);
@@ -342,6 +345,7 @@ public interface ICurioItem {
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    * @param stack        The ItemStack in question
    */
+  @OnlyIn(Dist.CLIENT)
   default void render(String identifier, int index, MatrixStack matrixStack,
                       IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
                       float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,

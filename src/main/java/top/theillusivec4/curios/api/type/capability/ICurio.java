@@ -46,6 +46,8 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 
@@ -323,6 +325,7 @@ public interface ICurio {
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    * @return True if the ItemStack has rendering, false if it does not
    */
+  @OnlyIn(Dist.CLIENT)
   default boolean canRender(String identifier, int index, LivingEntity livingEntity) {
     return false;
   }
@@ -335,6 +338,7 @@ public interface ICurio {
    * @param identifier   The identifier of the {@link ISlotType} of the slot
    * @param livingEntity The LivingEntity that is wearing the ItemStack
    */
+  @OnlyIn(Dist.CLIENT)
   default void render(String identifier, int index, MatrixStack matrixStack,
                       IRenderTypeBuffer renderTypeBuffer, int light, LivingEntity livingEntity,
                       float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks,
@@ -384,6 +388,7 @@ public interface ICurio {
   /**
    * Some helper methods for rendering curios.
    */
+  @OnlyIn(Dist.CLIENT)
   final class RenderHelper {
 
     /**
