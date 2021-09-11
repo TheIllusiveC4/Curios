@@ -202,6 +202,10 @@ public class CuriosContainer extends PlayerContainer {
     return this.cosmeticColumn;
   }
 
+  public void resetSlots() {
+    this.scrollToIndex(this.lastScrollIndex);
+  }
+
   public void scrollToIndex(int indexIn) {
 
     this.curiosHandler.ifPresent(curios -> {

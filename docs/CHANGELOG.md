@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.5-4.0.5.3] - 2021.09.11
+### Fixed
+- Fixed slots desyncing when shrinking/growing amounts
+
 ## [1.16.5-4.0.5.2] - 2021.06.07
 ### Added
 - Added Catalogue integration

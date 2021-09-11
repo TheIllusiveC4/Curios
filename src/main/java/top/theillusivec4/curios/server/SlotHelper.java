@@ -37,6 +37,7 @@ import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.util.ISlotHelper;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation.Operation;
@@ -103,9 +104,14 @@ public class SlotHelper implements ISlotHelper {
       handler.growSlotType(id, amount);
 
       if (livingEntity instanceof ServerPlayerEntity) {
+        ServerPlayerEntity player = (ServerPlayerEntity) livingEntity;
         NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) livingEntity),
+            .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
                 new SPacketSyncOperation(livingEntity.getEntityId(), id, Operation.GROW, amount));
+
+        if (player.openContainer instanceof CuriosContainer) {
+          ((CuriosContainer) player.openContainer).resetSlots();
+        }
       }
     });
   }
@@ -122,9 +128,14 @@ public class SlotHelper implements ISlotHelper {
       handler.shrinkSlotType(id, amount);
 
       if (livingEntity instanceof ServerPlayerEntity) {
+        ServerPlayerEntity player = (ServerPlayerEntity) livingEntity;
         NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) livingEntity),
+            .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
                 new SPacketSyncOperation(livingEntity.getEntityId(), id, Operation.SHRINK, amount));
+
+        if (player.openContainer instanceof CuriosContainer) {
+          ((CuriosContainer) player.openContainer).resetSlots();
+        }
       }
     });
   }
@@ -137,10 +148,15 @@ public class SlotHelper implements ISlotHelper {
           handler.unlockSlotType(id, type.getSize(), type.isVisible(), type.hasCosmetic());
 
           if (livingEntity instanceof ServerPlayerEntity) {
+            ServerPlayerEntity player = (ServerPlayerEntity) livingEntity;
             NetworkHandler.INSTANCE
-                .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) livingEntity),
+                .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
                     new SPacketSyncOperation(livingEntity.getEntityId(), id, Operation.UNLOCK,
                         type.getSize(), type.isVisible(), type.hasCosmetic()));
+
+            if (player.openContainer instanceof CuriosContainer) {
+              ((CuriosContainer) player.openContainer).resetSlots();
+            }
           }
         }));
   }
@@ -151,9 +167,14 @@ public class SlotHelper implements ISlotHelper {
       handler.lockSlotType(id);
 
       if (livingEntity instanceof ServerPlayerEntity) {
+        ServerPlayerEntity player = (ServerPlayerEntity) livingEntity;
         NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) livingEntity),
+            .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
                 new SPacketSyncOperation(livingEntity.getEntityId(), id, Operation.LOCK));
+
+        if (player.openContainer instanceof CuriosContainer) {
+          ((CuriosContainer) player.openContainer).resetSlots();
+        }
       }
     });
   }

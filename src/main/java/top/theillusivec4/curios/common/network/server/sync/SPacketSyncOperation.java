@@ -24,9 +24,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 public class SPacketSyncOperation {
 
@@ -98,6 +100,14 @@ public class SPacketSyncOperation {
                 break;
             }
           });
+
+          if (entity instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) entity;
+
+            if (player.openContainer instanceof CuriosContainer) {
+              ((CuriosContainer) player.openContainer).resetSlots();
+            }
+          }
         }
       }
     });
