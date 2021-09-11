@@ -4,8 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
 ## [1.16.5-4.0.5.3] - 2021.09.11
+### Added
+- Added Polish translation (thanks Greg-21!) [#163](https://github.com/TheIllusiveC4/Curios/pull/163)
 ### Fixed
 - Fixed slots desyncing when shrinking/growing amounts
+- Fixed null NBT tag crashes when syncing [#152](https://github.com/TheIllusiveC4/Curios/issues/152)
+- Fixed class-loading errors by annotating curio render methods with `OnlyIn(Dist.CLIENT)` [#121](https://github.com/TheIllusiveC4/Curios/issues/121)
 
 ## [1.16.5-4.0.5.2] - 2021.06.07
 ### Added
