@@ -25,6 +25,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -249,7 +250,7 @@ public interface ICurio {
    *
    * @return Data to be sent to the client
    */
-  @Nonnull
+  @Nullable
   default CompoundNBT writeSyncData() {
     return new CompoundNBT();
   }

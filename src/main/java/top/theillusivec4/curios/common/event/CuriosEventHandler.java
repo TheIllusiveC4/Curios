@@ -509,8 +509,10 @@ public class CuriosEventHandler {
         currentCurio.map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false)
             || prevCurio.map(curio -> curio.canSync(identifier, index, livingEntity)).orElse(false);
     CompoundNBT syncTag =
-        syncable ? currentCurio.map(ICurio::writeSyncData).orElse(new CompoundNBT())
-            : new CompoundNBT();
+        syncable ? currentCurio.map(curio -> {
+          CompoundNBT tag = curio.writeSyncData();
+          return tag != null ? tag : new CompoundNBT();
+        }).orElse(new CompoundNBT()) : new CompoundNBT();
     NetworkHandler.INSTANCE
         .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
             new SPacketSyncStack(livingEntity.getEntityId(), identifier, index, stack, type,

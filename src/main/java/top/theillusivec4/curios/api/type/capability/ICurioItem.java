@@ -24,6 +24,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
@@ -248,7 +249,7 @@ public interface ICurioItem {
    * @param stack The ItemStack in question
    * @return Data to be sent to the client
    */
-  @Nonnull
+  @Nullable
   default CompoundNBT writeSyncData(ItemStack stack) {
     return defaultInstance.writeSyncData();
   }
