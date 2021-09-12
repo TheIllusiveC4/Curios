@@ -73,8 +73,8 @@ dependencies {
 
 //    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
 
-//    compileOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}:api")
-//    runtimeOnly fg.deobf("mezz.jei:jei-1.16.4:${version_jei}")
+    compileOnly fg.deobf("mezz.jei:jei-1.17.1:${version_jei}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.17.1:${version_jei}")
 }
 
 //mixin {
