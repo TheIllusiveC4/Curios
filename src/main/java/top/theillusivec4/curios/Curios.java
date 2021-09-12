@@ -42,6 +42,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -65,6 +66,8 @@ import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
+import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.client.ClientEventHandler;
 import top.theillusivec4.curios.client.CuriosClientConfig;
 import top.theillusivec4.curios.client.IconHelper;
@@ -96,6 +99,7 @@ public class Curios {
     eventBus.addListener(this::setup);
     eventBus.addListener(this::config);
     eventBus.addListener(this::process);
+    eventBus.addListener(this::registerCaps);
     MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
     MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
     MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
@@ -106,13 +110,16 @@ public class Curios {
 
   private void setup(FMLCommonSetupEvent evt) {
     CuriosApi.setCuriosHelper(new CuriosHelper());
-    CurioInventoryCapability.register();
-    CurioItemCapability.register();
     MinecraftForge.EVENT_BUS.register(new CuriosEventHandler());
     NetworkHandler.register();
     ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
         new EmptyArgumentSerializer<>(CurioArgumentType::slot));
     CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
+  }
+
+  private void registerCaps(RegisterCapabilitiesEvent evt) {
+    evt.register(ICuriosItemHandler.class);
+    evt.register(ICurio.class);
   }
 
   private void process(InterModProcessEvent evt) {

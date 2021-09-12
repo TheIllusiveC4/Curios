@@ -23,17 +23,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public class CurioItemCapability {
-
-  public static void register() {
-    CapabilityManager.INSTANCE.register(ICurio.class);
-  }
 
   public static ICapabilityProvider createProvider(final ICurio curio) {
     return new Provider(curio);

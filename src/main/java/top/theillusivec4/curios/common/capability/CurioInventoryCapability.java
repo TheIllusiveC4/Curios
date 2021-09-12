@@ -41,7 +41,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -59,10 +58,6 @@ import top.theillusivec4.curios.api.type.util.ISlotHelper;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 
 public class CurioInventoryCapability {
-
-  public static void register() {
-    CapabilityManager.INSTANCE.register(ICuriosItemHandler.class);
-  }
 
   public static ICapabilityProvider createProvider(final Player playerEntity) {
     return new Provider(playerEntity);
@@ -195,9 +190,9 @@ public class CurioInventoryCapability {
         for (int i = 0; i < stacks.getSlots(); i++) {
           int index = i;
           lootingLevel += CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(
-              curio -> curio.getLootingLevel(
-                  new SlotContext(entry.getKey(), this.wearer, index, false,
-                      entry.getValue().getRenders().get(index)), source, target, baseLooting))
+                  curio -> curio.getLootingLevel(
+                      new SlotContext(entry.getKey(), this.wearer, index, false,
+                          entry.getValue().getRenders().get(index)), source, target, baseLooting))
               .orElse(0);
         }
       }
