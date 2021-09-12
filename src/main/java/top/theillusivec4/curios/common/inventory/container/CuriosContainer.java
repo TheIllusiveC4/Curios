@@ -202,6 +202,10 @@ public class CuriosContainer extends InventoryMenu {
     return this.cosmeticColumn;
   }
 
+  public void resetSlots() {
+    this.scrollToIndex(this.lastScrollIndex);
+  }
+
   public void scrollToIndex(int indexIn) {
 
     this.curiosHandler.ifPresent(curios -> {
@@ -351,7 +355,7 @@ public class CuriosContainer extends InventoryMenu {
     ItemStack itemstack = ItemStack.EMPTY;
     Slot slot = this.slots.get(index);
 
-    if (slot != null && slot.hasItem()) {
+    if (slot.hasItem()) {
       ItemStack itemstack1 = slot.getItem();
       itemstack = itemstack1.copy();
       EquipmentSlot entityequipmentslot = Mob.getEquipmentSlotForItem(itemstack);

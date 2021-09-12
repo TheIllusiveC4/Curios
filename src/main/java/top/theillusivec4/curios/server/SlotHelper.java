@@ -30,12 +30,14 @@ import java.util.TreeMap;
 import javax.annotation.Nonnull;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.util.ISlotHelper;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation.Operation;
@@ -100,10 +102,14 @@ public class SlotHelper implements ISlotHelper {
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
       handler.growSlotType(id, amount);
 
-      if (livingEntity instanceof ServerPlayer) {
+      if (livingEntity instanceof ServerPlayer player) {
         NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) livingEntity),
+            .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
                 new SPacketSyncOperation(livingEntity.getId(), id, Operation.GROW, amount));
+
+        if (player.containerMenu instanceof CuriosContainer) {
+          ((CuriosContainer) player.containerMenu).resetSlots();
+        }
       }
     });
   }
@@ -119,10 +125,14 @@ public class SlotHelper implements ISlotHelper {
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
       handler.shrinkSlotType(id, amount);
 
-      if (livingEntity instanceof ServerPlayer) {
+      if (livingEntity instanceof ServerPlayer player) {
         NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) livingEntity),
+            .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
                 new SPacketSyncOperation(livingEntity.getId(), id, Operation.SHRINK, amount));
+
+        if (player.containerMenu instanceof CuriosContainer) {
+          ((CuriosContainer) player.containerMenu).resetSlots();
+        }
       }
     });
   }

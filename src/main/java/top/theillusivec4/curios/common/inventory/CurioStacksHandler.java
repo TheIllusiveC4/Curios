@@ -105,7 +105,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   @Override
   public void shrink(int amount) {
     this.validateSizeChange(amount);
-    amount = Math.min(this.stackHandler.getSlots() - 1, amount);
+    amount = Math.min(this.stackHandler.getSlots(), amount);
     this.stackHandler.shrink(amount);
     this.cosmeticStackHandler.shrink(amount);
     NonNullList<Boolean> newList = NonNullList.withSize(this.renderHandler.size() - amount, true);

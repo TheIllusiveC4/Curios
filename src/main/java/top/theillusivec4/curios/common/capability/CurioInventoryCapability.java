@@ -142,7 +142,7 @@ public class CurioInventoryCapability {
 
       if (amount > 0) {
         this.getStacksHandler(identifier).ifPresent(stackHandler -> {
-          int toShrink = Math.min(stackHandler.getSlots() - 1, amount);
+          int toShrink = Math.min(stackHandler.getSlots(), amount);
           this.loseStacks(stackHandler.getStacks(), identifier, toShrink, stackHandler);
           stackHandler.shrink(amount);
         });
@@ -331,7 +331,7 @@ public class CurioInventoryCapability {
             this.wearer.getAttributes().removeAttributeModifiers(
                 CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack));
             CuriosApi.getCuriosHelper().getCurio(stack)
-                .ifPresent(curio -> curio.onUnequip(slotContext, stack));
+                .ifPresent(curio -> curio.onUnequip(slotContext, ItemStack.EMPTY));
           }
           stackHandler.setStackInSlot(i, ItemStack.EMPTY);
         }

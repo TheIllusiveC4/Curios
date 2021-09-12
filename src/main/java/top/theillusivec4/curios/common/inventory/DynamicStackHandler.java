@@ -66,7 +66,7 @@ public class DynamicStackHandler extends ItemStackHandler implements IDynamicSta
   }
 
   private static NonNullList<ItemStack> getResizedList(int size, NonNullList<ItemStack> stacks) {
-    NonNullList<ItemStack> newList = NonNullList.withSize(size, ItemStack.EMPTY);
+    NonNullList<ItemStack> newList = NonNullList.withSize(Math.max(0, size), ItemStack.EMPTY);
 
     for (int i = 0; i < newList.size() && i < stacks.size(); i++) {
       newList.set(i, stacks.get(i));
