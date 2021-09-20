@@ -14,20 +14,24 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import java.util.function.Predicate;
 
+/**
+ * LivingCurioDropsEvent is fired when an Entity's death causes dropped curios to appear. <br>
+ * This event is fired inside the {@link net.minecraftforge.event.entity.living.LivingDropsEvent}.
+ */
 @ZenRegister
-@Document("mods/Curio/Events/DropRulesEvent")
+@Document("mods/Curios/Events/DropRulesEvent")
 @NativeTypeRegistration(value = DropRulesEvent.class, zenCodeName = "mods.curios.event.DropRulesEvent")
 public class ExpandDropRulesEvent {
     /**
-     * @return the DamageSource that caused the drop to occur.
+     * the DamageSource that caused the drop to occur.
      */
-    @ZenCodeType.Getter
+    @ZenCodeType.Getter("damageSource")
     public static DamageSource getDamageSource(DropRulesEvent internal) {
         return internal.getSource();
     }
 
     /**
-     * @return the curio handler for the entity
+     * the curio handler for the entity
      */
     @ZenCodeType.Getter("curioHandler")
     public static ICuriosItemHandler getCurioHandler(DropRulesEvent internal) {
@@ -35,7 +39,7 @@ public class ExpandDropRulesEvent {
     }
 
     /**
-     * @return the amount of loot that will be dropped.
+     * the amount of loot that will be dropped.
      */
     @ZenCodeType.Getter("lootingLevel")
     public static int getLootingLevel(DropRulesEvent internal) {
@@ -43,15 +47,15 @@ public class ExpandDropRulesEvent {
     }
 
     /**
-     * @return whether the Entity doing the drop has recently been damaged.
+     * whether the Entity doing the drop has recently been damaged.
      */
-    @ZenCodeType.Getter
+    @ZenCodeType.Getter("isRecentlyHit")
     public static boolean isRecentlyHit(DropRulesEvent internal) {
         return internal.isRecentlyHit();
     }
 
     /**
-     * Adds an override {@link ICurio.DropRule} for the given
+     * Adds an override DropRule for the given
      * predicate. Each predicate will be applied to each ItemStack and those that pass will be given
      * the paired DropRule.
      *

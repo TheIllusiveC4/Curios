@@ -25,7 +25,7 @@ import java.util.List;
 @NativeTypeRegistration(value = CurioDropsEvent.class, zenCodeName = "mods.curios.event.CurioDropsEvent")
 public class ExpandCurioDropsEvent {
     /**
-     * @return the DamageSource that caused the drop to occur.
+     * the DamageSource that caused the drop to occur.
      */
     @ZenCodeType.Getter("damageSource")
     public static DamageSource getDamageSource(CurioDropsEvent internal) {
@@ -33,7 +33,7 @@ public class ExpandCurioDropsEvent {
     }
 
     /**
-     * @return the List of ItemEntity that will be dropped.
+     * the List of ItemEntity that will be dropped.
      */
     @ZenCodeType.Getter("drops")
     public static List<ItemEntity> getDrops(CurioDropsEvent internal) {
@@ -41,7 +41,7 @@ public class ExpandCurioDropsEvent {
     }
 
     /**
-     * @return the curio handler for the entity
+     * the curio handler for the entity
      */
     @ZenCodeType.Getter("curioHandler")
     public static ICuriosItemHandler getCurioHandler(CurioDropsEvent internal) {
@@ -49,7 +49,7 @@ public class ExpandCurioDropsEvent {
     }
 
     /**
-     * @return the amount of loot that will be dropped.
+     * the amount of loot that will be dropped.
      */
     @ZenCodeType.Getter("lootingLevel")
     public static int getLootingLevel(CurioDropsEvent internal) {
@@ -57,9 +57,9 @@ public class ExpandCurioDropsEvent {
     }
 
     /**
-     * @return whether the Entity doing the drop has recently been damaged.
+     * whether the Entity doing the drop has recently been damaged.
      */
-    @ZenCodeType.Getter
+    @ZenCodeType.Getter("isRecentlyHit")
     public static boolean isRecentlyHit(CurioDropsEvent internal) {
         return internal.isRecentlyHit();
     }

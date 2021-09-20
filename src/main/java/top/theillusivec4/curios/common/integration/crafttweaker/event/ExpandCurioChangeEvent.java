@@ -21,7 +21,7 @@ import top.theillusivec4.curios.api.event.CurioChangeEvent;
 @NativeTypeRegistration(value = CurioChangeEvent.class, zenCodeName = "mods.curios.event.CurioChangeEvent")
 public class ExpandCurioChangeEvent {
     /**
-     * @return the affected {@link top.theillusivec4.curios.api.type.ISlotType}
+     * the affected {@link top.theillusivec4.curios.api.type.ISlotType}
      */
     @ZenCodeType.Getter("identifier")
     public static String getIdentifier(CurioChangeEvent internal) {
@@ -29,7 +29,7 @@ public class ExpandCurioChangeEvent {
     }
 
     /**
-     * @return the {@link IItemStack} that was equipped previously.
+     * the {@link IItemStack} that was equipped previously.
      */
     @ZenCodeType.Getter("from")
     public static IItemStack getFrom(CurioChangeEvent internal) {
@@ -37,7 +37,7 @@ public class ExpandCurioChangeEvent {
     }
 
     /**
-     * @return the {@link ItemStack} that is equipped now.
+     * the {@link ItemStack} that is equipped now.
      */
     @ZenCodeType.Getter("to")
     public static IItemStack getTo(CurioChangeEvent internal) {
@@ -45,7 +45,7 @@ public class ExpandCurioChangeEvent {
     }
 
     /**
-     * @return index of the curio slot.
+     * index of the curio slot.
      */
     @ZenCodeType.Getter("slotIndex")
     public static int getSlotIndex(CurioChangeEvent internal) {
