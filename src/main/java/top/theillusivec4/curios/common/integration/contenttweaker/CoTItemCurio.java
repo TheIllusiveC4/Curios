@@ -35,6 +35,7 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @ZenRegister(modDeps = "contenttweaker")
@@ -104,6 +105,17 @@ public class CoTItemCurio extends CoTItemAdvanced {
         return this;
     }
 
+    /**
+     * Sets if the ItemStack should drop on death and persist through respawn.
+     * @param func an IDropRuleFunction function
+     * @return the CoTItemCurio, used for method chaining
+     */
+    @ZenCodeType.Method
+    public CoTItemCurio setDropRuleFunction(IDropRuleFunction func) {
+        ActionSetFunction.applyNewAction("dropRuleFunction", this, func, (item, function) -> item.curio.dropRuleFunction = function);
+        return this;
+    }
+
     @Nullable
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
@@ -116,6 +128,7 @@ public class CoTItemCurio extends CoTItemAdvanced {
         private IEquipCallback onUnequipped;
         private IEquipChecker canEquip;
         private IEquipChecker canUnequip;
+        private IDropRuleFunction dropRuleFunction;
 
         @Override
         public void curioTick(String identifier, int index, LivingEntity livingEntity) {
@@ -152,6 +165,15 @@ public class CoTItemCurio extends CoTItemAdvanced {
                 return canUnequip.check(identifier, livingEntity);
             }
             return true;
+        }
+
+        @Nonnull
+        @Override
+        public DropRule getDropRule(LivingEntity livingEntity) {
+            if (dropRuleFunction != null) {
+                return dropRuleFunction.call(livingEntity);
+            }
+            return DropRule.DEFAULT;
         }
     }
 }
