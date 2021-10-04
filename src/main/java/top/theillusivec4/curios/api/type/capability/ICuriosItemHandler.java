@@ -19,15 +19,19 @@
 
 package top.theillusivec4.curios.api.type.capability;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Tuple;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+/**
+ * A class to handle player's curios. You can get one by `curiosItemHandler` getter of {@link net.minecraft.entity.player.PlayerEntity}.
+ */
 public interface ICuriosItemHandler {
 
   /**

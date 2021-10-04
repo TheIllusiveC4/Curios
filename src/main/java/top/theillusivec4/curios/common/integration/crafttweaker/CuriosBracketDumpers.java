@@ -26,6 +26,7 @@ import org.openzen.zencode.java.ZenCodeType;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @ZenRegister
 @Document("mods/Curios/CuriosBracketDumpers")
@@ -34,6 +35,8 @@ public class CuriosBracketDumpers {
     @ZenCodeType.Method
     @BracketDumper("curiosslottype")
     public static Collection<String> getSlotTypeDump() {
-        return CuriosApi.getSlotHelper().getSlotTypeIds();
+        return CuriosApi.getSlotHelper().getSlotTypeIds().stream()
+                .map(s -> "<curiosslottype:" + s + ">")
+                .collect(Collectors.toList());
     }
 }

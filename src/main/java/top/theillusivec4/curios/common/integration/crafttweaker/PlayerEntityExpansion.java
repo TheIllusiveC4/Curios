@@ -20,16 +20,13 @@
 package top.theillusivec4.curios.common.integration.crafttweaker;
 
 import com.blamejared.crafttweaker.api.annotations.ZenRegister;
-import com.blamejared.crafttweaker_annotations.annotations.Document;
-import com.blamejared.crafttweaker_annotations.annotations.TypedExpansion;
 import net.minecraft.entity.player.PlayerEntity;
 import org.openzen.zencode.java.ZenCodeType;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 @ZenRegister
-@Document("mods/Curios/PlayerEntityExpansion")
-@TypedExpansion(PlayerEntity.class)
+@ZenCodeType.Expansion("crafttweaker.api.player.MCPlayerEntity")
 public class PlayerEntityExpansion {
     @ZenCodeType.Getter("curiosItemHandler")
     @ZenCodeType.Method
