@@ -27,7 +27,7 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 
 /**
- * {@link CurioChangeEvent} is fired when the Curio of a LivingEntity changes. <br> This event is
+ * CurioChangeEvent is fired when the Curio of a LivingEntity changes. <br> This event is
  * fired whenever changes in curios are detected in
  * <br> {@link net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent}.
  * <br> This also includes entities joining the World, as well as being cloned. <br> This event is

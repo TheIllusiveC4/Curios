@@ -29,7 +29,7 @@ import net.minecraftforge.eventbus.api.Cancelable;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 /**
- * LivingCurioDropsEvent is fired when an Entity's death causes dropped curios to appear.<br> This
+ * CurioDropsEvent is fired when an Entity's death causes dropped curios to appear.<br> This
  * event is fired whenever an Entity dies and drops items in {@link LivingEntity#onDeath(DamageSource)}.<br>
  * <br>
  * This event is fired inside the {@link net.minecraftforge.event.entity.living.LivingDropsEvent}.<br>
