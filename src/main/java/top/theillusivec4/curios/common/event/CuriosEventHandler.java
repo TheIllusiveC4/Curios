@@ -56,6 +56,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent.PickupXp;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -65,6 +66,7 @@ import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 import top.theillusivec4.curios.api.event.CurioDropsEvent;
+import top.theillusivec4.curios.api.event.CurioEquipEvent;
 import top.theillusivec4.curios.api.event.DropRulesEvent;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -339,9 +341,17 @@ public class CuriosEventHandler {
               for (int i = 0; i < stackHandler.getSlots(); i++) {
                 String id = entry.getKey();
                 SlotContext slotContext = new SlotContext(id, player, i);
+                CurioEquipEvent equipEvent = new CurioEquipEvent(stack, slotContext);
+                MinecraftForge.EVENT_BUS.post(equipEvent);
+                Event.Result result = equipEvent.getResult();
 
-                if (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(id, player) &&
-                    curio.canEquipFromUse(slotContext)) {
+                if (result == Event.Result.DENY) {
+                  continue;
+                }
+
+                if (result == Event.Result.ALLOW ||
+                    (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(id, player) &&
+                        curio.canEquipFromUse(slotContext))) {
                   ItemStack present = stackHandler.getStackInSlot(i);
 
                   if (present.isEmpty()) {

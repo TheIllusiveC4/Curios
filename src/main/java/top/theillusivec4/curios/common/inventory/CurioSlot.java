@@ -29,10 +29,14 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.items.SlotItemHandler;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.event.CurioEquipEvent;
+import top.theillusivec4.curios.api.event.CurioUnequipEvent;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CurioSlot extends SlotItemHandler {
@@ -70,17 +74,34 @@ public class CurioSlot extends SlotItemHandler {
 
   @Override
   public boolean isItemValid(@Nonnull ItemStack stack) {
-    return CuriosApi.getCuriosHelper().isStackValid(slotContext, stack) &&
-        CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(identifier, player))
-            .orElse(true) && super.isItemValid(stack);
+    CurioEquipEvent equipEvent = new CurioEquipEvent(stack, slotContext);
+    MinecraftForge.EVENT_BUS.post(equipEvent);
+    Event.Result result = equipEvent.getResult();
+
+    if (result == Event.Result.DENY) {
+      return false;
+    }
+    return result == Event.Result.ALLOW ||
+        (CuriosApi.getCuriosHelper().isStackValid(slotContext, stack) &&
+            CuriosApi.getCuriosHelper().getCurio(stack)
+                .map(curio -> curio.canEquip(identifier, player)).orElse(true) &&
+            super.isItemValid(stack));
   }
 
   @Override
   public boolean canTakeStack(PlayerEntity playerIn) {
     ItemStack stack = this.getStack();
-    return (stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack))
-        && CuriosApi.getCuriosHelper().getCurio(stack)
-        .map(curio -> curio.canUnequip(this.identifier, playerIn)).orElse(true) && super
-        .canTakeStack(playerIn);
+    CurioUnequipEvent unequipEvent = new CurioUnequipEvent(stack, slotContext);
+    MinecraftForge.EVENT_BUS.post(unequipEvent);
+    Event.Result result = unequipEvent.getResult();
+
+    if (result == Event.Result.DENY) {
+      return false;
+    }
+    return result == Event.Result.ALLOW ||
+        ((stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) &&
+            CuriosApi.getCuriosHelper().getCurio(stack)
+                .map(curio -> curio.canUnequip(this.identifier, playerIn)).orElse(true) &&
+            super.canTakeStack(playerIn));
   }
 }
