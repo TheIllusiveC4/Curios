@@ -43,6 +43,7 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -64,6 +65,7 @@ import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.client.ClientEventHandler;
 import top.theillusivec4.curios.client.CuriosClientConfig;
+import top.theillusivec4.curios.client.CuriosClientMod;
 import top.theillusivec4.curios.client.IconHelper;
 import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
@@ -91,6 +93,7 @@ public class Curios {
   private static final boolean DEBUG = false;
 
   public Curios() {
+    DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> CuriosClientMod::init);
     final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::setup);
     eventBus.addListener(this::config);
@@ -180,16 +183,7 @@ public class Curios {
 
     @SubscribeEvent
     public static void stitchTextures(TextureStitchEvent.Pre evt) {
-
-      if (evt.getMap().getTextureLocation() == PlayerContainer.LOCATION_BLOCKS_TEXTURE) {
-
-        for (SlotTypePreset preset : SlotTypePreset.values()) {
-          evt.addSprite(
-              new ResourceLocation(MODID, "item/empty_" + preset.getIdentifier() + "_slot"));
-        }
-        evt.addSprite(new ResourceLocation(MODID, "item/empty_cosmetic_slot"));
-        evt.addSprite(new ResourceLocation(MODID, "item/empty_curio_slot"));
-      }
+      CuriosClientMod.stitch(evt);
     }
 
     @SubscribeEvent
