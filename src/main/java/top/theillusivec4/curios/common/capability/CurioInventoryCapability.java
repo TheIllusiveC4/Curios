@@ -33,7 +33,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -49,6 +48,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
@@ -214,7 +214,7 @@ public class CurioInventoryCapability {
     @Override
     public void reset() {
 
-      if (!this.wearer.getEntityWorld().isRemote() && this.wearer instanceof ServerPlayerEntity) {
+      if (this.wearer != null && !this.wearer.getEntityWorld().isRemote()) {
         this.locked.clear();
         this.curios.clear();
         this.invalidStacks.clear();
@@ -379,6 +379,80 @@ public class CurioInventoryCapability {
     @Override
     public int getLootingBonus() {
       return this.fortuneAndLooting.getB();
+    }
+
+    @Override
+    public ListNBT saveInventory(boolean clear) {
+      ListNBT taglist = new ListNBT();
+
+      for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
+        CompoundNBT tag = new CompoundNBT();
+        ICurioStacksHandler stacksHandler = entry.getValue();
+        IDynamicStackHandler stacks = stacksHandler.getStacks();
+        IDynamicStackHandler cosmetics = stacksHandler.getCosmeticStacks();
+        tag.put("Stacks", stacks.serializeNBT());
+        tag.put("Cosmetics", cosmetics.serializeNBT());
+        tag.putString("Identifier", entry.getKey());
+        taglist.add(tag);
+
+        if (clear) {
+
+          for (int i = 0; i < stacks.getSlots(); i++) {
+            stacks.setStackInSlot(i, ItemStack.EMPTY);
+          }
+
+          for (int i = 0; i < cosmetics.getSlots(); i++) {
+            cosmetics.setStackInSlot(i, ItemStack.EMPTY);
+          }
+        }
+      }
+      return taglist;
+    }
+
+    @Override
+    public void loadInventory(ListNBT data) {
+
+      if (data != null) {
+
+        for (int i = 0; i < data.size(); i++) {
+          CompoundNBT tag = data.getCompound(i);
+          String identifier = tag.getString("Identifier");
+          ICurioStacksHandler stacksHandler = curios.get(identifier);
+
+          if (stacksHandler != null) {
+            CompoundNBT stacksData = tag.getCompound("Stacks");
+            ItemStackHandler loaded = new ItemStackHandler();
+            IDynamicStackHandler stacks = stacksHandler.getStacks();
+
+            if (!stacksData.isEmpty()) {
+              loaded.deserializeNBT(stacksData);
+              loadStacks(stacksHandler, loaded, stacks);
+            }
+            stacksData = tag.getCompound("Cosmetics");
+
+            if (!stacksData.isEmpty()) {
+              loaded.deserializeNBT(stacksData);
+              stacks = stacksHandler.getCosmeticStacks();
+              loadStacks(stacksHandler, loaded, stacks);
+            }
+          }
+        }
+      }
+    }
+
+    private void loadStacks(ICurioStacksHandler stacksHandler, ItemStackHandler loaded,
+                            IDynamicStackHandler stacks) {
+
+      for (int j = 0; j < stacksHandler.getSlots() && j < loaded.getSlots(); j++) {
+        ItemStack stack = stacks.getStackInSlot(j);
+        ItemStack loadedStack = loaded.getStackInSlot(j);
+
+        if (stack.isEmpty()) {
+          stacks.setStackInSlot(j, loadedStack);
+        } else {
+          this.loseInvalidStack(stack);
+        }
+      }
     }
 
     @Override

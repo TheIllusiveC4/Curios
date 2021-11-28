@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.Tuple;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -148,6 +149,20 @@ public interface ICuriosItemHandler {
    */
   int getLootingBonus();
 
+  /**
+   * Saves the curios inventory stacks to NBT.
+   *
+   * @param clear True to clear the inventory while saving, false to just save the data
+   * @return {@link ListNBT} with the curios inventory stacks data
+   */
+  ListNBT saveInventory(boolean clear);
+
+  /**
+   * Loads the curios inventory stacks from NBT.
+   *
+   * @param data {@link ListNBT} data from {@link ICuriosItemHandler#saveInventory(boolean)}
+   */
+  void loadInventory(ListNBT data);
 
   /**
    * Sets the total Fotrune and Looting bonuses of this handler and therefore it's bearer.
