@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.5-4.0.6.1] - 2021.11.30
+### Fixed
+- Fixed syncing slot shrinking client-side, actually this time
+
 ## [1.16.5-4.0.6.0] - 2021.11.30
 Please note that this update is more experimental than most and is marked as a beta. Be cautious about adding this to
 stable worlds.
