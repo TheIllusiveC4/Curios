@@ -34,7 +34,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -43,9 +42,9 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
@@ -76,8 +75,7 @@ public class CurioInventoryCapability {
     @Override
     public void reset() {
 
-      if (!this.wearer.getCommandSenderWorld().isClientSide() &&
-          this.wearer instanceof ServerPlayer) {
+      if (this.wearer != null && !this.wearer.getCommandSenderWorld().isClientSide()) {
         this.curios.clear();
         this.invalidStacks.clear();
         CuriosApi.getSlotHelper().createSlots().forEach(
@@ -200,6 +198,80 @@ public class CurioInventoryCapability {
     }
 
     @Override
+    public ListTag saveInventory(boolean clear) {
+      ListTag taglist = new ListTag();
+
+      for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
+        CompoundTag tag = new CompoundTag();
+        ICurioStacksHandler stacksHandler = entry.getValue();
+        IDynamicStackHandler stacks = stacksHandler.getStacks();
+        IDynamicStackHandler cosmetics = stacksHandler.getCosmeticStacks();
+        tag.put("Stacks", stacks.serializeNBT());
+        tag.put("Cosmetics", cosmetics.serializeNBT());
+        tag.putString("Identifier", entry.getKey());
+        taglist.add(tag);
+
+        if (clear) {
+
+          for (int i = 0; i < stacks.getSlots(); i++) {
+            stacks.setStackInSlot(i, ItemStack.EMPTY);
+          }
+
+          for (int i = 0; i < cosmetics.getSlots(); i++) {
+            cosmetics.setStackInSlot(i, ItemStack.EMPTY);
+          }
+        }
+      }
+      return taglist;
+    }
+
+    @Override
+    public void loadInventory(ListTag data) {
+
+      if (data != null) {
+
+        for (int i = 0; i < data.size(); i++) {
+          CompoundTag tag = data.getCompound(i);
+          String identifier = tag.getString("Identifier");
+          ICurioStacksHandler stacksHandler = curios.get(identifier);
+
+          if (stacksHandler != null) {
+            CompoundTag stacksData = tag.getCompound("Stacks");
+            ItemStackHandler loaded = new ItemStackHandler();
+            IDynamicStackHandler stacks = stacksHandler.getStacks();
+
+            if (!stacksData.isEmpty()) {
+              loaded.deserializeNBT(stacksData);
+              loadStacks(stacksHandler, loaded, stacks);
+            }
+            stacksData = tag.getCompound("Cosmetics");
+
+            if (!stacksData.isEmpty()) {
+              loaded.deserializeNBT(stacksData);
+              stacks = stacksHandler.getCosmeticStacks();
+              loadStacks(stacksHandler, loaded, stacks);
+            }
+          }
+        }
+      }
+    }
+
+    private void loadStacks(ICurioStacksHandler stacksHandler, ItemStackHandler loaded,
+                            IDynamicStackHandler stacks) {
+
+      for (int j = 0; j < stacksHandler.getSlots() && j < loaded.getSlots(); j++) {
+        ItemStack stack = stacks.getStackInSlot(j);
+        ItemStack loadedStack = loaded.getStackInSlot(j);
+
+        if (stack.isEmpty()) {
+          stacks.setStackInSlot(j, loadedStack);
+        } else {
+          this.loseInvalidStack(stack);
+        }
+      }
+    }
+
+    @Override
     public Tag writeTag() {
       CompoundTag compound = new CompoundTag();
 
@@ -216,7 +288,7 @@ public class CurioInventoryCapability {
 
     @Override
     public void readTag(Tag nbt) {
-      ListTag tagList = ((CompoundTag) nbt).getList("Curios", NBT.TAG_COMPOUND);
+      ListTag tagList = ((CompoundTag) nbt).getList("Curios", Tag.TAG_COMPOUND);
       ISlotHelper slotHelper = CuriosApi.getSlotHelper();
       ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
       LivingEntity livingEntity = this.getWearer();

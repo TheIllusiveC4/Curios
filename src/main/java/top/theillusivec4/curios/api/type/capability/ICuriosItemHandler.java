@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.damagesource.DamageSource;
@@ -127,6 +128,21 @@ public interface ICuriosItemHandler {
    * Get the amount of Looting levels that are provided by curios.
    */
   int getLootingLevel(DamageSource source, LivingEntity target, int baseLooting);
+
+  /**
+   * Saves the curios inventory stacks to NBT.
+   *
+   * @param clear True to clear the inventory while saving, false to just save the data
+   * @return {@link ListTag} with the curios inventory stacks data
+   */
+  ListTag saveInventory(boolean clear);
+
+  /**
+   * Loads the curios inventory stacks from NBT.
+   *
+   * @param data {@link ListTag} data from {@link ICuriosItemHandler#saveInventory(boolean)}
+   */
+  void loadInventory(ListTag data);
 
   /**
    * Serializes the curios inventory data
