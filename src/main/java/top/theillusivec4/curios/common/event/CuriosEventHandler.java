@@ -19,12 +19,15 @@
 
 package top.theillusivec4.curios.common.event;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
@@ -41,6 +44,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -80,12 +85,14 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
+import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
 import top.theillusivec4.curios.common.util.EquipCurioTrigger;
@@ -243,41 +250,14 @@ public class CuriosEventHandler {
   @SubscribeEvent
   public void playerClone(PlayerEvent.Clone evt) {
     Player player = evt.getPlayer();
-
     Player oldPlayer = evt.getOriginal();
     oldPlayer.revive();
     LazyOptional<ICuriosItemHandler> oldHandler = CuriosApi.getCuriosHelper()
         .getCuriosHandler(oldPlayer);
     LazyOptional<ICuriosItemHandler> newHandler = CuriosApi.getCuriosHelper()
         .getCuriosHandler(player);
-
-    oldHandler.ifPresent(oldCurios -> newHandler.ifPresent(newCurios -> {
-      newCurios.setCurios(new LinkedHashMap<>(oldCurios.getCurios()));
-
-      oldCurios.getCurios().forEach((identifier, stacksHandler) -> {
-        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
-
-        for (int i = 0; i < stackHandler.getSlots(); i++) {
-          ItemStack stack = stackHandler.getStackInSlot(i);
-          SlotContext slotContext =
-              new SlotContext(identifier, player, i, false, stacksHandler.getRenders().get(i));
-
-          if (!stack.isEmpty()) {
-            UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
-            player.getAttributes().addTransientAttributeModifiers(
-                CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack));
-            CuriosApi.getCuriosHelper().getCurio(stack)
-                .ifPresent(curio -> curio.onEquip(slotContext, ItemStack.EMPTY));
-
-            if (player instanceof ServerPlayer) {
-              EquipCurioTrigger.INSTANCE
-                  .trigger((ServerPlayer) player, stack, (ServerLevel) player.level,
-                      player.getX(), player.getY(), player.getZ());
-            }
-          }
-        }
-      });
-    }));
+    oldHandler.ifPresent(
+        oldCurios -> newHandler.ifPresent(newCurios -> newCurios.readTag(oldCurios.writeTag())));
   }
 
   @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -472,6 +452,7 @@ public class CuriosEventHandler {
     LivingEntity livingEntity = evt.getEntityLiving();
 
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
+      handler.clearCachedSlotModifiers();
       handler.handleInvalidStacks();
       Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
@@ -510,15 +491,46 @@ public class CuriosEventHandler {
               UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
 
               if (!prevStack.isEmpty()) {
-                livingEntity.getAttributes().removeAttributeModifiers(
-                    CuriosApi.getCuriosHelper()
-                        .getAttributeModifiers(slotContext, uuid, prevStack));
+                Multimap<Attribute, AttributeModifier> map =
+                    CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, prevStack);
+                Multimap<String, AttributeModifier> slots = HashMultimap.create();
+                Set<CuriosHelper.SlotAttributeWrapper> toRemove = new HashSet<>();
+
+                for (Attribute attribute : map.keySet()) {
+
+                  if (attribute instanceof CuriosHelper.SlotAttributeWrapper wrapper) {
+                    slots.putAll(wrapper.identifier, map.get(attribute));
+                    toRemove.add(wrapper);
+                  }
+                }
+
+                for (Attribute attribute : toRemove) {
+                  map.removeAll(attribute);
+                }
+                livingEntity.getAttributes().removeAttributeModifiers(map);
+                handler.removeSlotModifiers(slots);
                 prevCurio.ifPresent(curio -> curio.onUnequip(slotContext, stack));
               }
 
               if (!stack.isEmpty()) {
-                livingEntity.getAttributes().addTransientAttributeModifiers(
-                    CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack));
+                Multimap<Attribute, AttributeModifier> map =
+                    CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack);
+                Multimap<String, AttributeModifier> slots = HashMultimap.create();
+                Set<CuriosHelper.SlotAttributeWrapper> toRemove = new HashSet<>();
+
+                for (Attribute attribute : map.keySet()) {
+
+                  if (attribute instanceof CuriosHelper.SlotAttributeWrapper wrapper) {
+                    slots.putAll(wrapper.identifier, map.get(attribute));
+                    toRemove.add(wrapper);
+                  }
+                }
+
+                for (Attribute attribute : toRemove) {
+                  map.removeAll(attribute);
+                }
+                livingEntity.getAttributes().addTransientAttributeModifiers(map);
+                handler.addTransientSlotModifiers(slots);
                 currentCurio.ifPresent(curio -> curio.onEquip(slotContext, prevStack));
 
                 if (livingEntity instanceof ServerPlayer) {
@@ -538,6 +550,14 @@ public class CuriosEventHandler {
                   CuriosApi.getCuriosHelper().getCurio(prevCosmeticStack), identifier, index, true,
                   true, HandlerType.COSMETIC);
               cosmeticStackHandler.setPreviousStackInSlot(index, cosmeticStack.copy());
+            }
+            Set<ICurioStacksHandler> updates = handler.getUpdatingInventories();
+
+            if (!updates.isEmpty()) {
+              NetworkHandler.INSTANCE.send(
+                  PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
+                  new SPacketSyncModifiers(livingEntity.getId(), updates));
+              updates.clear();
             }
           }
         }

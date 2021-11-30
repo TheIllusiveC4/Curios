@@ -30,7 +30,6 @@ import java.util.TreeMap;
 import javax.annotation.Nonnull;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
@@ -65,7 +64,18 @@ public class SlotHelper implements ISlotHelper {
   public SortedMap<ISlotType, ICurioStacksHandler> createSlots() {
     SortedMap<ISlotType, ICurioStacksHandler> curios = new TreeMap<>();
     this.getSlotTypes().forEach(type -> curios.put(type,
-        new CurioStacksHandler(type.getSize(), 0, type.isVisible(), type.hasCosmetic())));
+        new CurioStacksHandler(null, type.getIdentifier(), type.getSize(), 0, type.isVisible(),
+            type.hasCosmetic())));
+    return curios;
+  }
+
+  @Override
+  public SortedMap<ISlotType, ICurioStacksHandler> createSlots(LivingEntity livingEntity) {
+    SortedMap<ISlotType, ICurioStacksHandler> curios = new TreeMap<>();
+    CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(
+        handler -> this.getSlotTypes().forEach(type -> curios.put(type,
+            new CurioStacksHandler(handler, type.getIdentifier(), type.getSize(), 0,
+                type.isVisible(), type.hasCosmetic()))));
     return curios;
   }
 

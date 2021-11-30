@@ -50,6 +50,7 @@ import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
@@ -168,12 +169,30 @@ public class ClientEventHandler {
                   d1 = amount * 100.0D;
                 }
 
-                if (flag) {
+                if (entry.getKey() instanceof CuriosHelper.SlotAttributeWrapper wrapper) {
+
+                  if (amount > 0.0D) {
+                    attributeTooltip.add((new TranslatableComponent(
+                                "curios.modifiers.slots.plus." +
+                                    attributemodifier.getOperation().toValue(),
+                                ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                                new TranslatableComponent("curios.identifier." + wrapper.identifier)))
+                            .withStyle(ChatFormatting.BLUE));
+                  } else {
+                    d1 = d1 * -1.0D;
+                    attributeTooltip.add((new TranslatableComponent(
+                                "curios.modifiers.slots.take." +
+                                    attributemodifier.getOperation().toValue(),
+                                ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                                new TranslatableComponent("curios.identifier." + wrapper.identifier)))
+                            .withStyle(ChatFormatting.RED));
+                  }
+                } else if (flag) {
                   attributeTooltip.add(
                       (new TextComponent(" ")).append(new TranslatableComponent(
-                          "attribute.modifier.equals." + attributemodifier.getOperation().toValue(),
-                          ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                          new TranslatableComponent(entry.getKey().getDescriptionId())))
+                              "attribute.modifier.equals." + attributemodifier.getOperation().toValue(),
+                              ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                              new TranslatableComponent(entry.getKey().getDescriptionId())))
                           .withStyle(ChatFormatting.DARK_GREEN));
                 } else if (amount > 0.0D) {
                   attributeTooltip.add((new TranslatableComponent(

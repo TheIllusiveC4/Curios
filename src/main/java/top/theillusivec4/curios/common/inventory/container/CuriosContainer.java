@@ -213,6 +213,7 @@ public class CuriosContainer extends InventoryMenu {
       int slots = 0;
       int yOffset = 12;
       int index = 0;
+      int startingIndex = indexIn;
       this.slots.subList(46, this.slots.size()).clear();
       this.lastSlots.subList(46, this.lastSlots.size()).clear();
       this.remoteSlots.subList(46, this.remoteSlots.size()).clear();
@@ -225,7 +226,26 @@ public class CuriosContainer extends InventoryMenu {
 
           for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
-            if (index >= indexIn) {
+            if (index >= startingIndex) {
+              slots++;
+            }
+            index++;
+          }
+        }
+      }
+      startingIndex = Math.min(startingIndex, Math.max(0, index - 8));
+      index = 0;
+      slots = 0;
+
+      for (String identifier : curioMap.keySet()) {
+        ICurioStacksHandler stacksHandler = curioMap.get(identifier);
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+
+        if (stacksHandler.isVisible()) {
+
+          for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+
+            if (index >= startingIndex) {
               this.addSlot(new CurioSlot(this.player, stackHandler, i, identifier, -18, yOffset,
                   stacksHandler.getRenders()));
               yOffset += 18;
@@ -247,7 +267,7 @@ public class CuriosContainer extends InventoryMenu {
 
           for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
-            if (index >= indexIn) {
+            if (index >= startingIndex) {
 
               if (stacksHandler.hasCosmetic()) {
                 IDynamicStackHandler cosmeticHandler = stacksHandler.getCosmeticStacks();

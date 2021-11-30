@@ -21,6 +21,7 @@ package top.theillusivec4.curios.common;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -54,6 +55,8 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 
 public class CuriosHelper implements ICuriosHelper {
+
+  private static final Map<String, SlotAttributeWrapper> SLOT_ATTRIBUTES = new HashMap<>();
 
   private static TriConsumer<String, Integer, LivingEntity> brokenCurioConsumerLegacy;
   private static Consumer<SlotContext> brokenCurioConsumer;
@@ -169,6 +172,14 @@ public class CuriosHelper implements ICuriosHelper {
   }
 
   @Override
+  public void addSlotModifier(Multimap<Attribute, AttributeModifier> map, String identifier,
+                              UUID uuid, double amount, AttributeModifier.Operation operation) {
+    SlotAttributeWrapper att =
+        SLOT_ATTRIBUTES.computeIfAbsent(identifier, SlotAttributeWrapper::new);
+    map.put(att, new AttributeModifier(uuid, identifier, amount, operation));
+  }
+
+  @Override
   public boolean isStackValid(SlotContext slotContext, ItemStack stack) {
     String id = slotContext.identifier();
     Set<String> tags = getCurioTags(stack.getItem());
@@ -199,6 +210,16 @@ public class CuriosHelper implements ICuriosHelper {
 
     if (brokenCurioConsumerLegacy == null) {
       brokenCurioConsumerLegacy = consumer;
+    }
+  }
+
+  public static class SlotAttributeWrapper extends Attribute {
+
+    public final String identifier;
+
+    private SlotAttributeWrapper(String identifier) {
+      super("curios.slot." + identifier, 0);
+      this.identifier = identifier;
     }
   }
 }
