@@ -20,6 +20,8 @@
 package top.theillusivec4.curios.common.inventory.container;
 
 import com.mojang.datafixers.util.Pair;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -33,6 +35,7 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.CraftingResultSlot;
+import net.minecraft.inventory.container.IContainerListener;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
@@ -44,6 +47,7 @@ import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.server.SSetSlotPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -207,12 +211,12 @@ public class CuriosContainer extends PlayerContainer {
   }
 
   public void scrollToIndex(int indexIn) {
-
     this.curiosHandler.ifPresent(curios -> {
       Map<String, ICurioStacksHandler> curioMap = curios.getCurios();
       int slots = 0;
       int yOffset = 12;
       int index = 0;
+      int startingIndex = indexIn;
       this.inventorySlots.subList(46, this.inventorySlots.size()).clear();
 
       if (this.inventoryItemStacks != null) {
@@ -227,7 +231,29 @@ public class CuriosContainer extends PlayerContainer {
 
           for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
-            if (index >= indexIn) {
+            if (index >= startingIndex) {
+              slots++;
+            }
+            index++;
+          }
+        }
+      }
+
+      if (index < 8 && startingIndex != 0) {
+        startingIndex = 0;
+      }
+      index = 0;
+      slots = 0;
+
+      for (String identifier : curioMap.keySet()) {
+        ICurioStacksHandler stacksHandler = curioMap.get(identifier);
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+
+        if (stacksHandler.isVisible()) {
+
+          for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
+
+            if (index >= startingIndex) {
               this.addSlot(new CurioSlot(this.player, stackHandler, i, identifier, -18, yOffset,
                   stacksHandler.getRenders()));
               yOffset += 18;
@@ -249,7 +275,7 @@ public class CuriosContainer extends PlayerContainer {
 
           for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
 
-            if (index >= indexIn) {
+            if (index >= startingIndex) {
 
               if (stacksHandler.hasCosmetic()) {
                 IDynamicStackHandler cosmeticHandler = stacksHandler.getCosmeticStacks();

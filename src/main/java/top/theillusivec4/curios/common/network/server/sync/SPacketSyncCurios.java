@@ -37,9 +37,20 @@ public class SPacketSyncCurios {
 
   private int entityId;
   private int entrySize;
-  private Map<String, ICurioStacksHandler> map;
+  private Map<String, CompoundNBT> map;
 
   public SPacketSyncCurios(int entityId, Map<String, ICurioStacksHandler> map) {
+    Map<String, CompoundNBT> result = new LinkedHashMap<>();
+
+    for (Map.Entry<String, ICurioStacksHandler> entry : map.entrySet()) {
+      result.put(entry.getKey(), entry.getValue().getSyncTag());
+    }
+    this.entityId = entityId;
+    this.entrySize = map.size();
+    this.map = result;
+  }
+
+  public SPacketSyncCurios(Map<String, CompoundNBT> map, int entityId) {
     this.entityId = entityId;
     this.entrySize = map.size();
     this.map = map;
@@ -49,28 +60,22 @@ public class SPacketSyncCurios {
     buf.writeInt(msg.entityId);
     buf.writeInt(msg.entrySize);
 
-    for (Map.Entry<String, ICurioStacksHandler> entry : msg.map.entrySet()) {
+    for (Map.Entry<String, CompoundNBT> entry : msg.map.entrySet()) {
       buf.writeString(entry.getKey());
-      buf.writeCompoundTag(entry.getValue().serializeNBT());
+      buf.writeCompoundTag(entry.getValue());
     }
   }
 
   public static SPacketSyncCurios decode(PacketBuffer buf) {
     int entityId = buf.readInt();
     int entrySize = buf.readInt();
-    Map<String, ICurioStacksHandler> map = new LinkedHashMap<>();
+    Map<String, CompoundNBT> map = new LinkedHashMap<>();
 
     for (int i = 0; i < entrySize; i++) {
       String key = buf.readString(25);
-      CurioStacksHandler stacksHandler = new CurioStacksHandler();
-      CompoundNBT compound = buf.readCompoundTag();
-
-      if (compound != null) {
-        stacksHandler.deserializeNBT(compound);
-      }
-      map.put(key, stacksHandler);
+      map.put(key, buf.readCompoundTag());
     }
-    return new SPacketSyncCurios(entityId, map);
+    return new SPacketSyncCurios(map, entityId);
   }
 
   public static void handle(SPacketSyncCurios msg, Supplier<NetworkEvent.Context> ctx) {
@@ -82,7 +87,17 @@ public class SPacketSyncCurios {
 
         if (entity instanceof LivingEntity) {
           CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity)
-              .ifPresent(handler -> handler.setCurios(msg.map));
+              .ifPresent(handler -> {
+                Map<String, ICurioStacksHandler> stacks = new LinkedHashMap<>();
+
+                for (Map.Entry<String, CompoundNBT> entry : msg.map.entrySet()) {
+                  ICurioStacksHandler stacksHandler =
+                      new CurioStacksHandler(handler, entry.getKey());
+                  stacksHandler.applySyncTag(entry.getValue());
+                  stacks.put(entry.getKey(), stacksHandler);
+                }
+                handler.setCurios(stacks);
+              });
         }
       }
     });

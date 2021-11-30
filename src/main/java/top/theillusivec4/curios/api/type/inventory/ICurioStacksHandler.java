@@ -19,8 +19,15 @@
 
 package top.theillusivec4.curios.api.type.inventory;
 
+import com.google.common.collect.Multimap;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
+import top.theillusivec4.curios.api.SlotContext;
 
 public interface ICurioStacksHandler {
 
@@ -60,14 +67,6 @@ public interface ICurioStacksHandler {
   int getSlots();
 
   /**
-   * Gets the size offset for this instance. This value is used to persist size changes for this
-   * handler even when the underlying size changes.
-   *
-   * @return The number of the size offset for this instance
-   */
-  int getSizeShift();
-
-  /**
    * Gets whether or not this stack handler should be visible. This does not lock the stack handler
    * from being used regardless.
    *
@@ -84,21 +83,6 @@ public interface ICurioStacksHandler {
   boolean hasCosmetic();
 
   /**
-   * Increases the number of slots by the given amount.
-   *
-   * @param amount The number of slots to add to the handler
-   */
-  void grow(int amount);
-
-  /**
-   * Decreases the number of slots by the given amount. This should not decrease the final number of
-   * slots below 1.
-   *
-   * @param amount The number of slots to remove from the handler
-   */
-  void shrink(int amount);
-
-  /**
    * Writes the data for this handler.
    *
    * @return A {@link CompoundNBT} representing the serialized data
@@ -111,4 +95,134 @@ public interface ICurioStacksHandler {
    * @param nbt A {@link CompoundNBT} representing the serialized data
    */
   void deserializeNBT(CompoundNBT nbt);
+
+  /**
+   * Retrieves the slot identifier associated with the handler.
+   *
+   * @return The slot identifier
+   */
+  String getIdentifier();
+
+  /**
+   * Retrieves all the slot modifiers on the handler.
+   *
+   * @return A map of modifiers with the UUID as keys and {@link AttributeModifier} as values
+   */
+  Map<UUID, AttributeModifier> getModifiers();
+
+  /**
+   * Retrieves all the permanent slot modifiers on the handler.
+   * <br>
+   * These slot modifiers are serialized on the handler.
+   *
+   * @return A set of {@link AttributeModifier}
+   */
+  Set<AttributeModifier> getPermanentModifiers();
+
+  /**
+   * Retrieves all the slot modifiers for a given operation on the handler.
+   *
+   * @param operation The operation of the modifiers
+   * @return A collection of {@link AttributeModifier}
+   */
+  Collection<AttributeModifier> getModifiersByOperation(AttributeModifier.Operation operation);
+
+  /**
+   * Adds a temporary slot modifier to the handler.
+   * <br>
+   * These slot modifiers are not serialized on the handler.
+   *
+   * @param modifier The {@link AttributeModifier} instance to add
+   */
+  void addTransientModifier(AttributeModifier modifier);
+
+  /**
+   * Adds a permanent slot modifier to the handler.
+   * <br>
+   * These slot modifiers are serialized on the handler.
+   *
+   * @param modifier The {@link AttributeModifier} instance to add
+   */
+  void addPermanentModifier(AttributeModifier modifier);
+
+  /**
+   * Removes a slot modifier from the handler.
+   *
+   * @param uuid The UUID of the modifier to remove
+   */
+  void removeModifier(UUID uuid);
+
+  /**
+   * Removes all the slot modifiers on the handler.
+   */
+  void clearModifiers();
+
+  /**
+   * Removes the cached modifiers that appear upon deserialization of the handler.
+   * <br>
+   * Primarily for internal use, used as a workaround to avoid calculating slot stacks before slot
+   * modifiers are initially applied.
+   */
+  void clearCachedModifiers();
+
+  /**
+   * Copies all the slot modifiers from another instance to this one.
+   *
+   * @param other The other instance
+   */
+  void copyModifiers(ICurioStacksHandler other);
+
+  /**
+   * Recalculates the slot modifiers and resizes the handler.
+   */
+  void update();
+
+  /**
+   * Retrieves the NBT data to sync to clients.
+   *
+   * @return The data represented as a {@link CompoundNBT}
+   */
+  CompoundNBT getSyncTag();
+
+  /**
+   * Applies the NBT data synced to clients.
+   * <br>
+   * Client-side only.
+   *
+   * @param tag The data represented as a {@link CompoundNBT}
+   */
+  void applySyncTag(CompoundNBT tag);
+
+  // ============ DEPRECATED ================
+
+  /**
+   * @return The number of the size offset for this instance
+   * @deprecated Use the new attribute modifier system through {@link ICurioStacksHandler#getModifiers()}
+   * <br>
+   * Gets the size offset for this instance. This value is used to persist size changes for this
+   * handler even when the underlying size changes.
+   */
+  @Deprecated
+  int getSizeShift();
+
+  /**
+   * @param amount The number of slots to add to the handler
+   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * <p>
+   * Increases the number of slots by the given amount.
+   */
+  @Deprecated
+  void grow(int amount);
+
+  /**
+   * @param amount The number of slots to remove from the handler
+   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * <p>
+   * Decreases the number of slots by the given amount. This should not decrease the final number of
+   * slots below 1.
+   */
+  @Deprecated
+  void shrink(int amount);
 }

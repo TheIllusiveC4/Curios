@@ -66,7 +66,19 @@ public class SlotHelper implements ISlotHelper {
     SortedMap<ISlotType, ICurioStacksHandler> curios = new TreeMap<>();
     this.getSlotTypes().stream().filter(type -> !type.isLocked()).collect(Collectors.toSet())
         .forEach(type -> curios.put(type,
-            new CurioStacksHandler(type.getSize(), 0, type.isVisible(), type.hasCosmetic())));
+            new CurioStacksHandler(null, type.getIdentifier(), type.getSize(), 0, type.isVisible(),
+                type.hasCosmetic())));
+    return curios;
+  }
+
+  @Override
+  public SortedMap<ISlotType, ICurioStacksHandler> createSlots(LivingEntity livingEntity) {
+    SortedMap<ISlotType, ICurioStacksHandler> curios = new TreeMap<>();
+    CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(
+        handler -> this.getSlotTypes().stream().filter(type -> !type.isLocked())
+            .collect(Collectors.toSet()).forEach(type -> curios.put(type,
+                new CurioStacksHandler(handler, type.getIdentifier(), type.getSize(), 0,
+                    type.isVisible(), type.hasCosmetic()))));
     return curios;
   }
 
@@ -115,7 +127,6 @@ public class SlotHelper implements ISlotHelper {
       }
     });
   }
-
 
   @Override
   public void shrinkSlotType(String id, final LivingEntity livingEntity) {

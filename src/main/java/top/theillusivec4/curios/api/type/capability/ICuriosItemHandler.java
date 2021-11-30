@@ -19,13 +19,18 @@
 
 package top.theillusivec4.curios.api.type.capability;
 
+import com.google.common.collect.Multimap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.Tuple;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
@@ -69,7 +74,7 @@ public interface ICuriosItemHandler {
   void reset();
 
   /**
-   * Gets the an Optional {@link ICurioStacksHandler} associated with the given {@link ISlotType}
+   * Gets the Optional {@link ICurioStacksHandler} associated with the given {@link ISlotType}
    * identifier or Optional.empty() if it doesn't exist.
    *
    * @param identifier The identifier for the {@link ISlotType}
@@ -99,24 +104,6 @@ public interface ICuriosItemHandler {
   void processSlots();
 
   /**
-   * Adds an amount of slots to the {@link ICurioStacksHandler} of a {@link ISlotType} associated
-   * with the identifier.
-   *
-   * @param identifier The identifier for the {@link ISlotType}
-   * @param amount     The number of slots to add, must be non-negative
-   */
-  void growSlotType(String identifier, int amount);
-
-  /**
-   * Removes an amount of slots from the {@link ICurioStacksHandler} of a {@link ISlotType}
-   * associated with the identifier.
-   *
-   * @param identifier The identifier for the {@link ISlotType}
-   * @param amount     The number of slots to remove, must be non-negative
-   */
-  void shrinkSlotType(String identifier, int amount);
-
-  /**
    * Gets the wearer/owner of this handler instance.
    *
    * @return The wearer
@@ -132,7 +119,7 @@ public interface ICuriosItemHandler {
   void loseInvalidStack(ItemStack stack);
 
   /**
-   * Drops all of the ItemStacks found in the invalid stacks list. Used for handling items found in
+   * Drops all the ItemStacks found in the invalid stacks list. Used for handling items found in
    * disabling/removing slots.
    */
   void handleInvalidStacks();
@@ -165,8 +152,101 @@ public interface ICuriosItemHandler {
   void loadInventory(ListNBT data);
 
   /**
-   * Sets the total Fotrune and Looting bonuses of this handler and therefore it's bearer.
+   * Sets the total Fortune and Looting bonuses associated with the handler.
+   *
+   * @param fortuneAndLooting Two integers, the first one representing fortune and the second looting
    */
   void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLooting);
+
+  /**
+   * Retrieves a set containing the {@link ICurioStacksHandler} that require its slot modifiers be
+   * synced to tracking clients.
+   *
+   * @return A set of {@link ICurioStacksHandler} that need to be synced to tracking clients
+   */
+  Set<ICurioStacksHandler> getUpdatingInventories();
+
+  /**
+   * Adds the specified slot modifiers to the handler as temporary slot modifiers.
+   * <br>
+   * These slot modifiers are not serialized and disappear upon deserialization.
+   *
+   * @param modifiers A {@link Multimap} with slot identifiers as keys and attribute modifiers as values
+   */
+  void addTransientSlotModifiers(Multimap<String, AttributeModifier> modifiers);
+
+  /**
+   * Adds the specified slot modifiers to the handler as permanent slot modifiers.
+   *
+   * @param modifiers A {@link Multimap} with slot identifiers as keys and attribute modifiers as values
+   */
+  void addPermanentSlotModifiers(Multimap<String, AttributeModifier> modifiers);
+
+  /**
+   * Removes the specified slot modifiers from the handler.
+   *
+   * @param modifiers A {@link Multimap} with slot identifiers as keys and attribute modifiers as values
+   */
+  void removeSlotModifiers(Multimap<String, AttributeModifier> modifiers);
+
+  /**
+   * Removes all the slot modifiers from the handler.
+   */
+  void clearSlotModifiers();
+
+  /**
+   * Retrieves all the slot modifiers from the handler.
+   *
+   * @return A {@link Multimap} with slot identifiers as keys and attribute modifiers as values
+   */
+  Multimap<String, AttributeModifier> getModifiers();
+
+  /**
+   * Serializes the handler to NBT.
+   *
+   * @return Data for the handler represented as a {@link CompoundNBT}
+   */
+  CompoundNBT writeNBT();
+
+  /**
+   * Deserializes the handler from NBT.
+   *
+   * @param compoundNBT Data for the handler represented as a {@link CompoundNBT}
+   */
+  void readNBT(CompoundNBT compoundNBT);
+
+  /**
+   * Removes the cached modifiers that appear upon deserialization of the handler.
+   * <br>
+   * Primarily for internal use, used as a workaround to avoid calculating slot stacks before slot
+   * modifiers are initially applied.
+   */
+  void clearCachedSlotModifiers();
+
+  // ============ DEPRECATED ================
+
+  /**
+   * @param identifier The identifier for the {@link ISlotType}
+   * @param amount     The number of slots to add, must be non-negative
+   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * when overriding {@link ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * <br>
+   * Adds an amount of slots to the {@link ICurioStacksHandler} of a {@link ISlotType} associated
+   * with the identifier.
+   */
+  @Deprecated
+  void growSlotType(String identifier, int amount);
+
+  /**
+   * @param identifier The identifier for the {@link ISlotType}
+   * @param amount     The number of slots to remove, must be non-negative
+   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * when overriding {@link ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * <p>
+   * Removes an amount of slots from the {@link ICurioStacksHandler} of a {@link ISlotType}
+   * associated with the identifier.
+   */
+  @Deprecated
+  void shrinkSlotType(String identifier, int amount);
 
 }

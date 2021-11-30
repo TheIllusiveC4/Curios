@@ -117,6 +117,18 @@ public interface ICuriosHelper {
                                                                ItemStack stack);
 
   /**
+   * Adds a slot modifier to a specified attribute map.
+   *
+   * @param map         A {@link Multimap} of attributes to attribute modifiers
+   * @param identifier  The identifier of the slot to add the modifier onto
+   * @param uuid        A UUID associated wth the slot
+   * @param amount      The amount of the modifier
+   * @param operation   The operation of the modifier
+   */
+  void addSlotModifier(Multimap<Attribute, AttributeModifier> map, String identifier, UUID uuid,
+                       double amount, AttributeModifier.Operation operation);
+
+  /**
    * Checks if the ItemStack is valid for a particular stack and slot context.
    *
    * @param slotContext Context about the slot that the ItemStack is being checked for

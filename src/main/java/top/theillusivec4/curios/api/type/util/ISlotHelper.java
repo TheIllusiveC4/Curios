@@ -19,11 +19,15 @@
 
 package top.theillusivec4.curios.api.type.util;
 
+import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.UUID;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
@@ -57,7 +61,7 @@ public interface ISlotHelper {
    * @return A map sorted by {@link ISlotType} with instances of {@link ICurioStacksHandler} using
    * default settings
    */
-  SortedMap<ISlotType, ICurioStacksHandler> createSlots();
+  SortedMap<ISlotType, ICurioStacksHandler> createSlots(LivingEntity livingEntity);
 
   /**
    * Gets all unique registered {@link ISlotType} identifiers.
@@ -85,49 +89,6 @@ public interface ISlotHelper {
   void setSlotsForType(String id, LivingEntity livingEntity, int amount);
 
   /**
-   * /** Adds a single slot to the {@link ISlotType} with the associated identifier. If the slot to
-   * be added is for a type that is not enabled on the entity, it will not be added. For adding
-   * slot(s) for types that are not yet available, there must first be a call to {@link
-   * ISlotHelper#unlockSlotType(String, LivingEntity)}
-   *
-   * @param id           The identifier of the {@link ISlotType}
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   */
-  void growSlotType(String id, LivingEntity livingEntity);
-
-  /**
-   * Adds multiple slots to the {@link ISlotType} with the associated identifier. If the slot to be
-   * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
-   * for types that are not yet available, there must first be a call to {@link
-   * ISlotHelper#unlockSlotType(String, LivingEntity)}
-   *
-   * @param id           The identifier of the {@link ISlotType}
-   * @param amount       The number of slots to add
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   */
-  void growSlotType(String id, int amount, LivingEntity livingEntity);
-
-  /**
-   * Removes a single slot to the {@link ISlotType} with the associated identifier. If the slot to
-   * be removed is the last slot available, it will not be removed. For the removal of the last
-   * slot, please see {@link ISlotHelper#lockSlotType(String, LivingEntity)}
-   *
-   * @param id           The identifier of the {@link ISlotType}
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   */
-  void shrinkSlotType(String id, LivingEntity livingEntity);
-
-  /**
-   * Removes multiple slots from the {@link ISlotType} with the associated identifier. If the slot
-   * to be removed is the last slot available, it will not be removed. For the removal of the last
-   * slot, please see {@link ISlotHelper#lockSlotType(String, LivingEntity)}
-   *
-   * @param id           The identifier of the {@link ISlotType}
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   */
-  void shrinkSlotType(String id, int amount, LivingEntity livingEntity);
-
-  /**
    * Adds a {@link ISlotType} to the entity with default settings.
    *
    * @param id           The identifier of the {@link ISlotType}
@@ -142,4 +103,69 @@ public interface ISlotHelper {
    * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
    */
   void lockSlotType(String id, final LivingEntity livingEntity);
+
+  // ============ DEPRECATED ================
+
+  /**
+   * @return A map sorted by {@link ISlotType} with instances of {@link ICurioStacksHandler} using
+   * default settings
+   * @deprecated Use entity-sensitive version {@link ISlotHelper#createSlots(LivingEntity)}
+   */
+  @Deprecated
+  SortedMap<ISlotType, ICurioStacksHandler> createSlots();
+
+  /**
+   * @param id           The identifier of the {@link ISlotType}
+   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
+   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * <br>
+   * Adds a single slot to the {@link ISlotType} with the associated identifier. If the slot to
+   * be added is for a type that is not enabled on the entity, it will not be added. For adding
+   * slot(s) for types that are not yet available, there must first be a call to {@link
+   * ISlotHelper#unlockSlotType(String, LivingEntity)}
+   */
+  @Deprecated
+  void growSlotType(String id, LivingEntity livingEntity);
+
+  /**
+   * @param id           The identifier of the {@link ISlotType}
+   * @param amount       The number of slots to add
+   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
+   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * <br>
+   * Adds multiple slots to the {@link ISlotType} with the associated identifier. If the slot to be
+   * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
+   * for types that are not yet available, there must first be a call to {@link
+   * ISlotHelper#unlockSlotType(String, LivingEntity)}
+   */
+  @Deprecated
+  void growSlotType(String id, int amount, LivingEntity livingEntity);
+
+  /**
+   * @param id           The identifier of the {@link ISlotType}
+   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
+   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * <br>
+   * Removes a single slot to the {@link ISlotType} with the associated identifier. If the slot to
+   * be removed is the last slot available, it will not be removed. For the removal of the last
+   * slot, please see {@link ISlotHelper#lockSlotType(String, LivingEntity)}
+   */
+  @Deprecated
+  void shrinkSlotType(String id, LivingEntity livingEntity);
+
+  /**
+   * @param id           The identifier of the {@link ISlotType}
+   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
+   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * <br>
+   * Removes multiple slots from the {@link ISlotType} with the associated identifier. If the slot
+   * to be removed is the last slot available, it will not be removed. For the removal of the last
+   * slot, please see {@link ISlotHelper#lockSlotType(String, LivingEntity)}
+   */
+  @Deprecated
+  void shrinkSlotType(String id, int amount, LivingEntity livingEntity);
 }

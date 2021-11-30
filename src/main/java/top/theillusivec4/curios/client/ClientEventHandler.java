@@ -21,7 +21,6 @@ package top.theillusivec4.curios.client;
 
 import static net.minecraft.item.ItemStack.DECIMALFORMAT;
 
-
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +50,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
@@ -171,12 +171,31 @@ public class ClientEventHandler {
                   d1 = amount * 100.0D;
                 }
 
-                if (flag) {
-                  tooltip.add((new StringTextComponent(" ")).appendSibling(new TranslationTextComponent(
-                      "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
-                      DECIMALFORMAT.format(d1),
-                      new TranslationTextComponent(entry.getKey().getAttributeName())))
-                      .mergeStyle(TextFormatting.DARK_GREEN));
+                if (entry.getKey() instanceof CuriosHelper.SlotAttributeWrapper) {
+                  CuriosHelper.SlotAttributeWrapper wrapper =
+                      (CuriosHelper.SlotAttributeWrapper) entry.getKey();
+
+                  if (amount > 0.0D) {
+                    tooltip.add((new TranslationTextComponent(
+                        "curios.modifiers.slots.plus." + attributemodifier.getOperation().getId(),
+                        DECIMALFORMAT.format(d1), new TranslationTextComponent(
+                        "curios.identifier." + wrapper.identifier))).mergeStyle(
+                        TextFormatting.BLUE));
+                  } else {
+                    d1 = d1 * -1.0D;
+                    tooltip.add((new TranslationTextComponent(
+                        "curios.modifiers.slots.take." + attributemodifier.getOperation().getId(),
+                        DECIMALFORMAT.format(d1), new TranslationTextComponent(
+                        "curios.identifier." + wrapper.identifier))).mergeStyle(
+                        TextFormatting.RED));
+                  }
+                } else if (flag) {
+                  tooltip.add(
+                      (new StringTextComponent(" ")).appendSibling(new TranslationTextComponent(
+                              "attribute.modifier.equals." + attributemodifier.getOperation().getId(),
+                              DECIMALFORMAT.format(d1),
+                              new TranslationTextComponent(entry.getKey().getAttributeName())))
+                          .mergeStyle(TextFormatting.DARK_GREEN));
                 } else if (amount > 0.0D) {
                   tooltip.add((new TranslationTextComponent(
                       "attribute.modifier.plus." + attributemodifier.getOperation().getId(),
