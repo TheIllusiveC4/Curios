@@ -239,7 +239,7 @@ public class CuriosContainer extends PlayerContainer {
         }
       }
 
-      startingIndex = Math.min(startingIndex, index - 8);
+      startingIndex = Math.min(startingIndex, Math.max(0, index - 8));
       index = 0;
       slots = 0;
 
