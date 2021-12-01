@@ -21,8 +21,9 @@ public class CuriosSpriteListener extends SimplePreparableReloadListener<Void> {
   @Nonnull
   @Override
   protected Void prepare(ResourceManager resourceManagerIn, @Nonnull ProfilerFiller profilerIn) {
-    Collection<ResourceLocation> resources = resourceManagerIn.listResources("textures",
-        (fileName) -> fileName.endsWith(".png"));
+    Collection<ResourceLocation> resources = resourceManagerIn.listResources("textures/slot",
+        (fileName) -> ResourceLocation.isValidResourceLocation(fileName) &&
+            fileName.endsWith(".png"));
     Set<ResourceLocation> result = new HashSet<>();
 
     for (ResourceLocation resource : resources) {

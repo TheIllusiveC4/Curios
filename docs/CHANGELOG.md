@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.17.1-5.0.2.1] - 2021.11.30
+### Fixed
+- Fixed resource loading crashing when invalid texture files are found [#183](https://github.com/TheIllusiveC4/Curios/issues/183)
+
 ## [1.17.1-5.0.2.0] - 2021.11.30
 Please note that this update is more experimental than most and is marked as a beta. Be cautious about adding this to
 stable worlds.
