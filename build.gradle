@@ -1,9 +1,9 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
-        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url = 'https://plugins.gradle.org/m2/' }
 //        maven {
-//            url "https://repo.spongepowered.org/repository/maven-public/"
+//            url = 'https://repo.spongepowered.org/repository/maven-public/'
 //            content { includeGroup "org.spongepowered" }
 //        }
         mavenCentral()
@@ -23,7 +23,7 @@ version = "${mod_version}"
 group = "top.theillusivec4.${mod_id}"
 archivesBaseName = "${mod_id}-forge"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
     mappings channel: 'official', version: "${version_mc}"
@@ -73,8 +73,8 @@ dependencies {
 
 //    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
 
-    compileOnly fg.deobf("mezz.jei:jei-1.17.1:${version_jei}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.17.1:${version_jei}")
+//    compileOnly fg.deobf("mezz.jei:jei-1.17.1:${version_jei}:api")
+//    runtimeOnly fg.deobf("mezz.jei:jei-1.17.1:${version_jei}")
 }
 
 //mixin {

@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[37,)"
+loaderVersion="[38,)"
 license="LGPL-3.0-or-later"
 issueTrackerURL="https://github.com/TheIllusiveC4/Curios/issues"
 logoFile="curios_icon.png"
@@ -16,13 +16,13 @@ A flexible and expandable accessory/equipment API for users and developers.
 [[dependencies.curios]]
     modId="forge"
     mandatory=true
-    versionRange="[37.0.42,)"
+    versionRange="[38,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curios]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.17.1,1.18)"
+    versionRange="[1.18,1.19)"
     ordering="NONE"
     side="BOTH"
 [modproperties.curios]

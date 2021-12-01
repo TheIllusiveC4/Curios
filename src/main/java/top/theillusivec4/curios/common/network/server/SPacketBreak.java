@@ -27,7 +27,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -62,19 +62,18 @@ public class SPacketBreak {
         Entity entity = Minecraft.getInstance().level.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity livingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
-            handler.getStacksHandler(msg.curioId).ifPresent(stacks -> {
-              ItemStack stack = stacks.getStacks().getStackInSlot(msg.slotId);
-              LazyOptional<ICurio> possibleCurio = CuriosApi.getCuriosHelper().getCurio(stack);
-              possibleCurio.ifPresent(curio -> curio.curioBreak(
-                  new SlotContext(msg.curioId, livingEntity, msg.slotId, false,
-                      stacks.getRenders().get(msg.slotId))));
+          CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
+              .ifPresent(handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacks -> {
+                ItemStack stack = stacks.getStacks().getStackInSlot(msg.slotId);
+                LazyOptional<ICurio> possibleCurio = CuriosApi.getCuriosHelper().getCurio(stack);
+                possibleCurio.ifPresent(curio -> curio.curioBreak(
+                    new SlotContext(msg.curioId, livingEntity, msg.slotId, false,
+                        stacks.getRenders().get(msg.slotId))));
 
-              if (!possibleCurio.isPresent()) {
-                ICurio.playBreakAnimation(stack, livingEntity);
-              }
-            });
-          });
+                if (!possibleCurio.isPresent()) {
+                  ICurio.playBreakAnimation(stack, livingEntity);
+                }
+              }));
         }
       }
     });

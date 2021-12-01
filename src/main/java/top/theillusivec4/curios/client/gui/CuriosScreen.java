@@ -40,7 +40,7 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
-import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -245,7 +245,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
         if (button instanceof RenderButton) {
           ((RenderButton) button).renderButtonOverlay(matrixStack, mouseX, mouseY, partialTicks);
 
-          if (((RenderButton) button).isHovered()) {
+          if (((RenderButton) button).isHoveredOrFocused()) {
             isButtonHovered = true;
           }
         }
@@ -257,8 +257,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
           .getCarried().isEmpty() && this.getSlotUnderMouse() != null) {
         Slot slot = this.getSlotUnderMouse();
 
-        if (slot instanceof CurioSlot && !slot.hasItem()) {
-          CurioSlot slotCurio = (CurioSlot) slot;
+        if (slot instanceof CurioSlot slotCurio && !slot.hasItem()) {
           this.renderTooltip(matrixStack, new TextComponent(slotCurio.getSlotName()), mouseX,
               mouseY);
         }

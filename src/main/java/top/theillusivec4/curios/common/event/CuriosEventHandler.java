@@ -68,8 +68,8 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
@@ -206,8 +206,7 @@ public class CuriosEventHandler {
   public void attachStackCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
     ItemStack stack = evt.getObject();
 
-    if (stack.getItem() instanceof ICurioItem) {
-      ICurioItem itemCurio = (ICurioItem) stack.getItem();
+    if (stack.getItem() instanceof ICurioItem itemCurio) {
 
       if (itemCurio.hasCurioCapability(stack)) {
         ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(itemCurio, stack);
@@ -222,8 +221,7 @@ public class CuriosEventHandler {
 
     Entity entity = evt.getEntity();
 
-    if (entity instanceof ServerPlayer) {
-      ServerPlayer serverPlayerEntity = (ServerPlayer) entity;
+    if (entity instanceof ServerPlayer serverPlayerEntity) {
       CuriosApi.getCuriosHelper().getCuriosHandler(serverPlayerEntity).ifPresent(handler -> {
         ServerPlayer mp = (ServerPlayer) entity;
         NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
@@ -238,8 +236,7 @@ public class CuriosEventHandler {
     Entity target = evt.getTarget();
     Player player = evt.getPlayer();
 
-    if (player instanceof ServerPlayer && target instanceof LivingEntity) {
-      LivingEntity livingBase = (LivingEntity) target;
+    if (player instanceof ServerPlayer && target instanceof LivingEntity livingBase) {
       CuriosApi.getCuriosHelper().getCuriosHandler(livingBase).ifPresent(
           handler -> NetworkHandler.INSTANCE
               .send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
@@ -341,7 +338,7 @@ public class CuriosEventHandler {
                 }
 
                 if (result == Event.Result.ALLOW ||
-                    (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(id, player) &&
+                    (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(slotContext) &&
                         curio.canEquipFromUse(slotContext))) {
                   ItemStack present = stackHandler.getStackInSlot(i);
 
@@ -411,8 +408,7 @@ public class CuriosEventHandler {
   public void looting(LootingLevelEvent evt) {
     DamageSource source = evt.getDamageSource();
 
-    if (source != null && source.getEntity() instanceof LivingEntity) {
-      LivingEntity living = (LivingEntity) source.getEntity();
+    if (source != null && source.getEntity() instanceof LivingEntity living) {
       evt.setLootingLevel(evt.getLootingLevel() +
           CuriosApi.getCuriosHelper().getCuriosHandler(living).map(handler -> handler
               .getLootingLevel(source, evt.getEntityLiving(), evt.getLootingLevel())).orElse(0));
@@ -473,7 +469,7 @@ public class CuriosEventHandler {
             stack.inventoryTick(livingEntity.level, livingEntity, -1, false);
             currentCurio.ifPresent(curio -> curio.curioTick(slotContext));
 
-            // todo: Remove in 1.18
+            // todo: Remove in 1.19
             if (livingEntity.level.isClientSide) {
               currentCurio.ifPresent(curio -> curio.curioAnimate(identifier, index, livingEntity));
             }

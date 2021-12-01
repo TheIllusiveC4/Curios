@@ -31,7 +31,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
@@ -58,8 +58,7 @@ public class CuriosButton extends ImageButton {
                 .send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla());
           } else {
 
-            if (parentGui instanceof InventoryScreen) {
-              InventoryScreen inventory = (InventoryScreen) parentGui;
+            if (parentGui instanceof InventoryScreen inventory) {
               RecipeBookComponent recipeBookGui = inventory.getRecipeBookComponent();
 
               if (recipeBookGui.isVisible()) {
@@ -81,8 +80,7 @@ public class CuriosButton extends ImageButton {
     int yOffset = parentGui instanceof CreativeModeInventoryScreen ? 68 : 83;
     y = parentGui.getGuiTop() + offsets.getB() + yOffset;
 
-    if (parentGui instanceof CreativeModeInventoryScreen) {
-      CreativeModeInventoryScreen gui = (CreativeModeInventoryScreen) parentGui;
+    if (parentGui instanceof CreativeModeInventoryScreen gui) {
       boolean isInventoryTab = gui.getSelectedTab() == CreativeModeTab.TAB_INVENTORY.getId();
       this.active = isInventoryTab;
 

@@ -68,11 +68,10 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   private NonNullList<Boolean> renderHandler;
 
   public CurioStacksHandler(ICuriosItemHandler itemHandler, String identifier) {
-    this(itemHandler, identifier, 1, 0, true, false);
+    this(itemHandler, identifier, 1, true, false);
   }
 
-  public CurioStacksHandler(ICuriosItemHandler itemHandler, String identifier, int size, int shift,
-                            boolean visible, boolean cosmetic) {
+  public CurioStacksHandler(ICuriosItemHandler itemHandler, String identifier, int size, boolean visible, boolean cosmetic) {
     this.baseSize = size;
     this.visible = visible;
     this.cosmetic = cosmetic;

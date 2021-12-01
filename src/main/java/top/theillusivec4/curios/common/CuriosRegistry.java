@@ -21,7 +21,7 @@ package top.theillusivec4.curios.common;
 
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -45,7 +45,7 @@ public class CuriosRegistry {
   @SubscribeEvent
   public static void registerContainer(RegistryEvent.Register<MenuType<?>> evt) {
     evt.getRegistry().register(
-        IForgeContainerType.create(CuriosContainer::new).setRegistryName("curios_container"));
+        IForgeMenuType.create(CuriosContainer::new).setRegistryName("curios_container"));
   }
 
   @SubscribeEvent

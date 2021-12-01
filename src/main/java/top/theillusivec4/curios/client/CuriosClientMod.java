@@ -23,7 +23,7 @@ public class CuriosClientMod {
 
   public static void stitch(final TextureStitchEvent.Pre evt) {
 
-    if (evt.getMap().location() == InventoryMenu.BLOCK_ATLAS) {
+    if (evt.getAtlas().location() == InventoryMenu.BLOCK_ATLAS) {
 
       for (SlotTypePreset preset : SlotTypePreset.values()) {
         evt.addSprite(

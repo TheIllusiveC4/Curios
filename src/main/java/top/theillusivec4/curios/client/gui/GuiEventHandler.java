@@ -28,9 +28,9 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketDestroy;
@@ -38,8 +38,8 @@ import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 public class GuiEventHandler {
 
   @SubscribeEvent
-  public void onInventoryGuiInit(GuiScreenEvent.InitGuiEvent.Post evt) {
-    Screen screen = evt.getGui();
+  public void onInventoryGuiInit(ScreenEvent.InitScreenEvent.Post evt) {
+    Screen screen = evt.getScreen();
 
     if (screen instanceof InventoryScreen || screen instanceof CreativeModeInventoryScreen) {
       AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) screen;
@@ -50,35 +50,31 @@ public class GuiEventHandler {
       int size = isCreative ? 10 : 14;
       int textureOffsetX = isCreative ? 64 : 50;
       int yOffset = isCreative ? 68 : 83;
-      evt.addWidget(new CuriosButton(gui, gui.getGuiLeft() + x, gui.getGuiTop() + y + yOffset, size,
+      evt.addListener(new CuriosButton(gui, gui.getGuiLeft() + x, gui.getGuiTop() + y + yOffset, size,
           size, textureOffsetX, 0, size, CuriosScreen.CURIO_INVENTORY));
     }
   }
 
   @SubscribeEvent
-  public void onInventoryGuiDrawBackground(GuiScreenEvent.DrawScreenEvent.Pre evt) {
+  public void onInventoryGuiDrawBackground(ScreenEvent.DrawScreenEvent.Pre evt) {
 
-    if (!(evt.getGui() instanceof InventoryScreen)) {
+    if (!(evt.getScreen() instanceof InventoryScreen gui)) {
       return;
     }
-    InventoryScreen gui = (InventoryScreen) evt.getGui();
-
     gui.xMouse = evt.getMouseX();
     gui.yMouse = evt.getMouseY();
   }
 
   @SubscribeEvent
-  public void onMouseClick(GuiScreenEvent.MouseClickedEvent.Pre evt) {
+  public void onMouseClick(ScreenEvent.MouseClickedEvent.Pre evt) {
     long handle = Minecraft.getInstance().getWindow().getWindow();
     boolean isLeftShiftDown = InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT);
     boolean isRightShiftDown = InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);
     boolean isShiftDown = isLeftShiftDown || isRightShiftDown;
 
-    if (!(evt.getGui() instanceof CreativeModeInventoryScreen) || !isShiftDown) {
+    if (!(evt.getScreen() instanceof CreativeModeInventoryScreen gui) || !isShiftDown) {
       return;
     }
-
-    CreativeModeInventoryScreen gui = (CreativeModeInventoryScreen) evt.getGui();
 
     if (gui.getSelectedTab() != CreativeModeTab.TAB_INVENTORY.getId()) {
       return;
