@@ -8,6 +8,7 @@ import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 
 public class CuriosSpriteListener extends ReloadListener<Void> {
@@ -18,8 +19,11 @@ public class CuriosSpriteListener extends ReloadListener<Void> {
   @Nonnull
   protected Void prepare(@Nonnull IResourceManager resourceManagerIn,
                          @Nonnull IProfiler profilerIn) {
-    Collection<ResourceLocation> resources = resourceManagerIn.getAllResourceLocations("textures",
-        (fileName) -> fileName.endsWith(".png"));
+    Collection<ResourceLocation> resources =
+        resourceManagerIn.getAllResourceLocations("textures/slot",
+            (fileName) -> ResourceLocation.isResouceNameValid(fileName) &&
+                fileName.endsWith(".png"));
+
     Set<ResourceLocation> result = new HashSet<>();
 
     for (ResourceLocation resource : resources) {
