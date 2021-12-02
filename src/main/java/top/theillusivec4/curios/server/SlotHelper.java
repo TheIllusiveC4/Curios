@@ -62,6 +62,11 @@ public class SlotHelper implements ISlotHelper {
   }
 
   @Override
+  public Collection<ISlotType> getSlotTypes(LivingEntity livingEntity) {
+    return getSlotTypes();
+  }
+
+  @Override
   public SortedMap<ISlotType, ICurioStacksHandler> createSlots() {
     SortedMap<ISlotType, ICurioStacksHandler> curios = new TreeMap<>();
     this.getSlotTypes().stream().filter(type -> !type.isLocked()).collect(Collectors.toSet())

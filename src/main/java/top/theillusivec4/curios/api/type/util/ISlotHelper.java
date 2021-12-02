@@ -58,10 +58,9 @@ public interface ISlotHelper {
   Collection<ISlotType> getSlotTypes();
 
   /**
-   * @return A map sorted by {@link ISlotType} with instances of {@link ICurioStacksHandler} using
-   * default settings
+   * @return A collection of all registered {@link ISlotType} for a specific entity
    */
-  SortedMap<ISlotType, ICurioStacksHandler> createSlots(LivingEntity livingEntity);
+  Collection<ISlotType> getSlotTypes(LivingEntity livingEntity);
 
   /**
    * Gets all unique registered {@link ISlotType} identifiers.
@@ -109,7 +108,15 @@ public interface ISlotHelper {
   /**
    * @return A map sorted by {@link ISlotType} with instances of {@link ICurioStacksHandler} using
    * default settings
-   * @deprecated Use entity-sensitive version {@link ISlotHelper#createSlots(LivingEntity)}
+   * @deprecated Use {@link ISlotHelper#getSlotTypes(LivingEntity)}
+   */
+  @Deprecated
+  SortedMap<ISlotType, ICurioStacksHandler> createSlots(LivingEntity livingEntity);
+
+  /**
+   * @return A map sorted by {@link ISlotType} with instances of {@link ICurioStacksHandler} using
+   * default settings
+   * @deprecated Use {@link ISlotHelper#getSlotTypes()}
    */
   @Deprecated
   SortedMap<ISlotType, ICurioStacksHandler> createSlots();
