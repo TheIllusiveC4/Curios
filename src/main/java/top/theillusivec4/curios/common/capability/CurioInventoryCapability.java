@@ -180,10 +180,9 @@ public class CurioInventoryCapability {
         this.loseStacks(stackHandler.getStacks(), id, stackHandler.getSlots());
       }));
       this.toUnlock.forEach(state -> {
-        CuriosApi.getSlotHelper().getSlotType(state.identifier).ifPresent(
-            type -> this.curios.putIfAbsent(state.identifier,
-                new CurioStacksHandler(this, state.identifier, state.amount, 0, state.visible,
-                    state.cosmetic)));
+        this.curios.putIfAbsent(state.identifier,
+            new CurioStacksHandler(this, state.identifier, state.amount, 0, state.visible,
+                state.cosmetic));
         this.locked.remove(state.identifier);
       });
       this.toLock.clear();
