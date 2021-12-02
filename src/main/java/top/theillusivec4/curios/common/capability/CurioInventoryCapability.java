@@ -29,6 +29,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.core.Direction;
@@ -82,9 +85,14 @@ public class CurioInventoryCapability {
       if (this.wearer != null && !this.wearer.getCommandSenderWorld().isClientSide()) {
         this.curios.clear();
         this.invalidStacks.clear();
-        CuriosApi.getSlotHelper().createSlots(this.wearer).forEach(
-            ((slotType, stacksHandler) -> this.curios
-                .put(slotType.getIdentifier(), stacksHandler)));
+        SortedSet<ISlotType> sorted =
+            new TreeSet<>(CuriosApi.getSlotHelper().getSlotTypes(this.wearer));
+
+        for (ISlotType slotType : sorted) {
+          this.curios.put(slotType.getIdentifier(),
+              new CurioStacksHandler(this, slotType.getIdentifier(), slotType.getSize(), 0,
+                  slotType.isVisible(), slotType.hasCosmetic()));
+        }
       }
     }
 
@@ -374,8 +382,15 @@ public class CurioInventoryCapability {
 
       if (!tagList.isEmpty() && slotHelper != null) {
         Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
-        SortedMap<ISlotType, ICurioStacksHandler> sortedCurios =
-            slotHelper.createSlots(livingEntity);
+        SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = new TreeMap<>();
+        SortedSet<ISlotType> sorted =
+            new TreeSet<>(CuriosApi.getSlotHelper().getSlotTypes(this.wearer));
+
+        for (ISlotType slotType : sorted) {
+          sortedCurios.put(slotType,
+              new CurioStacksHandler(this, slotType.getIdentifier(), slotType.getSize(), 0,
+                  slotType.isVisible(), slotType.hasCosmetic()));
+        }
 
         for (int i = 0; i < tagList.size(); i++) {
           CompoundTag tag = tagList.getCompound(i);
