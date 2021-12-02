@@ -58,8 +58,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   private final Set<AttributeModifier> cachedModifiers = new HashSet<>();
   private final Multimap<AttributeModifier.Operation, AttributeModifier> modifiersByOperation =
       HashMultimap.create();
-  private final int baseSize;
 
+  private int baseSize;
   private IDynamicStackHandler stackHandler;
   private IDynamicStackHandler cosmeticStackHandler;
   private boolean visible;
@@ -280,6 +280,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     compoundNBT.put("Renders", nbt);
     compoundNBT.putBoolean("HasCosmetic", this.cosmetic);
     compoundNBT.putBoolean("Visible", this.visible);
+    compoundNBT.putInt("BaseSize", this.baseSize);
 
     if (!this.modifiers.isEmpty()) {
       ListTag list = new ListTag();
@@ -293,6 +294,10 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   public void applySyncTag(CompoundTag tag) {
+
+    if (tag.contains("BaseSize")) {
+      this.baseSize = tag.getInt("BaseSize");
+    }
 
     if (tag.contains("Stacks")) {
       this.stackHandler.deserializeNBT(tag.getCompound("Stacks"));
