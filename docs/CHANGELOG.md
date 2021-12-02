@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.17.1-5.0.2.2] - 2021.12.02
+### Fixed
+- Fixed slots not being loaded correctly in some situations
+- Fixed slot size desyncs when players have more than one of any slot type [#185](https://github.com/TheIllusiveC4/Curios/issues/185)
+- Fixed potential crash on dedicated servers [#184](https://github.com/TheIllusiveC4/Curios/issues/184)
+
 ## [1.17.1-5.0.2.1] - 2021.11.30
 ### Fixed
 - Fixed resource loading crashing when invalid texture files are found [#183](https://github.com/TheIllusiveC4/Curios/issues/183)
