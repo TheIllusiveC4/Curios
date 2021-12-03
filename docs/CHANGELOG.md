@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.17.1-5.0.2.3] - 2021.12.02
+### Fixed
+- Fixed crash when running data generation in development environments [#188](https://github.com/TheIllusiveC4/Curios/issues/188)
+
 ## [1.17.1-5.0.2.2] - 2021.12.02
 ### Fixed
 - Fixed slots not being loaded correctly in some situations
