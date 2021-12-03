@@ -13,12 +13,17 @@ public class CuriosClientMod {
 
   private static final CuriosSpriteListener SPRITE_LISTENER = new CuriosSpriteListener();
 
+  @SuppressWarnings("ConstantConditions")
   public static void init() {
-    IResourceManager manager = Minecraft.getInstance().getResourceManager();
+    Minecraft mc = Minecraft.getInstance();
 
-    if (manager instanceof IReloadableResourceManager) {
-      IReloadableResourceManager reloader = (IReloadableResourceManager) manager;
-      reloader.addReloadListener(SPRITE_LISTENER);
+    if (mc != null) {
+      IResourceManager manager = mc.getResourceManager();
+
+      if (manager instanceof IReloadableResourceManager) {
+        IReloadableResourceManager reloader = (IReloadableResourceManager) manager;
+        reloader.addReloadListener(SPRITE_LISTENER);
+      }
     }
   }
 
