@@ -81,12 +81,13 @@ public class CurioInventoryCapability {
 
     @Override
     public void reset() {
+      ISlotHelper slotHelper = CuriosApi.getSlotHelper();
 
-      if (this.wearer != null && !this.wearer.getCommandSenderWorld().isClientSide()) {
+      if (slotHelper != null && this.wearer != null &&
+          !this.wearer.getCommandSenderWorld().isClientSide()) {
         this.curios.clear();
         this.invalidStacks.clear();
-        SortedSet<ISlotType> sorted =
-            new TreeSet<>(CuriosApi.getSlotHelper().getSlotTypes(this.wearer));
+        SortedSet<ISlotType> sorted = new TreeSet<>(slotHelper.getSlotTypes(this.wearer));
 
         for (ISlotType slotType : sorted) {
           this.curios.put(slotType.getIdentifier(),
