@@ -312,47 +312,42 @@ public class CuriosEventHandler {
     ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
     curiosHelper.getCurio(stack).ifPresent(
         curio -> curiosHelper.getCuriosHandler(player).ifPresent(handler -> {
+          Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
-          if (!player.world.isRemote) {
-            Map<String, ICurioStacksHandler> curios = handler.getCurios();
+          for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
+            IDynamicStackHandler stackHandler = entry.getValue().getStacks();
 
-            for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
-              IDynamicStackHandler stackHandler = entry.getValue().getStacks();
+            for (int i = 0; i < stackHandler.getSlots(); i++) {
+              String id = entry.getKey();
+              SlotContext slotContext = new SlotContext(id, player, i);
+              CurioEquipEvent equipEvent = new CurioEquipEvent(stack, slotContext);
+              MinecraftForge.EVENT_BUS.post(equipEvent);
+              Event.Result result = equipEvent.getResult();
 
-              for (int i = 0; i < stackHandler.getSlots(); i++) {
-                String id = entry.getKey();
-                SlotContext slotContext = new SlotContext(id, player, i);
-                CurioEquipEvent equipEvent = new CurioEquipEvent(stack, slotContext);
-                MinecraftForge.EVENT_BUS.post(equipEvent);
-                Event.Result result = equipEvent.getResult();
+              if (result == Event.Result.DENY) {
+                continue;
+              }
 
-                if (result == Event.Result.DENY) {
-                  continue;
-                }
+              if (result == Event.Result.ALLOW ||
+                  (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(id, player) &&
+                      curio.canEquipFromUse(slotContext))) {
+                ItemStack present = stackHandler.getStackInSlot(i);
 
-                if (result == Event.Result.ALLOW ||
-                    (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(id, player) &&
-                        curio.canEquipFromUse(slotContext))) {
-                  ItemStack present = stackHandler.getStackInSlot(i);
+                if (present.isEmpty()) {
+                  stackHandler.setStackInSlot(i, stack.copy());
+                  curio.onEquipFromUse(slotContext);
 
-                  if (present.isEmpty()) {
-                    stackHandler.setStackInSlot(i, stack.copy());
-                    curio.onEquipFromUse(slotContext);
-
-                    if (!player.isCreative()) {
-                      int count = stack.getCount();
-                      stack.shrink(count);
-                    }
-                    evt.setCancellationResult(ActionResultType.SUCCESS);
-                    evt.setCanceled(true);
-                    return;
+                  if (!player.isCreative()) {
+                    int count = stack.getCount();
+                    stack.shrink(count);
                   }
+                  evt.setCancellationResult(
+                      ActionResultType.func_233537_a_(player.world.isRemote()));
+                  evt.setCanceled(true);
+                  return;
                 }
               }
             }
-          } else {
-            evt.setCancellationResult(ActionResultType.func_233537_a_(player.world.isRemote()));
-            evt.setCanceled(true);
           }
         }));
   }
