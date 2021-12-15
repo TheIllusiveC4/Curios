@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.18.1-5.0.3.0] - 2021.12.14
+### Added
+- Re-add Just Enough Items integration
+### Changed
+- Updated to Minecraft 1.18.1
+- Updated Russian localization (thanks DrHesperus!) [#190](https://github.com/TheIllusiveC4/Curios/pull/190)
+
 ## [1.18-5.0.2.5] - 2021.12.14
 ### Changed
 - [API] `ICurio#canEquipFromUse` and `ICurio#onEquipFromUse` methods are now called both client-side and server-side
