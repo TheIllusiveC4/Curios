@@ -238,7 +238,7 @@ public class CurioInventoryCapability {
       if (this.wearer != null && !this.wearer.getEntityWorld().isRemote()) {
         List<ItemStack> drops = new ArrayList<>();
 
-        for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
+        for (int i = Math.max(0, stackHandler.getSlots() - amount); i >= 0 && i < stackHandler.getSlots(); i++) {
           ItemStack stack = stackHandler.getStackInSlot(i);
           drops.add(stackHandler.getStackInSlot(i));
           SlotContext slotContext = new SlotContext(identifier, this.wearer, i);
