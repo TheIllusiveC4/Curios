@@ -124,29 +124,36 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   @Override
   public void grow(int amount) {
-    this.validateSizeChange(amount);
-    this.addLegacyChange(amount);
+    amount = Math.max(0, amount);
+
+    if (amount > 0) {
+      this.addLegacyChange(amount);
+    }
   }
 
   @Override
   public void shrink(int amount) {
-    this.validateSizeChange(amount);
-    this.addLegacyChange(Math.min(this.getSlots(), amount) * -1);
+    amount = Math.max(0, amount);
+
+    if (amount > 0) {
+      this.addLegacyChange(Math.min(this.getSlots(), amount) * -1);
+    }
   }
 
   private void addLegacyChange(int shift) {
     AttributeModifier mod = this.getModifiers().get(LEGACY_UUID);
     int current = mod != null ? (int) mod.getAmount() : 0;
     current += shift;
-    this.addPermanentModifier(new AttributeModifier(LEGACY_UUID, "legacy", current,
-        AttributeModifier.Operation.ADDITION));
-  }
-
-  private void validateSizeChange(int amount) {
-
-    if (amount < 0) {
-      throw new IllegalArgumentException("Amount cannot be negative!");
-    }
+    AttributeModifier newModifier =
+        new AttributeModifier(LEGACY_UUID, "legacy", current, AttributeModifier.Operation.ADDITION);
+    this.modifiers.put(newModifier.getId(), newModifier);
+    Collection<AttributeModifier> modifiers =
+        this.getModifiersByOperation(newModifier.getOperation());
+    modifiers.remove(newModifier);
+    modifiers.add(newModifier);
+    this.persistentModifiers.remove(newModifier);
+    this.persistentModifiers.add(newModifier);
+    this.flagUpdate();
   }
 
   @Override
@@ -489,7 +496,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
     List<ItemStack> drops = new ArrayList<>();
 
-    for (int i = stackHandler.getSlots() - amount; i < stackHandler.getSlots(); i++) {
+    for (int i = Math.max(0, stackHandler.getSlots() - amount); i >= 0 && i < stackHandler.getSlots(); i++) {
       ItemStack stack = stackHandler.getStackInSlot(i);
       drops.add(stackHandler.getStackInSlot(i));
       LivingEntity entity = this.itemHandler.getWearer();
