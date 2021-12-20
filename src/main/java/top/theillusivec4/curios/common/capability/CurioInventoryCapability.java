@@ -405,6 +405,7 @@ public class CurioInventoryCapability {
             CurioStacksHandler newStacksHandler =
                 new CurioStacksHandler(this, type.getIdentifier(), type.getSize(), type.isVisible(),
                     type.hasCosmetic());
+            newStacksHandler.copyModifiers(prevStacksHandler);
             int index = 0;
 
             while (index < newStacksHandler.getSlots() && index < prevStacksHandler
