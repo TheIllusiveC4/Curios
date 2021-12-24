@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.18.1-5.0.4.0] - 2021.12.23
+### Added
+- [API] Added `makesPiglinNeutral` method for creating curios that can make piglins neutral like gold armor [#86](https://github.com/TheIllusiveC4/Curios/issues/86)
+- [API] Added `isEnderMask` method for creating curios that can hide player heads from Endermen like carved pumpkins [#196](https://github.com/TheIllusiveC4/Curios/issues/196)
+- Added mixins, developers building against this version of Curios and newer will need to make sure their environment is
+configured for mixin dependency development (see README.md)
+### Changed
+- Replaced fortune global loot modifier with internal methods
+
 ## [1.18.1-5.0.3.1] - 2021.12.19
 ### Fixed
 - Fixed slot amount changes not persisting when applicable
