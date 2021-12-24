@@ -32,6 +32,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -98,6 +99,11 @@ public class RingItem extends Item {
 
       @Override
       public boolean makesPiglinsNeutral(SlotContext slotContext) {
+        return true;
+      }
+
+      @Override
+      public boolean isEnderMask(SlotContext slotContext, EnderMan enderMan) {
         return true;
       }
     });

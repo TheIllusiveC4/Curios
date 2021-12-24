@@ -29,6 +29,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import top.theillusivec4.curios.api.SlotContext;
@@ -150,5 +151,10 @@ public class ItemizedCurioCapability implements ICurio {
   @Override
   public boolean makesPiglinsNeutral(SlotContext slotContext) {
     return this.curioItem.makesPiglinsNeutral(slotContext, this.getStack());
+  }
+
+  @Override
+  public boolean isEnderMask(SlotContext slotContext, EnderMan enderMan) {
+    return this.curioItem.isEnderMask(slotContext, enderMan, this.getStack());
   }
 }

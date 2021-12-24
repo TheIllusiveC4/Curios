@@ -36,6 +36,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -278,6 +280,23 @@ public interface ICurio {
    */
   default boolean makesPiglinsNeutral(SlotContext slotContext) {
     return this.getStack().makesPiglinsNeutral(slotContext.entity());
+  }
+
+  /**
+   * Determines whether wearing the curio masks the user's eyes against Enderman, in the same manner
+   * as wearing a pumpkin in vanilla.
+   *
+   * @param slotContext Context about the slot that the ItemStack is in
+   * @param enderMan    The Enderman entity that the user is looking at
+   * @return True if it can mask the user from Enderman, false otherwise
+   */
+  default boolean isEnderMask(SlotContext slotContext, EnderMan enderMan) {
+
+    if (slotContext.entity() instanceof Player player) {
+      return this.getStack().isEnderMask(player, enderMan);
+    } else {
+      return false;
+    }
   }
 
   /**
