@@ -2,21 +2,21 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url = 'https://plugins.gradle.org/m2/' }
-//        maven {
-//            url = 'https://repo.spongepowered.org/repository/maven-public/'
-//            content { includeGroup "org.spongepowered" }
-//        }
+        maven {
+            url = 'https://repo.spongepowered.org/repository/maven-public/'
+            content { includeGroup "org.spongepowered" }
+        }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-//        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
         classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version:'1.4.0'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.matthewprenger.cursegradle'
-//apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'maven-publish'
 
 version = "${mod_version}"
@@ -33,7 +33,7 @@ minecraft {
         client {
             workingDirectory project.file('run')
 
-//            arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
+            arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             property 'mixin.env.remapRefMap', 'true'
@@ -51,7 +51,7 @@ minecraft {
         server {
             workingDirectory project.file('run')
 
-//            arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
+            arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             property 'mixin.env.remapRefMap', 'true'
@@ -71,6 +71,7 @@ minecraft {
 
             args '--mod', 'curios', '--all', '--output', file('src/generated/resources/')
 
+            arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
@@ -89,15 +90,15 @@ minecraft {
 dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
 
-//    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 
     compileOnly fg.deobf("mezz.jei:jei-1.18.1:${version_jei}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.18.1:${version_jei}")
 }
 
-//mixin {
-//    add sourceSets.main, "${mod_id}.refmap.json"
-//}
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+}
 
 repositories {
     maven {
@@ -128,8 +129,8 @@ jar {
                     "Implementation-Title"    : "${mod_id}",
                     "Implementation-Version"  : "${mod_version}",
                     "Implementation-Vendor"   : "${mod_author}",
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
-//                    "MixinConfigs"            : "${mod_id}.mixins.json"],)
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    "MixinConfigs"            : "${mod_id}.mixins.json"],)
     }
 }
 

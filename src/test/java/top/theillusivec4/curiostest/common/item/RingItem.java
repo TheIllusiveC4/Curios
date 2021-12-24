@@ -95,6 +95,11 @@ public class RingItem extends Item {
       public boolean canEquipFromUse(SlotContext slot) {
         return true;
       }
+
+      @Override
+      public boolean makesPiglinsNeutral(SlotContext slotContext) {
+        return true;
+      }
     });
   }
 

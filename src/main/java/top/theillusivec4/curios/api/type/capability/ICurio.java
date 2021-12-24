@@ -270,6 +270,17 @@ public interface ICurio {
   }
 
   /**
+   * Determines whether wearing the curio makes nearby piglins neutral, in the same manner as
+   * wearing gold armor in vanilla.
+   *
+   * @param slotContext Context about the slot that the ItemStack is in
+   * @return True if nearby piglins are neutral, false otherwise
+   */
+  default boolean makesPiglinsNeutral(SlotContext slotContext) {
+    return this.getStack().makesPiglinsNeutral(slotContext.entity());
+  }
+
+  /**
    * Used by {@link ICurio#getDropRule(LivingEntity)} to determine drop on death behavior.
    * <br>
    * DEFAULT - normal vanilla behavior with drops dictated by the Keep Inventory game rule

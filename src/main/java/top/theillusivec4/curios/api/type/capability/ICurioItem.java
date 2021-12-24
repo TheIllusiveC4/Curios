@@ -298,6 +298,17 @@ public interface ICurioItem {
     return getLootingBonus(slotContext.identifier(), slotContext.entity(), stack, slotContext.index());
   }
 
+  /**
+   * Determines whether wearing the curio makes nearby piglins neutral, in the same manner as
+   * wearing gold armor in vanilla.
+   *
+   * @param slotContext Context about the slot that the ItemStack is in
+   * @return True if nearby piglins are neutral, false otherwise
+   */
+  default boolean makesPiglinsNeutral(SlotContext slotContext, ItemStack stack) {
+    return stack.makesPiglinsNeutral(slotContext.entity());
+  }
+
   // ========== DEPRECATED ================
 
   /**
