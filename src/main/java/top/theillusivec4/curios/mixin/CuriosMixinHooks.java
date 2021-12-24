@@ -1,7 +1,9 @@
 package top.theillusivec4.curios.mixin;
 
 import java.util.Map;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.storage.loot.LootContext;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -32,29 +34,13 @@ public class CuriosMixinHooks {
     }).orElse(false);
   }
 
-//  public static int getFortuneLevel(Entity entity, LootContext lootContext) {
-//
-//    if (entity instanceof LivingEntity) {
-//      LivingEntity livingEntity = (LivingEntity) entity;
-//      AtomicInteger fortuneLevel = new AtomicInteger();
-//      CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
-//
-//        for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
-//          IDynamicStackHandler stacks = entry.getValue().getStacks();
-//
-//          for (int i = 0; i < stacks.getSlots(); i++) {
-//            final int index = i;
-//            fortuneLevel
-//                .addAndGet(CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(
-//                    curio -> curio
-//                        .getFortuneLevel(new SlotContext(entry.getKey(), livingEntity, index),
-//                            lootContext)).orElse(0));
-//          }
-//        }
-//      });
-//      return fortuneLevel.get();
-//    } else {
-//      return 0;
-//    }
-//  }
+  public static int getFortuneLevel(Entity entity, LootContext lootContext) {
+
+    if (entity instanceof LivingEntity livingEntity) {
+      return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
+          .map(handler -> handler.getFortuneLevel(lootContext)).orElse(0);
+    } else {
+      return 0;
+    }
+  }
 }

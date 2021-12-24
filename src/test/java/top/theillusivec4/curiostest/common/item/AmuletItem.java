@@ -37,6 +37,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -77,6 +78,11 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
   @Override
   public boolean isFoil(@Nonnull ItemStack stack) {
     return true;
+  }
+
+  @Override
+  public int getFortuneLevel(SlotContext slotContext, LootContext lootContext, ItemStack stack) {
+    return 3;
   }
 
   @Override
