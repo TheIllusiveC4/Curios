@@ -39,8 +39,8 @@ dependencies {
 
 ### Using Curios 1.18.1-5.0.4.0+
 
-Curios 1.18.1-5.0.4.0+ added mixins and developers who also use mixins will need to make sure to tweak their run
-configurations in order to launch the game in their development environment if using this version or newer as a dependency.
+Curios 1.18.1-5.0.4.0+ added mixins and developers will need to make sure to tweak their run configurations in order
+to launch the game in their development environment if using this version or newer as a dependency.
 
 #### 1. Add these lines to your run configurations
 
