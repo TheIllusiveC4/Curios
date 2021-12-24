@@ -2,6 +2,7 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url = 'https://plugins.gradle.org/m2/' }
+        maven { url = 'https://maven.parchmentmc.org' }
         maven {
             url = 'https://repo.spongepowered.org/repository/maven-public/'
             content { includeGroup "org.spongepowered" }
@@ -12,12 +13,14 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
         classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version:'1.4.0'
+        classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'maven-publish'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
 version = "${mod_version}"
 group = "top.theillusivec4.${mod_id}"
@@ -26,7 +29,7 @@ archivesBaseName = "${mod_id}-forge"
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'official', version: "${version_mc}"
+    mappings channel: 'parchment', version: '2021.12.19-1.18.1'
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
