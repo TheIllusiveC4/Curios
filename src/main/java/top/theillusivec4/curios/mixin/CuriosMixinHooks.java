@@ -4,7 +4,9 @@ import java.util.Map;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -58,7 +60,13 @@ public class CuriosMixinHooks {
     }).orElse(false);
   }
 
-  public static int getFortuneLevel(Entity entity, LootContext lootContext) {
+  public static int getFortuneLevel(Player player) {
+    return CuriosApi.getCuriosHelper().getCuriosHandler(player)
+        .map(handler -> handler.getFortuneLevel(null)).orElse(0);
+  }
+
+  public static int getFortuneLevel(LootContext lootContext) {
+    Entity entity = lootContext.getParamOrNull(LootContextParams.THIS_ENTITY);
 
     if (entity instanceof LivingEntity livingEntity) {
       return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)

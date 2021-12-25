@@ -20,6 +20,6 @@ public class MixinShearsItem {
       method = "interactLivingEntity")
   private int curios$applyFortuneToShears(Player player, ItemStack stack, Level level, BlockPos pos,
                                           int fortune) {
-    return fortune + CuriosMixinHooks.getFortuneLevel(player, null);
+    return fortune + CuriosMixinHooks.getFortuneLevel(player);
   }
 }
