@@ -120,6 +120,13 @@ public interface ICurioStacksHandler {
   Set<AttributeModifier> getPermanentModifiers();
 
   /**
+   * Retrieves all the transient modifiers that have been deserialized but not yet processed.
+   *
+   * @return A set of {@link AttributeModifier}
+   */
+  Set<AttributeModifier> getCachedModifiers();
+
+  /**
    * Retrieves all the slot modifiers for a given operation on the handler.
    *
    * @param operation The operation of the modifiers

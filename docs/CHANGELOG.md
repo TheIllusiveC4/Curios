@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.5-4.0.6.8] - 2021.12.27
+### Fixed
+- Fixed client-side syncing errors when applying slot modifiers to slots with base size 0
+- Fixed slot amount changes persistent when not applicable
+
 ## [1.16.5-4.0.6.7] - 2021.12.19
 ### Fixed
 - Fixed slot amount changes not persisting when applicable

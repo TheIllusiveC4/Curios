@@ -362,9 +362,11 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   @Override
   public void copyModifiers(ICurioStacksHandler other) {
     this.modifiers.clear();
+    this.cachedModifiers.clear();
     this.modifiersByOperation.clear();
     this.persistentModifiers.clear();
     other.getModifiers().forEach((uuid, modifier) -> this.addTransientModifier(modifier));
+    this.cachedModifiers.addAll(other.getCachedModifiers());
 
     for (AttributeModifier persistentModifier : other.getPermanentModifiers()) {
       this.addPermanentModifier(persistentModifier);
@@ -379,6 +381,11 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   @Override
   public Set<AttributeModifier> getPermanentModifiers() {
     return this.persistentModifiers;
+  }
+
+  @Override
+  public Set<AttributeModifier> getCachedModifiers() {
+    return this.cachedModifiers;
   }
 
   public Collection<AttributeModifier> getModifiersByOperation(
@@ -409,6 +416,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   private void flagUpdate() {
     this.update = true;
+    this.itemHandler.getUpdatingInventories().remove(this);
     this.itemHandler.getUpdatingInventories().add(this);
   }
 
@@ -497,7 +505,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
     List<ItemStack> drops = new ArrayList<>();
 
-    for (int i = Math.max(0, stackHandler.getSlots() - amount); i >= 0 && i < stackHandler.getSlots(); i++) {
+    for (int i = Math.max(0, stackHandler.getSlots() - amount);
+         i >= 0 && i < stackHandler.getSlots(); i++) {
       ItemStack stack = stackHandler.getStackInSlot(i);
       drops.add(stackHandler.getStackInSlot(i));
       LivingEntity entity = this.itemHandler.getWearer();
