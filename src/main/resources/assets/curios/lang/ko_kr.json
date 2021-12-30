@@ -1,5 +1,5 @@
 {
-  "curios.name": "Curios",
+  "curios.name": "큐리오스",
   "curios.slot": "슬롯",
   "curios.cosmetic": "겉치레",
   "commands.curios.set.success": "%s 슬롯을 %s이(가) %d개 가지도록 설정했습니다",
@@ -10,7 +10,7 @@
   "commands.curios.clear.success": "%s 슬롯에 든 아이템을 %s에게서 제거했습니다",
   "commands.curios.clearAll.success": "%s의 모든 슬롯에 든 아이템을 제거했습니다",
   "commands.curios.reset.success": "%s의 슬롯을 초기화했습니다",
-  "argument.curios.type.unknown": "%s은(는) 존재하지 않는 curios 슬롯입니다",
+  "argument.curios.type.unknown": "%s은(는) 존재하지 않는 큐리오스 슬롯입니다",
   "curios.identifier.curio": "골동품",
   "curios.identifier.necklace": "목걸이",
   "curios.identifier.ring": "반지",
@@ -31,7 +31,13 @@
   "curios.modifiers.charm": "장신구로 쓸 때:",
   "curios.modifiers.hands": "손에 있을 때:",
   "curios.modifiers.bracelet": "팔찌를 찼을 때:",
-  "key.curios.category": "Curios",
-  "key.curios.open.desc": "Curios 인벤토리 열기/닫기",
+  "curios.modifiers.slots.plus.0": "+%s %s 슬롯",
+  "curios.modifiers.slots.plus.1": "+%s%% %s 슬롯",
+  "curios.modifiers.slots.plus.2": "+%s%% %s 슬롯",
+  "curios.modifiers.slots.take.0": "-%s %s 슬롯",
+  "curios.modifiers.slots.take.1": "-%s%% %s 슬롯",
+  "curios.modifiers.slots.take.2": "-%s%% %s 슬롯",
+  "key.curios.category": "큐리오스",
+  "key.curios.open.desc": "큐리오스 인벤토리 열기/닫기",
   "gui.curios.toggle": "보이게/안 보이게 하기"
 }
