@@ -162,9 +162,14 @@ public class ClientEventHandler {
                 double d1;
 
                 if (attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_BASE
-                    && attributemodifier.getOperation()
-                    != AttributeModifier.Operation.MULTIPLY_TOTAL) {
-                  d1 = amount;
+                    && attributemodifier.getOperation() !=
+                    AttributeModifier.Operation.MULTIPLY_TOTAL) {
+
+                  if (entry.getKey().equals(Attributes.KNOCKBACK_RESISTANCE)) {
+                    d1 = amount * 10.0D;
+                  } else {
+                    d1 = amount;
+                  }
                 } else {
                   d1 = amount * 100.0D;
                 }
@@ -173,19 +178,19 @@ public class ClientEventHandler {
 
                   if (amount > 0.0D) {
                     attributeTooltip.add((new TranslatableComponent(
-                                "curios.modifiers.slots.plus." +
-                                    attributemodifier.getOperation().toValue(),
-                                ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                                new TranslatableComponent("curios.identifier." + wrapper.identifier)))
-                            .withStyle(ChatFormatting.BLUE));
+                        "curios.modifiers.slots.plus." +
+                            attributemodifier.getOperation().toValue(),
+                        ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                        new TranslatableComponent("curios.identifier." + wrapper.identifier)))
+                        .withStyle(ChatFormatting.BLUE));
                   } else {
                     d1 = d1 * -1.0D;
                     attributeTooltip.add((new TranslatableComponent(
-                                "curios.modifiers.slots.take." +
-                                    attributemodifier.getOperation().toValue(),
-                                ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                                new TranslatableComponent("curios.identifier." + wrapper.identifier)))
-                            .withStyle(ChatFormatting.RED));
+                        "curios.modifiers.slots.take." +
+                            attributemodifier.getOperation().toValue(),
+                        ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                        new TranslatableComponent("curios.identifier." + wrapper.identifier)))
+                        .withStyle(ChatFormatting.RED));
                   }
                 } else if (flag) {
                   attributeTooltip.add(

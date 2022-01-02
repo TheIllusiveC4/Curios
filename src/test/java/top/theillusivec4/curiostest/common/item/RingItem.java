@@ -76,6 +76,9 @@ public class RingItem extends Item {
         atts.put(Attributes.ARMOR,
             new AttributeModifier(uuid, CuriosTest.MODID + ":armor_bonus", 2,
                 AttributeModifier.Operation.ADDITION));
+        atts.put(Attributes.KNOCKBACK_RESISTANCE,
+            new AttributeModifier(uuid, CuriosTest.MODID + ":knockback_resist", 0.2,
+                AttributeModifier.Operation.ADDITION));
         return atts;
       }
 
