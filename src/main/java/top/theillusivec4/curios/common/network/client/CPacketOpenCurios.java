@@ -49,7 +49,7 @@ public class CPacketOpenCurios {
         NetworkHooks.openGui(sender, new CuriosContainerProvider());
 
         if (!stack.isEmpty()) {
-          sender.inventoryMenu.setCarried(stack);
+          sender.containerMenu.setCarried(stack);
           NetworkHandler.INSTANCE
               .send(PacketDistributor.PLAYER.with(() -> sender), new SPacketGrabbedItem(stack));
         }

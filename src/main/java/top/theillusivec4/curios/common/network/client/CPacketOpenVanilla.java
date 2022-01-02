@@ -42,8 +42,8 @@ public class CPacketOpenVanilla {
       ServerPlayer sender = ctx.get().getSender();
 
       if (sender != null) {
-        ItemStack stack = sender.inventoryMenu.getCarried();
-        sender.inventoryMenu.setCarried(ItemStack.EMPTY);
+        ItemStack stack = sender.containerMenu.getCarried();
+        sender.containerMenu.setCarried(ItemStack.EMPTY);
         sender.doCloseContainer();
 
         if (!stack.isEmpty()) {

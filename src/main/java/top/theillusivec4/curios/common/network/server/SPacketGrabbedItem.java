@@ -48,7 +48,8 @@ public class SPacketGrabbedItem {
       LocalPlayer clientPlayer = Minecraft.getInstance().player;
 
       if (clientPlayer != null) {
-        clientPlayer.inventoryMenu.setCarried(msg.stack);
+        clientPlayer.inventoryMenu.setCarried(ItemStack.EMPTY);
+        clientPlayer.containerMenu.setCarried(msg.stack);
       }
     });
     ctx.get().setPacketHandled(true);
