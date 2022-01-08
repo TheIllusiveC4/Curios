@@ -36,13 +36,14 @@ import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Wearable;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curiostest.CuriosTest;
 
-public class RingItem extends Item {
+public class RingItem extends Item implements Wearable {
 
   public RingItem() {
     super(new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).defaultDurability(0));

@@ -31,6 +31,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
@@ -58,6 +59,7 @@ public class KnucklesItem extends Item {
         atts.put(Attributes.ATTACK_DAMAGE,
             new AttributeModifier(uuid, CuriosTest.MODID + ":attack_damage_bonus", 4,
                 AttributeModifier.Operation.ADDITION));
+        CuriosApi.getCuriosHelper().addSlotModifier(atts, "ring", uuid, 2, AttributeModifier.Operation.ADDITION);
         return atts;
       }
     });
