@@ -21,7 +21,10 @@ package top.theillusivec4.curios.common;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -44,9 +47,11 @@ import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -96,6 +101,95 @@ public class CuriosHelper implements ICuriosHelper {
     });
   }
 
+  @Override
+  public Optional<SlotResult> findFirstCurio(@Nonnull LivingEntity livingEntity, Item item) {
+    return findFirstCurio(livingEntity, (stack) -> stack.getItem() == item);
+  }
+
+  @Override
+  public Optional<SlotResult> findFirstCurio(@Nonnull LivingEntity livingEntity,
+                                             Predicate<ItemStack> filter) {
+    SlotResult result = getCuriosHandler(livingEntity).map(handler -> {
+      Map<String, ICurioStacksHandler> curios = handler.getCurios();
+
+      for (String id : curios.keySet()) {
+        ICurioStacksHandler stacksHandler = curios.get(id);
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+
+        for (int i = 0; i < stackHandler.getSlots(); i++) {
+          ItemStack stack = stackHandler.getStackInSlot(i);
+
+          if (!stack.isEmpty() && filter.test(stack)) {
+            return new SlotResult(
+                new SlotContext(id, livingEntity, i, false, stacksHandler.getRenders().get(i)),
+                stack);
+          }
+        }
+      }
+      return new SlotResult(null, ItemStack.EMPTY);
+    }).orElse(new SlotResult(null, ItemStack.EMPTY));
+    return result.stack().isEmpty() ? Optional.empty() : Optional.of(result);
+  }
+
+  @Override
+  public List<SlotResult> findCurios(@Nonnull LivingEntity livingEntity, Item item) {
+    return findCurios(livingEntity, (stack) -> stack.getItem() == item);
+  }
+
+  @Override
+  public List<SlotResult> findCurios(@Nonnull LivingEntity livingEntity,
+                                     Predicate<ItemStack> filter) {
+    List<SlotResult> result = new ArrayList<>();
+    getCuriosHandler(livingEntity).ifPresent(handler -> {
+      Map<String, ICurioStacksHandler> curios = handler.getCurios();
+
+      for (String id : curios.keySet()) {
+        ICurioStacksHandler stacksHandler = curios.get(id);
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+
+        for (int i = 0; i < stackHandler.getSlots(); i++) {
+          ItemStack stack = stackHandler.getStackInSlot(i);
+
+          if (!stack.isEmpty() && filter.test(stack)) {
+            result.add(new SlotResult(
+                new SlotContext(id, livingEntity, i, false, stacksHandler.getRenders().get(i)),
+                stack));
+          }
+        }
+      }
+    });
+    return result;
+  }
+
+  @Override
+  public List<SlotResult> findCurios(@NotNull LivingEntity livingEntity, String... identifiers) {
+    List<SlotResult> result = new ArrayList<>();
+    Set<String> ids = new HashSet<>(List.of(identifiers));
+    getCuriosHandler(livingEntity).ifPresent(handler -> {
+      Map<String, ICurioStacksHandler> curios = handler.getCurios();
+
+      for (String id : curios.keySet()) {
+
+        if (ids.contains(id)) {
+          ICurioStacksHandler stacksHandler = curios.get(id);
+          IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+
+          for (int i = 0; i < stackHandler.getSlots(); i++) {
+            ItemStack stack = stackHandler.getStackInSlot(i);
+
+            if (!stack.isEmpty()) {
+              result.add(new SlotResult(
+                  new SlotContext(id, livingEntity, i, false, stacksHandler.getRenders().get(i)),
+                  stack));
+            }
+          }
+        }
+      }
+    });
+    return result;
+  }
+
+  @Nonnull
   @Override
   public Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(Item item,
                                                                                  @Nonnull
@@ -150,7 +244,8 @@ public class CuriosHelper implements ICuriosHelper {
       for (int i = 0; i < listnbt.size(); ++i) {
         CompoundTag compoundnbt = listnbt.getCompound(i);
 
-        if (!compoundnbt.contains("Slot", 8) || compoundnbt.getString("Slot").equals(identifier)) {
+        if (!compoundnbt.contains("Slot", 8) ||
+            compoundnbt.getString("Slot").equals(identifier)) {
           Attribute attribute = ForgeRegistries.ATTRIBUTES
               .getValue(ResourceLocation.tryParse(compoundnbt.getString("AttributeName")));
 
