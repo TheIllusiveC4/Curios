@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.api.type.util;
 
 import com.google.common.collect.Multimap;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -36,6 +37,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
@@ -66,7 +68,7 @@ public interface ICuriosHelper {
   Set<String> getCurioTags(Item item);
 
   /**
-   * Gets a {@link LazyOptional} of an {@link IItemHandlerModifiable} that contains all of the
+   * Gets a {@link LazyOptional} of an {@link IItemHandlerModifiable} that contains all the
    * equipped curio stacks (not including cosmetics).
    *
    * @param livingEntity The wearer of the curios
@@ -75,30 +77,50 @@ public interface ICuriosHelper {
   LazyOptional<IItemHandlerModifiable> getEquippedCurios(LivingEntity livingEntity);
 
   /**
-   * Gets the first found {@link ItemStack} of the {@link Item} type equipped in a curio slot, or
-   * {@link Optional#empty()} if no matches were found.
+   * Gets the first matching item equipped in a curio slot.
    *
-   * @param item         The {@link Item} to find
    * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
-   * @return An {@link Optional} wrapper of the found triplet, or {@link Optional#empty()} is
-   * nothing was found.
+   * @param item         The item to search for
+   * @return An optional {@link SlotResult} with the found item, or empty if none were found
    */
-  Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(Item item,
-                                                                          @Nonnull
-                                                                              LivingEntity livingEntity);
+  Optional<SlotResult> findFirstCurio(@Nonnull LivingEntity livingEntity, Item item);
 
   /**
-   * Gets the first found {@link ItemStack} of the item type equipped in a curio slot that matches
-   * the filter, or {@link Optional#empty()} if no matches were found.
+   * Gets the first matching item equipped in a curio slot that matches the filter.
    *
-   * @param filter       The filter to test against
    * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
-   * @return An {@link Optional#empty()} wrapper of the found triplet, or {@link Optional#empty()}
-   * is nothing was found.
+   * @param filter       The filter to test against
+   * @return An optional {@link SlotResult} with the found item, or empty if none were found
    */
-  @Nonnull
-  Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(
-      Predicate<ItemStack> filter, @Nonnull LivingEntity livingEntity);
+  Optional<SlotResult> findFirstCurio(@Nonnull LivingEntity livingEntity,
+                                      Predicate<ItemStack> filter);
+
+  /**
+   * Gets all matching items equipped in a curio slot.
+   *
+   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
+   * @param item         The item to search for
+   * @return A list of matching results
+   */
+  List<SlotResult> findCurios(@Nonnull LivingEntity livingEntity, Item item);
+
+  /**
+   * Gets all matching items equipped in a curio slot that matches the filter.
+   *
+   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
+   * @param filter       The filter to test against
+   * @return A list of matching results
+   */
+  List<SlotResult> findCurios(@Nonnull LivingEntity livingEntity, Predicate<ItemStack> filter);
+
+  /**
+   * Gets all items equipped in all curio slots with specific identifiers.
+   *
+   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
+   * @param identifiers  The identifiers for the slot types
+   * @return A list of matching results
+   */
+  List<SlotResult> findCurios(@Nonnull LivingEntity livingEntity, String... identifiers);
 
   /**
    * Retrieves a map of attribute modifiers for the ItemStack.
@@ -119,11 +141,11 @@ public interface ICuriosHelper {
   /**
    * Adds a slot modifier to a specified attribute map.
    *
-   * @param map         A {@link Multimap} of attributes to attribute modifiers
-   * @param identifier  The identifier of the slot to add the modifier onto
-   * @param uuid        A UUID associated wth the slot
-   * @param amount      The amount of the modifier
-   * @param operation   The operation of the modifier
+   * @param map        A {@link Multimap} of attributes to attribute modifiers
+   * @param identifier The identifier of the slot to add the modifier onto
+   * @param uuid       A UUID associated wth the slot
+   * @param amount     The amount of the modifier
+   * @param operation  The operation of the modifier
    */
   void addSlotModifier(Multimap<Attribute, AttributeModifier> map, String identifier, UUID uuid,
                        double amount, AttributeModifier.Operation operation);
@@ -162,6 +184,37 @@ public interface ICuriosHelper {
   void setBrokenCurioConsumer(TriConsumer<String, Integer, LivingEntity> consumer);
 
   // ========= DEPRECATED =============
+
+  /**
+   * @param item         The {@link Item} to find
+   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
+   * @return An {@link Optional} wrapper of the found triplet, or {@link Optional#empty()} is
+   * nothing was found.
+   * @deprecated Use {@link ICuriosHelper#findFirstCurio(LivingEntity, Item)}
+   * <p>
+   * Gets the first found {@link ItemStack} of the {@link Item} type equipped in a curio slot, or
+   * {@link Optional#empty()} if no matches were found.
+   */
+  @Nonnull
+  @Deprecated
+  Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(Item item,
+                                                                          @Nonnull
+                                                                              LivingEntity livingEntity);
+
+  /**
+   * @param filter       The filter to test against
+   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
+   * @return An {@link Optional#empty()} wrapper of the found triplet, or {@link Optional#empty()}
+   * is nothing was found.
+   * @deprecated Use {@link ICuriosHelper#findFirstCurio(LivingEntity, Predicate)}
+   * <p>
+   * Gets the first found {@link ItemStack} of the item type equipped in a curio slot that matches
+   * the filter, or {@link Optional#empty()} if no matches were found.
+   */
+  @Nonnull
+  @Deprecated
+  Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(
+      Predicate<ItemStack> filter, @Nonnull LivingEntity livingEntity);
 
   /**
    * @deprecated See {@link ICuriosHelper#getAttributeModifiers(SlotContext, UUID, ItemStack)} for

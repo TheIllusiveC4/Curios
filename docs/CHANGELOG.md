@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.5-4.0.7.0] - 2021.01.08
+### Added
+- [API] Added `findFirstCurio` and `findCurios` methods to `ICuriosHelper`
+### Changed
+- Updated `ko_kr` localization (thanks mindy15963!) [#200](https://github.com/TheIllusiveC4/Curios/pull/200)
+### Deprecated
+- [API] Deprecated `findEquippedCurio` methods in `ICuriosHelper`
+### Fixed
+- Fixed knockback resistance tooltips not being formatted correctly
+- Fixed clearing inventory via Creative 'x' button resulting in lingering attribute modifiers when equipped
+
 ## [1.16.5-4.0.6.8] - 2021.12.27
 ### Fixed
 - Fixed client-side syncing errors when applying slot modifiers to slots with base size 0

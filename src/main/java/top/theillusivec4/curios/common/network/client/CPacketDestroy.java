@@ -19,13 +19,26 @@
 
 package top.theillusivec4.curios.common.network.client;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fml.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+import top.theillusivec4.curios.common.CuriosHelper;
+import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 
 public class CPacketDestroy {
 
@@ -45,10 +58,44 @@ public class CPacketDestroy {
             .ifPresent(handler -> handler.getCurios().values().forEach(stacksHandler -> {
               IDynamicStackHandler stackHandler = stacksHandler.getStacks();
               IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
+              String id = stacksHandler.getIdentifier();
 
               for (int i = 0; i < stackHandler.getSlots(); i++) {
+                UUID uuid = UUID.nameUUIDFromBytes((id + i).getBytes());
+                SlotContext slotContext = new SlotContext(id, sender, i);
+                ItemStack stack = stackHandler.getStackInSlot(i);
+                Multimap<Attribute, AttributeModifier> map =
+                    CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack);
+                Multimap<String, AttributeModifier> slots = HashMultimap.create();
+                Set<CuriosHelper.SlotAttributeWrapper> toRemove = new HashSet<>();
+
+                for (Attribute attribute : map.keySet()) {
+
+                  if (attribute instanceof CuriosHelper.SlotAttributeWrapper) {
+                    CuriosHelper.SlotAttributeWrapper wrapper =
+                        (CuriosHelper.SlotAttributeWrapper) attribute;
+                    slots.putAll(wrapper.identifier, map.get(attribute));
+                    toRemove.add(wrapper);
+                  }
+                }
+
+                for (Attribute attribute : toRemove) {
+                  map.removeAll(attribute);
+                }
+                sender.getAttributeManager().removeModifiers(map);
+                handler.removeSlotModifiers(slots);
+                CuriosApi.getCuriosHelper().getCurio(stack)
+                    .ifPresent(curio -> curio.onUnequip(slotContext, stack));
                 stackHandler.setStackInSlot(i, ItemStack.EMPTY);
+                NetworkHandler.INSTANCE.send(
+                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sender),
+                    new SPacketSyncStack(sender.getEntityId(), id, i, ItemStack.EMPTY,
+                        SPacketSyncStack.HandlerType.EQUIPMENT, new CompoundNBT()));
                 cosmeticStackHandler.setStackInSlot(i, ItemStack.EMPTY);
+                NetworkHandler.INSTANCE.send(
+                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sender),
+                    new SPacketSyncStack(sender.getEntityId(), id, i, ItemStack.EMPTY,
+                        SPacketSyncStack.HandlerType.COSMETIC, new CompoundNBT()));
               }
             }));
       }

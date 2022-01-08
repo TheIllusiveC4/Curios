@@ -166,7 +166,12 @@ public class ClientEventHandler {
                 if (attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_BASE
                     && attributemodifier.getOperation()
                     != AttributeModifier.Operation.MULTIPLY_TOTAL) {
-                  d1 = amount;
+
+                  if (entry.getKey().equals(Attributes.KNOCKBACK_RESISTANCE)) {
+                    d1 = amount * 10.0D;
+                  } else {
+                    d1 = amount;
+                  }
                 } else {
                   d1 = amount * 100.0D;
                 }
