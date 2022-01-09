@@ -71,7 +71,8 @@ public class ClientEventHandler {
     Minecraft mc = Minecraft.getInstance();
 
     if (KeyRegistry.openCurios.consumeClick() && mc.isWindowActive()) {
-      NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios());
+      NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
+          new CPacketOpenCurios(ItemStack.EMPTY));
     }
   }
 

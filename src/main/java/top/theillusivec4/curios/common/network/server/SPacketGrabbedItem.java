@@ -28,7 +28,7 @@ import net.minecraftforge.network.NetworkEvent;
 
 public class SPacketGrabbedItem {
 
-  private ItemStack stack;
+  private final ItemStack stack;
 
   public SPacketGrabbedItem(ItemStack stackIn) {
     this.stack = stackIn;
@@ -48,7 +48,6 @@ public class SPacketGrabbedItem {
       LocalPlayer clientPlayer = Minecraft.getInstance().player;
 
       if (clientPlayer != null) {
-        clientPlayer.inventoryMenu.setCarried(ItemStack.EMPTY);
         clientPlayer.containerMenu.setCarried(msg.stack);
       }
     });
