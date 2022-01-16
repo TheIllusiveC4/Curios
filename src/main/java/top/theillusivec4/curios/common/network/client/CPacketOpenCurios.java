@@ -32,11 +32,18 @@ import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
 
 public class CPacketOpenCurios {
 
+  private final ItemStack carried;
+
+  public CPacketOpenCurios(ItemStack stack) {
+    this.carried = stack;
+  }
+
   public static void encode(CPacketOpenCurios msg, FriendlyByteBuf buf) {
+    buf.writeItem(msg.carried);
   }
 
   public static CPacketOpenCurios decode(FriendlyByteBuf buf) {
-    return new CPacketOpenCurios();
+    return new CPacketOpenCurios(buf.readItem());
   }
 
   public static void handle(CPacketOpenCurios msg, Supplier<NetworkEvent.Context> ctx) {
@@ -44,12 +51,12 @@ public class CPacketOpenCurios {
       ServerPlayer sender = ctx.get().getSender();
 
       if (sender != null) {
-        ItemStack stack = sender.inventoryMenu.getCarried();
-        sender.inventoryMenu.setCarried(ItemStack.EMPTY);
+        ItemStack stack = sender.isCreative() ? msg.carried : sender.containerMenu.getCarried();
+        sender.containerMenu.setCarried(ItemStack.EMPTY);
         NetworkHooks.openGui(sender, new CuriosContainerProvider());
 
         if (!stack.isEmpty()) {
-          sender.inventoryMenu.setCarried(stack);
+          sender.containerMenu.setCarried(stack);
           NetworkHandler.INSTANCE
               .send(PacketDistributor.PLAYER.with(() -> sender), new SPacketGrabbedItem(stack));
         }

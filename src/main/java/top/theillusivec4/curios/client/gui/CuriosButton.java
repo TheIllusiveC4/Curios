@@ -48,25 +48,28 @@ public class CuriosButton extends ImageButton {
         (button) -> {
           Minecraft mc = Minecraft.getInstance();
 
-          if (parentGui instanceof CuriosScreen && mc.player != null) {
-            InventoryScreen inventory = new InventoryScreen(mc.player);
-            ItemStack stack = mc.player.inventoryMenu.getCarried();
-            mc.player.inventoryMenu.setCarried(ItemStack.EMPTY);
-            mc.setScreen(inventory);
-            mc.player.inventoryMenu.setCarried(stack);
-            NetworkHandler.INSTANCE
-                .send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla());
-          } else {
+          if (mc.player != null) {
+            ItemStack stack = mc.player.containerMenu.getCarried();
+            mc.player.containerMenu.setCarried(ItemStack.EMPTY);
 
-            if (parentGui instanceof InventoryScreen) {
-              InventoryScreen inventory = (InventoryScreen) parentGui;
-              RecipeBookComponent recipeBookGui = inventory.getRecipeBookComponent();
+            if (parentGui instanceof CuriosScreen) {
+              InventoryScreen inventory = new InventoryScreen(mc.player);
+              mc.setScreen(inventory);
+              mc.player.containerMenu.setCarried(stack);
+              NetworkHandler.INSTANCE
+                  .send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla(stack));
+            } else {
 
-              if (recipeBookGui.isVisible()) {
-                recipeBookGui.toggleVisibility();
+              if (parentGui instanceof InventoryScreen inventory) {
+                RecipeBookComponent recipeBookGui = inventory.getRecipeBookComponent();
+
+                if (recipeBookGui.isVisible()) {
+                  recipeBookGui.toggleVisibility();
+                }
               }
+              NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
+                  new CPacketOpenCurios(stack));
             }
-            NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(), new CPacketOpenCurios());
           }
         });
     this.parentGui = parentGui;

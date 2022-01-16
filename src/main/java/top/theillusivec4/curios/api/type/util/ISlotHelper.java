@@ -165,16 +165,12 @@ public interface ISlotHelper {
    * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
    */
   @Deprecated
-  default void unlockSlotType(String id, LivingEntity livingEntity) {
-    growSlotType(id, 1, livingEntity);
-  }
+  void unlockSlotType(String id, LivingEntity livingEntity);
 
   /**
    * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
    * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
    */
   @Deprecated
-  default void lockSlotType(String id, final LivingEntity livingEntity) {
-    shrinkSlotType(id, 1, livingEntity);
-  }
+  void lockSlotType(String id, final LivingEntity livingEntity);
 }

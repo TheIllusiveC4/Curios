@@ -114,21 +114,9 @@ public class SlotHelper implements ISlotHelper {
 
   @Override
   public void growSlotType(String id, int amount, final LivingEntity livingEntity) {
-    CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
-      handler.growSlotType(id, amount);
-
-      if (livingEntity instanceof ServerPlayer player) {
-        NetworkHandler.INSTANCE
-            .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
-                new SPacketSyncOperation(livingEntity.getId(), id, Operation.GROW, amount));
-
-        if (player.containerMenu instanceof CuriosContainer) {
-          ((CuriosContainer) player.containerMenu).resetSlots();
-        }
-      }
-    });
+    CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
+        .ifPresent(handler -> handler.growSlotType(id, amount));
   }
-
 
   @Override
   public void shrinkSlotType(String id, final LivingEntity livingEntity) {
@@ -137,17 +125,28 @@ public class SlotHelper implements ISlotHelper {
 
   @Override
   public void shrinkSlotType(String id, int amount, final LivingEntity livingEntity) {
+    CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
+        .ifPresent(handler -> handler.shrinkSlotType(id, amount));
+  }
+
+  @Override
+  public void unlockSlotType(String id, LivingEntity livingEntity) {
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
-      handler.shrinkSlotType(id, amount);
 
-      if (livingEntity instanceof ServerPlayer player) {
-        NetworkHandler.INSTANCE
-            .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
-                new SPacketSyncOperation(livingEntity.getId(), id, Operation.SHRINK, amount));
+      if (handler.getStacksHandler(id).map(stacksHandler -> stacksHandler.getSlots() == 0)
+          .orElse(false)) {
+        handler.growSlotType(id, 1);
+      }
+    });
+  }
 
-        if (player.containerMenu instanceof CuriosContainer) {
-          ((CuriosContainer) player.containerMenu).resetSlots();
-        }
+  @Override
+  public void lockSlotType(String id, LivingEntity livingEntity) {
+    CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
+      int amount = handler.getStacksHandler(id).map(ICurioStacksHandler::getSlots).orElse(0);
+
+      if (amount > 0) {
+        handler.shrinkSlotType(id, amount);
       }
     });
   }
