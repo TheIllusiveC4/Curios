@@ -83,6 +83,7 @@ import top.theillusivec4.curios.common.triggers.EquipCurioTrigger;
 import top.theillusivec4.curios.server.SlotHelper;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
+import top.theillusivec4.curios.server.command.CuriosSelectorOptions;
 
 @Mod(Curios.MODID)
 public class Curios {
@@ -116,6 +117,7 @@ public class Curios {
     ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
         new ArgumentSerializer<>(CurioArgumentType::slot));
     CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
+    CuriosSelectorOptions.register();
   }
 
   private void enqueue(InterModEnqueueEvent evt) {
