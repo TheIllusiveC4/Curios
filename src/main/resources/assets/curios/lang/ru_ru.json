@@ -1,7 +1,7 @@
 {
   "curios.name": "Curios",
   "curios.slot": "Слот",
-  "curios.cosmetic": "Украшение:",
+  "curios.cosmetic": "Косметика:",
   "commands.curios.set.success": "Количество слотов типа «%s» было изменено на %d для %s",
   "commands.curios.add.success": "%d слотов типа «%s» было добавлено для %s",
   "commands.curios.remove.success": "%d слотов типа «%s» было убрано у %s",
@@ -35,6 +35,12 @@
   "curios.modifiers.charm": "Если надето как амулет:",
   "curios.modifiers.hands": "При ношении на руках:",
   "curios.modifiers.bracelet": "Если надето как браслет:",
+  "curios.modifiers.slots.plus.0": "+%s к слотам %s",
+  "curios.modifiers.slots.plus.1": "+%s%% к слотам %s",
+  "curios.modifiers.slots.plus.2": "+%s%% к слотам %s",
+  "curios.modifiers.slots.take.0": "-%s к слотам %s",
+  "curios.modifiers.slots.take.1": "-%s%% к слотам %s",
+  "curios.modifiers.slots.take.2": "-%s%% к слотам %s",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Открыть/Закрыть инвентарь Curios",
   "gui.curios.toggle": "Переключить видимость"
