@@ -20,24 +20,17 @@
 package top.theillusivec4.curios;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
-import java.util.Map;
 import javax.annotation.Nonnull;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.commands.synchronization.ArgumentTypes;
 import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -85,6 +78,7 @@ import top.theillusivec4.curios.common.util.EquipCurioTrigger;
 import top.theillusivec4.curios.server.SlotHelper;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
+import top.theillusivec4.curios.server.command.CuriosSelectorOptions;
 
 @Mod(Curios.MODID)
 public class Curios {
@@ -114,6 +108,7 @@ public class Curios {
     ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
         new EmptyArgumentSerializer<>(CurioArgumentType::slot));
     CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
+    CuriosSelectorOptions.register();
   }
 
   private void registerCaps(RegisterCapabilitiesEvent evt) {
