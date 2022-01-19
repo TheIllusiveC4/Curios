@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.18.1-5.0.6.0] - 2022.01.18
+### Added
+- Added `uk_ua.json` localization (thanks Sushomeister!)
+- Added new entity selector option, `curios=`. More information at the [wiki](https://github.com/TheIllusiveC4/Curios/wiki/Commands#entity-selector-options).
+### Changed
+- Updated `ru_ru.json` localization (thanks Sushomeister!)
+
 ## [1.18.1-5.0.5.2] - 2022.01.15
 ### Fixed
 - Fixed deprecated usages of `ISlotHelper#unlockSlotType` and `ISlotHelper#lockSlotType` modifying slots differently
