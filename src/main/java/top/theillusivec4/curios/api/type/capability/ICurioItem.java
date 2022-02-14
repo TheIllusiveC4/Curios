@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -32,10 +36,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.network.chat.Component;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
 
@@ -267,7 +267,7 @@ public interface ICurioItem {
    * @return A list of ITextComponent to display as curio attribute modifier information
    */
   default List<Component> getAttributesTooltip(List<Component> tooltips,
-                                                    ItemStack stack) {
+                                               ItemStack stack) {
     return showAttributesTooltip("", stack) ? tooltips : new ArrayList<>();
   }
 
@@ -281,7 +281,8 @@ public interface ICurioItem {
    * @return Amount of additional Fortune levels that will be applied when mining
    */
   default int getFortuneLevel(SlotContext slotContext, LootContext lootContext, ItemStack stack) {
-    return getFortuneBonus(slotContext.identifier(), slotContext.entity(), stack, slotContext.index());
+    return getFortuneBonus(slotContext.identifier(), slotContext.entity(), stack,
+        slotContext.index());
   }
 
   /**
@@ -297,7 +298,8 @@ public interface ICurioItem {
    */
   default int getLootingLevel(SlotContext slotContext, DamageSource source, LivingEntity target,
                               int baseLooting, ItemStack stack) {
-    return getLootingBonus(slotContext.identifier(), slotContext.entity(), stack, slotContext.index());
+    return getLootingBonus(slotContext.identifier(), slotContext.entity(), stack,
+        slotContext.index());
   }
 
   /**
@@ -395,7 +397,11 @@ public interface ICurioItem {
    */
   @Deprecated
   default void playRightClickEquipSound(LivingEntity livingEntity, ItemStack stack) {
-    defaultInstance.playRightClickEquipSound(livingEntity);
+    // Not enough context for id and index, so we just pass in artificial values with the entity
+    ICurio.SoundInfo soundInfo =
+        getEquipSound(new SlotContext("", livingEntity, 0, false, true), stack);
+    livingEntity.level.playSound(null, livingEntity.blockPosition(), soundInfo.getSoundEvent(),
+        livingEntity.getSoundSource(), soundInfo.getVolume(), soundInfo.getPitch());
   }
 
   /**
