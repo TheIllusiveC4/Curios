@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.18.1-5.0.6.1] - 2022.02.15
+### Changed
+- Updated `ko_kr.json` localization (thanks mindy15963!) [#211](https://github.com/TheIllusiveC4/Curios/pull/211)
+### Fixed
+- Fixed `ICurioItem#getEquipSound` not being called [#222](https://github.com/TheIllusiveC4/Curios/issues/222)
+- Fixed crashes with out-of-bound indices when unequipping items that provide slot attribute modifiers [#221](https://github.com/TheIllusiveC4/Curios/issues/221)
+
 ## [1.18.1-5.0.6.0] - 2022.01.18
 ### Added
 - Added `uk_ua.json` localization (thanks Sushomeister!)
