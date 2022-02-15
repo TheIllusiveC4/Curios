@@ -22,6 +22,7 @@ package top.theillusivec4.curios.common.network.server;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -66,9 +67,10 @@ public class SPacketBreak {
               .ifPresent(handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacks -> {
                 ItemStack stack = stacks.getStacks().getStackInSlot(msg.slotId);
                 LazyOptional<ICurio> possibleCurio = CuriosApi.getCuriosHelper().getCurio(stack);
+                NonNullList<Boolean> renderStates = stacks.getRenders();
                 possibleCurio.ifPresent(curio -> curio.curioBreak(
                     new SlotContext(msg.curioId, livingEntity, msg.slotId, false,
-                        stacks.getRenders().get(msg.slotId))));
+                        renderStates.size() > msg.slotId && renderStates.get(msg.slotId))));
 
                 if (!possibleCurio.isPresent()) {
                   ICurio.playBreakAnimation(stack, livingEntity);

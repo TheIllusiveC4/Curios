@@ -38,6 +38,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Wearable;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
@@ -80,6 +81,8 @@ public class RingItem extends Item implements Wearable {
         atts.put(Attributes.KNOCKBACK_RESISTANCE,
             new AttributeModifier(uuid, CuriosTest.MODID + ":knockback_resist", 0.2,
                 AttributeModifier.Operation.ADDITION));
+        CuriosApi.getCuriosHelper()
+            .addSlotModifier(atts, "ring", uuid, 1, AttributeModifier.Operation.ADDITION);
         return atts;
       }
 

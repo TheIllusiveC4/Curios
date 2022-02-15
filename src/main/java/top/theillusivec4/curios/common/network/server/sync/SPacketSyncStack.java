@@ -22,6 +22,7 @@ package top.theillusivec4.curios.common.network.server.sync;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
@@ -80,9 +81,10 @@ public class SPacketSyncStack {
                 boolean cosmetic = HandlerType.fromValue(msg.handlerType) == HandlerType.COSMETIC;
 
                 if (!compoundNBT.isEmpty()) {
+                  NonNullList<Boolean> renderStates = stacksHandler.getRenders();
                   CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> curio.readSyncData(
                       new SlotContext(msg.curioId, (LivingEntity) entity, slot, cosmetic,
-                          stacksHandler.getRenders().get(slot)), compoundNBT));
+                          renderStates.size() > slot && renderStates.get(slot)), compoundNBT));
                 }
 
                 if (cosmetic) {

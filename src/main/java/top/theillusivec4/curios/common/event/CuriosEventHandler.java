@@ -108,8 +108,8 @@ public class CuriosEventHandler {
                                   boolean keepInventory, LivingDropsEvent evt) {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
-      SlotContext slotContext =
-          new SlotContext(identifier, livingEntity, i, cosmetic, renders.get(i));
+      SlotContext slotContext = new SlotContext(identifier, livingEntity, i, cosmetic,
+          renders.size() > i && renders.get(i));
 
       if (!stack.isEmpty()) {
         DropRule dropRuleOverride = null;
@@ -325,8 +325,9 @@ public class CuriosEventHandler {
 
             for (int i = 0; i < stackHandler.getSlots(); i++) {
               String id = entry.getKey();
-              SlotContext slotContext =
-                  new SlotContext(id, player, i, false, entry.getValue().getRenders().get(i));
+              NonNullList<Boolean> renderStates = entry.getValue().getRenders();
+              SlotContext slotContext = new SlotContext(id, player, i, false,
+                  renderStates.size() > i && renderStates.get(i));
               CurioEquipEvent equipEvent = new CurioEquipEvent(stack, slotContext);
               MinecraftForge.EVENT_BUS.post(equipEvent);
               Event.Result result = equipEvent.getResult();
@@ -390,7 +391,8 @@ public class CuriosEventHandler {
                                            NonNullList<Boolean> renders) {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
-      SlotContext slotContext = new SlotContext(id, player, i, cosmetic, renders.get(i));
+      SlotContext slotContext =
+          new SlotContext(id, player, i, cosmetic, renders.size() > i && renders.get(i));
 
       if (!stack.isEmpty() && !curiosHelper.isStackValid(slotContext, stack)) {
         stacks.setStackInSlot(i, ItemStack.EMPTY);
@@ -421,8 +423,9 @@ public class CuriosEventHandler {
         IDynamicStackHandler stacks = entry.getValue().getStacks();
 
         for (int i = 0; i < stacks.getSlots(); i++) {
+          NonNullList<Boolean> renderStates = entry.getValue().getRenders();
           SlotContext slotContext = new SlotContext(entry.getKey(), player, i, false,
-              entry.getValue().getRenders().get(i));
+              renderStates.size() > i && renderStates.get(i));
           fortuneLevel.addAndGet(curiosHelper.getCurio(stacks.getStackInSlot(i)).map(
                   curio -> curio.getFortuneLevel(slotContext, null))
               .orElse(0));
@@ -453,9 +456,10 @@ public class CuriosEventHandler {
         IDynamicStackHandler stackHandler = stacksHandler.getStacks();
         IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
 
-        for (int i = 0; i < stackHandler.getSlots(); i++) {
+        for (int i = 0; i < stacksHandler.getSlots(); i++) {
+          NonNullList<Boolean> renderStates = stacksHandler.getRenders();
           SlotContext slotContext = new SlotContext(identifier, livingEntity, i, false,
-              stacksHandler.getRenders().get(i));
+              renderStates.size() > i && renderStates.get(i));
           ItemStack stack = stackHandler.getStackInSlot(i);
           LazyOptional<ICurio> currentCurio = CuriosApi.getCuriosHelper().getCurio(stack);
           final int index = i;
@@ -476,7 +480,7 @@ public class CuriosEventHandler {
             if (!ItemStack.matches(stack, prevStack)) {
               LazyOptional<ICurio> prevCurio = CuriosApi.getCuriosHelper().getCurio(prevStack);
               syncCurios(livingEntity, stack, currentCurio, prevCurio, identifier, index, false,
-                  stacksHandler.getRenders().get(index), HandlerType.EQUIPMENT);
+                  renderStates.size() > index && renderStates.get(index), HandlerType.EQUIPMENT);
               MinecraftForge.EVENT_BUS
                   .post(new CurioChangeEvent(livingEntity, identifier, i, prevStack, stack));
               UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());

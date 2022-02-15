@@ -25,6 +25,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -55,15 +56,16 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
           for (int i = 0; i < stackHandler.getSlots(); i++) {
             ItemStack stack = cosmeticStacksHandler.getStackInSlot(i);
             boolean cosmetic = true;
+            NonNullList<Boolean> renderStates = stacksHandler.getRenders();
+            boolean renderable = renderStates.size() > i && renderStates.get(i);
 
-            if (stack.isEmpty() && stacksHandler.getRenders().get(i)) {
+            if (stack.isEmpty() && renderable) {
               stack = stackHandler.getStackInSlot(i);
               cosmetic = false;
             }
 
             if (!stack.isEmpty()) {
-              SlotContext slotContext =
-                  new SlotContext(id, livingEntity, i, cosmetic, stacksHandler.getRenders().get(i));
+              SlotContext slotContext = new SlotContext(id, livingEntity, i, cosmetic, renderable);
               ItemStack finalStack = stack;
               CuriosRendererRegistry.getRenderer(stack.getItem()).ifPresent(
                   renderer -> renderer

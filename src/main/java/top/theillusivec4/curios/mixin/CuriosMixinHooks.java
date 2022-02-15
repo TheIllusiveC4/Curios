@@ -1,6 +1,7 @@
 package top.theillusivec4.curios.mixin;
 
 import java.util.Map;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
@@ -22,10 +23,11 @@ public class CuriosMixinHooks {
 
         for (int i = 0; i < stacks.getSlots(); i++) {
           final int index = i;
+          NonNullList<Boolean> renderStates = entry.getValue().getRenders();
           boolean hasMask =
               CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(curio -> curio
                       .isEnderMask(new SlotContext(entry.getKey(), livingEntity, index, false,
-                          entry.getValue().getRenders().get(index)), enderMan))
+                          renderStates.size() > index && renderStates.get(index)), enderMan))
                   .orElse(false);
 
           if (hasMask) {
@@ -45,10 +47,11 @@ public class CuriosMixinHooks {
 
         for (int i = 0; i < stacks.getSlots(); i++) {
           final int index = i;
+          NonNullList<Boolean> renderStates = entry.getValue().getRenders();
           boolean canNeutralize =
               CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(curio -> curio
                       .makesPiglinsNeutral(new SlotContext(entry.getKey(), livingEntity, index, false,
-                          entry.getValue().getRenders().get(index))))
+                          renderStates.size() > index && renderStates.get(index))))
                   .orElse(false);
 
           if (canNeutralize) {

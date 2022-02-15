@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
@@ -120,9 +121,9 @@ public class CuriosHelper implements ICuriosHelper {
           ItemStack stack = stackHandler.getStackInSlot(i);
 
           if (!stack.isEmpty() && filter.test(stack)) {
-            return new SlotResult(
-                new SlotContext(id, livingEntity, i, false, stacksHandler.getRenders().get(i)),
-                stack);
+            NonNullList<Boolean> renderStates = stacksHandler.getRenders();
+            return new SlotResult(new SlotContext(id, livingEntity, i, false,
+                renderStates.size() > i && renderStates.get(i)), stack);
           }
         }
       }
@@ -151,9 +152,9 @@ public class CuriosHelper implements ICuriosHelper {
           ItemStack stack = stackHandler.getStackInSlot(i);
 
           if (!stack.isEmpty() && filter.test(stack)) {
-            result.add(new SlotResult(
-                new SlotContext(id, livingEntity, i, false, stacksHandler.getRenders().get(i)),
-                stack));
+            NonNullList<Boolean> renderStates = stacksHandler.getRenders();
+            result.add(new SlotResult(new SlotContext(id, livingEntity, i, false,
+                renderStates.size() > i && renderStates.get(i)), stack));
           }
         }
       }
@@ -178,9 +179,9 @@ public class CuriosHelper implements ICuriosHelper {
             ItemStack stack = stackHandler.getStackInSlot(i);
 
             if (!stack.isEmpty()) {
-              result.add(new SlotResult(
-                  new SlotContext(id, livingEntity, i, false, stacksHandler.getRenders().get(i)),
-                  stack));
+              NonNullList<Boolean> renderStates = stacksHandler.getRenders();
+              result.add(new SlotResult(new SlotContext(id, livingEntity, i, false,
+                  renderStates.size() > i && renderStates.get(i)), stack));
             }
           }
         }

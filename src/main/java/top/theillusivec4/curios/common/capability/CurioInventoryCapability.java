@@ -180,9 +180,12 @@ public class CurioInventoryCapability {
         for (int i = 0; i < stacks.getSlots(); i++) {
           final int index = i;
           fortuneLevel += CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(
-              curio -> curio.getFortuneLevel(
-                  new SlotContext(entry.getKey(), this.wearer, index, false,
-                      entry.getValue().getRenders().get(index)), lootContext)).orElse(0);
+              curio -> {
+                NonNullList<Boolean> renderStates = entry.getValue().getRenders();
+                return curio.getFortuneLevel(
+                    new SlotContext(entry.getKey(), this.wearer, index, false,
+                        renderStates.size() > index && renderStates.get(index)), lootContext);
+              }).orElse(0);
         }
       }
       return fortuneLevel;
@@ -197,9 +200,13 @@ public class CurioInventoryCapability {
         for (int i = 0; i < stacks.getSlots(); i++) {
           int index = i;
           lootingLevel += CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(
-                  curio -> curio.getLootingLevel(
-                      new SlotContext(entry.getKey(), this.wearer, index, false,
-                          entry.getValue().getRenders().get(index)), source, target, baseLooting))
+                  curio -> {
+                    NonNullList<Boolean> renderStates = entry.getValue().getRenders();
+                    return curio.getLootingLevel(
+                        new SlotContext(entry.getKey(), this.wearer, index, false,
+                            renderStates.size() > index && renderStates.get(index)), source, target,
+                        baseLooting);
+                  })
               .orElse(0);
         }
       }
@@ -411,8 +418,9 @@ public class CurioInventoryCapability {
             while (index < newStacksHandler.getSlots() && index < prevStacksHandler
                 .getSlots()) {
               ItemStack prevStack = prevStacksHandler.getStacks().getStackInSlot(index);
+              NonNullList<Boolean> renderStates = newStacksHandler.getRenders();
               SlotContext slotContext = new SlotContext(identifier, livingEntity, index, false,
-                  newStacksHandler.getRenders().get(index));
+                  renderStates.size() > index && renderStates.get(index));
 
               if (!prevStack.isEmpty()) {
 

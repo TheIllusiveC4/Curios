@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -62,8 +63,9 @@ public class CPacketDestroy {
 
               for (int i = 0; i < stackHandler.getSlots(); i++) {
                 UUID uuid = UUID.nameUUIDFromBytes((id + i).getBytes());
-                SlotContext slotContext =
-                    new SlotContext(id, sender, i, false, stacksHandler.getRenders().get(i));
+                NonNullList<Boolean> renderStates = stacksHandler.getRenders();
+                SlotContext slotContext = new SlotContext(id, sender, i, false,
+                    renderStates.size() > i && renderStates.get(i));
                 ItemStack stack = stackHandler.getStackInSlot(i);
                 Multimap<Attribute, AttributeModifier> map =
                     CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack);
