@@ -421,8 +421,11 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   private void flagUpdate() {
     this.update = true;
-    this.itemHandler.getUpdatingInventories().remove(this);
-    this.itemHandler.getUpdatingInventories().add(this);
+
+    if (this.itemHandler != null) {
+      this.itemHandler.getUpdatingInventories().remove(this);
+      this.itemHandler.getUpdatingInventories().add(this);
+    }
   }
 
   public void clearModifiers() {
@@ -467,7 +470,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       if (size != this.getSlots()) {
         this.resize((int) size);
 
-        if (this.itemHandler.getWearer() instanceof Player player) {
+        if (this.itemHandler != null && this.itemHandler.getWearer() instanceof Player player) {
 
           if (player.containerMenu instanceof CuriosContainer) {
             ((CuriosContainer) player.containerMenu).resetSlots();
@@ -508,6 +511,10 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
+
+    if (this.itemHandler == null) {
+      return;
+    }
     List<ItemStack> drops = new ArrayList<>();
 
     for (int i = Math.max(0, stackHandler.getSlots() - amount);
