@@ -159,6 +159,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   @Override
   public CompoundTag serializeNBT() {
     CompoundTag compoundNBT = new CompoundTag();
+    compoundNBT.putInt("SavedBaseSize", this.baseSize);
     compoundNBT.put("Stacks", this.stackHandler.serializeNBT());
     compoundNBT.put("Cosmetics", this.cosmeticStackHandler.serializeNBT());
 
@@ -200,6 +201,10 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   @Override
   public void deserializeNBT(CompoundTag nbt) {
+
+    if (nbt.contains("SavedBaseSize")) {
+      this.baseSize = nbt.getInt("SavedBaseSize");
+    }
 
     if (nbt.contains("Stacks")) {
       this.stackHandler.deserializeNBT(nbt.getCompound("Stacks"));
@@ -259,8 +264,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
           this.addTransientModifier(attributeModifier);
         }
       }
-      this.update();
     }
+    this.update();
   }
 
   @Override
@@ -434,6 +439,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       this.removeModifier(cachedModifier.getId());
     }
     this.cachedModifiers.clear();
+    this.flagUpdate();
   }
 
   public void update() {

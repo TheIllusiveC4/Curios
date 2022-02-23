@@ -32,6 +32,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.core.Direction;
@@ -41,6 +42,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -60,6 +62,7 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 import top.theillusivec4.curios.api.type.util.ISlotHelper;
+import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 
 public class CurioInventoryCapability {
@@ -337,7 +340,36 @@ public class CurioInventoryCapability {
     public void clearCachedSlotModifiers() {
 
       for (Map.Entry<String, ICurioStacksHandler> entry : this.curios.entrySet()) {
-        entry.getValue().clearCachedModifiers();
+        ICurioStacksHandler stacksHandler = entry.getValue();
+        Set<AttributeModifier> modifiers = stacksHandler.getCachedModifiers();
+
+        if (!modifiers.isEmpty()) {
+          IDynamicStackHandler stacks = stacksHandler.getStacks();
+          NonNullList<Boolean> renderStates = stacksHandler.getRenders();
+          String id = entry.getKey();
+          Set<AttributeModifier> foundModifiers = new HashSet<>();
+
+          for (int i = 0; i < stacks.getSlots(); i++) {
+            ItemStack stack = stacks.getStackInSlot(i);
+
+            if (!stack.isEmpty()) {
+              SlotContext slotContext = new SlotContext(id, this.getWearer(), i, false,
+                  renderStates.size() > i && renderStates.get(i));
+              UUID uuid = UUID.nameUUIDFromBytes((id + i).getBytes());
+              Multimap<Attribute, AttributeModifier> map =
+                  CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack);
+
+              for (Attribute attribute : map.keySet()) {
+
+                if (attribute instanceof CuriosHelper.SlotAttributeWrapper) {
+                  foundModifiers.addAll(map.get(attribute));
+                }
+              }
+            }
+          }
+          modifiers.removeIf(foundModifiers::contains);
+          stacksHandler.clearCachedModifiers();
+        }
       }
     }
 
