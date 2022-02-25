@@ -338,6 +338,7 @@ public class CurioInventoryCapability {
 
     @Override
     public void clearCachedSlotModifiers() {
+      Multimap<String, AttributeModifier> slots = HashMultimap.create();
 
       for (Map.Entry<String, ICurioStacksHandler> entry : this.curios.entrySet()) {
         ICurioStacksHandler stacksHandler = entry.getValue();
@@ -347,7 +348,6 @@ public class CurioInventoryCapability {
           IDynamicStackHandler stacks = stacksHandler.getStacks();
           NonNullList<Boolean> renderStates = stacksHandler.getRenders();
           String id = entry.getKey();
-          Set<AttributeModifier> foundModifiers = new HashSet<>();
 
           for (int i = 0; i < stacks.getSlots(); i++) {
             ItemStack stack = stacks.getStackInSlot(i);
@@ -361,13 +361,24 @@ public class CurioInventoryCapability {
 
               for (Attribute attribute : map.keySet()) {
 
-                if (attribute instanceof CuriosHelper.SlotAttributeWrapper) {
-                  foundModifiers.addAll(map.get(attribute));
+                if (attribute instanceof CuriosHelper.SlotAttributeWrapper wrapper) {
+                  slots.putAll(wrapper.identifier, map.get(attribute));
                 }
               }
             }
           }
-          modifiers.removeIf(foundModifiers::contains);
+        }
+      }
+
+      for (Map.Entry<String, Collection<AttributeModifier>> entry : slots.asMap().entrySet()) {
+        String id = entry.getKey();
+        ICurioStacksHandler stacksHandler = this.curios.get(id);
+
+        if (stacksHandler != null) {
+
+          for (AttributeModifier attributeModifier : entry.getValue()) {
+            stacksHandler.getCachedModifiers().remove(attributeModifier);
+          }
           stacksHandler.clearCachedModifiers();
         }
       }
