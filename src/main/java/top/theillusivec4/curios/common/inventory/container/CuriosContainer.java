@@ -369,6 +369,14 @@ public class CuriosContainer extends InventoryMenu {
     return true;
   }
 
+  @Override
+  public void setItem(int pSlotId, int pStateId, @Nonnull ItemStack pStack) {
+
+    if (this.slots.size() > pSlotId) {
+      super.setItem(pSlotId, pStateId, pStack);
+    }
+  }
+
   @Nonnull
   @Override
   public ItemStack quickMoveStack(@Nonnull Player playerIn, int index) {
