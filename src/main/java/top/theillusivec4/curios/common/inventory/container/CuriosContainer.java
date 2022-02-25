@@ -210,6 +210,14 @@ public class CuriosContainer extends PlayerContainer {
     this.scrollToIndex(this.lastScrollIndex);
   }
 
+  @Override
+  public void putStackInSlot(int slotID, @Nonnull ItemStack stack) {
+
+    if (this.inventorySlots.size() > slotID) {
+      super.putStackInSlot(slotID, stack);
+    }
+  }
+
   public void scrollToIndex(int indexIn) {
     this.curiosHandler.ifPresent(curios -> {
       Map<String, ICurioStacksHandler> curioMap = curios.getCurios();

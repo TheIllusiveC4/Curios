@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
@@ -49,8 +50,10 @@ public class CuriosLayer<T extends LivingEntity, M extends EntityModel<T>> exten
 
           for (int i = 0; i < stackHandler.getSlots(); i++) {
             ItemStack stack = cosmeticStacksHandler.getStackInSlot(i);
+            NonNullList<Boolean> renderStates = stacksHandler.getRenders();
+            boolean renderable = renderStates.size() > i && renderStates.get(i);
 
-            if (stack.isEmpty() && stacksHandler.getRenders().get(i)) {
+            if (stack.isEmpty() && renderable) {
               stack = stackHandler.getStackInSlot(i);
             }
 

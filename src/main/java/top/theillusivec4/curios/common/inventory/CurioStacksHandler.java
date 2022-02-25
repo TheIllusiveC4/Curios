@@ -159,6 +159,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   @Override
   public CompoundNBT serializeNBT() {
     CompoundNBT compoundNBT = new CompoundNBT();
+    compoundNBT.putInt("SavedBaseSize", this.baseSize);
     compoundNBT.put("Stacks", this.stackHandler.serializeNBT());
     compoundNBT.put("Cosmetics", this.cosmeticStackHandler.serializeNBT());
 
@@ -200,6 +201,10 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   @Override
   public void deserializeNBT(CompoundNBT nbt) {
+
+    if (nbt.contains("SavedBaseSize")) {
+      this.baseSize = nbt.getInt("SavedBaseSize");
+    }
 
     if (nbt.contains("Stacks")) {
       this.stackHandler.deserializeNBT(nbt.getCompound("Stacks"));
@@ -259,8 +264,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
           this.addTransientModifier(attributeModifier);
         }
       }
-      this.update();
     }
+    this.update();
   }
 
   @Override
@@ -416,8 +421,11 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   private void flagUpdate() {
     this.update = true;
-    this.itemHandler.getUpdatingInventories().remove(this);
-    this.itemHandler.getUpdatingInventories().add(this);
+
+    if (this.itemHandler != null) {
+      this.itemHandler.getUpdatingInventories().remove(this);
+      this.itemHandler.getUpdatingInventories().add(this);
+    }
   }
 
   public void clearModifiers() {
@@ -434,6 +442,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       this.removeModifier(cachedModifier.getID());
     }
     this.cachedModifiers.clear();
+    this.flagUpdate();
   }
 
   public void update() {
@@ -461,7 +470,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       if (size != this.getSlots()) {
         this.resize((int) size);
 
-        if (this.itemHandler.getWearer() instanceof PlayerEntity) {
+        if (this.itemHandler != null && this.itemHandler.getWearer() instanceof PlayerEntity) {
           PlayerEntity player = (PlayerEntity) this.itemHandler.getWearer();
 
           if (player.openContainer instanceof CuriosContainer) {
@@ -503,6 +512,10 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   private void loseStacks(IDynamicStackHandler stackHandler, String identifier, int amount) {
+
+    if (this.itemHandler == null) {
+      return;
+    }
     List<ItemStack> drops = new ArrayList<>();
 
     for (int i = Math.max(0, stackHandler.getSlots() - amount);

@@ -64,7 +64,8 @@ public class CurioSlot extends SlotItemHandler {
   }
 
   public boolean getRenderStatus() {
-    return this.renderStatuses.get(this.getSlotIndex());
+    return this.renderStatuses.size() > this.getSlotIndex() &&
+        this.renderStatuses.get(this.getSlotIndex());
   }
 
   @OnlyIn(Dist.CLIENT)
