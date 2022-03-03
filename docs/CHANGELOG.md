@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.18.2-5.0.6.3] - 2022.03.02
+### Changed
+- Updated to Minecraft 1.18.2
+
 ## [1.18.1-5.0.6.2] - 2022.02.25
 ### Changed
 - Updated `ko_kr.json` localization (thanks PixVoxel!) [#223](https://github.com/TheIllusiveC4/Curios/pull/223)

@@ -37,6 +37,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -78,9 +79,11 @@ public class CuriosHelper implements ICuriosHelper {
     return livingEntity.getCapability(CuriosCapability.INVENTORY);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public Set<String> getCurioTags(Item item) {
-    return item.getTags().stream().filter(tag -> tag.getNamespace().equals(CuriosApi.MODID))
+    return item.builtInRegistryHolder().tags().map(TagKey::location)
+        .filter(resourceLocation -> resourceLocation.getNamespace().equals(CuriosApi.MODID))
         .map(ResourceLocation::getPath).collect(Collectors.toSet());
   }
 
