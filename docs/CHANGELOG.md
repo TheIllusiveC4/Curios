@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.5-4.0.8.2] - 2022.03.31
+### Changed
+- Updated `fr_fr.json` localization (thanks HollishKid!) [#228](https://github.com/TheIllusiveC4/Curios/pull/228)
+### Fixed
+- Fixed slot modifiers incorrectly persisting in some cases
+
 ## [1.16.5-4.0.8.1] - 2022.02.25
 ### Changed
 - Updated `ko_kr.json` localization (thanks PixVoxel!) [#223](https://github.com/TheIllusiveC4/Curios/pull/223)

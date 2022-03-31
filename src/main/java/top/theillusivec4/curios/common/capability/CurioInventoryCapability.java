@@ -470,6 +470,13 @@ public class CurioInventoryCapability {
           stacksHandler.clearCachedModifiers();
         }
       }
+
+      for (Map.Entry<String, ICurioStacksHandler> entry : this.curios.entrySet()) {
+
+        if (!slots.asMap().containsKey(entry.getKey())) {
+          entry.getValue().clearCachedModifiers();
+        }
+      }
     }
 
     @Override
