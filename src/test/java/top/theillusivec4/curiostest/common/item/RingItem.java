@@ -37,7 +37,9 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Wearable;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -112,6 +114,11 @@ public class RingItem extends Item implements Wearable {
       @Override
       public boolean isEnderMask(SlotContext slotContext, EnderMan enderMan) {
         return true;
+      }
+
+      @Override
+      public int getFortuneLevel(SlotContext slotContext, @Nullable LootContext lootContext) {
+        return 3;
       }
     });
   }
