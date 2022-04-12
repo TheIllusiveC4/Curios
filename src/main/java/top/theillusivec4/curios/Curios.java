@@ -75,6 +75,7 @@ import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.slottype.SlotTypeManager;
 import top.theillusivec4.curios.common.util.EquipCurioTrigger;
+import top.theillusivec4.curios.common.util.SetCurioAttributesFunction;
 import top.theillusivec4.curios.server.SlotHelper;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
@@ -105,10 +106,13 @@ public class Curios {
     CuriosApi.setCuriosHelper(new CuriosHelper());
     MinecraftForge.EVENT_BUS.register(new CuriosEventHandler());
     NetworkHandler.register();
-    ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
-        new EmptyArgumentSerializer<>(CurioArgumentType::slot));
-    CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
-    CuriosSelectorOptions.register();
+    evt.enqueueWork(() -> {
+      ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
+          new EmptyArgumentSerializer<>(CurioArgumentType::slot));
+      CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
+      CuriosSelectorOptions.register();
+      SetCurioAttributesFunction.register();
+    });
   }
 
   private void registerCaps(RegisterCapabilitiesEvent evt) {

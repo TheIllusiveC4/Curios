@@ -248,18 +248,36 @@ public class CuriosHelper implements ICuriosHelper {
       for (int i = 0; i < listnbt.size(); ++i) {
         CompoundTag compoundnbt = listnbt.getCompound(i);
 
-        if (!compoundnbt.contains("Slot", 8) ||
-            compoundnbt.getString("Slot").equals(identifier)) {
-          Attribute attribute = ForgeRegistries.ATTRIBUTES
-              .getValue(ResourceLocation.tryParse(compoundnbt.getString("AttributeName")));
+        if (compoundnbt.getString("Slot").equals(identifier)) {
+          ResourceLocation rl = ResourceLocation.tryParse(compoundnbt.getString("AttributeName"));
+          UUID id = uuid;
 
-          if (attribute != null) {
-            AttributeModifier attributemodifier = AttributeModifier.load(compoundnbt);
+          if (rl != null) {
 
-            if (attributemodifier != null
-                && attributemodifier.getId().getLeastSignificantBits() != 0L
-                && attributemodifier.getId().getMostSignificantBits() != 0L) {
-              multimap.put(attribute, attributemodifier);
+            if (compoundnbt.contains("UUID")) {
+              id = compoundnbt.getUUID("UUID");
+            }
+
+            if (id.getLeastSignificantBits() != 0L && id.getMostSignificantBits() != 0L) {
+              AttributeModifier.Operation operation =
+                  AttributeModifier.Operation.fromValue(compoundnbt.getInt("Operation"));
+              double amount = compoundnbt.getDouble("Amount");
+              String name = compoundnbt.getString("Name");
+
+              if (rl.getNamespace().equals("curios")) {
+                String identifier1 = rl.getPath();
+
+                if (CuriosApi.getSlotHelper().getSlotType(identifier1).isPresent()) {
+                  CuriosApi.getCuriosHelper()
+                      .addSlotModifier(multimap, identifier1, id, amount, operation);
+                }
+              } else {
+                Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(rl);
+
+                if (attribute != null) {
+                  multimap.put(attribute, new AttributeModifier(id, name, amount, operation));
+                }
+              }
             }
           }
         }
@@ -273,9 +291,50 @@ public class CuriosHelper implements ICuriosHelper {
   @Override
   public void addSlotModifier(Multimap<Attribute, AttributeModifier> map, String identifier,
                               UUID uuid, double amount, AttributeModifier.Operation operation) {
-    SlotAttributeWrapper att =
-        SLOT_ATTRIBUTES.computeIfAbsent(identifier, SlotAttributeWrapper::new);
-    map.put(att, new AttributeModifier(uuid, identifier, amount, operation));
+    map.put(getOrCreateSlotAttribute(identifier),
+        new AttributeModifier(uuid, identifier, amount, operation));
+  }
+
+  @Override
+  public void addSlotModifier(ItemStack stack, String identifier, String name, UUID uuid,
+                              double amount, AttributeModifier.Operation operation, String slot) {
+    addModifier(stack, getOrCreateSlotAttribute(identifier), name, uuid, amount, operation, slot);
+  }
+
+  @Override
+  public void addModifier(ItemStack stack, Attribute attribute, String name, UUID uuid,
+                          double amount, AttributeModifier.Operation operation, String slot) {
+    CompoundTag tag = stack.getOrCreateTag();
+
+    if (!tag.contains("CurioAttributeModifiers", 9)) {
+      tag.put("CurioAttributeModifiers", new ListTag());
+    }
+    ListTag listtag = tag.getList("CurioAttributeModifiers", 10);
+    CompoundTag compoundtag = new CompoundTag();
+    compoundtag.putString("Name", name);
+    compoundtag.putDouble("Amount", amount);
+    compoundtag.putInt("Operation", operation.toValue());
+
+    if (uuid != null) {
+      compoundtag.putUUID("UUID", uuid);
+    }
+    String id = "";
+
+    if (attribute instanceof SlotAttributeWrapper wrapper) {
+      id = "curios:" + wrapper.identifier;
+    } else {
+      ResourceLocation rl = ForgeRegistries.ATTRIBUTES.getKey(attribute);
+
+      if (rl != null) {
+        id = rl.toString();
+      }
+    }
+
+    if (!id.isEmpty()) {
+      compoundtag.putString("AttributeName", id);
+    }
+    compoundtag.putString("Slot", slot);
+    listtag.add(compoundtag);
   }
 
   @Override
@@ -310,6 +369,10 @@ public class CuriosHelper implements ICuriosHelper {
     if (brokenCurioConsumerLegacy == null) {
       brokenCurioConsumerLegacy = consumer;
     }
+  }
+
+  public static SlotAttributeWrapper getOrCreateSlotAttribute(String identifier) {
+    return SLOT_ATTRIBUTES.computeIfAbsent(identifier, SlotAttributeWrapper::new);
   }
 
   public static class SlotAttributeWrapper extends Attribute {
