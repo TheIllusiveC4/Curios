@@ -2,18 +2,25 @@ package top.theillusivec4.curios.mixin;
 
 import java.util.Map;
 import net.minecraft.core.NonNullList;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.tags.ITagManager;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CuriosMixinHooks {
+
+  private static final ITagManager<Item> ITEM_TAGS = ForgeRegistries.ITEMS.tags();
 
   public static boolean hasEnderMask(LivingEntity livingEntity, EnderMan enderMan) {
     return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).map(handler -> {
@@ -77,5 +84,20 @@ public class CuriosMixinHooks {
     } else {
       return 0;
     }
+  }
+
+  public static boolean isFreezeImmune(LivingEntity livingEntity) {
+    return CuriosApi.getCuriosHelper().getEquippedCurios(livingEntity).map(curios -> {
+
+      for (int i = 0; i < curios.getSlots(); i++) {
+        ItemStack stack = curios.getStackInSlot(i);
+
+        if (ITEM_TAGS != null &&
+            ITEM_TAGS.getTag(ItemTags.FREEZE_IMMUNE_WEARABLES).contains(stack.getItem())) {
+          return true;
+        }
+      }
+      return false;
+    }).orElse(false);
   }
 }

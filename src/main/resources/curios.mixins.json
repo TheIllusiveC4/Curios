@@ -6,6 +6,7 @@
   "mixins": [
     "MixinApplyBonusCount",
     "MixinEnderMan",
+    "MixinLivingEntity",
     "MixinPiglinAi",
     "MixinShearsItem"
   ],
