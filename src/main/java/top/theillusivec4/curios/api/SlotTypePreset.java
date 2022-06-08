@@ -61,6 +61,6 @@ public enum SlotTypePreset {
 
   public Builder getMessageBuilder() {
     return new Builder(this.id).priority(this.priority).icon(
-        new ResourceLocation(CuriosApi.MODID, "item/empty_" + this.getIdentifier() + "_slot"));
+        new ResourceLocation(CuriosApi.MODID, "slot/empty_" + this.getIdentifier() + "_slot"));
   }
 }

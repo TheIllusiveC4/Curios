@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 public class CurioArgumentType implements ArgumentType<String> {
 
@@ -41,7 +41,7 @@ public class CurioArgumentType implements ArgumentType<String> {
 
   private static final Collection<String> EXAMPLES = Arrays.asList("ring", "head");
   private static final DynamicCommandExceptionType UNKNOWN_TYPE = new DynamicCommandExceptionType(
-      type -> new TranslatableComponent("argument.curios.type.unknown", type));
+      type -> Component.translatable("argument.curios.type.unknown", type));
 
   public static CurioArgumentType slot() {
     return new CurioArgumentType();

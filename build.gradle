@@ -29,7 +29,7 @@ archivesBaseName = "${mod_id}-forge"
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'parchment', version: '2022.03.13-1.18.2'
+    mappings channel: 'parchment', version: '1.18.2-2022.06.05-1.19'
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -93,8 +93,8 @@ dependencies {
 
     annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 
-    compileOnly fg.deobf("mezz.jei:jei-1.18.2:${version_jei}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:${version_jei}")
+//    compileOnly fg.deobf("mezz.jei:jei-1.18.2:${version_jei}:api")
+//    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:${version_jei}")
 }
 
 mixin {

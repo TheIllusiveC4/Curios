@@ -32,8 +32,6 @@ import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
@@ -151,14 +149,15 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
       this.addRenderableWidget(this.buttonCurios);
 
       if (!this.menu.player.isCreative()) {
-        this.addRenderableWidget(new ImageButton(this.leftPos + 104, this.height / 2 - 22, 20, 18, 0, 0, 19,
-            RECIPE_BUTTON_TEXTURE, (button) -> {
-          this.recipeBookGui.toggleVisibility();
-          this.updateScreenPosition();
-          ((ImageButton) button).setPosition(this.leftPos + 104, this.height / 2 - 22);
-          this.buttonCurios
-              .setPosition(this.leftPos + offsets.getA(), this.height / 2 + offsets.getB());
-        }));
+        this.addRenderableWidget(
+            new ImageButton(this.leftPos + 104, this.height / 2 - 22, 20, 18, 0, 0, 19,
+                RECIPE_BUTTON_TEXTURE, (button) -> {
+              this.recipeBookGui.toggleVisibility();
+              this.updateScreenPosition();
+              ((ImageButton) button).setPosition(this.leftPos + 104, this.height / 2 - 22);
+              this.buttonCurios
+                  .setPosition(this.leftPos + offsets.getA(), this.height / 2 + offsets.getB());
+            }));
       }
 
       this.updateRenderButtons();
@@ -258,7 +257,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
         Slot slot = this.getSlotUnderMouse();
 
         if (slot instanceof CurioSlot slotCurio && !slot.hasItem()) {
-          this.renderTooltip(matrixStack, new TextComponent(slotCurio.getSlotName()), mouseX,
+          this.renderTooltip(matrixStack, Component.literal(slotCurio.getSlotName()), mouseX,
               mouseY);
         }
       }
@@ -276,7 +275,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
       if (clientPlayer != null && clientPlayer.inventoryMenu.getCarried().isEmpty()) {
 
         if (this.isRenderButtonHovered) {
-          this.renderTooltip(matrixStack, new TranslatableComponent("gui.curios.toggle"), mouseX,
+          this.renderTooltip(matrixStack, Component.translatable("gui.curios.toggle"), mouseX,
               mouseY);
         } else if (this.hoveredSlot != null && this.hoveredSlot.hasItem()) {
           this.renderTooltip(matrixStack, this.hoveredSlot.getItem(), mouseX, mouseY);

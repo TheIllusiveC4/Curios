@@ -49,6 +49,7 @@ public class CuriosTest {
   public static final Logger LOGGER = LogManager.getLogger();
 
   public CuriosTest() {
+    CuriosTestRegistry.init();
     final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::enqueue);
     eventBus.addListener(this::clientSetup);
@@ -58,14 +59,15 @@ public class CuriosTest {
   private void enqueue(final InterModEnqueueEvent evt) {
     InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE,
         () -> Arrays.stream(SlotTypePreset.values())
-            .map(preset -> preset.getMessageBuilder().cosmetic().build()).collect(Collectors.toList()));
+            .map(preset -> preset.getMessageBuilder().cosmetic().build())
+            .collect(Collectors.toList()));
   }
 
   private void clientSetup(final FMLClientSetupEvent evt) {
-    CuriosRendererRegistry
-        .register(CuriosTestRegistry.AMULET, () -> (AmuletItem) CuriosTestRegistry.AMULET);
-    CuriosRendererRegistry.register(CuriosTestRegistry.CROWN, CrownRenderer::new);
-    CuriosRendererRegistry.register(CuriosTestRegistry.KNUCKLES, KnucklesRenderer::new);
+    CuriosRendererRegistry.register(CuriosTestRegistry.AMULET.get(),
+        () -> (AmuletItem) CuriosTestRegistry.AMULET.get());
+    CuriosRendererRegistry.register(CuriosTestRegistry.CROWN.get(), CrownRenderer::new);
+    CuriosRendererRegistry.register(CuriosTestRegistry.KNUCKLES.get(), KnucklesRenderer::new);
   }
 
   private void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions evt) {

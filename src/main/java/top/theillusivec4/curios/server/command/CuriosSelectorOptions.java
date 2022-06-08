@@ -11,7 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagParser;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +22,8 @@ public class CuriosSelectorOptions {
 
   public static void register() {
     EntitySelectorOptions.register("curios", CuriosSelectorOptions::curioArgument,
-        entitySelectorParser -> true, new TranslatableComponent("argument.entity.options.curios.description"));
+        entitySelectorParser -> true,
+        Component.translatable("argument.entity.options.curios.description"));
   }
 
   private static void curioArgument(EntitySelectorParser parser) throws CommandSyntaxException {

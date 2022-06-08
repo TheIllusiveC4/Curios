@@ -20,11 +20,11 @@
 package top.theillusivec4.curiostest.common;
 
 import net.minecraft.world.item.Item;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import top.theillusivec4.curiostest.CuriosTest;
 import top.theillusivec4.curiostest.common.item.AmuletItem;
 import top.theillusivec4.curiostest.common.item.CrownItem;
@@ -34,36 +34,15 @@ import top.theillusivec4.curiostest.common.item.RingItem;
 @Mod.EventBusSubscriber(modid = CuriosTest.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CuriosTestRegistry {
 
-  @ObjectHolder("curiostest:ring")
-  public static final Item RING;
+  private static final DeferredRegister<Item> ITEMS =
+      DeferredRegister.create(ForgeRegistries.ITEMS, CuriosTest.MODID);
 
-  @ObjectHolder("curiostest:amulet")
-  public static final Item AMULET;
+  public static final RegistryObject<Item> RING = ITEMS.register("ring", RingItem::new);
+  public static final RegistryObject<Item> AMULET = ITEMS.register("amulet", AmuletItem::new);
+  public static final RegistryObject<Item> CROWN = ITEMS.register("crown", CrownItem::new);
+  public static final RegistryObject<Item> KNUCKLES = ITEMS.register("knuckles", KnucklesItem::new);
 
-  @ObjectHolder("curiostest:crown")
-  public static final Item CROWN;
-
-  @ObjectHolder("curiostest:knuckles")
-  public static final Item KNUCKLES;
-
-  static {
-    RING = null;
-    AMULET = null;
-    CROWN = null;
-    KNUCKLES = null;
-  }
-
-  @SubscribeEvent
-  public static void registerItems(RegistryEvent.Register<Item> evt) {
-    IForgeRegistry<Item> registry = evt.getRegistry();
-    register(new RingItem(), "ring", registry);
-    register(new AmuletItem(), "amulet", registry);
-    register(new CrownItem(), "crown", registry);
-    register(new KnucklesItem(), "knuckles", registry);
-  }
-
-  private static void register(Item item, String name, IForgeRegistry<Item> registry) {
-    item.setRegistryName(CuriosTest.MODID, name);
-    registry.register(item);
+  public static void init() {
+    ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
   }
 }

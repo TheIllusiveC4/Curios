@@ -32,8 +32,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -95,12 +93,12 @@ public class ClientEventHandler {
 
       if (!slots.isEmpty()) {
         List<Component> tagTooltips = new ArrayList<>();
-        MutableComponent slotsTooltip = new TranslatableComponent("curios.slot")
+        MutableComponent slotsTooltip = Component.translatable("curios.slot")
             .append(": ").withStyle(ChatFormatting.GOLD);
 
         for (int j = 0; j < slots.size(); j++) {
           String key = "curios.identifier." + slots.get(j);
-          MutableComponent type = new TranslatableComponent(key);
+          MutableComponent type = Component.translatable(key);
 
           if (j < slots.size() - 1) {
             type = type.append(", ");
@@ -131,8 +129,8 @@ public class ClientEventHandler {
                   UUID.randomUUID(), stack);
 
           if (!multimap.isEmpty() && (i & 2) == 0) {
-            attributeTooltip.add(TextComponent.EMPTY);
-            attributeTooltip.add(new TranslatableComponent("curios.modifiers." + identifier)
+            attributeTooltip.add(Component.empty());
+            attributeTooltip.add(Component.translatable("curios.modifiers." + identifier)
                 .withStyle(ChatFormatting.GOLD));
 
             for (Map.Entry<Attribute, AttributeModifier> entry : multimap.entries()) {
@@ -178,40 +176,40 @@ public class ClientEventHandler {
                 if (entry.getKey() instanceof CuriosHelper.SlotAttributeWrapper wrapper) {
 
                   if (amount > 0.0D) {
-                    attributeTooltip.add((new TranslatableComponent(
+                    attributeTooltip.add((Component.translatable(
                         "curios.modifiers.slots.plus." +
                             attributemodifier.getOperation().toValue(),
                         ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                        new TranslatableComponent("curios.identifier." + wrapper.identifier)))
+                        Component.translatable("curios.identifier." + wrapper.identifier)))
                         .withStyle(ChatFormatting.BLUE));
                   } else {
                     d1 = d1 * -1.0D;
-                    attributeTooltip.add((new TranslatableComponent(
+                    attributeTooltip.add((Component.translatable(
                         "curios.modifiers.slots.take." +
                             attributemodifier.getOperation().toValue(),
                         ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                        new TranslatableComponent("curios.identifier." + wrapper.identifier)))
+                        Component.translatable("curios.identifier." + wrapper.identifier)))
                         .withStyle(ChatFormatting.RED));
                   }
                 } else if (flag) {
                   attributeTooltip.add(
-                      (new TextComponent(" ")).append(new TranslatableComponent(
+                      (Component.literal(" ")).append(Component.translatable(
                               "attribute.modifier.equals." + attributemodifier.getOperation().toValue(),
                               ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                              new TranslatableComponent(entry.getKey().getDescriptionId())))
+                              Component.translatable(entry.getKey().getDescriptionId())))
                           .withStyle(ChatFormatting.DARK_GREEN));
                 } else if (amount > 0.0D) {
-                  attributeTooltip.add((new TranslatableComponent(
+                  attributeTooltip.add((Component.translatable(
                       "attribute.modifier.plus." + attributemodifier.getOperation().toValue(),
                       ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                      new TranslatableComponent(entry.getKey().getDescriptionId())))
+                      Component.translatable(entry.getKey().getDescriptionId())))
                       .withStyle(ChatFormatting.BLUE));
                 } else if (amount < 0.0D) {
                   d1 = d1 * -1.0D;
-                  attributeTooltip.add((new TranslatableComponent(
+                  attributeTooltip.add((Component.translatable(
                       "attribute.modifier.take." + attributemodifier.getOperation().toValue(),
                       ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                      new TranslatableComponent(entry.getKey().getDescriptionId())))
+                      Component.translatable(entry.getKey().getDescriptionId())))
                       .withStyle(ChatFormatting.RED));
                 }
               }

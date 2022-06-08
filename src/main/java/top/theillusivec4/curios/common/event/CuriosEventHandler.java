@@ -52,11 +52,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.EnderManAngerEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
@@ -437,8 +439,37 @@ public class CuriosEventHandler {
             .getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, player.getMainHandItem());
     int silklevel = EnchantmentHelper
         .getItemEnchantmentLevel(Enchantments.SILK_TOUCH, player.getMainHandItem());
+    LevelAccessor level = evt.getWorld();
     evt.setExpToDrop(evt.getState()
-        .getExpDrop(evt.getWorld(), evt.getPos(), bonusLevel + fortuneLevel.get(), silklevel));
+        .getExpDrop(level, level.getRandom(), evt.getPos(), bonusLevel + fortuneLevel.get(),
+            silklevel));
+  }
+
+  @SubscribeEvent
+  public void enderManAnger(final EnderManAngerEvent evt) {
+    Player player = evt.getPlayer();
+    CuriosApi.getCuriosHelper().getCuriosHandler(player).ifPresent(handler -> {
+
+      all:
+      for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
+        IDynamicStackHandler stacks = entry.getValue().getStacks();
+
+        for (int i = 0; i < stacks.getSlots(); i++) {
+          final int index = i;
+          NonNullList<Boolean> renderStates = entry.getValue().getRenders();
+          boolean hasMask =
+              CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(curio -> curio
+                      .isEnderMask(new SlotContext(entry.getKey(), player, index, false,
+                          renderStates.size() > index && renderStates.get(index)), evt.getEntity()))
+                  .orElse(false);
+
+          if (hasMask) {
+            evt.setCanceled(true);
+            break all;
+          }
+        }
+      }
+    });
   }
 
   @SubscribeEvent

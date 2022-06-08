@@ -27,7 +27,7 @@ import java.util.Map;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
@@ -99,7 +99,7 @@ public class CuriosCommand {
   private static int setSlotsForPlayer(CommandSourceStack source, ServerPlayer playerMP,
                                        String slot, int amount) {
     CuriosApi.getSlotHelper().setSlotsForType(slot, playerMP, amount);
-    source.sendSuccess(new TranslatableComponent("commands.curios.set.success", slot,
+    source.sendSuccess(Component.translatable("commands.curios.set.success", slot,
             CuriosApi.getSlotHelper().getSlotsForType(playerMP, slot), playerMP.getDisplayName()),
         true);
     return Command.SINGLE_SUCCESS;
@@ -108,7 +108,7 @@ public class CuriosCommand {
   private static int growSlotForPlayer(CommandSourceStack source, ServerPlayer playerMP,
                                        String slot, int amount) {
     CuriosApi.getSlotHelper().growSlotType(slot, amount, playerMP);
-    source.sendSuccess(new TranslatableComponent("commands.curios.add.success", amount, slot,
+    source.sendSuccess(Component.translatable("commands.curios.add.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
@@ -116,7 +116,7 @@ public class CuriosCommand {
   private static int shrinkSlotForPlayer(CommandSourceStack source, ServerPlayer playerMP,
                                          String slot, int amount) {
     CuriosApi.getSlotHelper().shrinkSlotType(slot, amount, playerMP);
-    source.sendSuccess(new TranslatableComponent("commands.curios.remove.success", amount, slot,
+    source.sendSuccess(Component.translatable("commands.curios.remove.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
@@ -138,10 +138,10 @@ public class CuriosCommand {
     });
 
     if (slot.isEmpty()) {
-      source.sendSuccess(new TranslatableComponent("commands.curios.clearAll.success",
+      source.sendSuccess(Component.translatable("commands.curios.clearAll.success",
           playerMP.getDisplayName()), true);
     } else {
-      source.sendSuccess(new TranslatableComponent("commands.curios.clear.success", slot,
+      source.sendSuccess(Component.translatable("commands.curios.clear.success", slot,
           playerMP.getDisplayName()), true);
     }
     return Command.SINGLE_SUCCESS;
@@ -154,7 +154,7 @@ public class CuriosCommand {
           new SPacketSyncCurios(playerMP.getId(), handler.getCurios()));
     });
     source.sendSuccess(
-        new TranslatableComponent("commands.curios.reset.success", playerMP.getDisplayName()),
+        Component.translatable("commands.curios.reset.success", playerMP.getDisplayName()),
         true);
     return Command.SINGLE_SUCCESS;
   }

@@ -11,7 +11,6 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSyntaxException;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -20,6 +19,7 @@ import net.minecraft.Util;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
@@ -65,7 +65,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
 
   @Nonnull
   public ItemStack run(@Nonnull ItemStack stack, LootContext context) {
-    Random random = context.getRandom();
+    RandomSource random = context.getRandom();
 
     for (Modifier modifier : this.modifiers) {
       UUID uuid = modifier.id;

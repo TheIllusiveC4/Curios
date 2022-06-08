@@ -19,28 +19,36 @@
 
 package top.theillusivec4.curios.common;
 
+import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
+import net.minecraft.core.Registry;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ObjectHolder;
-import top.theillusivec4.curios.Curios;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.RegistryObject;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
+import top.theillusivec4.curios.server.command.CurioArgumentType;
 
-@Mod.EventBusSubscriber(modid = Curios.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CuriosRegistry {
 
-  @ObjectHolder("curios:curios_container")
-  public static final MenuType<CuriosContainer> CONTAINER_TYPE;
+  private static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENT_TYPES =
+      DeferredRegister.create(Registry.COMMAND_ARGUMENT_TYPE_REGISTRY, CuriosApi.MODID);
+  private static final DeferredRegister<MenuType<?>> MENU_TYPES =
+      DeferredRegister.create(Registry.MENU_REGISTRY, CuriosApi.MODID);
 
-  static {
-    CONTAINER_TYPE = null;
-  }
+  public static final RegistryObject<ArgumentTypeInfo<?, ?>>
+      CURIO_SLOT_ARGUMENT = ARGUMENT_TYPES.register("slot_type",
+      () -> SingletonArgumentInfo.contextFree(CurioArgumentType::slot));
+  public static final RegistryObject<MenuType<CuriosContainer>> CURIO_MENU =
+      MENU_TYPES.register("curios_container",
+          () -> IForgeMenuType.create(CuriosContainer::new));
 
-  @SubscribeEvent
-  public static void registerContainer(RegistryEvent.Register<MenuType<?>> evt) {
-    evt.getRegistry().register(
-        IForgeMenuType.create(CuriosContainer::new).setRegistryName("curios_container"));
+  public static void init() {
+    IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    ARGUMENT_TYPES.register(eventBus);
+    MENU_TYPES.register(eventBus);
   }
 }

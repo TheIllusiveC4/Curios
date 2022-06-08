@@ -5,7 +5,6 @@
   "refmap": "curios.refmap.json",
   "mixins": [
     "MixinApplyBonusCount",
-    "MixinEnderMan",
     "MixinLivingEntity",
     "MixinPiglinAi",
     "MixinShearsItem"

@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.common.inventory.container;
 
 import com.mojang.datafixers.util.Pair;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -85,8 +86,9 @@ public class CuriosContainer extends InventoryMenu {
 
   public CuriosContainer(int windowId, Inventory playerInventory) {
     super(playerInventory, playerInventory.player.level.isClientSide, playerInventory.player);
-    this.menuType = CuriosRegistry.CONTAINER_TYPE;
+    this.menuType = CuriosRegistry.CURIO_MENU.get();
     this.containerId = windowId;
+    this.remoteSlots.clear();
     this.lastSlots.clear();
     this.slots.clear();
     this.player = playerInventory.player;

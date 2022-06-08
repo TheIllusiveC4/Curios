@@ -6,8 +6,6 @@ import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotTypePreset;
 
 public class CuriosClientMod {
 
@@ -29,14 +27,6 @@ public class CuriosClientMod {
   public static void stitch(final TextureStitchEvent.Pre evt) {
 
     if (evt.getAtlas().location() == InventoryMenu.BLOCK_ATLAS) {
-
-      for (SlotTypePreset preset : SlotTypePreset.values()) {
-        evt.addSprite(
-            new ResourceLocation(CuriosApi.MODID,
-                "item/empty_" + preset.getIdentifier() + "_slot"));
-      }
-      evt.addSprite(new ResourceLocation(CuriosApi.MODID, "item/empty_cosmetic_slot"));
-      evt.addSprite(new ResourceLocation(CuriosApi.MODID, "item/empty_curio_slot"));
 
       for (ResourceLocation sprite : SPRITE_LISTENER.getSprites()) {
         evt.addSprite(sprite);

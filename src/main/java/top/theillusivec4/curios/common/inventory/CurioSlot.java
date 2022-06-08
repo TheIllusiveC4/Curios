@@ -58,11 +58,16 @@ public class CurioSlot extends SlotItemHandler {
     this.setBackground(InventoryMenu.BLOCK_ATLAS,
         player.getCommandSenderWorld().isClientSide() ?
             CuriosApi.getIconHelper().getIcon(identifier)
-            : new ResourceLocation(Curios.MODID, "item/empty_curio_slot"));
+            : new ResourceLocation(Curios.MODID, "slot/empty_curio_slot"));
   }
 
   public String getIdentifier() {
     return this.identifier;
+  }
+
+  @Override
+  public void initialize(@Nonnull ItemStack stack) {
+    this.setChanged();
   }
 
   public boolean getRenderStatus() {

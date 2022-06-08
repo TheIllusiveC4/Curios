@@ -26,14 +26,13 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 
 public class CuriosContainerProvider implements MenuProvider {
 
   @Nonnull
   @Override
   public Component getDisplayName() {
-    return new TranslatableComponent("container.crafting");
+    return Component.translatable("container.crafting");
   }
 
   @Nullable
