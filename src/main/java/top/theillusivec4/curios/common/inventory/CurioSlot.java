@@ -65,11 +65,6 @@ public class CurioSlot extends SlotItemHandler {
     return this.identifier;
   }
 
-  @Override
-  public void initialize(@Nonnull ItemStack stack) {
-    this.setChanged();
-  }
-
   public boolean getRenderStatus() {
     return this.renderStatuses.size() > this.getSlotIndex() &&
         this.renderStatuses.get(this.getSlotIndex());

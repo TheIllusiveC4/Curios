@@ -16,7 +16,7 @@ A flexible and expandable accessory/equipment API for users and developers.
 [[dependencies.curios]]
     modId="forge"
     mandatory=true
-    versionRange="[41,)"
+    versionRange="[41.0.8,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curios]]
