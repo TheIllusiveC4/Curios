@@ -131,11 +131,21 @@ public class ClientEventHandler {
                   UUID.randomUUID(), stack);
 
           if (!multimap.isEmpty() && (i & 2) == 0) {
-            attributeTooltip.add(TextComponent.EMPTY);
-            attributeTooltip.add(new TranslatableComponent("curios.modifiers." + identifier)
-                .withStyle(ChatFormatting.GOLD));
+            boolean init = false;
 
             for (Map.Entry<Attribute, AttributeModifier> entry : multimap.entries()) {
+
+              // Some mods are adding null attributes so add a guard here to not crash the client
+              if (entry.getKey() == null) {
+                continue;
+              }
+
+              if (!init) {
+                attributeTooltip.add(TextComponent.EMPTY);
+                attributeTooltip.add(new TranslatableComponent("curios.modifiers." + identifier)
+                    .withStyle(ChatFormatting.GOLD));
+                init = true;
+              }
               AttributeModifier attributemodifier = entry.getValue();
               double amount = attributemodifier.getAmount();
               boolean flag = false;
