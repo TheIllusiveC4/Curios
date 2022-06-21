@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.18.2-5.0.7.1] - 2022.06.20
+### Fixed
+- Fixed datapack functions failing to load when utilizing Curios slot commands [#240](https://github.com/TheIllusiveC4/Curios/issues/240)
+- Fixed null attributes crashing clients when hovering over curio tooltips [#242](https://github.com/TheIllusiveC4/Curios/issues/242)
+
 ## [1.18.2-5.0.7.0] - 2022.04.12
 ### Added
 - Added `it_it` localization (thanks BlackShadow77!) [#235](https://github.com/TheIllusiveC4/Curios/pull/235)
