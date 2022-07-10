@@ -36,6 +36,9 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
+import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
+import top.theillusivec4.curios.api.type.capability.ICurio.SoundInfo;
+
 public class ItemizedCurioCapability implements ICurio {
   private final ItemStack stack;
   private final ICurioItem curioItem;

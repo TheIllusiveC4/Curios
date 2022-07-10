@@ -93,11 +93,11 @@ dependencies {
 
     annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 
-    // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-${version_mc}-common-api:${version_jei}")
-    compileOnly fg.deobf("mezz.jei:jei-${version_mc}-forge-api:${version_jei}")
-    // at runtime, use the full JEI jar for Forge
-    runtimeOnly fg.deobf("mezz.jei:jei-${version_mc}-forge:${version_jei}")
+//    // compile against the JEI API but do not include it at runtime
+//    compileOnly fg.deobf("mezz.jei:jei-${version_mc}-common-api:${version_jei}")
+//    compileOnly fg.deobf("mezz.jei:jei-${version_mc}-forge-api:${version_jei}")
+//    // at runtime, use the full JEI jar for Forge
+//    runtimeOnly fg.deobf("mezz.jei:jei-${version_mc}-forge:${version_jei}")
 }
 
 mixin {

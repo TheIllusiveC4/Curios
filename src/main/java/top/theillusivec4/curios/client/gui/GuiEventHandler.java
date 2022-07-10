@@ -38,7 +38,7 @@ import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 public class GuiEventHandler {
 
   @SubscribeEvent
-  public void onInventoryGuiInit(ScreenEvent.InitScreenEvent.Post evt) {
+  public void onInventoryGuiInit(ScreenEvent.Init.Post evt) {
     Screen screen = evt.getScreen();
 
     if (screen instanceof InventoryScreen || screen instanceof CreativeModeInventoryScreen) {
@@ -56,7 +56,7 @@ public class GuiEventHandler {
   }
 
   @SubscribeEvent
-  public void onInventoryGuiDrawBackground(ScreenEvent.DrawScreenEvent.Pre evt) {
+  public void onInventoryGuiDrawBackground(ScreenEvent.Render.Pre evt) {
 
     if (!(evt.getScreen() instanceof InventoryScreen gui)) {
       return;
@@ -66,7 +66,7 @@ public class GuiEventHandler {
   }
 
   @SubscribeEvent
-  public void onMouseClick(ScreenEvent.MouseClickedEvent.Pre evt) {
+  public void onMouseClick(ScreenEvent.MouseButtonPressed.Pre evt) {
     long handle = Minecraft.getInstance().getWindow().getWindow();
     boolean isLeftShiftDown = InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT);
     boolean isRightShiftDown = InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);

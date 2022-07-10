@@ -33,6 +33,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -181,12 +182,16 @@ public class Curios {
     }
 
     @SubscribeEvent
+    public static void registerKeys(final RegisterKeyMappingsEvent evt) {
+      evt.register(KeyRegistry.openCurios);
+    }
+
+    @SubscribeEvent
     public static void setupClient(FMLClientSetupEvent evt) {
       CuriosApi.setIconHelper(new IconHelper());
       MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
       MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
       MenuScreens.register(CuriosRegistry.CURIO_MENU.get(), CuriosScreen::new);
-      KeyRegistry.registerKeys();
     }
 
     @SubscribeEvent

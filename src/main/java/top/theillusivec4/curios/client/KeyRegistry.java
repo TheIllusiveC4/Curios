@@ -20,20 +20,10 @@
 package top.theillusivec4.curios.client;
 
 import net.minecraft.client.KeyMapping;
-import net.minecraftforge.client.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyRegistry {
 
-  public static KeyMapping openCurios;
-
-  public static void registerKeys() {
-    openCurios = registerKeybinding(
-        new KeyMapping("key.curios.open.desc", GLFW.GLFW_KEY_G, "key.curios.category"));
-  }
-
-  private static KeyMapping registerKeybinding(KeyMapping key) {
-    ClientRegistry.registerKeyBinding(key);
-    return key;
-  }
+  public static KeyMapping openCurios =
+      new KeyMapping("key.curios.open.desc", GLFW.GLFW_KEY_G, "key.curios.category");
 }
