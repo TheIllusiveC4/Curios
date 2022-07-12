@@ -53,7 +53,7 @@ public class CPacketOpenCurios {
       if (sender != null) {
         ItemStack stack = sender.isCreative() ? msg.carried : sender.containerMenu.getCarried();
         sender.containerMenu.setCarried(ItemStack.EMPTY);
-        NetworkHooks.openGui(sender, new CuriosContainerProvider());
+        NetworkHooks.openScreen(sender, new CuriosContainerProvider());
 
         if (!stack.isEmpty()) {
           sender.containerMenu.setCarried(stack);

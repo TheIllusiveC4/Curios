@@ -77,7 +77,7 @@ public class ClientEventHandler {
   @SubscribeEvent
   public void onTooltip(ItemTooltipEvent evt) {
     ItemStack stack = evt.getItemStack();
-    Player player = evt.getPlayer();
+    Player player = evt.getEntity();
 
     if (!stack.isEmpty()) {
       List<Component> tooltip = evt.getToolTip();

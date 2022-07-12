@@ -57,7 +57,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.EnderManAngerEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -66,7 +66,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent.PickupXp;
-import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -156,9 +156,8 @@ public class CuriosEventHandler {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
 
-      if (!stack.isEmpty() &&
-          EnchantmentHelper.getItemEnchantmentLevel(Enchantments.MENDING, stack) > 0
-          && stack.isDamaged()) {
+      if (!stack.isEmpty() && stack.getEnchantmentLevel(Enchantments.MENDING) > 0 &&
+          stack.isDamaged()) {
         evt.setCanceled(true);
         ExperienceOrb orb = evt.getOrb();
         player.takeXpDelay = 2;
@@ -179,7 +178,7 @@ public class CuriosEventHandler {
 
   @SubscribeEvent
   public void playerLoggedIn(PlayerLoggedInEvent evt) {
-    Player playerEntity = evt.getPlayer();
+    Player playerEntity = evt.getEntity();
 
     if (playerEntity instanceof ServerPlayer) {
       Collection<ISlotType> slotTypes = CuriosApi.getSlotHelper().getSlotTypes();
@@ -219,7 +218,7 @@ public class CuriosEventHandler {
   }
 
   @SubscribeEvent
-  public void entityJoinWorld(EntityJoinWorldEvent evt) {
+  public void entityJoinWorld(EntityJoinLevelEvent evt) {
 
     Entity entity = evt.getEntity();
 
@@ -236,7 +235,7 @@ public class CuriosEventHandler {
   public void playerStartTracking(PlayerEvent.StartTracking evt) {
 
     Entity target = evt.getTarget();
-    Player player = evt.getPlayer();
+    Player player = evt.getEntity();
 
     if (player instanceof ServerPlayer && target instanceof LivingEntity livingBase) {
       CuriosApi.getCuriosHelper().getCuriosHandler(livingBase).ifPresent(
@@ -248,7 +247,7 @@ public class CuriosEventHandler {
 
   @SubscribeEvent
   public void playerClone(PlayerEvent.Clone evt) {
-    Player player = evt.getPlayer();
+    Player player = evt.getEntity();
     Player oldPlayer = evt.getOriginal();
     oldPlayer.revive();
     LazyOptional<ICuriosItemHandler> oldHandler = CuriosApi.getCuriosHelper()
@@ -262,7 +261,7 @@ public class CuriosEventHandler {
   @SubscribeEvent(priority = EventPriority.HIGHEST)
   public void playerDrops(LivingDropsEvent evt) {
 
-    LivingEntity livingEntity = evt.getEntityLiving();
+    LivingEntity livingEntity = evt.getEntity();
 
     if (!livingEntity.isSpectator()) {
 
@@ -297,7 +296,7 @@ public class CuriosEventHandler {
 
   @SubscribeEvent
   public void playerXPPickUp(PickupXp evt) {
-    Player player = evt.getPlayer();
+    Player player = evt.getEntity();
 
     if (!player.level.isClientSide) {
       CuriosApi.getCuriosHelper().getCuriosHandler(player).ifPresent(handler -> {
@@ -315,7 +314,7 @@ public class CuriosEventHandler {
 
   @SubscribeEvent
   public void curioRightClick(PlayerInteractEvent.RightClickItem evt) {
-    Player player = evt.getPlayer();
+    Player player = evt.getEntity();
     ItemStack stack = evt.getItemStack();
     ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
     curiosHelper.getCurio(stack).ifPresent(
@@ -363,10 +362,10 @@ public class CuriosEventHandler {
   }
 
   @SubscribeEvent
-  public void worldTick(TickEvent.WorldTickEvent evt) {
+  public void worldTick(TickEvent.LevelTickEvent evt) {
 
-    if (evt.world instanceof ServerLevel && dirtyTags) {
-      PlayerList list = ((ServerLevel) evt.world).getServer().getPlayerList();
+    if (evt.level instanceof ServerLevel && dirtyTags) {
+      PlayerList list = ((ServerLevel) evt.level).getServer().getPlayerList();
       ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
 
       for (ServerPlayer player : list.getPlayers()) {
@@ -410,7 +409,7 @@ public class CuriosEventHandler {
     if (source != null && source.getEntity() instanceof LivingEntity living) {
       evt.setLootingLevel(evt.getLootingLevel() +
           CuriosApi.getCuriosHelper().getCuriosHandler(living).map(handler -> handler
-              .getLootingLevel(source, evt.getEntityLiving(), evt.getLootingLevel())).orElse(0));
+              .getLootingLevel(source, evt.getEntity(), evt.getLootingLevel())).orElse(0));
     }
   }
 
@@ -434,12 +433,10 @@ public class CuriosEventHandler {
         }
       }
     });
-    int bonusLevel =
-        EnchantmentHelper
-            .getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, player.getMainHandItem());
-    int silklevel = EnchantmentHelper
-        .getItemEnchantmentLevel(Enchantments.SILK_TOUCH, player.getMainHandItem());
-    LevelAccessor level = evt.getWorld();
+    ItemStack stack = player.getMainHandItem();
+    int bonusLevel = stack.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE);
+    int silklevel = stack.getEnchantmentLevel(Enchantments.SILK_TOUCH);
+    LevelAccessor level = evt.getLevel();
     evt.setExpToDrop(evt.getState()
         .getExpDrop(level, level.getRandom(), evt.getPos(), bonusLevel + fortuneLevel.get(),
             silklevel));
@@ -473,8 +470,8 @@ public class CuriosEventHandler {
   }
 
   @SubscribeEvent
-  public void tick(LivingEvent.LivingUpdateEvent evt) {
-    LivingEntity livingEntity = evt.getEntityLiving();
+  public void tick(LivingEvent.LivingTickEvent evt) {
+    LivingEntity livingEntity = evt.getEntity();
 
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
       handler.clearCachedSlotModifiers();
