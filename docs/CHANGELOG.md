@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.19.2-5.1.1.0] - 2022.08.08
+### Added
+- Re-added JEI integration
+### Changed
+- Updated to Minecraft 1.19.2
+- Updated to Forge 43.0.0+
+- Updated Polish (pl_pl) localization (thanks Greg-21!) [#247](https://github.com/TheIllusiveC4/Curios/pull/247)
+- Updated Ukranian (uk_ua) localization (thanks Sushomeister!) [#245](https://github.com/TheIllusiveC4/Curios/pull/245)
+
 ## [1.19.1-5.1.0.5] - 2022.07.28
 ### Changed
 - Updated to Minecraft 1.19.1
