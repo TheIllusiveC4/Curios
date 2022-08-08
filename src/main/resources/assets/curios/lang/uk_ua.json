@@ -10,6 +10,7 @@
   "commands.curios.clear.success": "Слот %s очищено для %s",
   "commands.curios.clearAll.success": "Усі слоти очищено для %s",
   "commands.curios.reset.success": "Слоти для %s скинуто",
+  "argument.entity.options.curios.description": "Curios інвентар сутності",
   "argument.curios.type.unknown": "Невідомий сувенірний слот типу %s",
   "curios.identifier.curio": "Сувенір",
   "curios.identifier.necklace": "Намисто",
