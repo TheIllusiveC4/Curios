@@ -91,7 +91,7 @@ public class Curios {
   public static final String MODID = CuriosApi.MODID;
   public static final Logger LOGGER = LogManager.getLogger();
 
-  private static final boolean DEBUG = false;
+  private static final boolean DEBUG = true;
 
   public Curios() {
     DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> CuriosClientMod::init);
@@ -114,10 +114,12 @@ public class Curios {
     CurioItemCapability.register();
     MinecraftForge.EVENT_BUS.register(new CuriosEventHandler());
     NetworkHandler.register();
-    ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
-        new ArgumentSerializer<>(CurioArgumentType::slot));
-    CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
-    CuriosSelectorOptions.register();
+    evt.enqueueWork(() -> {
+      ArgumentTypes.register("curios:slot_type", CurioArgumentType.class,
+          new ArgumentSerializer<>(CurioArgumentType::slot));
+      CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
+      CuriosSelectorOptions.register();
+    });
   }
 
   private void enqueue(InterModEnqueueEvent evt) {
