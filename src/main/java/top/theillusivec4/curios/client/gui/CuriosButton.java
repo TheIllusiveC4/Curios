@@ -29,7 +29,6 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -39,7 +38,6 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 public class CuriosButton extends ImageButton {
 
   private final AbstractContainerScreen<?> parentGui;
-  private boolean isRecipeBookVisible = false;
 
   CuriosButton(AbstractContainerScreen<?> parentGui, int xIn, int yIn, int widthIn, int heightIn,
                int textureOffsetX, int textureOffsetY, int yDiffText, ResourceLocation resource) {
@@ -76,22 +74,22 @@ public class CuriosButton extends ImageButton {
   }
 
   @Override
-  public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY,
-                     float partialTicks) {
+  public void m_86412_(@Nonnull PoseStack matrixStack, int mouseX, int mouseY,
+                       float partialTicks) {
     Tuple<Integer, Integer> offsets =
         CuriosScreen.getButtonOffset(parentGui instanceof CreativeModeInventoryScreen);
-    x = parentGui.getGuiLeft() + offsets.getA();
+    this.m_252865_(parentGui.getGuiLeft() + offsets.getA());
     int yOffset = parentGui instanceof CreativeModeInventoryScreen ? 68 : 83;
-    y = parentGui.getGuiTop() + offsets.getB() + yOffset;
+    this.m_252888_(parentGui.getGuiTop() + offsets.getB() + yOffset);
 
     if (parentGui instanceof CreativeModeInventoryScreen gui) {
-      boolean isInventoryTab = gui.getSelectedTab() == CreativeModeTab.TAB_INVENTORY.getId();
+      boolean isInventoryTab = gui.m_258017_();
       this.active = isInventoryTab;
 
       if (!isInventoryTab) {
         return;
       }
     }
-    super.render(matrixStack, mouseX, mouseY, partialTicks);
+    super.m_86412_(matrixStack, mouseX, mouseY, partialTicks);
   }
 }

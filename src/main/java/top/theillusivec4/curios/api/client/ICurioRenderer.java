@@ -1,7 +1,7 @@
 package top.theillusivec4.curios.api.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -12,8 +12,7 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Quaternionf;
 import top.theillusivec4.curios.api.SlotContext;
 
 public interface ICurioRenderer {
@@ -56,7 +55,19 @@ public interface ICurioRenderer {
   static void rotateIfSneaking(final PoseStack matrixStack, final LivingEntity livingEntity) {
 
     if (livingEntity.isCrouching()) {
-      matrixStack.mulPose(Vector3f.XP.rotationDegrees(90.0F / (float) Math.PI));
+      EntityRenderer<? super LivingEntity> render =
+          Minecraft.getInstance().getEntityRenderDispatcher()
+              .getRenderer(livingEntity);
+
+      if (render instanceof LivingEntityRenderer) {
+        @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>
+            livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
+        EntityModel<LivingEntity> model = livingRenderer.getModel();
+
+        if (model instanceof HumanoidModel) {
+          matrixStack.m_252781_(Axis.f_252529_.m_252961_(((HumanoidModel<LivingEntity>) model).body.xRot));
+        }
+      }
     }
   }
 

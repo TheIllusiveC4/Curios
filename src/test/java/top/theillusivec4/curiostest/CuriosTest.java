@@ -21,7 +21,9 @@ package top.theillusivec4.curiostest;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
@@ -54,6 +56,13 @@ public class CuriosTest {
     eventBus.addListener(this::enqueue);
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::registerLayers);
+    eventBus.addListener(this::creativeTab);
+  }
+
+  private void creativeTab(final CreativeModeTabEvent.BuildContents evt) {
+    evt.registerSimple(CreativeModeTabs.f_256797_, CuriosTestRegistry.AMULET.get(),
+        CuriosTestRegistry.CROWN.get(), CuriosTestRegistry.KNUCKLES.get(),
+        CuriosTestRegistry.RING.get());
   }
 
   private void enqueue(final InterModEnqueueEvent evt) {

@@ -25,7 +25,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
@@ -154,9 +154,9 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
                 RECIPE_BUTTON_TEXTURE, (button) -> {
               this.recipeBookGui.toggleVisibility();
               this.updateScreenPosition();
-              ((ImageButton) button).setPosition(this.leftPos + 104, this.height / 2 - 22);
-              this.buttonCurios
-                  .setPosition(this.leftPos + offsets.getA(), this.height / 2 + offsets.getB());
+              button.m_252846_(this.leftPos + 104, this.height / 2 - 22);
+              this.buttonCurios.m_252846_(this.leftPos + offsets.getA(),
+                  this.height / 2 + offsets.getB());
             }));
       }
 
@@ -225,21 +225,21 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
   }
 
   @Override
-  public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void m_86412_(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     this.renderBackground(matrixStack);
 
     if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
       this.renderBg(matrixStack, partialTicks, mouseX, mouseY);
-      this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
+      this.recipeBookGui.m_86412_(matrixStack, mouseX, mouseY, partialTicks);
     } else {
-      this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
-      super.render(matrixStack, mouseX, mouseY, partialTicks);
+      this.recipeBookGui.m_86412_(matrixStack, mouseX, mouseY, partialTicks);
+      super.m_86412_(matrixStack, mouseX, mouseY, partialTicks);
       this.recipeBookGui
           .renderGhostRecipe(matrixStack, this.leftPos, this.topPos, true, partialTicks);
 
       boolean isButtonHovered = false;
 
-      for (Widget button : this.renderables) {
+      for (Renderable button : this.renderables) {
 
         if (button instanceof RenderButton) {
           ((RenderButton) button).renderButtonOverlay(matrixStack, mouseX, mouseY, partialTicks);
@@ -473,12 +473,6 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
   @Override
   public void recipesUpdated() {
     this.recipeBookGui.recipesUpdated();
-  }
-
-  @Override
-  public void removed() {
-    this.recipeBookGui.removed();
-    super.removed();
   }
 
   @Nonnull

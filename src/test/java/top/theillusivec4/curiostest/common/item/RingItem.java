@@ -49,7 +49,7 @@ import top.theillusivec4.curiostest.CuriosTest;
 public class RingItem extends Item implements Wearable {
 
   public RingItem() {
-    super(new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).defaultDurability(0));
+    super(new Item.Properties().stacksTo(1).defaultDurability(0));
   }
 
   @Override

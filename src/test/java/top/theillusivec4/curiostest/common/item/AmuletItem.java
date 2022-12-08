@@ -52,7 +52,7 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
   private Object model;
 
   public AmuletItem() {
-    super(new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).defaultDurability(0));
+    super(new Item.Properties().stacksTo(1).defaultDurability(0));
   }
 
   @Override

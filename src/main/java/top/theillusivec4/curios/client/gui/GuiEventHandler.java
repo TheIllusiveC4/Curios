@@ -76,7 +76,7 @@ public class GuiEventHandler {
       return;
     }
 
-    if (gui.getSelectedTab() != CreativeModeTab.TAB_INVENTORY.getId()) {
+    if (!gui.m_258017_()) {
       return;
     }
     Slot destroyItemSlot = gui.destroyItemSlot;

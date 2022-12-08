@@ -36,7 +36,7 @@ import top.theillusivec4.curios.common.capability.CurioItemCapability;
 public class CrownItem extends Item {
 
   public CrownItem() {
-    super(new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).defaultDurability(2000));
+    super(new Item.Properties().stacksTo(1).defaultDurability(2000));
   }
 
   @Override

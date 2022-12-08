@@ -17,6 +17,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.RandomSource;
@@ -46,7 +48,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
   }
 
   public static void register() {
-    TYPE = Registry.register(Registry.LOOT_FUNCTION_TYPE,
+    TYPE = Registry.register(BuiltInRegistries.f_256753_,
         new ResourceLocation(CuriosApi.MODID, "set_curio_attributes"),
         new LootItemFunctionType(new SetCurioAttributesFunction.Serializer()));
   }

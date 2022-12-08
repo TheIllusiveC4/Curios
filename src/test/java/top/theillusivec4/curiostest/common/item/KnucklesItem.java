@@ -40,7 +40,7 @@ import top.theillusivec4.curiostest.CuriosTest;
 public class KnucklesItem extends Item {
 
   public KnucklesItem() {
-    super(new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1));
+    super(new Item.Properties().stacksTo(1));
   }
 
   @Override
