@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.19.3-5.1.1.2] - 2022.12.08
+### Fixed
+- Fix version requirements for Minecraft and Forge
+
 ## [1.19.3-5.1.1.1] - 2022.12.08
 ### Changed
 - Updated to Minecraft 1.19.3
