@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.19.3-5.1.2.0] - 2023.01.09
+### Added
+- Added new `ICurio#canWalkOnPowderedSnow` method for curio implementations that allow walking on Powdered Snow blocks
+  (thanks bconlon!) [#273](https://github.com/TheIllusiveC4/Curios/pull/273)
+
 ## [1.19.3-5.1.1.2] - 2022.12.08
 ### Fixed
 - Fix version requirements for Minecraft and Forge
