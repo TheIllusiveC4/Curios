@@ -314,6 +314,17 @@ public interface ICurioItem {
   }
 
   /**
+   * Determines whether wearing the curio will allow the user to walk on powder snow, in the same manner as
+   * wearing leather boots in vanilla.
+   *
+   * @param slotContext Context about the slot that the ItemStack is in
+   * @return True if the user can walk on powder snow, false otherwise
+   */
+  default boolean canWalkOnPowderedSnow(SlotContext slotContext, ItemStack stack) {
+    return stack.canWalkOnPowderedSnow(slotContext.entity());
+  }
+
+  /**
    * Determines whether wearing the curio masks the user's eyes against Enderman, in the same manner
    * as wearing a pumpkin in vanilla.
    *
