@@ -133,7 +133,7 @@ public class Curios {
   }
 
   private void registerCommands(RegisterCommandsEvent evt) {
-    CuriosCommand.register(evt.getDispatcher());
+    CuriosCommand.register(evt.getDispatcher(), evt.getBuildContext());
   }
 
   private void reload(final AddReloadListenerEvent evt) {

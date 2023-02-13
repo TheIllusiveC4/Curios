@@ -23,10 +23,14 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Map;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.item.ItemArgument;
+import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -38,10 +42,30 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 
 public class CuriosCommand {
 
-  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher,
+                              CommandBuildContext buildContext) {
 
     LiteralArgumentBuilder<CommandSourceStack> curiosCommand = Commands.literal("curios")
         .requires(player -> player.hasPermission(2));
+
+    curiosCommand.then(Commands.literal("replace").then(
+        Commands.argument("slot", CurioArgumentType.slot()).then(
+            Commands.argument("index", IntegerArgumentType.integer()).then(
+                Commands.argument("player", EntityArgument.player()).then(
+                    Commands.literal("with").then(
+                        Commands.argument("item", ItemArgument.item(buildContext)).executes(
+                            context -> replaceItemForPlayer(context.getSource(),
+                                EntityArgument.getPlayer(context, "player"),
+                                CurioArgumentType.getSlot(context, "slot"),
+                                IntegerArgumentType.getInteger(context, "index"),
+                                ItemArgument.getItem(context, "item"))).then(
+                            Commands.argument("count", IntegerArgumentType.integer()).executes(
+                                context -> replaceItemForPlayer(context.getSource(),
+                                    EntityArgument.getPlayer(context, "player"),
+                                    CurioArgumentType.getSlot(context, "slot"),
+                                    IntegerArgumentType.getInteger(context, "index"),
+                                    ItemArgument.getItem(context, "item"),
+                                    IntegerArgumentType.getInteger(context, "count"))))))))));
 
     curiosCommand.then(Commands.literal("set").then(
         Commands.argument("slot", CurioArgumentType.slot()).then(
@@ -94,6 +118,23 @@ public class CuriosCommand {
                 EntityArgument.getPlayer(context, "player")))));
 
     dispatcher.register(curiosCommand);
+  }
+
+  private static int replaceItemForPlayer(CommandSourceStack source, ServerPlayer player,
+                                          String slot, int index, ItemInput item)
+      throws CommandSyntaxException {
+    return replaceItemForPlayer(source, player, slot, index, item, 1);
+  }
+
+  private static int replaceItemForPlayer(CommandSourceStack source, ServerPlayer player,
+                                          String slot, int index, ItemInput item, int count)
+      throws CommandSyntaxException {
+    ItemStack stack = item.createItemStack(count, false);
+    CuriosApi.getCuriosHelper().setEquippedCurio(player, slot, index, stack);
+    source.sendSuccess(
+        Component.translatable("commands.curios.replace.success", slot, player.getDisplayName(),
+            stack.getDisplayName()), true);
+    return Command.SINGLE_SUCCESS;
   }
 
   private static int setSlotsForPlayer(CommandSourceStack source, ServerPlayer playerMP,
