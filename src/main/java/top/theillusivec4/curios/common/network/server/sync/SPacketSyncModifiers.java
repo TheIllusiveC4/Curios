@@ -11,8 +11,10 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
@@ -85,6 +87,8 @@ public class SPacketSyncModifiers {
                 if (entity instanceof Player player) {
 
                   if (player.containerMenu instanceof CuriosContainer) {
+                    MinecraftForge.EVENT_BUS.post(
+                        new SlotModifiersUpdatedEvent(player, msg.updates.keySet()));
                     ((CuriosContainer) player.containerMenu).resetSlots();
                   }
                 }

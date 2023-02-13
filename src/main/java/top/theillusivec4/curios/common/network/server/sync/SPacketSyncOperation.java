@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
+import java.util.Set;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -26,8 +27,10 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 public class SPacketSyncOperation {
@@ -93,6 +96,7 @@ public class SPacketSyncOperation {
             if (entity instanceof Player player) {
 
               if (player.containerMenu instanceof CuriosContainer) {
+                MinecraftForge.EVENT_BUS.post(new SlotModifiersUpdatedEvent(player, Set.of(id)));
                 ((CuriosContainer) player.containerMenu).resetSlots();
               }
             }
