@@ -164,7 +164,7 @@ curseforge {
         id = "${curse_id}"
         releaseType = "${curse_release}"
         changelogType = 'markdown'
-        changelog = file('docs/CHANGELOG.md')
+        changelog = file('CHANGELOG_LATEST.md')
         addArtifact(sourcesJar)
         addArtifact(apiJar)
         "${curse_versions}".split(',').each {
