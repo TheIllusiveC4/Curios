@@ -25,6 +25,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import java.util.Map;
+import java.util.Set;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -39,6 +40,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
+import top.theillusivec4.curios.common.slottype.SlotTypeManager;
 
 public class CuriosCommand {
 
@@ -47,6 +49,16 @@ public class CuriosCommand {
 
     LiteralArgumentBuilder<CommandSourceStack> curiosCommand = Commands.literal("curios")
         .requires(player -> player.hasPermission(2));
+
+    curiosCommand.then(Commands.literal("list").executes(context -> {
+      Map<String, Set<String>> map = SlotTypeManager.getIdsToMods();
+
+      for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
+        context.getSource().sendSuccess(
+            Component.literal(entry.getKey() + " - " + String.join(", ", entry.getValue())), false);
+      }
+      return Command.SINGLE_SUCCESS;
+    }));
 
     curiosCommand.then(Commands.literal("replace").then(
         Commands.argument("slot", CurioArgumentType.slot()).then(
