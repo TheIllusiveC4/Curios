@@ -76,6 +76,12 @@ public class CurioSlot extends SlotItemHandler {
   }
 
   @Override
+  public void set(@Nonnull ItemStack stack) {
+    super.set(stack);
+    CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> curio.onEquipFromUse(slotContext));
+  }
+
+  @Override
   public boolean mayPlace(@Nonnull ItemStack stack) {
     CurioEquipEvent equipEvent = new CurioEquipEvent(stack, slotContext);
     MinecraftForge.EVENT_BUS.post(equipEvent);

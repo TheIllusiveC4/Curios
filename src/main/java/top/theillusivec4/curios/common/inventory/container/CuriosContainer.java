@@ -108,6 +108,12 @@ public class CuriosContainer extends InventoryMenu {
     for (int k = 0; k < 4; ++k) {
       final EquipmentSlot equipmentslottype = VALID_EQUIPMENT_SLOTS[k];
       this.addSlot(new Slot(playerInventory, 36 + (3 - k), 8, 8 + k * 18) {
+        @Override
+        public void set(@Nonnull ItemStack stack) {
+          ItemStack itemstack = this.getItem();
+          super.set(stack);
+          CuriosContainer.this.player.onEquipItem(equipmentslottype, itemstack, stack);
+        }
 
         @Override
         public int getMaxStackSize() {
