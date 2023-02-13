@@ -38,6 +38,7 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.CurioEquipEvent;
 import top.theillusivec4.curios.api.event.CurioUnequipEvent;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+import top.theillusivec4.curios.mixin.core.AccessorEntity;
 
 public class CurioSlot extends SlotItemHandler {
 
@@ -77,8 +78,15 @@ public class CurioSlot extends SlotItemHandler {
 
   @Override
   public void set(@Nonnull ItemStack stack) {
+    ItemStack current = this.getItem();
+    boolean flag = current.isEmpty() && stack.isEmpty();
     super.set(stack);
-    CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> curio.onEquipFromUse(slotContext));
+
+    if (!flag && !ItemStack.isSame(current, stack) &&
+        !((AccessorEntity) this.player).getFirstTick()) {
+      CuriosApi.getCuriosHelper().getCurio(stack)
+          .ifPresent(curio -> curio.onEquipFromUse(this.slotContext));
+    }
   }
 
   @Override
