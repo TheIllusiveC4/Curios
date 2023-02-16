@@ -70,8 +70,8 @@ public class SPacketSyncModifiers {
       if (world != null) {
         Entity entity = world.getEntity(msg.entityId);
 
-        if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity)
+        if (entity instanceof LivingEntity livingEntity) {
+          CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
               .ifPresent(handler -> {
                 Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
@@ -84,11 +84,14 @@ public class SPacketSyncModifiers {
                   }
                 }
 
+                if (!msg.updates.isEmpty()) {
+                  MinecraftForge.EVENT_BUS.post(
+                      new SlotModifiersUpdatedEvent(livingEntity, msg.updates.keySet()));
+                }
+
                 if (entity instanceof Player player) {
 
                   if (player.containerMenu instanceof CuriosContainer) {
-                    MinecraftForge.EVENT_BUS.post(
-                        new SlotModifiersUpdatedEvent(player, msg.updates.keySet()));
                     ((CuriosContainer) player.containerMenu).resetSlots();
                   }
                 }

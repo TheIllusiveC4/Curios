@@ -472,11 +472,12 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       if (size != this.getSlots()) {
         this.resize((int) size);
 
-        if (this.itemHandler != null && this.itemHandler.getWearer() instanceof Player player) {
+        if (this.itemHandler != null && this.itemHandler.getWearer() != null) {
+          MinecraftForge.EVENT_BUS.post(
+              new SlotModifiersUpdatedEvent(this.itemHandler.getWearer(), Set.of(this.identifier)));
 
-          if (player.containerMenu instanceof CuriosContainer) {
-            MinecraftForge.EVENT_BUS.post(
-                new SlotModifiersUpdatedEvent(player, Set.of(this.identifier)));
+          if (this.itemHandler.getWearer() instanceof Player player &&
+              player.containerMenu instanceof CuriosContainer) {
             ((CuriosContainer) player.containerMenu).resetSlots();
           }
         }
