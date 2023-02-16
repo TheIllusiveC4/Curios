@@ -82,8 +82,8 @@ public class SPacketSyncOperation {
       if (world != null) {
         Entity entity = world.getEntity(msg.entityId);
 
-        if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
+        if (entity instanceof LivingEntity livingEntity) {
+          CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
             Operation op = Operation.fromValue(msg.operation);
             String id = msg.curioId;
             int amount = msg.amount;
@@ -92,6 +92,7 @@ public class SPacketSyncOperation {
               case GROW -> handler.growSlotType(id, amount);
               case SHRINK -> handler.shrinkSlotType(id, amount);
             }
+            MinecraftForge.EVENT_BUS.post(new SlotModifiersUpdatedEvent(livingEntity, Set.of(id)));
 
             if (entity instanceof Player player) {
 
