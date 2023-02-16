@@ -8,6 +8,7 @@
     "MixinEnderMan",
     "MixinLivingEntity",
     "MixinPiglinAi",
+    "MixinPowderSnowBlock",
     "MixinShearsItem"
   ],
   "minVersion": "0.8"

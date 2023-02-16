@@ -14,6 +14,7 @@ buildscript {
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
         classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version:'1.4.0'
         classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
+        classpath group: 'com.modrinth.minotaur', name: 'Minotaur', version: '2.+'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -21,6 +22,7 @@ apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'maven-publish'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'com.modrinth.minotaur'
 
 version = "${mod_version}"
 group = "top.theillusivec4.${mod_id}"
@@ -159,15 +161,26 @@ curseforge {
 
     project {
         id = "${curse_id}"
-        releaseType = "${curse_release}"
+        releaseType = "${release_type}"
         changelogType = 'markdown'
-        changelog = file('docs/CHANGELOG.md')
+        changelog = file('CHANGELOG_LATEST.md')
         addArtifact(sourcesJar)
         addArtifact(apiJar)
-        "${curse_versions}".split(',').each {
+        "${release_versions}".split(',').each {
             addGameVersion "${it}"
         }
     }
+}
+
+modrinth {
+    token = findProperty('modrinthKey') ?: 0
+    projectId = "${modrinth_id}"
+    versionName = getArchivesBaseName() + "-" + getVersion()
+    versionType = "${release_type}"
+    changelog = file('CHANGELOG_LATEST.md').text
+    uploadFile = jar
+    additionalFiles = [sourcesJar, apiJar]
+    gameVersions = "${release_versions}".split(",") as List<String>
 }
 
 publishing {

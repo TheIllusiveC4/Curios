@@ -70,6 +70,30 @@ public class CuriosMixinHooks {
     }).orElse(false);
   }
 
+  public static boolean canWalkOnPowderSnow(LivingEntity livingEntity) {
+    return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).map(handler -> {
+
+      for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
+        IDynamicStackHandler stacks = entry.getValue().getStacks();
+
+        for (int i = 0; i < stacks.getSlots(); i++) {
+          final int index = i;
+          NonNullList<Boolean> renderStates = entry.getValue().getRenders();
+          boolean canWalk =
+              CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(curio -> curio
+                      .canWalkOnPowderedSnow(new SlotContext(entry.getKey(), livingEntity, index, false,
+                          renderStates.size() > index && renderStates.get(index))))
+                  .orElse(false);
+
+          if (canWalk) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }).orElse(false);
+  }
+
   public static int getFortuneLevel(Player player) {
     return CuriosApi.getCuriosHelper().getCuriosHandler(player)
         .map(handler -> handler.getFortuneLevel(null)).orElse(0);

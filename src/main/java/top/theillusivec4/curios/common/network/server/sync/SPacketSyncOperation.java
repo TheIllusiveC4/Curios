@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
+import java.util.Set;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -26,8 +27,10 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 public class SPacketSyncOperation {
@@ -79,8 +82,8 @@ public class SPacketSyncOperation {
       if (world != null) {
         Entity entity = world.getEntity(msg.entityId);
 
-        if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity).ifPresent(handler -> {
+        if (entity instanceof LivingEntity livingEntity) {
+          CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(handler -> {
             Operation op = Operation.fromValue(msg.operation);
             String id = msg.curioId;
             int amount = msg.amount;
@@ -89,6 +92,7 @@ public class SPacketSyncOperation {
               case GROW -> handler.growSlotType(id, amount);
               case SHRINK -> handler.shrinkSlotType(id, amount);
             }
+            MinecraftForge.EVENT_BUS.post(new SlotModifiersUpdatedEvent(livingEntity, Set.of(id)));
 
             if (entity instanceof Player player) {
 

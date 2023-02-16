@@ -11,8 +11,10 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
@@ -68,8 +70,8 @@ public class SPacketSyncModifiers {
       if (world != null) {
         Entity entity = world.getEntity(msg.entityId);
 
-        if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity)
+        if (entity instanceof LivingEntity livingEntity) {
+          CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
               .ifPresent(handler -> {
                 Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
@@ -80,6 +82,11 @@ public class SPacketSyncModifiers {
                   if (stacksHandler != null) {
                     stacksHandler.applySyncTag(entry.getValue());
                   }
+                }
+
+                if (!msg.updates.isEmpty()) {
+                  MinecraftForge.EVENT_BUS.post(
+                      new SlotModifiersUpdatedEvent(livingEntity, msg.updates.keySet()));
                 }
 
                 if (entity instanceof Player player) {

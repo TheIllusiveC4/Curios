@@ -154,6 +154,11 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
+  public boolean canWalkOnPowderedSnow(SlotContext slotContext) {
+    return this.curioItem.canWalkOnPowderedSnow(slotContext, this.getStack());
+  }
+
+  @Override
   public boolean isEnderMask(SlotContext slotContext, EnderMan enderMan) {
     return this.curioItem.isEnderMask(slotContext, enderMan, this.getStack());
   }

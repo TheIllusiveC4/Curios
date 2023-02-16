@@ -39,8 +39,10 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
@@ -470,9 +472,12 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       if (size != this.getSlots()) {
         this.resize((int) size);
 
-        if (this.itemHandler != null && this.itemHandler.getWearer() instanceof Player player) {
+        if (this.itemHandler != null && this.itemHandler.getWearer() != null) {
+          MinecraftForge.EVENT_BUS.post(
+              new SlotModifiersUpdatedEvent(this.itemHandler.getWearer(), Set.of(this.identifier)));
 
-          if (player.containerMenu instanceof CuriosContainer) {
+          if (this.itemHandler.getWearer() instanceof Player player &&
+              player.containerMenu instanceof CuriosContainer) {
             ((CuriosContainer) player.containerMenu).resetSlots();
           }
         }
