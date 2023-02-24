@@ -20,7 +20,6 @@
 package top.theillusivec4.curios.common.inventory.container;
 
 import com.mojang.datafixers.util.Pair;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nonnull;
