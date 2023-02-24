@@ -1,6 +1,7 @@
 {
   "curios.name": "饰品",
   "curios.slot": "栏位",
+  "curios.cosmetic": "装饰品",
   "commands.curios.set.success": "类型%s的%d栏位已设置为到%s中",
   "commands.curios.add.success": "类型%s的%d栏位已添加到%s中",
   "commands.curios.remove.success": "类型%s的%d栏位已从%s中移除",
@@ -9,6 +10,7 @@
   "commands.curios.clear.success": "栏位%s已为%s清除",
   "commands.curios.clearAll.success": "已清除%s的所有栏位",
   "commands.curios.reset.success": "重置%s的栏位",
+  "argument.entity.options.curios.description": "实体饰品栏",
   "argument.curios.type.unknown": "未知的栏位类型%s",
   "curios.identifier.curio": "饰品",
   "curios.identifier.necklace": "项链",
@@ -19,6 +21,7 @@
   "curios.identifier.body": "胸饰",
   "curios.identifier.charm": "护符",
   "curios.identifier.hands": "手饰",
+  "curios.identifier.bracelet": "手镯",
   "curios.modifiers.curio": "佩戴饰品时：",
   "curios.modifiers.necklace": "佩戴项链时：",
   "curios.modifiers.ring": "佩戴戒指时：",
@@ -28,6 +31,14 @@
   "curios.modifiers.body": "佩戴胸饰时：",
   "curios.modifiers.charm": "佩戴护符时：",
   "curios.modifiers.hands": "佩戴手饰时：",
+  "curios.modifiers.bracelet": "佩戴手镯时：",
+  "curios.modifiers.slots.plus.0": "+%s %s 栏位",
+  "curios.modifiers.slots.plus.1": "+%s%% %s 栏位",
+  "curios.modifiers.slots.plus.2": "+%s%% %s 栏位",
+  "curios.modifiers.slots.take.0": "-%s %s 栏位",
+  "curios.modifiers.slots.take.1": "-%s%% %s 栏位",
+  "curios.modifiers.slots.take.2": "-%s%% %s 栏位",
   "key.curios.category": "饰品",
-  "key.curios.open.desc": "打开/关闭饰品栏"
+  "key.curios.open.desc": "打开/关闭饰品栏",
+  "gui.curios.toggle": "切换是否可见"
 }
