@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.19.2-5.1.3.0] - 2023.03.02
+### Added
+- Added `/curios drop` command for dropping curio items
+### Fixed
+- Fixed curio entity selectors counting slots with size 0 erroneously
+
 ## [1.19.2-5.1.2.2] - 2023.02.15
 ### Fixed
 - Fixed `SlotModifiersUpdatedEvent` not always firing

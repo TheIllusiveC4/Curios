@@ -2,6 +2,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.19.x/docs/CHANGELOG.md).
 
-## [1.19.2-5.1.2.2] - 2023.02.15
+## [1.19.2-5.1.3.0] - 2023.03.02
+### Added
+- Added `/curios drop` command for dropping curio items
 ### Fixed
-- Fixed `SlotModifiersUpdatedEvent` not always firing
+- Fixed curio entity selectors counting slots with size 0 erroneously
