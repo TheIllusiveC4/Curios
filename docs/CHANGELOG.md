@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.18.2-5.0.9.0] - 2023.03.02
+### Added
+- Added `/curios drop` command for dropping curio items
+### Fixed
+- Fixed curio entity selectors counting slots with size 0 erroneously
+
 ## [1.18.2-5.0.8.0] - 2023.02.15
 ### Added
 - Added new `ICurio#canWalkOnPowderedSnow` method for curio implementations that allow walking on Powdered Snow blocks

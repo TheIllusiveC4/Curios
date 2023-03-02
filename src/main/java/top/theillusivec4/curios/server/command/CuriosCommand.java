@@ -123,6 +123,15 @@ public class CuriosCommand {
                     EntityArgument.getPlayer(context, "player"),
                     CurioArgumentType.getSlot(context, "slot"))))));
 
+    curiosCommand.then(Commands.literal("drop").then(
+        Commands.argument("player", EntityArgument.player()).executes(
+            context -> dropSlotsForPlayer(context.getSource(),
+                EntityArgument.getPlayer(context, "player"), "")).then(
+            Commands.argument("slot", CurioArgumentType.slot()).executes(
+                context -> dropSlotsForPlayer(context.getSource(),
+                    EntityArgument.getPlayer(context, "player"),
+                    CurioArgumentType.getSlot(context, "slot"))))));
+
     curiosCommand.then(Commands.literal("reset").then(
         Commands.argument("player", EntityArgument.player()).executes(
             context -> resetSlotsForPlayer(context.getSource(),
@@ -171,6 +180,50 @@ public class CuriosCommand {
     source.sendSuccess(new TranslatableComponent("commands.curios.remove.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
+  }
+
+  private static int dropSlotsForPlayer(CommandSourceStack source, ServerPlayer playerMP,
+                                        String slot) {
+
+    CuriosApi.getCuriosHelper().getCuriosHandler(playerMP).ifPresent(handler -> {
+      Map<String, ICurioStacksHandler> curios = handler.getCurios();
+
+      if (!slot.isEmpty() && curios.get(slot) != null) {
+        drop(curios.get(slot), playerMP);
+      } else {
+
+        for (String id : curios.keySet()) {
+          drop(curios.get(id), playerMP);
+        }
+      }
+    });
+
+    if (slot.isEmpty()) {
+      source.sendSuccess(new TranslatableComponent("commands.curios.dropAll.success",
+          playerMP.getDisplayName()), true);
+    } else {
+      source.sendSuccess(new TranslatableComponent("commands.curios.drop.success", slot,
+          playerMP.getDisplayName()), true);
+    }
+    return Command.SINGLE_SUCCESS;
+  }
+
+  private static void drop(ICurioStacksHandler stacksHandler, ServerPlayer serverPlayer) {
+
+    for (int i = 0; i < stacksHandler.getSlots(); i++) {
+      ItemStack stack1 = stacksHandler.getStacks().getStackInSlot(i);
+      stacksHandler.getStacks().setStackInSlot(i, ItemStack.EMPTY);
+      ItemStack stack2 = stacksHandler.getCosmeticStacks().getStackInSlot(i);
+      stacksHandler.getCosmeticStacks().setStackInSlot(i, ItemStack.EMPTY);
+
+      if (!stack1.isEmpty()) {
+        serverPlayer.drop(stack1, true, false);
+      }
+
+      if (!stack2.isEmpty()) {
+        serverPlayer.drop(stack2, true, false);
+      }
+    }
   }
 
   private static int clearSlotsForPlayer(CommandSourceStack source, ServerPlayer playerMP,
