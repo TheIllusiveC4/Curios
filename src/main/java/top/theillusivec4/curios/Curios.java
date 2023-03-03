@@ -31,10 +31,8 @@ import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.resources.ReloadListener;
 import net.minecraft.command.arguments.ArgumentSerializer;
 import net.minecraft.command.arguments.ArgumentTypes;
-import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -78,6 +76,7 @@ import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
+import top.theillusivec4.curios.common.objects.SetCurioAttributes;
 import top.theillusivec4.curios.common.slottype.SlotTypeManager;
 import top.theillusivec4.curios.common.triggers.EquipCurioTrigger;
 import top.theillusivec4.curios.server.SlotHelper;
@@ -119,6 +118,7 @@ public class Curios {
           new ArgumentSerializer<>(CurioArgumentType::slot));
       CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
       CuriosSelectorOptions.register();
+      SetCurioAttributes.register();
     });
   }
 

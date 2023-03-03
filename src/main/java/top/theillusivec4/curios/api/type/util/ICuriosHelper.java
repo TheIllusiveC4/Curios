@@ -151,6 +151,34 @@ public interface ICuriosHelper {
                        double amount, AttributeModifier.Operation operation);
 
   /**
+   * Adds a slot modifier to an ItemStack's tag data.
+   *
+   * @param stack      The ItemStack to add the modifier to
+   * @param identifier The identifier of the slot to add the modifier onto
+   * @param name       The name for the modifier
+   * @param uuid       A UUID associated wth the modifier, or null if the slot UUID should be used
+   * @param amount     The amount of the modifier
+   * @param operation  The operation of the modifier
+   * @param slot       The slot that the ItemStack provides the modifier from
+   */
+  void addSlotModifier(ItemStack stack, String identifier, String name, UUID uuid, double amount,
+                       AttributeModifier.Operation operation, String slot);
+
+  /**
+   * Adds an attribute modifier to an ItemStack's tag data.
+   *
+   * @param stack     The ItemStack to add the modifier to
+   * @param attribute The attribute to add the modifier onto
+   * @param name      The name for the modifier
+   * @param uuid      A UUID associated wth the modifier, or null if the slot UUID should be used
+   * @param amount    The amount of the modifier
+   * @param operation The operation of the modifier
+   * @param slot      The slot that the ItemStack provides the modifier from
+   */
+  void addModifier(ItemStack stack, Attribute attribute, String name, UUID uuid, double amount,
+                   AttributeModifier.Operation operation, String slot);
+
+  /**
    * Checks if the ItemStack is valid for a particular stack and slot context.
    *
    * @param slotContext Context about the slot that the ItemStack is being checked for
