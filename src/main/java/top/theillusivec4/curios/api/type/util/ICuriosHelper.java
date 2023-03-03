@@ -77,6 +77,17 @@ public interface ICuriosHelper {
   LazyOptional<IItemHandlerModifiable> getEquippedCurios(LivingEntity livingEntity);
 
   /**
+   * Replaces the currently equipped item in a specified curio slot, if it exists.
+   *
+   * @param livingEntity The wearer of the curio
+   * @param identifier   The identifier of the curio slot
+   * @param index        The index of the curio slot
+   * @param stack        The new stack to place into the slot
+   */
+  void setEquippedCurio(@Nonnull LivingEntity livingEntity, String identifier, int index,
+                        ItemStack stack);
+
+  /**
    * Gets the first matching item equipped in a curio slot.
    *
    * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
@@ -121,6 +132,17 @@ public interface ICuriosHelper {
    * @return A list of matching results
    */
   List<SlotResult> findCurios(@Nonnull LivingEntity livingEntity, String... identifiers);
+
+  /**
+   * Gets the currently equipped item in a specified curio slot, if it exists.
+   *
+   * @param livingEntity The wearer of the curio
+   * @param identifier   The identifier of the curio slot
+   * @param index        The index of the curio slot
+   * @return The equipped curio stack, or empty if there is none
+   */
+  Optional<SlotResult> findCurio(@Nonnull LivingEntity livingEntity, String identifier, int index);
+
 
   /**
    * Retrieves a map of attribute modifiers for the ItemStack.

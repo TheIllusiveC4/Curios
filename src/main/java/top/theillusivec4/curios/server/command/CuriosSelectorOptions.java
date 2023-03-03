@@ -96,7 +96,7 @@ public class CuriosSelectorOptions {
 
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
 
-        if (slots.contains(entry.getKey()) && (max == -1 || entry.getValue().getSlots() >= max)) {
+        if (matches(slots, max, entry.getKey(), entry.getValue())) {
           foundSlot = true;
         } else if (foundSlot) {
           return true;
@@ -107,7 +107,7 @@ public class CuriosSelectorOptions {
 
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
 
-        if (slots.contains(entry.getKey()) && (max == -1 || entry.getValue().getSlots() >= max)) {
+        if (matches(slots, max, entry.getKey(), entry.getValue())) {
           foundSlot = true;
         } else if (foundSlot) {
           return false;
@@ -122,11 +122,17 @@ public class CuriosSelectorOptions {
 
     for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
 
-      if (slots.contains(entry.getKey()) && (max == -1 || entry.getValue().getSlots() >= max)) {
+      if (matches(slots, max, entry.getKey(), entry.getValue())) {
         return !invert;
       }
     }
     return invert;
+  }
+
+  private static boolean matches(Set<String> slots, int max, String id,
+                                 ICurioStacksHandler stacks) {
+    int size = stacks.getSlots();
+    return slots.contains(id) && size > 0 && (max == -1 || size >= max);
   }
 
   private static boolean hasOnlyItem(Map<String, ICurioStacksHandler> curios, Set<String> slots,

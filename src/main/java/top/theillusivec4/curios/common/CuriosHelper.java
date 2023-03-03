@@ -99,6 +99,23 @@ public class CuriosHelper implements ICuriosHelper {
   }
 
   @Override
+  public void setEquippedCurio(@Nonnull LivingEntity livingEntity, String identifier, int index,
+                               ItemStack stack) {
+    getCuriosHandler(livingEntity).ifPresent(handler -> {
+      Map<String, ICurioStacksHandler> curios = handler.getCurios();
+      ICurioStacksHandler stacksHandler = curios.get(identifier);
+
+      if (stacksHandler != null) {
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+
+        if (index < stackHandler.getSlots()) {
+          stackHandler.setStackInSlot(index, stack);
+        }
+      }
+    });
+  }
+
+  @Override
   public Optional<SlotResult> findFirstCurio(@Nonnull LivingEntity livingEntity, Item item) {
     return findFirstCurio(livingEntity, (stack) -> stack.getItem() == item);
   }
@@ -178,6 +195,29 @@ public class CuriosHelper implements ICuriosHelper {
       }
     });
     return result;
+  }
+
+  @Override
+  public Optional<SlotResult> findCurio(@Nonnull LivingEntity livingEntity,
+                                        String identifier, int index) {
+    SlotResult result = getCuriosHandler(livingEntity).map(handler -> {
+      Map<String, ICurioStacksHandler> curios = handler.getCurios();
+      ICurioStacksHandler stacksHandler = curios.get(identifier);
+
+      if (stacksHandler != null) {
+        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+
+        if (index < stackHandler.getSlots()) {
+          ItemStack stack = stackHandler.getStackInSlot(index);
+
+          if (!stack.isEmpty()) {
+            return new SlotResult(new SlotContext(identifier, livingEntity, index), stack);
+          }
+        }
+      }
+      return new SlotResult(null, ItemStack.EMPTY);
+    }).orElse(new SlotResult(null, ItemStack.EMPTY));
+    return result.getStack().isEmpty() ? Optional.empty() : Optional.of(result);
   }
 
   @Nonnull
