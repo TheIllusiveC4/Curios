@@ -34,6 +34,7 @@ import java.util.concurrent.CompletableFuture;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.util.text.TranslationTextComponent;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class CurioArgumentType implements ArgumentType<String> {
 
@@ -66,7 +67,7 @@ public class CurioArgumentType implements ArgumentType<String> {
   public String parse(StringReader reader) throws CommandSyntaxException {
     String s = reader.readUnquotedString();
 
-    if (!slotIds.contains(s)) {
+    if (CuriosApi.getSlotHelper() != null && !slotIds.contains(s)) {
       throw UNKNOWN_TYPE.create(s);
     } else {
       return s;

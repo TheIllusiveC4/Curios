@@ -21,6 +21,7 @@ package top.theillusivec4.curios.common.inventory;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,9 +39,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
@@ -470,11 +473,17 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       if (size != this.getSlots()) {
         this.resize((int) size);
 
-        if (this.itemHandler != null && this.itemHandler.getWearer() instanceof PlayerEntity) {
-          PlayerEntity player = (PlayerEntity) this.itemHandler.getWearer();
+        if (this.itemHandler != null && this.itemHandler.getWearer() != null) {
+          MinecraftForge.EVENT_BUS.post(
+              new SlotModifiersUpdatedEvent(this.itemHandler.getWearer(),
+                  Sets.newHashSet(this.identifier)));
 
-          if (player.openContainer instanceof CuriosContainer) {
-            ((CuriosContainer) player.openContainer).resetSlots();
+          if (this.itemHandler.getWearer() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) this.itemHandler.getWearer();
+
+            if (player.openContainer instanceof CuriosContainer) {
+              ((CuriosContainer) player.openContainer).resetSlots();
+            }
           }
         }
       }

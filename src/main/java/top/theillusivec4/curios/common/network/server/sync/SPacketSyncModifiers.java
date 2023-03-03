@@ -11,8 +11,10 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
@@ -80,6 +82,11 @@ public class SPacketSyncModifiers {
                   if (stacksHandler != null) {
                     stacksHandler.applySyncTag(entry.getValue());
                   }
+                }
+
+                if (!msg.updates.isEmpty()) {
+                  MinecraftForge.EVENT_BUS.post(
+                      new SlotModifiersUpdatedEvent((LivingEntity) entity, msg.updates.keySet()));
                 }
 
                 if (entity instanceof PlayerEntity) {
