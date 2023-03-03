@@ -19,11 +19,14 @@
 
 package top.theillusivec4.curios.common.slottype;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,6 +46,11 @@ public class SlotTypeManager {
 
   private static Map<String, Builder> imcBuilders = new HashMap<>();
   private static Map<String, Builder> configBuilders = new HashMap<>();
+  private static Map<String, Set<String>> idsToMods = new HashMap<>();
+
+  public static Map<String, Set<String>> getIdsToMods() {
+    return ImmutableMap.copyOf(idsToMods);
+  }
 
   public static void buildImcSlotTypes(Stream<InterModComms.IMCMessage> register,
                                        Stream<IMCMessage> modify) {
@@ -83,6 +91,7 @@ public class SlotTypeManager {
         builder = new Builder(id).copyFrom(builder);
       }
       configBuilders.putIfAbsent(id, builder);
+      idsToMods.computeIfAbsent(id, (k) -> new HashSet<>()).add("config");
 
       if (setting.priority != null) {
         builder.priority(setting.priority, force);
@@ -146,34 +155,39 @@ public class SlotTypeManager {
       }
     });
 
-    messageMap.values().forEach(msgList -> msgList.forEach(msg -> {
-      String id = msg.getIdentifier();
-      Builder builder = imcBuilders.get(id);
+    for (Map.Entry<String, List<SlotTypeMessage>> entry : messageMap.entrySet()) {
+      String modId = entry.getKey();
 
-      if (builder == null && create) {
-        builder = new Builder(id);
-        imcBuilders.put(id, builder);
-      }
+      for (SlotTypeMessage msg : entry.getValue()) {
+        String id = msg.getIdentifier();
+        Builder builder = imcBuilders.get(id);
 
-      if (builder != null) {
-        builder.size(msg.getSize()).locked(msg.isLocked()).visible(msg.isVisible())
-            .hasCosmetic(msg.hasCosmetic());
-        SlotTypeMessage.Builder preset = SlotTypePreset.findPreset(id)
-            .map(SlotTypePreset::getMessageBuilder).orElse(null);
-        SlotTypeMessage presetMsg = preset != null ? preset.build() : null;
-
-        if (msg.getIcon() == null && presetMsg != null) {
-          builder.icon(presetMsg.getIcon());
-        } else {
-          builder.icon(msg.getIcon());
+        if (builder == null && create) {
+          builder = new Builder(id);
+          imcBuilders.put(id, builder);
+          idsToMods.computeIfAbsent(id, (k) -> new HashSet<>()).add(modId);
         }
 
-        if (msg.getPriority() == null && presetMsg != null) {
-          builder.priority(presetMsg.getPriority());
-        } else {
-          builder.priority(msg.getPriority());
+        if (builder != null) {
+          builder.size(msg.getSize()).locked(msg.isLocked()).visible(msg.isVisible())
+              .hasCosmetic(msg.hasCosmetic());
+          SlotTypeMessage.Builder preset = SlotTypePreset.findPreset(id)
+              .map(SlotTypePreset::getMessageBuilder).orElse(null);
+          SlotTypeMessage presetMsg = preset != null ? preset.build() : null;
+
+          if (msg.getIcon() == null && presetMsg != null) {
+            builder.icon(presetMsg.getIcon());
+          } else {
+            builder.icon(msg.getIcon());
+          }
+
+          if (msg.getPriority() == null && presetMsg != null) {
+            builder.priority(presetMsg.getPriority());
+          } else {
+            builder.priority(msg.getPriority());
+          }
         }
       }
-    }));
+    }
   }
 }
