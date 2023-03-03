@@ -3,6 +3,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.16.5-4.1.0.0] - 2023.03.03
+### Added
+- [API] Added `SlotModifiersUpdatedEvent` to listen for broadcasted dynamic changes to slot sizes on players due to slot
+modifiers
+- [API] Added `ICuriosHelper#setEquippedCurio` and `ICuriosHelper#findCurio()` for setting items into curio slots and getting
+items from curio slots respectively
+- Added new commands:
+  - `/curios drop` for dropping curio items from slots
+  - `/curios list` for listing curio slots and origins
+  - `/curios replace` for setting curio items into slots
+- Added `curios:set_curio_attributes` loot function
+### Fixed
+- Fixed curio entity selectors counting slots with size 0 erroneously
+- Fixed startup crashes with ConcurrentModificationException
+
 ## [1.16.5-4.0.8.2] - 2022.03.31
 ### Changed
 - Updated `fr_fr.json` localization (thanks HollishKid!) [#228](https://github.com/TheIllusiveC4/Curios/pull/228)
