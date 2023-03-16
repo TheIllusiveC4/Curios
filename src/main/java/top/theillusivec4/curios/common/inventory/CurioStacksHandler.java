@@ -496,7 +496,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
         this.loseStacks(this.stackHandler, identifier, change);
         this.stackHandler.shrink(change);
         this.cosmeticStackHandler.shrink(change);
-        NonNullList<Boolean> newList = NonNullList.withSize(newSize, true);
+        NonNullList<Boolean> newList = NonNullList.withSize(Math.max(0, newSize), true);
 
         for (int i = 0; i < newList.size() && i < this.renderHandler.size(); i++) {
           newList.set(i, renderHandler.get(i));
@@ -505,7 +505,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       } else {
         this.stackHandler.grow(change);
         this.cosmeticStackHandler.grow(change);
-        NonNullList<Boolean> newList = NonNullList.withSize(newSize, true);
+        NonNullList<Boolean> newList = NonNullList.withSize(Math.max(0, newSize), true);
 
         for (int i = 0; i < newList.size() && i < this.renderHandler.size(); i++) {
           newList.set(i, renderHandler.get(i));
