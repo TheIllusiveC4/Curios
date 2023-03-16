@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.19.3-5.1.4.1] - 2023.03.15
+### Added
+- Added `vi_vn` localization (thanks ZzThanhBaozZ!) [#289](https://github.com/TheIllusiveC4/Curios/pull/289)
+### Changed
+- Updated `it_it` localization (thanks WVam!) [#288](https://github.com/TheIllusiveC4/Curios/pull/288)
+### Fixed
+- Fixed crashes when slots get resized to negative amounts dynamically
+
 ## [1.19.3-5.1.4.0] - 2023.02.27
 ### Added
 - Added `/curios drop` command for dropping curio items
