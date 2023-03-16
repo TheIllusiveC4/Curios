@@ -46,7 +46,7 @@ public class RenderButton extends ImageButton {
   }
 
   @Override
-  public void m_86412_(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void renderWidget(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     // NO-OP
   }
 
@@ -59,7 +59,7 @@ public class RenderButton extends ImageButton {
     if (!slot.getRenderStatus()) {
       j += 8;
     }
-    blit(matrixStack, this.m_252754_(), this.m_252907_(), (float) j, (float) this.yTexStart,
+    blit(matrixStack, this.getX(), this.getY(), (float) j, (float) this.yTexStart,
         this.width, this.height, 256, 256);
     RenderSystem.enableDepthTest();
   }

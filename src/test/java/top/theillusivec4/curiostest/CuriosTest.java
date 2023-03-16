@@ -20,8 +20,11 @@
 package top.theillusivec4.curiostest;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -60,9 +63,16 @@ public class CuriosTest {
   }
 
   private void creativeTab(final CreativeModeTabEvent.BuildContents evt) {
-    evt.registerSimple(CreativeModeTabs.f_256797_, CuriosTestRegistry.AMULET.get(),
-        CuriosTestRegistry.CROWN.get(), CuriosTestRegistry.KNUCKLES.get(),
-        CuriosTestRegistry.RING.get());
+
+    if (evt.getTab() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+      Collection<ItemLike> items =
+          List.of(CuriosTestRegistry.AMULET.get(), CuriosTestRegistry.CROWN.get(),
+              CuriosTestRegistry.KNUCKLES.get(), CuriosTestRegistry.RING.get());
+
+      for (ItemLike item : items) {
+        evt.accept(item);
+      }
+    }
   }
 
   private void enqueue(final InterModEnqueueEvent evt) {

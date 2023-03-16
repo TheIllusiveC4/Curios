@@ -65,7 +65,7 @@ public interface ICurioRenderer {
         EntityModel<LivingEntity> model = livingRenderer.getModel();
 
         if (model instanceof HumanoidModel) {
-          matrixStack.m_252781_(Axis.f_252529_.m_252961_(((HumanoidModel<LivingEntity>) model).body.xRot));
+          matrixStack.mulPose(Axis.XP.rotation(((HumanoidModel<LivingEntity>) model).body.xRot));
         }
       }
     }

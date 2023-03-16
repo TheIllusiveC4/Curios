@@ -48,14 +48,14 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
   }
 
   public static void register() {
-    TYPE = Registry.register(BuiltInRegistries.f_256753_,
+    TYPE = Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE,
         new ResourceLocation(CuriosApi.MODID, "set_curio_attributes"),
         new LootItemFunctionType(new SetCurioAttributesFunction.Serializer()));
   }
 
   @Nonnull
   public LootItemFunctionType getType() {
-    return LootItemFunctions.SET_ATTRIBUTES;
+    return TYPE;
   }
 
   @Nonnull

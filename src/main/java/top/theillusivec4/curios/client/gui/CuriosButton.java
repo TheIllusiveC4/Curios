@@ -74,22 +74,22 @@ public class CuriosButton extends ImageButton {
   }
 
   @Override
-  public void m_86412_(@Nonnull PoseStack matrixStack, int mouseX, int mouseY,
+  public void renderWidget(@Nonnull PoseStack matrixStack, int mouseX, int mouseY,
                        float partialTicks) {
     Tuple<Integer, Integer> offsets =
         CuriosScreen.getButtonOffset(parentGui instanceof CreativeModeInventoryScreen);
-    this.m_252865_(parentGui.getGuiLeft() + offsets.getA());
+    this.setX(parentGui.getGuiLeft() + offsets.getA());
     int yOffset = parentGui instanceof CreativeModeInventoryScreen ? 68 : 83;
-    this.m_252888_(parentGui.getGuiTop() + offsets.getB() + yOffset);
+    this.setY(parentGui.getGuiTop() + offsets.getB() + yOffset);
 
     if (parentGui instanceof CreativeModeInventoryScreen gui) {
-      boolean isInventoryTab = gui.m_258017_();
+      boolean isInventoryTab = gui.isInventoryOpen();
       this.active = isInventoryTab;
 
       if (!isInventoryTab) {
         return;
       }
     }
-    super.m_86412_(matrixStack, mouseX, mouseY, partialTicks);
+    super.renderWidget(matrixStack, mouseX, mouseY, partialTicks);
   }
 }

@@ -154,8 +154,8 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
                 RECIPE_BUTTON_TEXTURE, (button) -> {
               this.recipeBookGui.toggleVisibility();
               this.updateScreenPosition();
-              button.m_252846_(this.leftPos + 104, this.height / 2 - 22);
-              this.buttonCurios.m_252846_(this.leftPos + offsets.getA(),
+              button.setPosition(this.leftPos + 104, this.height / 2 - 22);
+              this.buttonCurios.setPosition(this.leftPos + offsets.getA(),
                   this.height / 2 + offsets.getB());
             }));
       }
@@ -225,15 +225,15 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
   }
 
   @Override
-  public void m_86412_(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     this.renderBackground(matrixStack);
 
     if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
       this.renderBg(matrixStack, partialTicks, mouseX, mouseY);
-      this.recipeBookGui.m_86412_(matrixStack, mouseX, mouseY, partialTicks);
+      this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
     } else {
-      this.recipeBookGui.m_86412_(matrixStack, mouseX, mouseY, partialTicks);
-      super.m_86412_(matrixStack, mouseX, mouseY, partialTicks);
+      this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
+      super.render(matrixStack, mouseX, mouseY, partialTicks);
       this.recipeBookGui
           .renderGhostRecipe(matrixStack, this.leftPos, this.topPos, true, partialTicks);
 
@@ -326,9 +326,9 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
       RenderSystem.setShaderTexture(0, INVENTORY_LOCATION);
       int i = this.leftPos;
       int j = this.topPos;
-      this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
-      InventoryScreen.renderEntityInInventory(i + 51, j + 75, 30, (float) (i + 51) - mouseX,
-          (float) (j + 75 - 50) - mouseY, this.minecraft.player);
+      blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+      InventoryScreen.renderEntityInInventoryFollowsMouse(matrixStack, i + 51, j + 75, 30,
+          (float) (i + 51) - mouseX, (float) (j + 75 - 50) - mouseY, this.minecraft.player);
       CuriosApi.getCuriosHelper().getCuriosHandler(this.minecraft.player).ifPresent(handler -> {
         int slotCount = handler.getVisibleSlots();
 
@@ -345,14 +345,14 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
             width = 46;
             xOffset -= 19;
           }
-          this.blit(matrixStack, i + xOffset, j + 4, xTexOffset, 0, width, upperHeight);
+          blit(matrixStack, i + xOffset, j + 4, xTexOffset, 0, width, upperHeight);
 
           if (slotCount <= 8) {
-            this.blit(matrixStack, i + xOffset, j + 4 + upperHeight, xTexOffset, 151, width, 7);
+            blit(matrixStack, i + xOffset, j + 4 + upperHeight, xTexOffset, 151, width, 7);
           } else {
-            this.blit(matrixStack, i + xOffset - 16, j + 4, 27, 0, 23, 158);
+            blit(matrixStack, i + xOffset - 16, j + 4, 27, 0, 23, 158);
             RenderSystem.setShaderTexture(0, CREATIVE_INVENTORY_TABS);
-            this.blit(matrixStack, i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 232, 0,
+            blit(matrixStack, i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 232, 0,
                 12, 15);
           }
 
@@ -362,7 +362,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
               int x = this.leftPos + slot.x - 1;
               int y = this.topPos + slot.y - 1;
               RenderSystem.setShaderTexture(0, CURIO_INVENTORY);
-              this.blit(matrixStack, x, y, 138, 0, 18, 18);
+              blit(matrixStack, x, y, 138, 0, 18, 18);
             }
           }
         }

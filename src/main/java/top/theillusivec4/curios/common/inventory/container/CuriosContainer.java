@@ -337,8 +337,9 @@ public class CuriosContainer extends InventoryMenu {
 
       if (recipe.isPresent()) {
         CraftingRecipe craftingRecipe = recipe.get();
+
         if (this.craftResult.setRecipeUsed(this.player.level, playerMP, craftingRecipe)) {
-          stack = craftingRecipe.assemble(this.craftMatrix);
+          stack = craftingRecipe.assemble(this.craftMatrix, this.player.level.registryAccess());
         }
       }
       this.craftResult.setItem(0, stack);

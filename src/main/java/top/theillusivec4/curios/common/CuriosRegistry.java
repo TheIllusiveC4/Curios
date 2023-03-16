@@ -21,7 +21,6 @@ package top.theillusivec4.curios.common;
 
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -36,9 +35,9 @@ import top.theillusivec4.curios.server.command.CurioArgumentType;
 public class CuriosRegistry {
 
   private static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENT_TYPES =
-      DeferredRegister.create(Registries.f_256982_, CuriosApi.MODID);
+      DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, CuriosApi.MODID);
   private static final DeferredRegister<MenuType<?>> MENU_TYPES =
-      DeferredRegister.create(Registries.f_256798_, CuriosApi.MODID);
+      DeferredRegister.create(Registries.MENU, CuriosApi.MODID);
 
   public static final RegistryObject<ArgumentTypeInfo<?, ?>>
       CURIO_SLOT_ARGUMENT = ARGUMENT_TYPES.register("slot_type",

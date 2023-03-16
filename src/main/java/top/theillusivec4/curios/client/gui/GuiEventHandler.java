@@ -76,7 +76,7 @@ public class GuiEventHandler {
       return;
     }
 
-    if (!gui.m_258017_()) {
+    if (!gui.isInventoryOpen()) {
       return;
     }
     Slot destroyItemSlot = gui.destroyItemSlot;

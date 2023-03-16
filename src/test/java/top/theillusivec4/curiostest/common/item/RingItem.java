@@ -33,10 +33,8 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.EnderMan;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Wearable;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +44,7 @@ import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curiostest.CuriosTest;
 
-public class RingItem extends Item implements Wearable {
+public class RingItem extends Item {
 
   public RingItem() {
     super(new Item.Properties().stacksTo(1).defaultDurability(0));
