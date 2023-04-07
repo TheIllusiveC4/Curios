@@ -244,7 +244,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
         if (button instanceof RenderButton) {
           ((RenderButton) button).renderButtonOverlay(matrixStack, mouseX, mouseY, partialTicks);
 
-          if (((RenderButton) button).isHoveredOrFocused()) {
+          if (((RenderButton) button).isHovered()) {
             isButtonHovered = true;
           }
         }
