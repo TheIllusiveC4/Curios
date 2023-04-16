@@ -23,9 +23,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
@@ -38,6 +41,7 @@ import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
+import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import top.theillusivec4.curiostest.client.CuriosLayerDefinitions;
 import top.theillusivec4.curiostest.client.model.AmuletModel;
 import top.theillusivec4.curiostest.client.model.CrownModel;
@@ -60,6 +64,16 @@ public class CuriosTest {
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::registerLayers);
     eventBus.addListener(this::creativeTab);
+    MinecraftForge.EVENT_BUS.addListener(this::attributeModifier);
+  }
+
+  private void attributeModifier(final CurioAttributeModifierEvent evt) {
+
+    if (evt.getSlotContext().identifier().equals("curio")) {
+      evt.clearModifiers();
+      evt.addModifier(Attributes.MAX_HEALTH, new AttributeModifier(evt.getUuid(), "test", 10.0d,
+          AttributeModifier.Operation.ADDITION));
+    }
   }
 
   private void creativeTab(final CreativeModeTabEvent.BuildContents evt) {
