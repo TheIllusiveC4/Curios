@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.19.4-5.1.5.0] - 2023.04.16
+### Added
+- Added `CurioAttributeModifierEvent` for editing curio attribute modifiers in slots [#292](https://github.com/TheIllusiveC4/Curios/issues/292)
+### Changed
+- Curios that can be equipped from use in the hotbar will now swap with existing curios in valid slots [#301](https://github.com/TheIllusiveC4/Curios/issues/301)
+
 ## [1.19.4-5.1.4.3] - 2023.04.06
 ### Fixed
 - Fixed toggle visibility buttons causing menu issues when clicked [#296](https://github.com/TheIllusiveC4/Curios/issues/296)
