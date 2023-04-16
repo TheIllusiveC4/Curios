@@ -43,6 +43,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -55,6 +56,7 @@ import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.SlotTypePreset;
+import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -280,10 +282,9 @@ public class CuriosHelper implements ICuriosHelper {
   @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                       UUID uuid, ItemStack stack) {
-    Multimap<Attribute, AttributeModifier> multimap;
+    Multimap<Attribute, AttributeModifier> multimap = HashMultimap.create();
 
     if (stack.getTag() != null && stack.getTag().contains("CurioAttributeModifiers", 9)) {
-      multimap = HashMultimap.create();
       ListTag listnbt = stack.getTag().getList("CurioAttributeModifiers", 10);
       String identifier = slotContext.identifier();
 
@@ -324,10 +325,14 @@ public class CuriosHelper implements ICuriosHelper {
           }
         }
       }
-      return multimap;
+    } else {
+      multimap = getCurio(stack).map(curio -> curio.getAttributeModifiers(slotContext, uuid))
+          .orElse(multimap);
     }
-    return getCurio(stack).map(curio -> curio.getAttributeModifiers(slotContext, uuid))
-        .orElse(HashMultimap.create());
+    CurioAttributeModifierEvent evt =
+        new CurioAttributeModifierEvent(stack, slotContext, uuid, multimap);
+    MinecraftForge.EVENT_BUS.post(evt);
+    return evt.getModifiers();
   }
 
   @Override
