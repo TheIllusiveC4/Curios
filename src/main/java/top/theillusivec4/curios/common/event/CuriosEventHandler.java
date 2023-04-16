@@ -341,20 +341,16 @@ public class CuriosEventHandler {
                   (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(slotContext) &&
                       curio.canEquipFromUse(slotContext))) {
                 ItemStack present = stackHandler.getStackInSlot(i);
+                stackHandler.setStackInSlot(i, stack.copy());
+                curio.onEquipFromUse(slotContext);
 
-                if (present.isEmpty()) {
-                  stackHandler.setStackInSlot(i, stack.copy());
-                  curio.onEquipFromUse(slotContext);
-
-                  if (!player.isCreative()) {
-                    int count = stack.getCount();
-                    stack.shrink(count);
-                  }
-                  evt.setCancellationResult(
-                      InteractionResult.sidedSuccess(player.level.isClientSide()));
-                  evt.setCanceled(true);
-                  return;
+                if (!present.isEmpty()) {
+                  player.setItemInHand(evt.getHand(), present.copy());
                 }
+                evt.setCancellationResult(
+                    InteractionResult.sidedSuccess(player.level.isClientSide()));
+                evt.setCanceled(true);
+                return;
               }
             }
           }
