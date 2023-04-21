@@ -320,6 +320,7 @@ public class CuriosEventHandler {
     curiosHelper.getCurio(stack).ifPresent(
         curio -> curiosHelper.getCuriosHandler(player).ifPresent(handler -> {
           Map<String, ICurioStacksHandler> curios = handler.getCurios();
+          Tuple<IDynamicStackHandler, SlotContext> firstSlot = null;
 
           for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
             IDynamicStackHandler stackHandler = entry.getValue().getStacks();
@@ -341,18 +342,37 @@ public class CuriosEventHandler {
                   (curiosHelper.isStackValid(slotContext, stack) && curio.canEquip(slotContext) &&
                       curio.canEquipFromUse(slotContext))) {
                 ItemStack present = stackHandler.getStackInSlot(i);
-                stackHandler.setStackInSlot(i, stack.copy());
-                curio.onEquipFromUse(slotContext);
 
-                if (!present.isEmpty()) {
-                  player.setItemInHand(evt.getHand(), present.copy());
+                if (present.isEmpty()) {
+                  stackHandler.setStackInSlot(i, stack.copy());
+                  curio.onEquipFromUse(slotContext);
+
+                  if (!player.isCreative()) {
+                    int count = stack.getCount();
+                    stack.shrink(count);
+                  }
+                  evt.setCancellationResult(
+                      InteractionResult.sidedSuccess(player.level.isClientSide()));
+                  evt.setCanceled(true);
+                  return;
+                } else if (firstSlot == null) {
+                  firstSlot = new Tuple<>(stackHandler, slotContext);
                 }
-                evt.setCancellationResult(
-                    InteractionResult.sidedSuccess(player.level.isClientSide()));
-                evt.setCanceled(true);
-                return;
               }
             }
+          }
+
+          if (firstSlot != null) {
+            IDynamicStackHandler stackHandler = firstSlot.getA();
+            SlotContext slotContext = firstSlot.getB();
+            int i = slotContext.index();
+            ItemStack present = stackHandler.getStackInSlot(i);
+            stackHandler.setStackInSlot(i, stack.copy());
+            curio.onEquipFromUse(slotContext);
+            player.setItemInHand(evt.getHand(), present.copy());
+            evt.setCancellationResult(
+                InteractionResult.sidedSuccess(player.level.isClientSide()));
+            evt.setCanceled(true);
           }
         }));
   }
