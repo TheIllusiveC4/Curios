@@ -2,8 +2,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.19.3/docs/CHANGELOG.md).
 
-## [1.19.4-5.1.5.1] - 2023.04.20
+## [1.19.4-5.1.5.2] - 2023.04.28
 ### Changed
-- Curios swapping will now take into account all valid slots instead of just the first valid slot
-### Fixed
-- Fixed duplication bug when equipping from use in the hotbar
+- Updated `ru_ru` localization (thanks Heimdallr-1!) [#302](https://github.com/TheIllusiveC4/Curios/pull/302)
