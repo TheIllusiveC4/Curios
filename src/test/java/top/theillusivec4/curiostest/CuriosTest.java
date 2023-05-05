@@ -94,6 +94,8 @@ public class CuriosTest {
         () -> Arrays.stream(SlotTypePreset.values())
             .map(preset -> preset.getMessageBuilder().cosmetic().build())
             .collect(Collectors.toList()));
+    InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE,
+        () -> new SlotTypeMessage.Builder("test").build());
   }
 
   private void clientSetup(final FMLClientSetupEvent evt) {

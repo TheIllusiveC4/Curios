@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.19.4-5.1.5.3] - 2023.05.05
+### Fixed
+- Fixed default curio slot texture not showing properly
+
 ## [1.19.4-5.1.5.2] - 2023.04.28
 ### Changed
 - Updated `ru_ru` localization (thanks Heimdallr-1!) [#302](https://github.com/TheIllusiveC4/Curios/pull/302)
