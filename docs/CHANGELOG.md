@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.19.2-5.1.4.1] - 2023.05.05
+### Fixed
+- Fixed default curio slot texture not showing properly
+
 ## [1.19.2-5.1.4.0] - 2023.04.16
 ### Added
 - Added `CurioAttributeModifierEvent` for editing curio attribute modifiers in slots [#292](https://github.com/TheIllusiveC4/Curios/issues/292)
