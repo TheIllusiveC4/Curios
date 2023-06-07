@@ -5,7 +5,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,30 +20,6 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 public class CuriosMixinHooks {
 
   private static final ITagManager<Item> ITEM_TAGS = ForgeRegistries.ITEMS.tags();
-
-  public static boolean hasEnderMask(LivingEntity livingEntity, EnderMan enderMan) {
-    return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).map(handler -> {
-
-      for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
-        IDynamicStackHandler stacks = entry.getValue().getStacks();
-
-        for (int i = 0; i < stacks.getSlots(); i++) {
-          final int index = i;
-          NonNullList<Boolean> renderStates = entry.getValue().getRenders();
-          boolean hasMask =
-              CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(curio -> curio
-                      .isEnderMask(new SlotContext(entry.getKey(), livingEntity, index, false,
-                          renderStates.size() > index && renderStates.get(index)), enderMan))
-                  .orElse(false);
-
-          if (hasMask) {
-            return true;
-          }
-        }
-      }
-      return false;
-    }).orElse(false);
-  }
 
   public static boolean canNeutralizePiglins(LivingEntity livingEntity) {
     return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).map(handler -> {
@@ -80,10 +55,10 @@ public class CuriosMixinHooks {
           final int index = i;
           NonNullList<Boolean> renderStates = entry.getValue().getRenders();
           boolean canWalk =
-                  CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(curio -> curio
-                                  .canWalkOnPowderedSnow(new SlotContext(entry.getKey(), livingEntity, index, false,
-                                          renderStates.size() > index && renderStates.get(index))))
-                          .orElse(false);
+              CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(curio -> curio
+                      .canWalkOnPowderedSnow(new SlotContext(entry.getKey(), livingEntity, index, false,
+                          renderStates.size() > index && renderStates.get(index))))
+                  .orElse(false);
 
           if (canWalk) {
             return true;
