@@ -351,10 +351,10 @@ public interface ICurio {
     if (!stack.isEmpty()) {
 
       if (!livingEntity.isSilent()) {
-        livingEntity.level
+        livingEntity.level()
             .playLocalSound(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(),
                 SoundEvents.ITEM_BREAK, livingEntity.getSoundSource(), 0.8F,
-                0.8F + livingEntity.level.random.nextFloat() * 0.4F, false);
+                0.8F + livingEntity.level().random.nextFloat() * 0.4F, false);
       }
 
       for (int i = 0; i < 5; ++i) {
@@ -369,7 +369,7 @@ public interface ICurio {
         vec3d1 = vec3d1.yRot(-livingEntity.getYRot() * ((float) Math.PI / 180F));
         vec3d1 = vec3d1.add(livingEntity.getX(),
             livingEntity.getY() + livingEntity.getEyeHeight(), livingEntity.getZ());
-        livingEntity.level
+        livingEntity.level()
             .addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
                 vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
       }
@@ -521,7 +521,7 @@ public interface ICurio {
   default void playRightClickEquipSound(LivingEntity livingEntity) {
     // Not enough context for id and index so we just pass in artificial values with the entity
     SoundInfo soundInfo = getEquipSound(new SlotContext("", livingEntity, 0, false, true));
-    livingEntity.level.playSound(null, livingEntity.blockPosition(), soundInfo.getSoundEvent(),
+    livingEntity.level().playSound(null, livingEntity.blockPosition(), soundInfo.getSoundEvent(),
         livingEntity.getSoundSource(), soundInfo.getVolume(), soundInfo.getPitch());
   }
 

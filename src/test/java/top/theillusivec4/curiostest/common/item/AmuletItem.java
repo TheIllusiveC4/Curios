@@ -59,7 +59,7 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
   public void curioTick(SlotContext slotContext, ItemStack stack) {
     LivingEntity living = slotContext.entity();
 
-    if (!living.level.isClientSide() && living.tickCount % 40 == 0) {
+    if (!living.level().isClientSide() && living.tickCount % 40 == 0) {
       living.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 80, 0, true, true));
     }
   }

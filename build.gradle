@@ -1,38 +1,25 @@
-buildscript {
-    repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        maven { url = 'https://plugins.gradle.org/m2/' }
-        maven { url = 'https://maven.parchmentmc.org' }
-        maven {
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
-            content { includeGroup "org.spongepowered" }
-        }
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
-        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version:'1.4.0'
-        classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
-        classpath group: 'com.modrinth.minotaur', name: 'Minotaur', version: '2.+'
-    }
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'com.modrinth.minotaur' version '2.+'
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
+    id 'net.darkhax.curseforgegradle' version '1.+'
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'com.matthewprenger.cursegradle'
-apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'maven-publish'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'com.modrinth.minotaur'
 
 version = "${mod_version}"
 group = "top.theillusivec4.${mod_id}"
-archivesBaseName = "${mod_id}-forge"
+
+base {
+    archivesName = "${mod_id}-forge"
+}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'parchment', version: '1.19.3-2023.03.12-1.19.4'
+    mappings channel: 'parchment', version: '1.19.3-2023.03.12-1.20'
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -160,20 +147,18 @@ artifacts {
 
 jar.finalizedBy('reobfJar')
 
-curseforge {
-    apiKey = findProperty('curseKey') ?: 0
-
-    project {
-        id = "${curse_id}"
-        releaseType = "${release_type}"
-        changelogType = 'markdown'
-        changelog = file('CHANGELOG_LATEST.md')
-        addArtifact(sourcesJar)
-        addArtifact(apiJar)
-        "${release_versions}".split(',').each {
-            addGameVersion "${it}"
-        }
+task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
+    apiToken = findProperty('curseKey')
+    def projectId = "${curse_id}".toString()
+    def mainFile = upload(projectId, jar)
+    mainFile.changelogType = 'markdown'
+    mainFile.changelog = file('CHANGELOG_LATEST.md')
+    mainFile.releaseType = "${release_type}"
+    "${release_versions}".split(',').each {
+        mainFile.addGameVersion("${it}")
     }
+    mainFile.withAdditionalFile(sourcesJar)
+    mainFile.withAdditionalFile(apiJar)
 }
 
 modrinth {
@@ -216,4 +201,8 @@ publishing {
             }
         }
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }

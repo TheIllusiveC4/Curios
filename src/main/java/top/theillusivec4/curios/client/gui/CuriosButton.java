@@ -22,6 +22,7 @@ package top.theillusivec4.curios.client.gui;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -74,8 +75,8 @@ public class CuriosButton extends ImageButton {
   }
 
   @Override
-  public void renderWidget(@Nonnull PoseStack matrixStack, int mouseX, int mouseY,
-                       float partialTicks) {
+  public void renderWidget(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
+                           float partialTicks) {
     Tuple<Integer, Integer> offsets =
         CuriosScreen.getButtonOffset(parentGui instanceof CreativeModeInventoryScreen);
     this.setX(parentGui.getGuiLeft() + offsets.getA());
@@ -90,6 +91,6 @@ public class CuriosButton extends ImageButton {
         return;
       }
     }
-    super.renderWidget(matrixStack, mouseX, mouseY, partialTicks);
+    super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
   }
 }

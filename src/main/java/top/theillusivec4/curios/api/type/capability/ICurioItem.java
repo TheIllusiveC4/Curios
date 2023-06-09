@@ -411,7 +411,7 @@ public interface ICurioItem {
     // Not enough context for id and index, so we just pass in artificial values with the entity
     ICurio.SoundInfo soundInfo =
         getEquipSound(new SlotContext("", livingEntity, 0, false, true), stack);
-    livingEntity.level.playSound(null, livingEntity.blockPosition(), soundInfo.getSoundEvent(),
+    livingEntity.level().playSound(null, livingEntity.blockPosition(), soundInfo.getSoundEvent(),
         livingEntity.getSoundSource(), soundInfo.getVolume(), soundInfo.getPitch());
   }
 

@@ -141,11 +141,11 @@ public class CuriosEventHandler {
 
   private static ItemEntity getDroppedItem(ItemStack droppedItem, LivingEntity livingEntity) {
     double d0 = livingEntity.getY() - 0.30000001192092896D + livingEntity.getEyeHeight();
-    ItemEntity entityitem = new ItemEntity(livingEntity.level, livingEntity.getX(), d0,
+    ItemEntity entityitem = new ItemEntity(livingEntity.level(), livingEntity.getX(), d0,
         livingEntity.getZ(), droppedItem);
     entityitem.setPickUpDelay(40);
-    float f = livingEntity.level.random.nextFloat() * 0.5F;
-    float f1 = livingEntity.level.random.nextFloat() * ((float) Math.PI * 2F);
+    float f = livingEntity.level().random.nextFloat() * 0.5F;
+    float f1 = livingEntity.level().random.nextFloat() * ((float) Math.PI * 2F);
     entityitem.setDeltaMovement((-Mth.sin(f1) * f), 0.20000000298023224D, (Mth.cos(f1) * f));
     return entityitem;
   }
@@ -275,7 +275,7 @@ public class CuriosEventHandler {
         MinecraftForge.EVENT_BUS.post(dropRulesEvent);
         List<Tuple<Predicate<ItemStack>, DropRule>> dropRules = dropRulesEvent.getOverrides();
 
-        boolean keepInventory = livingEntity.level.getGameRules()
+        boolean keepInventory = livingEntity.level().getGameRules()
             .getBoolean(GameRules.RULE_KEEPINVENTORY);
 
         curios.forEach((id, stacksHandler) -> {
@@ -298,7 +298,7 @@ public class CuriosEventHandler {
   public void playerXPPickUp(PickupXp evt) {
     Player player = evt.getEntity();
 
-    if (!player.level.isClientSide) {
+    if (!player.level().isClientSide) {
       CuriosApi.getCuriosHelper().getCuriosHandler(player).ifPresent(handler -> {
         Map<String, ICurioStacksHandler> curios = handler.getCurios();
         for (ICurioStacksHandler stacksHandler : curios.values()) {
@@ -352,7 +352,7 @@ public class CuriosEventHandler {
                     stack.shrink(count);
                   }
                   evt.setCancellationResult(
-                      InteractionResult.sidedSuccess(player.level.isClientSide()));
+                      InteractionResult.sidedSuccess(player.level().isClientSide()));
                   evt.setCanceled(true);
                   return;
                 } else if (firstSlot == null) {
@@ -371,7 +371,7 @@ public class CuriosEventHandler {
             curio.onEquipFromUse(slotContext);
             player.setItemInHand(evt.getHand(), present.copy());
             evt.setCancellationResult(
-                InteractionResult.sidedSuccess(player.level.isClientSide()));
+                InteractionResult.sidedSuccess(player.level().isClientSide()));
             evt.setCanceled(true);
           }
         }));
@@ -509,16 +509,16 @@ public class CuriosEventHandler {
           final int index = i;
 
           if (!stack.isEmpty()) {
-            stack.inventoryTick(livingEntity.level, livingEntity, -1, false);
+            stack.inventoryTick(livingEntity.level(), livingEntity, -1, false);
             currentCurio.ifPresent(curio -> curio.curioTick(slotContext));
 
             // todo: Remove in 1.19
-            if (livingEntity.level.isClientSide) {
+            if (livingEntity.level().isClientSide) {
               currentCurio.ifPresent(curio -> curio.curioAnimate(identifier, index, livingEntity));
             }
           }
 
-          if (!livingEntity.level.isClientSide) {
+          if (!livingEntity.level().isClientSide) {
             ItemStack prevStack = stackHandler.getPreviousStackInSlot(i);
 
             if (!ItemStack.matches(stack, prevStack)) {
@@ -574,7 +574,7 @@ public class CuriosEventHandler {
 
                 if (livingEntity instanceof ServerPlayer) {
                   EquipCurioTrigger.INSTANCE.trigger((ServerPlayer) livingEntity, stack,
-                      (ServerLevel) livingEntity.level, livingEntity.getX(),
+                      (ServerLevel) livingEntity.level(), livingEntity.getX(),
                       livingEntity.getY(), livingEntity.getZ());
                 }
               }

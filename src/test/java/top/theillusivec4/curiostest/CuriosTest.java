@@ -29,7 +29,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
@@ -76,9 +76,9 @@ public class CuriosTest {
     }
   }
 
-  private void creativeTab(final CreativeModeTabEvent.BuildContents evt) {
+  private void creativeTab(final BuildCreativeModeTabContentsEvent evt) {
 
-    if (evt.getTab() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+    if (evt.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
       Collection<ItemLike> items =
           List.of(CuriosTestRegistry.AMULET.get(), CuriosTestRegistry.CROWN.get(),
               CuriosTestRegistry.KNUCKLES.get(), CuriosTestRegistry.RING.get());

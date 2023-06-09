@@ -55,7 +55,8 @@ public class CuriosCommand {
 
       for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
         context.getSource().sendSuccess(
-            Component.literal(entry.getKey() + " - " + String.join(", ", entry.getValue())), false);
+            () -> Component.literal(entry.getKey() + " - " + String.join(", ", entry.getValue())),
+            false);
       }
       return Command.SINGLE_SUCCESS;
     }));
@@ -152,16 +153,15 @@ public class CuriosCommand {
       throws CommandSyntaxException {
     ItemStack stack = item.createItemStack(count, false);
     CuriosApi.getCuriosHelper().setEquippedCurio(player, slot, index, stack);
-    source.sendSuccess(
-        Component.translatable("commands.curios.replace.success", slot, player.getDisplayName(),
-            stack.getDisplayName()), true);
+    source.sendSuccess(() -> Component.translatable("commands.curios.replace.success", slot,
+        player.getDisplayName(), stack.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
 
   private static int setSlotsForPlayer(CommandSourceStack source, ServerPlayer playerMP,
                                        String slot, int amount) {
     CuriosApi.getSlotHelper().setSlotsForType(slot, playerMP, amount);
-    source.sendSuccess(Component.translatable("commands.curios.set.success", slot,
+    source.sendSuccess(() -> Component.translatable("commands.curios.set.success", slot,
             CuriosApi.getSlotHelper().getSlotsForType(playerMP, slot), playerMP.getDisplayName()),
         true);
     return Command.SINGLE_SUCCESS;
@@ -170,7 +170,7 @@ public class CuriosCommand {
   private static int growSlotForPlayer(CommandSourceStack source, ServerPlayer playerMP,
                                        String slot, int amount) {
     CuriosApi.getSlotHelper().growSlotType(slot, amount, playerMP);
-    source.sendSuccess(Component.translatable("commands.curios.add.success", amount, slot,
+    source.sendSuccess(() -> Component.translatable("commands.curios.add.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
@@ -178,7 +178,7 @@ public class CuriosCommand {
   private static int shrinkSlotForPlayer(CommandSourceStack source, ServerPlayer playerMP,
                                          String slot, int amount) {
     CuriosApi.getSlotHelper().shrinkSlotType(slot, amount, playerMP);
-    source.sendSuccess(Component.translatable("commands.curios.remove.success", amount, slot,
+    source.sendSuccess(() -> Component.translatable("commands.curios.remove.success", amount, slot,
         playerMP.getDisplayName()), true);
     return Command.SINGLE_SUCCESS;
   }
@@ -200,10 +200,10 @@ public class CuriosCommand {
     });
 
     if (slot.isEmpty()) {
-      source.sendSuccess(Component.translatable("commands.curios.dropAll.success",
+      source.sendSuccess(() -> Component.translatable("commands.curios.dropAll.success",
           playerMP.getDisplayName()), true);
     } else {
-      source.sendSuccess(Component.translatable("commands.curios.drop.success", slot,
+      source.sendSuccess(() -> Component.translatable("commands.curios.drop.success", slot,
           playerMP.getDisplayName()), true);
     }
     return Command.SINGLE_SUCCESS;
@@ -244,10 +244,10 @@ public class CuriosCommand {
     });
 
     if (slot.isEmpty()) {
-      source.sendSuccess(Component.translatable("commands.curios.clearAll.success",
+      source.sendSuccess(() -> Component.translatable("commands.curios.clearAll.success",
           playerMP.getDisplayName()), true);
     } else {
-      source.sendSuccess(Component.translatable("commands.curios.clear.success", slot,
+      source.sendSuccess(() -> Component.translatable("commands.curios.clear.success", slot,
           playerMP.getDisplayName()), true);
     }
     return Command.SINGLE_SUCCESS;
@@ -260,7 +260,7 @@ public class CuriosCommand {
           new SPacketSyncCurios(playerMP.getId(), handler.getCurios()));
     });
     source.sendSuccess(
-        Component.translatable("commands.curios.reset.success", playerMP.getDisplayName()),
+        () -> Component.translatable("commands.curios.reset.success", playerMP.getDisplayName()),
         true);
     return Command.SINGLE_SUCCESS;
   }
