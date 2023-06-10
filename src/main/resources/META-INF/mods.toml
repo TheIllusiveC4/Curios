@@ -16,13 +16,13 @@ A flexible and expandable accessory/equipment API for users and developers.
 [[dependencies.curios]]
     modId="forge"
     mandatory=true
-    versionRange="[45,)"
+    versionRange="[46,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curios]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.4]"
+    versionRange="[1.20]"
     ordering="NONE"
     side="BOTH"
 [modproperties.curios]

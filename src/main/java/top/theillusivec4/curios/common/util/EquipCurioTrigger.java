@@ -2,14 +2,10 @@ package top.theillusivec4.curios.common.util;
 
 import com.google.gson.JsonObject;
 import javax.annotation.Nonnull;
-import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
-import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
-import net.minecraft.advancements.critereon.EntityPredicate;
-import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.LocationPredicate;
+
+import net.minecraft.advancements.critereon.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.advancements.critereon.DeserializationContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import top.theillusivec4.curios.Curios;
@@ -40,7 +36,7 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
   @Override
   public EquipCurioTrigger.Instance createInstance(@Nonnull JsonObject json,
                                                        @Nonnull
-                                                           EntityPredicate.Composite playerPred,
+                                                       ContextAwarePredicate playerPred,
                                                        @Nonnull DeserializationContext conditions) {
     return new EquipCurioTrigger.Instance(playerPred, ItemPredicate.fromJson(json.get("item")),
         LocationPredicate.fromJson(json.get("location")));
@@ -56,7 +52,7 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
     private final ItemPredicate item;
     private final LocationPredicate location;
 
-    Instance(EntityPredicate.Composite playerPred, ItemPredicate count,
+    Instance(ContextAwarePredicate playerPred, ItemPredicate count,
              LocationPredicate indexPos) {
       super(ID, playerPred);
       this.item = count;

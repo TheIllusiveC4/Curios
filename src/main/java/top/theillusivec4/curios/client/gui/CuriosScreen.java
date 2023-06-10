@@ -24,6 +24,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -78,7 +79,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
   public CuriosScreen(CuriosContainer curiosContainer, Inventory playerInventory,
                       Component title) {
     super(curiosContainer, playerInventory, title);
-    this.passEvents = true;
+//    this.passEvents = true;
   }
 
   public static Tuple<Integer, Integer> getButtonOffset(boolean isCreative) {
@@ -225,24 +226,24 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
   }
 
   @Override
-  public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    this.renderBackground(matrixStack);
+  public void render(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    this.renderBackground(guiGraphics);
 
     if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
-      this.renderBg(matrixStack, partialTicks, mouseX, mouseY);
-      this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
+      this.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+      this.recipeBookGui.render(guiGraphics, mouseX, mouseY, partialTicks);
     } else {
-      this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
-      super.render(matrixStack, mouseX, mouseY, partialTicks);
+      this.recipeBookGui.render(guiGraphics, mouseX, mouseY, partialTicks);
+      super.render(guiGraphics, mouseX, mouseY, partialTicks);
       this.recipeBookGui
-          .renderGhostRecipe(matrixStack, this.leftPos, this.topPos, true, partialTicks);
+          .renderGhostRecipe(guiGraphics, this.leftPos, this.topPos, true, partialTicks);
 
       boolean isButtonHovered = false;
 
       for (Renderable button : this.renderables) {
 
         if (button instanceof RenderButton) {
-          ((RenderButton) button).renderButtonOverlay(matrixStack, mouseX, mouseY, partialTicks);
+          ((RenderButton) button).renderButtonOverlay(guiGraphics, mouseX, mouseY, partialTicks);
 
           if (((RenderButton) button).isHovered()) {
             isButtonHovered = true;
@@ -257,16 +258,16 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
         Slot slot = this.getSlotUnderMouse();
 
         if (slot instanceof CurioSlot slotCurio && !slot.hasItem()) {
-          this.renderTooltip(matrixStack, Component.literal(slotCurio.getSlotName()), mouseX,
+          guiGraphics.renderTooltip(font, Component.literal(slotCurio.getSlotName()), mouseX,
               mouseY);
         }
       }
     }
-    this.renderTooltip(matrixStack, mouseX, mouseY);
+    this.renderTooltip(guiGraphics, mouseX, mouseY);
   }
 
   @Override
-  protected void renderTooltip(@Nonnull PoseStack matrixStack, int mouseX, int mouseY) {
+  protected void renderTooltip(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY) {
     Minecraft mc = this.minecraft;
 
     if (mc != null) {
@@ -275,10 +276,10 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
       if (clientPlayer != null && clientPlayer.inventoryMenu.getCarried().isEmpty()) {
 
         if (this.isRenderButtonHovered) {
-          this.renderTooltip(matrixStack, Component.translatable("gui.curios.toggle"), mouseX,
+          guiGraphics.renderTooltip(font, Component.translatable("gui.curios.toggle"), mouseX,
               mouseY);
         } else if (this.hoveredSlot != null && this.hoveredSlot.hasItem()) {
-          this.renderTooltip(matrixStack, this.hoveredSlot.getItem(), mouseX, mouseY);
+          guiGraphics.renderTooltip(font, this.hoveredSlot.getItem(), mouseX, mouseY);
         }
       }
     }
@@ -305,11 +306,11 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
   }
 
   @Override
-  protected void renderLabels(@Nonnull PoseStack matrixStack, int mouseX,
+  protected void renderLabels(@Nonnull GuiGraphics guiGraphics, int mouseX,
                               int mouseY) {
 
     if (this.minecraft != null && this.minecraft.player != null) {
-      this.font.draw(matrixStack, this.title, 97, 6, 4210752);
+      guiGraphics.drawString(font, this.title, 97, 6, 4210752, false);
     }
   }
 
@@ -318,16 +319,15 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
    */
 
   @Override
-  protected void renderBg(@Nonnull PoseStack matrixStack,
+  protected void renderBg(@Nonnull GuiGraphics guiGraphics,
                           float partialTicks, int mouseX, int mouseY) {
 
     if (this.minecraft != null && this.minecraft.player != null) {
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-      RenderSystem.setShaderTexture(0, INVENTORY_LOCATION);
       int i = this.leftPos;
       int j = this.topPos;
-      blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
-      InventoryScreen.renderEntityInInventoryFollowsMouse(matrixStack, i + 51, j + 75, 30,
+      guiGraphics.blit(INVENTORY_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
+      InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, i + 51, j + 75, 30,
           (float) (i + 51) - mouseX, (float) (j + 75 - 50) - mouseY, this.minecraft.player);
       CuriosApi.getCuriosHelper().getCuriosHandler(this.minecraft.player).ifPresent(handler -> {
         int slotCount = handler.getVisibleSlots();
@@ -345,14 +345,14 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
             width = 46;
             xOffset -= 19;
           }
-          blit(matrixStack, i + xOffset, j + 4, xTexOffset, 0, width, upperHeight);
+          guiGraphics.blit(CURIO_INVENTORY, i + xOffset, j + 4, xTexOffset, 0, width, upperHeight);
 
           if (slotCount <= 8) {
-            blit(matrixStack, i + xOffset, j + 4 + upperHeight, xTexOffset, 151, width, 7);
+            guiGraphics.blit(CURIO_INVENTORY, i + xOffset, j + 4 + upperHeight, xTexOffset, 151, width, 7);
           } else {
-            blit(matrixStack, i + xOffset - 16, j + 4, 27, 0, 23, 158);
-            RenderSystem.setShaderTexture(0, CREATIVE_INVENTORY_TABS);
-            blit(matrixStack, i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 232, 0,
+            guiGraphics.blit(CURIO_INVENTORY, i + xOffset - 16, j + 4, 27, 0, 23, 158);
+
+            guiGraphics.blit(CREATIVE_INVENTORY_TABS, i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 232, 0,
                 12, 15);
           }
 
@@ -361,8 +361,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
             if (slot instanceof CosmeticCurioSlot) {
               int x = this.leftPos + slot.x - 1;
               int y = this.topPos + slot.y - 1;
-              RenderSystem.setShaderTexture(0, CURIO_INVENTORY);
-              blit(matrixStack, x, y, 138, 0, 18, 18);
+              guiGraphics.blit(CURIO_INVENTORY, x, y, 138, 0, 18, 18);
             }
           }
         }

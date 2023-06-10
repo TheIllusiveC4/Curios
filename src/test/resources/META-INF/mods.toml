@@ -12,12 +12,12 @@ A test mod for Curios
 [[dependencies.curiostest]]
     modId="forge"
     mandatory=true
-    versionRange="[41,)"
+    versionRange="[46,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curiostest]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19,1.20)"
+    versionRange="[1.20]"
     ordering="NONE"
     side="BOTH"

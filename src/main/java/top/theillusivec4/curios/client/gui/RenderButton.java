@@ -22,6 +22,8 @@ package top.theillusivec4.curios.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nonnull;
+
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.resources.ResourceLocation;
@@ -46,11 +48,11 @@ public class RenderButton extends ImageButton {
   }
 
   @Override
-  public void renderWidget(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void renderWidget(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
     // NO-OP
   }
 
-  public void renderButtonOverlay(@Nonnull PoseStack matrixStack, int mouseX, int mouseY,
+  public void renderButtonOverlay(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
                                   float partialTicks) {
     RenderSystem.setShaderTexture(0, this.resourceLocation);
     RenderSystem.disableDepthTest();
@@ -59,7 +61,7 @@ public class RenderButton extends ImageButton {
     if (!slot.getRenderStatus()) {
       j += 8;
     }
-    blit(matrixStack, this.getX(), this.getY(), (float) j, (float) this.yTexStart,
+    guiGraphics.blit(resourceLocation, this.getX(), this.getY(), (float) j, (float) this.yTexStart,
         this.width, this.height, 256, 256);
     RenderSystem.enableDepthTest();
   }

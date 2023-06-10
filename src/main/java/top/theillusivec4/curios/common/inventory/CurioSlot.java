@@ -82,7 +82,7 @@ public class CurioSlot extends SlotItemHandler {
     boolean flag = current.isEmpty() && stack.isEmpty();
     super.set(stack);
 
-    if (!flag && !ItemStack.isSame(current, stack) &&
+    if (!flag && !ItemStack.isSameItem(current, stack) &&
         !((AccessorEntity) this.player).getFirstTick()) {
       CuriosApi.getCuriosHelper().getCurio(stack)
           .ifPresent(curio -> curio.onEquipFromUse(this.slotContext));

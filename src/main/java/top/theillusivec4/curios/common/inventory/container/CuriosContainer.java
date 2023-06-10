@@ -34,12 +34,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.inventory.RecipeBookType;
-import net.minecraft.world.inventory.ResultContainer;
-import net.minecraft.world.inventory.ResultSlot;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
@@ -74,7 +69,7 @@ public class CuriosContainer extends InventoryMenu {
 
   private final boolean isLocalWorld;
 
-  private CraftingContainer craftMatrix = new CraftingContainer(this, 2, 2);
+  private CraftingContainer craftMatrix = new TransientCraftingContainer(this, 2, 2);
   private ResultContainer craftResult = new ResultContainer();
   private int lastScrollIndex;
   private boolean cosmeticColumn;
@@ -84,14 +79,14 @@ public class CuriosContainer extends InventoryMenu {
   }
 
   public CuriosContainer(int windowId, Inventory playerInventory) {
-    super(playerInventory, playerInventory.player.level.isClientSide, playerInventory.player);
+    super(playerInventory, playerInventory.player.level().isClientSide, playerInventory.player);
     this.menuType = CuriosRegistry.CURIO_MENU.get();
     this.containerId = windowId;
     this.remoteSlots.clear();
     this.lastSlots.clear();
     this.slots.clear();
     this.player = playerInventory.player;
-    this.isLocalWorld = this.player.level.isClientSide;
+    this.isLocalWorld = this.player.level().isClientSide;
     this.curiosHandler = CuriosApi.getCuriosHelper().getCuriosHandler(this.player);
     this.addSlot(
         new ResultSlot(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154,
@@ -324,22 +319,22 @@ public class CuriosContainer extends InventoryMenu {
   @Override
   public void slotsChanged(@Nonnull Container inventoryIn) {
 
-    if (!this.player.level.isClientSide) {
+    if (!this.player.level().isClientSide) {
       ServerPlayer playerMP = (ServerPlayer) this.player;
       ItemStack stack = ItemStack.EMPTY;
-      MinecraftServer server = this.player.level.getServer();
+      MinecraftServer server = this.player.level().getServer();
 
       if (server == null) {
         return;
       }
       Optional<CraftingRecipe> recipe = server.getRecipeManager()
-          .getRecipeFor(RecipeType.CRAFTING, this.craftMatrix, this.player.level);
+          .getRecipeFor(RecipeType.CRAFTING, this.craftMatrix, this.player.level());
 
       if (recipe.isPresent()) {
         CraftingRecipe craftingRecipe = recipe.get();
 
-        if (this.craftResult.setRecipeUsed(this.player.level, playerMP, craftingRecipe)) {
-          stack = craftingRecipe.assemble(this.craftMatrix, this.player.level.registryAccess());
+        if (this.craftResult.setRecipeUsed(this.player.level(), playerMP, craftingRecipe)) {
+          stack = craftingRecipe.assemble(this.craftMatrix, this.player.level().registryAccess());
         }
       }
       this.craftResult.setItem(0, stack);
@@ -355,7 +350,7 @@ public class CuriosContainer extends InventoryMenu {
     super.removed(playerIn);
     this.craftResult.clearContent();
 
-    if (!playerIn.level.isClientSide) {
+    if (!playerIn.level().isClientSide) {
       this.clearContainer(playerIn, this.craftMatrix);
     }
   }
@@ -480,7 +475,7 @@ public class CuriosContainer extends InventoryMenu {
 
   @Override
   public boolean recipeMatches(Recipe<? super CraftingContainer> recipeIn) {
-    return recipeIn.matches(this.craftMatrix, this.player.level);
+    return recipeIn.matches(this.craftMatrix, this.player.level());
   }
 
   @Override

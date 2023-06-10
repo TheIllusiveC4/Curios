@@ -58,7 +58,7 @@ public class RingItem extends Item {
       public void curioTick(SlotContext slotContext) {
         LivingEntity livingEntity = slotContext.entity();
 
-        if (!livingEntity.level.isClientSide() && livingEntity.tickCount % 19 == 0) {
+        if (!livingEntity.level().isClientSide() && livingEntity.tickCount % 19 == 0) {
           livingEntity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 20, 0, true, true));
         }
       }
