@@ -55,7 +55,6 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
@@ -563,7 +562,6 @@ public class CurioInventoryCapability {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nullable Capability<T> capability, Direction facing) {
-      Curios.LOGGER.info("get");
 
       if (!this.wearer.level().isClientSide() &&
           CuriosApi.getEntitySlots(this.wearer.getType()).isEmpty()) {
