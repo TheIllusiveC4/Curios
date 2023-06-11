@@ -56,6 +56,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.EnderManAngerEvent;
@@ -91,9 +92,13 @@ import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
+import top.theillusivec4.curios.common.data.CuriosEntityManager;
+import top.theillusivec4.curios.common.data.CuriosSlotManager;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncData;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
@@ -126,6 +131,11 @@ public class CuriosEventHandler {
             CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio
                 .getDropRule(slotContext, evt.getSource(), evt.getLootingLevel(),
                     evt.isRecentlyHit())).orElse(DropRule.DEFAULT);
+
+        if (dropRule == DropRule.DEFAULT) {
+          dropRule = CuriosSlotManager.INSTANCE.getSlot(identifier).map(ISlotType::getDropRule)
+              .orElse(DropRule.DEFAULT);
+        }
 
         if ((dropRule == DropRule.DEFAULT && keepInventory) || dropRule == DropRule.ALWAYS_KEEP) {
           continue;
@@ -181,7 +191,7 @@ public class CuriosEventHandler {
     Player playerEntity = evt.getEntity();
 
     if (playerEntity instanceof ServerPlayer) {
-      Collection<ISlotType> slotTypes = CuriosApi.getSlotHelper().getSlotTypes();
+      Collection<ISlotType> slotTypes = CuriosApi.getPlayerSlots().values();
       Map<String, ResourceLocation> icons = new HashMap<>();
       slotTypes.forEach(type -> icons.put(type.getIdentifier(), type.getIcon()));
       NetworkHandler.INSTANCE
@@ -191,11 +201,38 @@ public class CuriosEventHandler {
   }
 
   @SubscribeEvent
+  public void onDatapackSync(OnDatapackSyncEvent evt) {
+
+    if (evt.getPlayer() == null) {
+      PlayerList playerList = evt.getPlayerList();
+
+      for (ServerPlayer player : playerList.getPlayers()) {
+
+        CuriosApi.getCuriosHelper().getCuriosHandler(player).ifPresent(handler -> {
+          handler.readTag(handler.writeTag());
+          NetworkHandler.INSTANCE.send(
+              PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
+              new SPacketSyncCurios(player.getId(), handler.getCurios()));
+
+          if (player.containerMenu instanceof CuriosContainer curiosContainer) {
+            curiosContainer.resetSlots();
+          }
+        });
+        NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+            new SPacketSyncData(CuriosEntityManager.getSyncPacket()));
+      }
+    } else {
+      NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(evt::getPlayer),
+          new SPacketSyncData(CuriosEntityManager.getSyncPacket()));
+    }
+  }
+
+  @SubscribeEvent
   public void attachEntitiesCapabilities(AttachCapabilitiesEvent<Entity> evt) {
 
-    if (evt.getObject() instanceof Player) {
+    if (evt.getObject() instanceof LivingEntity livingEntity) {
       evt.addCapability(CuriosCapability.ID_INVENTORY,
-          CurioInventoryCapability.createProvider((Player) evt.getObject()));
+          CurioInventoryCapability.createProvider(livingEntity));
     }
   }
 

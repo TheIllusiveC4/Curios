@@ -19,7 +19,7 @@
 
 package top.theillusivec4.curios;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
+import com.mojang.logging.LogUtils;
 import javax.annotation.Nonnull;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -45,18 +45,16 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.config.IConfigSpec;
 import net.minecraftforge.fml.config.ModConfig.Type;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
+import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.client.ClientEventHandler;
@@ -69,9 +67,11 @@ import top.theillusivec4.curios.client.render.CuriosLayer;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.CuriosRegistry;
+import top.theillusivec4.curios.common.data.CuriosEntityManager;
+import top.theillusivec4.curios.common.data.CuriosSlotManager;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.slottype.SlotTypeManager;
+import top.theillusivec4.curios.common.slottype.LegacySlotManager;
 import top.theillusivec4.curios.common.util.EquipCurioTrigger;
 import top.theillusivec4.curios.common.util.SetCurioAttributesFunction;
 import top.theillusivec4.curios.server.SlotHelper;
@@ -83,13 +83,12 @@ import top.theillusivec4.curios.server.command.CuriosSelectorOptions;
 public class Curios {
 
   public static final String MODID = CuriosApi.MODID;
-  public static final Logger LOGGER = LogManager.getLogger();
+  public static final Logger LOGGER = LogUtils.getLogger();
 
   public Curios() {
     CuriosRegistry.init();
     final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::setup);
-    eventBus.addListener(this::config);
     eventBus.addListener(this::process);
     eventBus.addListener(this::registerCaps);
     MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
@@ -97,7 +96,6 @@ public class Curios {
     MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
     MinecraftForge.EVENT_BUS.addListener(this::reload);
     ModLoadingContext.get().registerConfig(Type.CLIENT, CuriosClientConfig.CLIENT_SPEC);
-    ModLoadingContext.get().registerConfig(Type.SERVER, CuriosConfig.SERVER_SPEC);
   }
 
   private void setup(FMLCommonSetupEvent evt) {
@@ -119,13 +117,16 @@ public class Curios {
   }
 
   private void process(InterModProcessEvent evt) {
-    SlotTypeManager.buildImcSlotTypes(evt.getIMCStream(SlotTypeMessage.REGISTER_TYPE::equals),
+    LegacySlotManager.buildImcSlotTypes(evt.getIMCStream(SlotTypeMessage.REGISTER_TYPE::equals),
         evt.getIMCStream(SlotTypeMessage.MODIFY_TYPE::equals));
   }
 
   private void serverAboutToStart(ServerAboutToStartEvent evt) {
     CuriosApi.setSlotHelper(new SlotHelper());
-    SlotTypeManager.buildSlotTypes();
+
+    for (ISlotType value : CuriosSlotManager.INSTANCE.getSlots().values()) {
+      CuriosApi.getSlotHelper().addSlotType(value);
+    }
   }
 
   private void serverStopped(ServerStoppedEvent evt) {
@@ -137,6 +138,8 @@ public class Curios {
   }
 
   private void reload(final AddReloadListenerEvent evt) {
+    evt.addListener(CuriosSlotManager.INSTANCE);
+    evt.addListener(CuriosEntityManager.INSTANCE);
     evt.addListener(new SimplePreparableReloadListener<Void>() {
       @Nonnull
       @Override
@@ -151,22 +154,6 @@ public class Curios {
         CuriosEventHandler.dirtyTags = true;
       }
     });
-  }
-
-  private void config(final ModConfigEvent.Loading evt) {
-
-    if (evt.getConfig().getModId().equals(MODID)) {
-
-      if (evt.getConfig().getType() == Type.SERVER) {
-        IConfigSpec<?> spec = evt.getConfig().getSpec();
-        CommentedConfig commentedConfig = evt.getConfig().getConfigData();
-
-        if (spec == CuriosConfig.SERVER_SPEC) {
-          CuriosConfig.transformCurios(commentedConfig);
-          SlotTypeManager.buildConfigSlotTypes();
-        }
-      }
-    }
   }
 
   @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Bus.MOD)

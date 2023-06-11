@@ -174,7 +174,7 @@ public class CuriosContainer extends InventoryMenu {
 
           for (int i = 0; i < stackHandler.getSlots() && slots < 8; i++) {
             this.addSlot(new CurioSlot(this.player, stackHandler, i, identifier, -18, yOffset,
-                stacksHandler.getRenders()));
+                stacksHandler.getRenders(), stacksHandler.canToggleRendering()));
             yOffset += 18;
             slots++;
           }
@@ -255,7 +255,7 @@ public class CuriosContainer extends InventoryMenu {
 
             if (index >= startingIndex) {
               this.addSlot(new CurioSlot(this.player, stackHandler, i, identifier, -18, yOffset,
-                  stacksHandler.getRenders()));
+                  stacksHandler.getRenders(), stacksHandler.canToggleRendering()));
               yOffset += 18;
               slots++;
             }

@@ -40,9 +40,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import org.apache.commons.lang3.EnumUtils;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
+import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
@@ -66,20 +68,25 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   private IDynamicStackHandler cosmeticStackHandler;
   private boolean visible;
   private boolean cosmetic;
+  private boolean canToggleRender;
+  private ICurio.DropRule dropRule;
   private boolean update;
   private NonNullList<Boolean> renderHandler;
 
   public CurioStacksHandler(ICuriosItemHandler itemHandler, String identifier) {
-    this(itemHandler, identifier, 1, true, false);
+    this(itemHandler, identifier, 1, true, false, true, ICurio.DropRule.DEFAULT);
   }
 
   public CurioStacksHandler(ICuriosItemHandler itemHandler, String identifier, int size,
-                            boolean visible, boolean cosmetic) {
+                            boolean visible, boolean cosmetic, boolean canToggleRender,
+                            ICurio.DropRule dropRule) {
     this.baseSize = size;
     this.visible = visible;
     this.cosmetic = cosmetic;
     this.itemHandler = itemHandler;
     this.identifier = identifier;
+    this.canToggleRender = canToggleRender;
+    this.dropRule = dropRule;
     this.stackHandler = new DynamicStackHandler(size);
     this.cosmeticStackHandler = new DynamicStackHandler(size);
     this.renderHandler = NonNullList.withSize(size, true);
@@ -101,6 +108,16 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   public NonNullList<Boolean> getRenders() {
     this.update();
     return this.renderHandler;
+  }
+
+  @Override
+  public boolean canToggleRendering() {
+    return this.canToggleRender;
+  }
+
+  @Override
+  public ICurio.DropRule getDropRule() {
+    return this.dropRule;
   }
 
   @Override
@@ -179,6 +196,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     compoundNBT.put("Renders", nbt);
     compoundNBT.putBoolean("HasCosmetic", this.cosmetic);
     compoundNBT.putBoolean("Visible", this.visible);
+    compoundNBT.putBoolean("RenderToggle", this.canToggleRender);
+    compoundNBT.putString("DropRule", this.dropRule.toString());
 
     if (!this.persistentModifiers.isEmpty()) {
       ListTag list = new ListTag();
@@ -242,6 +261,13 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     }
     this.cosmetic = nbt.contains("HasCosmetic") ? nbt.getBoolean("HasCosmetic") : this.cosmetic;
     this.visible = nbt.contains("Visible") ? nbt.getBoolean("Visible") : this.visible;
+    this.canToggleRender =
+        nbt.contains("RenderToggle") ? nbt.getBoolean("RenderToggle") : this.canToggleRender;
+
+    if (nbt.contains("DropRule")) {
+      this.dropRule =
+          EnumUtils.getEnum(ICurio.DropRule.class, nbt.getString("DropRule"), this.dropRule);
+    }
 
     if (nbt.contains("PersistentModifiers", 9)) {
       ListTag list = nbt.getList("PersistentModifiers", 10);
@@ -294,6 +320,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     compoundNBT.put("Renders", nbt);
     compoundNBT.putBoolean("HasCosmetic", this.cosmetic);
     compoundNBT.putBoolean("Visible", this.visible);
+    compoundNBT.putBoolean("RenderToggle", this.canToggleRender);
+    compoundNBT.putString("DropRule", this.dropRule.toString());
     compoundNBT.putInt("BaseSize", this.baseSize);
 
     if (!this.modifiers.isEmpty()) {
@@ -347,6 +375,13 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     }
     this.cosmetic = tag.contains("HasCosmetic") ? tag.getBoolean("HasCosmetic") : this.cosmetic;
     this.visible = tag.contains("Visible") ? tag.getBoolean("Visible") : this.visible;
+    this.canToggleRender =
+        tag.contains("RenderToggle") ? tag.getBoolean("RenderToggle") : this.canToggleRender;
+
+    if (tag.contains("DropRule")) {
+      this.dropRule =
+          EnumUtils.getEnum(ICurio.DropRule.class, tag.getString("DropRule"), this.dropRule);
+    }
     this.modifiers.clear();
     this.persistentModifiers.clear();
     this.modifiersByOperation.clear();

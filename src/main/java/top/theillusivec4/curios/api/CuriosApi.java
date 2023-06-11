@@ -19,9 +19,15 @@
 
 package top.theillusivec4.curios.api;
 
+import java.util.Map;
+import java.util.Optional;
+import net.minecraft.world.entity.EntityType;
+import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 import top.theillusivec4.curios.api.type.util.IIconHelper;
 import top.theillusivec4.curios.api.type.util.ISlotHelper;
+import top.theillusivec4.curios.common.data.CuriosEntityManager;
+import top.theillusivec4.curios.common.data.CuriosSlotManager;
 
 public final class CuriosApi {
 
@@ -59,5 +65,27 @@ public final class CuriosApi {
     if (curiosHelper == null) {
       curiosHelper = helper;
     }
+  }
+
+  public static Optional<ISlotType> getSlot(String id) {
+    return Optional.ofNullable(getSlots().get(id));
+  }
+
+  public static Map<String, ISlotType> getSlots() {
+    return CuriosSlotManager.INSTANCE.getSlots();
+  }
+
+  /**
+   * @return The slot types provided to player entities
+   */
+  public static Map<String, ISlotType> getPlayerSlots() {
+    return getEntitySlots(EntityType.PLAYER);
+  }
+
+  /**
+   * @return The slot types provided to the given entity type
+   */
+  public static Map<String, ISlotType> getEntitySlots(EntityType<?> type) {
+    return CuriosEntityManager.INSTANCE.getEntitySlots(type);
   }
 }

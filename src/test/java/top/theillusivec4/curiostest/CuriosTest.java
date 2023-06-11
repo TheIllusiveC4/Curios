@@ -91,11 +91,7 @@ public class CuriosTest {
 
   private void enqueue(final InterModEnqueueEvent evt) {
     InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE,
-        () -> Arrays.stream(SlotTypePreset.values())
-            .map(preset -> preset.getMessageBuilder().cosmetic().build())
-            .collect(Collectors.toList()));
-    InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE,
-        () -> new SlotTypeMessage.Builder("test").build());
+        () -> new SlotTypeMessage.Builder("legacy").build());
   }
 
   private void clientSetup(final FMLClientSetupEvent evt) {

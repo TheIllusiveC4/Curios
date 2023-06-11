@@ -28,6 +28,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public interface ICurioStacksHandler {
 
@@ -56,6 +57,28 @@ public interface ICurioStacksHandler {
    * @return A list of boolean values for render states
    */
   NonNullList<Boolean> getRenders();
+
+  /**
+   * Gets whether this stack handler can toggle rendering its contents on an entity, which is stored in {@link ICurioStacksHandler#getRenders()}.
+   *
+   * @return True to allow render toggling, false otherwise
+   */
+  default boolean canToggleRendering() {
+    return true;
+  }
+
+  /**
+   * Gets the drop rule that determines behavior for the contents upon death.
+   * See {@link ICurio.DropRule} for possible values.
+   * <br>
+   * {@link ICurio.DropRule#DEFAULT} will defer to the drop behavior defined by the Curios
+   * configuration.
+   *
+   * @return The {@link ICurio.DropRule} to use for drop behavior
+   */
+  default ICurio.DropRule getDropRule() {
+    return ICurio.DropRule.DEFAULT;
+  }
 
   /**
    * Gets the number of slots for equipped curio stacks.

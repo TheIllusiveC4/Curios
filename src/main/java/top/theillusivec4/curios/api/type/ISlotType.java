@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.api.type;
 
 import net.minecraft.resources.ResourceLocation;
+import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public interface ISlotType extends Comparable<ISlotType> {
 
@@ -34,9 +35,9 @@ public interface ISlotType extends Comparable<ISlotType> {
   ResourceLocation getIcon();
 
   /**
-   * @return The priority of this slot type for ordering
+   * @return The ordering priority of this slot type, lower numbers appear first
    */
-  int getPriority();
+  int getOrder();
 
   /**
    * @return The number of slots to give by default for this slot type
@@ -44,20 +45,48 @@ public interface ISlotType extends Comparable<ISlotType> {
   int getSize();
 
   /**
-   * @deprecated Check if {@link ISlotType#getSize()} returns 0
+   * @return True if the slot type appears in the native Curios GUI, false otherwise
    */
-  @Deprecated
-  default boolean isLocked() {
-    return getSize() == 0;
-  }
-
-  /**
-   * @return True if the slot type should be visible, false otherwise
-   */
-  boolean isVisible();
+  boolean useNativeGui();
 
   /**
    * @return True if the slot type has active cosmetic slots, false otherwise
    */
   boolean hasCosmetic();
+
+  /**
+   * @return True if the slot type can toggle rendering on entities, false otherwise
+   */
+  boolean canToggleRendering();
+
+  /**
+   * @return The {@link ICurio.DropRule} associated with this slot type
+   */
+  ICurio.DropRule getDropRule();
+
+  /**
+   * @deprecated Check if {@link ISlotType#getSize()} returns 0
+   */
+  @Deprecated
+  default boolean isLocked() {
+    return this.getSize() == 0;
+  }
+
+  /**
+   * @return The priority of this slot type for ordering
+   * @deprecated Use {@link ISlotType#getOrder()}
+   */
+  @Deprecated
+  default int getPriority() {
+    return this.getOrder();
+  }
+
+  /**
+   * @return True if the slot type should be visible, false otherwise
+   * @deprecated Use {@link ISlotType#useNativeGui()}
+   */
+  @Deprecated
+  default boolean isVisible() {
+    return this.useNativeGui();
+  }
 }

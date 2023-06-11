@@ -24,14 +24,17 @@ import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.network.NetworkEvent;
+import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 public class SPacketSyncCurios {
 
@@ -97,6 +100,11 @@ public class SPacketSyncCurios {
                   stacks.put(entry.getKey(), stacksHandler);
                 }
                 handler.setCurios(stacks);
+
+                if (entity instanceof LocalPlayer player &&
+                    player.containerMenu instanceof CuriosContainer curiosContainer) {
+                  curiosContainer.resetSlots();
+                }
               });
         }
       }

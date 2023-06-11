@@ -43,6 +43,8 @@ public interface ISlotHelper {
    */
   void addSlotType(ISlotType slotType);
 
+  void clear();
+
   /**
    * Gets the {@link ISlotType} registered to the given identifier, or {@link Optional#empty()} if
    * none is registered.

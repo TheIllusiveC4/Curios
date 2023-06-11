@@ -310,7 +310,7 @@ public class CuriosHelper implements ICuriosHelper {
               if (rl.getNamespace().equals("curios")) {
                 String identifier1 = rl.getPath();
 
-                if (CuriosApi.getSlotHelper().getSlotType(identifier1).isPresent()) {
+                if (CuriosApi.getSlot(identifier1).isPresent()) {
                   CuriosApi.getCuriosHelper()
                       .addSlotModifier(multimap, identifier1, id, amount, operation);
                 }

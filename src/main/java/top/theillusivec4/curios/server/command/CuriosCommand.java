@@ -40,7 +40,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
-import top.theillusivec4.curios.common.slottype.SlotTypeManager;
+import top.theillusivec4.curios.common.slottype.LegacySlotManager;
 
 public class CuriosCommand {
 
@@ -51,7 +51,7 @@ public class CuriosCommand {
         .requires(player -> player.hasPermission(2));
 
     curiosCommand.then(Commands.literal("list").executes(context -> {
-      Map<String, Set<String>> map = SlotTypeManager.getIdsToMods();
+      Map<String, Set<String>> map = LegacySlotManager.getIdsToMods();
 
       for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
         context.getSource().sendSuccess(

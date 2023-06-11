@@ -40,6 +40,7 @@ import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
 import top.theillusivec4.curios.common.network.server.SPacketScroll;
 import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncData;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncRender;
@@ -89,6 +90,8 @@ public class NetworkHandler {
         SPacketSyncRender::handle);
     register(SPacketSyncModifiers.class, SPacketSyncModifiers::encode, SPacketSyncModifiers::decode,
         SPacketSyncModifiers::handle);
+    register(SPacketSyncData.class, SPacketSyncData::encode, SPacketSyncData::decode,
+        SPacketSyncData::handle);
 
     // Assignment of curio breaking to the network instance
     CuriosApi.getCuriosHelper().setBrokenCurioConsumer((slotContext) -> INSTANCE

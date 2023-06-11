@@ -47,13 +47,16 @@ public class CurioSlot extends SlotItemHandler {
   private final SlotContext slotContext;
 
   private NonNullList<Boolean> renderStatuses;
+  private boolean canToggleRender;
 
   public CurioSlot(Player player, IDynamicStackHandler handler, int index, String identifier,
-                   int xPosition, int yPosition, NonNullList<Boolean> renders) {
+                   int xPosition, int yPosition, NonNullList<Boolean> renders,
+                   boolean canToggleRender) {
     super(handler, index, xPosition, yPosition);
     this.identifier = identifier;
     this.renderStatuses = renders;
     this.player = player;
+    this.canToggleRender = canToggleRender;
     this.slotContext = new SlotContext(identifier, player, index, this instanceof CosmeticCurioSlot,
         this instanceof CosmeticCurioSlot || renders.get(index));
     this.setBackground(InventoryMenu.BLOCK_ATLAS,
@@ -66,7 +69,15 @@ public class CurioSlot extends SlotItemHandler {
     return this.identifier;
   }
 
+  public boolean canToggleRender() {
+    return this.canToggleRender;
+  }
+
   public boolean getRenderStatus() {
+
+    if (!this.canToggleRender) {
+      return true;
+    }
     return this.renderStatuses.size() > this.getSlotIndex() &&
         this.renderStatuses.get(this.getSlotIndex());
   }

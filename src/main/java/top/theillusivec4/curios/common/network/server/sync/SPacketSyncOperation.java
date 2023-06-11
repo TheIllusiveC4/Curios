@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -94,7 +95,7 @@ public class SPacketSyncOperation {
             }
             MinecraftForge.EVENT_BUS.post(new SlotModifiersUpdatedEvent(livingEntity, Set.of(id)));
 
-            if (entity instanceof Player player) {
+            if (entity instanceof LocalPlayer player) {
 
               if (player.containerMenu instanceof CuriosContainer) {
                 ((CuriosContainer) player.containerMenu).resetSlots();

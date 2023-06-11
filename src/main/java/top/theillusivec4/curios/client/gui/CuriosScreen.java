@@ -169,13 +169,16 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
 
     for (Slot inventorySlot : this.menu.slots) {
 
-      if (inventorySlot instanceof CurioSlot && !(inventorySlot instanceof CosmeticCurioSlot)) {
-        this.addRenderableWidget(
-            new RenderButton((CurioSlot) inventorySlot, this.leftPos + inventorySlot.x + 11,
-                this.topPos + inventorySlot.y - 3, 8, 8, 75, 0, 8, CURIO_INVENTORY,
-                (button) -> NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-                    new CPacketToggleRender(((CurioSlot) inventorySlot).getIdentifier(),
-                        inventorySlot.getSlotIndex()))));
+      if (inventorySlot instanceof CurioSlot curioSlot &&
+          !(inventorySlot instanceof CosmeticCurioSlot)) {
+
+        if (curioSlot.canToggleRender()) {
+          this.addRenderableWidget(new RenderButton(curioSlot, this.leftPos + inventorySlot.x + 11,
+              this.topPos + inventorySlot.y - 3, 8, 8, 75, 0, 8, CURIO_INVENTORY,
+              (button) -> NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
+                  new CPacketToggleRender(curioSlot.getIdentifier(),
+                      inventorySlot.getSlotIndex()))));
+        }
       }
     }
   }
@@ -307,7 +310,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
   protected void renderLabels(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY) {
 
     if (this.minecraft != null && this.minecraft.player != null) {
-      guiGraphics.drawString(this.font, this.title, 97, 6, 4210752);
+      guiGraphics.drawString(this.font, this.title, 97, 6, 4210752, false);
     }
   }
 

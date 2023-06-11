@@ -37,11 +37,16 @@ import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 
 public class SlotHelper implements ISlotHelper {
 
-  private Map<String, ISlotType> idToType = new HashMap<>();
+  private final Map<String, ISlotType> idToType = new HashMap<>();
 
   @Override
   public void addSlotType(ISlotType slotType) {
     this.idToType.put(slotType.getIdentifier(), slotType);
+  }
+
+  @Override
+  public void clear() {
+    this.idToType.clear();
   }
 
   @Override
@@ -64,7 +69,7 @@ public class SlotHelper implements ISlotHelper {
     SortedMap<ISlotType, ICurioStacksHandler> curios = new TreeMap<>();
     this.getSlotTypes().forEach(type -> curios.put(type,
         new CurioStacksHandler(null, type.getIdentifier(), type.getSize(), type.isVisible(),
-            type.hasCosmetic())));
+            type.hasCosmetic(), type.canToggleRendering(), type.getDropRule())));
     return curios;
   }
 
@@ -74,7 +79,7 @@ public class SlotHelper implements ISlotHelper {
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(
         handler -> this.getSlotTypes().forEach(type -> curios.put(type,
             new CurioStacksHandler(handler, type.getIdentifier(), type.getSize(), type.isVisible(),
-                type.hasCosmetic()))));
+                type.hasCosmetic(), type.canToggleRendering(), type.getDropRule()))));
     return curios;
   }
 

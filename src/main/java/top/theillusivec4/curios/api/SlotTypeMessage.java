@@ -21,6 +21,11 @@ package top.theillusivec4.curios.api;
 
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * @deprecated Use the datapack-based approach to slot registration instead of IMC
+ * @see <a href="https://docs.illusivesoulworks.com/category/curios">Curios Documentation</a>
+ */
+@Deprecated
 public final class SlotTypeMessage {
 
   public static final String REGISTER_TYPE = "register_type";
@@ -42,18 +47,22 @@ public final class SlotTypeMessage {
     this.icon = builder.icon;
   }
 
+  @Deprecated
   public String getIdentifier() {
     return this.identifier;
   }
 
+  @Deprecated
   public ResourceLocation getIcon() {
     return this.icon;
   }
 
+  @Deprecated
   public Integer getPriority() {
     return this.priority;
   }
 
+  @Deprecated
   public int getSize() {
     return this.size;
   }
@@ -66,14 +75,17 @@ public final class SlotTypeMessage {
     return getSize() == 0;
   }
 
+  @Deprecated
   public boolean isVisible() {
     return this.visible;
   }
 
+  @Deprecated
   public boolean hasCosmetic() {
     return this.cosmetic;
   }
 
+  @Deprecated
   public static class Builder {
 
     private final String identifier;
@@ -83,20 +95,24 @@ public final class SlotTypeMessage {
     private boolean cosmetic = false;
     private ResourceLocation icon = null;
 
+    @Deprecated
     public Builder(String identifier) {
       this.identifier = identifier;
     }
 
+    @Deprecated
     public Builder icon(ResourceLocation icon) {
       this.icon = icon;
       return this;
     }
 
+    @Deprecated
     public Builder priority(int priority) {
       this.priority = priority;
       return this;
     }
 
+    @Deprecated
     public Builder size(int size) {
       this.size = size;
       return this;
@@ -111,16 +127,19 @@ public final class SlotTypeMessage {
       return this;
     }
 
+    @Deprecated
     public Builder hide() {
       this.visible = false;
       return this;
     }
 
+    @Deprecated
     public Builder cosmetic() {
       this.cosmetic = true;
       return this;
     }
 
+    @Deprecated
     public SlotTypeMessage build() {
       return new SlotTypeMessage(this);
     }
