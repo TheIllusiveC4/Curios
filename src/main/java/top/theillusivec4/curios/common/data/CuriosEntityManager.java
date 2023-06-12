@@ -75,7 +75,8 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
     }
 
     this.server = map.entrySet().stream().collect(
-        ImmutableMap.toImmutableMap(Map.Entry::getKey, (entry) -> entry.getValue().build()));
+        ImmutableMap.toImmutableMap(Map.Entry::getKey,
+            (entry) -> entry.getValue().buildKeepingLast()));
     Curios.LOGGER.info("Loaded {} curio entities", map.size());
   }
 
