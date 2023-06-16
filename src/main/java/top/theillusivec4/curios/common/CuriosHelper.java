@@ -149,7 +149,8 @@ public class CuriosHelper implements ICuriosHelper {
       }
       return new SlotResult(null, ItemStack.EMPTY);
     }).orElse(new SlotResult(null, ItemStack.EMPTY));
-    return result.stack().isEmpty() ? Optional.empty() : Optional.of(result);
+    return (result.stack().isEmpty() || result.slotContext() == null) ? Optional.empty() :
+        Optional.of(result);
   }
 
   @Override
@@ -232,7 +233,8 @@ public class CuriosHelper implements ICuriosHelper {
       }
       return new SlotResult(null, ItemStack.EMPTY);
     }).orElse(new SlotResult(null, ItemStack.EMPTY));
-    return result.stack().isEmpty() ? Optional.empty() : Optional.of(result);
+    return (result.stack().isEmpty() || result.slotContext() == null) ? Optional.empty() :
+        Optional.of(result);
   }
 
   @Nonnull
