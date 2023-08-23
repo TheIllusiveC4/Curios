@@ -393,7 +393,18 @@ public class CuriosEventHandler {
                   evt.setCanceled(true);
                   return;
                 } else if (firstSlot == null) {
-                  firstSlot = new Tuple<>(stackHandler, slotContext);
+                  CurioEquipEvent unequipEvent = new CurioEquipEvent(present, slotContext);
+                  MinecraftForge.EVENT_BUS.post(unequipEvent);
+                  result = unequipEvent.getResult();
+
+                  if (result == Event.Result.DENY) {
+                    continue;
+                  }
+
+                  if (result == Event.Result.ALLOW || CuriosApi.getCuriosHelper().getCurio(present)
+                      .map(c -> c.canUnequip(slotContext)).orElse(true)) {
+                    firstSlot = new Tuple<>(stackHandler, slotContext);
+                  }
                 }
               }
             }
