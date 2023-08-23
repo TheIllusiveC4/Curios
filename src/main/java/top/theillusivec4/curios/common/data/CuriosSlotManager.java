@@ -19,10 +19,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.commons.lang3.EnumUtils;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.api.type.util.ISlotHelper;
 import top.theillusivec4.curios.common.slottype.LegacySlotManager;
 import top.theillusivec4.curios.common.slottype.SlotType;
 
@@ -98,15 +96,6 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
     this.idToMods = modMap.entrySet().stream()
         .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().build()));
     Curios.LOGGER.info("Loaded {} curio slots", map.size());
-    ISlotHelper slotHelper = CuriosApi.getSlotHelper();
-
-    if (slotHelper != null) {
-      slotHelper.clear();
-
-      for (ISlotType value : this.slots.values()) {
-        slotHelper.addSlotType(value);
-      }
-    }
   }
 
   public Map<String, ISlotType> getSlots() {

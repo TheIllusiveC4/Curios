@@ -20,6 +20,8 @@
 package top.theillusivec4.curios;
 
 import com.mojang.logging.LogUtils;
+import java.util.HashSet;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -123,10 +125,13 @@ public class Curios {
 
   private void serverAboutToStart(ServerAboutToStartEvent evt) {
     CuriosApi.setSlotHelper(new SlotHelper());
+    Set<String> slotIds = new HashSet<>();
 
     for (ISlotType value : CuriosSlotManager.INSTANCE.getSlots().values()) {
       CuriosApi.getSlotHelper().addSlotType(value);
+      slotIds.add(value.getIdentifier());
     }
+    CurioArgumentType.slotIds = slotIds;
   }
 
   private void serverStopped(ServerStoppedEvent evt) {
