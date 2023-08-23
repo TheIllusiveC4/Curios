@@ -116,6 +116,11 @@ public class CurioSlot extends SlotItemHandler {
   }
 
   @Override
+  public boolean allowModification(@Nonnull Player pPlayer) {
+    return true;
+  }
+
+  @Override
   public boolean mayPickup(Player playerIn) {
     ItemStack stack = this.getItem();
     CurioUnequipEvent unequipEvent = new CurioUnequipEvent(stack, slotContext);
