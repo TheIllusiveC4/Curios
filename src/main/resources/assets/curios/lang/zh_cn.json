@@ -1,6 +1,7 @@
 {
   "curios.name": "饰品",
   "curios.slot": "栏位",
+  "curios.tooltip.slot": "栏位:",
   "curios.cosmetic": "装饰品",
   "commands.curios.set.success": "类型%s的%d栏位已设置为到%s中",
   "commands.curios.add.success": "类型%s的%d栏位已添加到%s中",

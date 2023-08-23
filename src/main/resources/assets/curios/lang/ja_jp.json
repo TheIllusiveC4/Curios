@@ -1,6 +1,7 @@
 {
   "curios.name": "キュリオス",
   "curios.slot": "スロット",
+  "curios.tooltip.slot": "スロット:",
   "commands.curios.set.success": "タイプ%sが%sの%dスロットに設定されました",
   "commands.curios.add.success": "タイプ%sの%dスロットが%sに追加されました",
   "commands.curios.remove.success": "タイプ%sの%dスロットが%sから削除されました",

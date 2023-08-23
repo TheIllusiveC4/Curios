@@ -93,8 +93,9 @@ public class ClientEventHandler {
 
       if (!slots.isEmpty()) {
         List<Component> tagTooltips = new ArrayList<>();
-        MutableComponent slotsTooltip = Component.translatable("curios.slot")
-            .append(": ").withStyle(ChatFormatting.GOLD);
+        MutableComponent slotsTooltip =
+            Component.translatable("curios.tooltip.slot").append(" ")
+                .withStyle(ChatFormatting.GOLD);
 
         for (int j = 0; j < slots.size(); j++) {
           String key = "curios.identifier." + slots.get(j);

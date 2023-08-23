@@ -1,6 +1,7 @@
 {
   "curios.name": "Curios",
   "curios.slot": "Case",
+  "curios.tooltip.slot": "Case:",
   "curios.cosmetic": "Cosmétique",
   "commands.curios.set.success": "Type %s a été changé en %d cases pour %s",
   "commands.curios.add.success": "%d cases de type %s ont été ajoutées à %s",

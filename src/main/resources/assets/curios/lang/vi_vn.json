@@ -1,6 +1,7 @@
 {
     "curios.name": "Phụ Kiện",
     "curios.slot": "Vị Trí",
+    "curios.tooltip.slot": "Vị Trí:",
     "curios.cosmetic": "Thẩm Mỹ",
     "commands.curios.set.success": "Loại %s giờ đã được gán thành %d vị trí cho %s",
     "commands.curios.add.success": "%d vị trí của loại %s đã được thêm vào %s",

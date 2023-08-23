@@ -1,6 +1,7 @@
 {
   "curios.name": "Acessórios",
   "curios.slot": "Slot",
+  "curios.tooltip.slot": "Slot:",
   "curios.cosmetic": "Cosmético",
   "commands.curios.set.success": "O tipo %s agora foi definido para %d slots para %s",
   "commands.curios.add.success": "%d slots do tipo %s foram adicionados a %s",

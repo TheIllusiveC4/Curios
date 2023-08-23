@@ -1,6 +1,7 @@
 {
   "curios.name": "Curios",
   "curios.slot": "Slot",
+  "curios.tooltip.slot": "Slot:",
   "curios.cosmetic": "Kosmetyczny",
   "commands.curios.set.success": "Ustawiono typ „%s” na następującą liczbę slotów: %d graczowi %s",
   "commands.curios.add.success": "Następująca liczba slotów: %d typu „%s” została dodana graczowi %s",

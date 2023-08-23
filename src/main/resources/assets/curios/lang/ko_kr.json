@@ -1,6 +1,7 @@
 {
   "curios.name": "장신구",
   "curios.slot": "슬롯",
+  "curios.tooltip.slot": "슬롯:",
   "curios.cosmetic": "치장",
   "commands.curios.set.success": "%s 슬롯을 %s이(가) %d개 가지도록 설정했습니다",
   "commands.curios.add.success": "%s 슬롯을 %s이(가) %d개만큼 더 가지도록 설정했습니다",

@@ -1,6 +1,7 @@
 {
   "curios.name": "Curios",
   "curios.slot": "Ranuras",
+  "curios.tooltip.slot": "Ranuras:",
   "curios.cosmetic": "Cosméticos",
   "commands.curios.set.success": "El tipo %s se ha fijado ahora en las ranuras %d para %s",
   "commands.curios.add.success": "%d ranuras de tipo %s han sido agregadas a %s",
