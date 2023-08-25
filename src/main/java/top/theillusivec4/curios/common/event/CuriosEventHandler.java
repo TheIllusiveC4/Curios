@@ -88,6 +88,7 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
+import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
 import top.theillusivec4.curios.common.capability.CurioItemCapability;
@@ -315,11 +316,15 @@ public class CuriosEventHandler {
         boolean keepInventory = livingEntity.level().getGameRules()
             .getBoolean(GameRules.RULE_KEEPINVENTORY);
 
+        if (CuriosConfig.SERVER.keepCurios.get() != CuriosConfig.KeepCurios.DEFAULT) {
+          keepInventory = CuriosConfig.SERVER.keepCurios.get() == CuriosConfig.KeepCurios.ON;
+        }
+        boolean finalKeepInventory = keepInventory;
         curios.forEach((id, stacksHandler) -> {
           handleDrops(id, livingEntity, dropRules, stacksHandler.getRenders(),
-              stacksHandler.getStacks(), false, curioDrops, keepInventory, evt);
+              stacksHandler.getStacks(), false, curioDrops, finalKeepInventory, evt);
           handleDrops(id, livingEntity, dropRules, stacksHandler.getRenders(),
-              stacksHandler.getCosmeticStacks(), true, curioDrops, keepInventory, evt);
+              stacksHandler.getCosmeticStacks(), true, curioDrops, finalKeepInventory, evt);
         });
 
         if (!MinecraftForge.EVENT_BUS.post(

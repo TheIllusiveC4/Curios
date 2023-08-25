@@ -19,19 +19,15 @@
 
 package top.theillusivec4.curios.common;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
-import com.electronwill.nightconfig.core.conversion.ObjectConverter;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
-import top.theillusivec4.curios.common.CuriosConfig.CuriosSettings.CuriosSetting;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class CuriosConfig {
 
   public static final ForgeConfigSpec SERVER_SPEC;
   public static final Server SERVER;
-  public static List<CuriosSetting> curios = new ArrayList<>();
+  private static final String CONFIG_PREFIX = "gui." + CuriosApi.MODID + ".config.";
 
   static {
     final Pair<Server, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder()
@@ -40,35 +36,25 @@ public class CuriosConfig {
     SERVER = specPair.getLeft();
   }
 
-  public static void transformCurios(CommentedConfig configData) {
-    SERVER.curiosSettings = new ObjectConverter().toObject(configData, CuriosSettings::new);
-    curios = SERVER.curiosSettings.curiosSettings;
-  }
-
   public static class Server {
 
-    public CuriosSettings curiosSettings;
+    public ForgeConfigSpec.EnumValue<KeepCurios> keepCurios;
 
     public Server(ForgeConfigSpec.Builder builder) {
-      builder.comment("List of curio slot type settings")
-          .define("curiosSettings", new ArrayList<>());
+      keepCurios = builder.comment("""
+              Sets behavior for keeping Curios items on death.
+              ON - Curios items are kept on death
+              DEFAULT - Curios items follow the keepInventory gamerule
+              OFF - Curios items are dropped on death""")
+          .translation(CONFIG_PREFIX + "keepCurios").defineEnum("keepCurios", KeepCurios.DEFAULT);
+
       builder.build();
     }
   }
 
-  public static class CuriosSettings {
-
-    public List<CuriosSetting> curiosSettings;
-
-    public static class CuriosSetting {
-
-      public String identifier;
-      public String icon;
-      public Integer priority;
-      public Integer size;
-      public Boolean visible;
-      public Boolean hasCosmetic;
-      public Boolean override;
-    }
+  public enum KeepCurios {
+    ON,
+    DEFAULT,
+    OFF
   }
 }
