@@ -43,6 +43,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.ApiStatus;
 import top.theillusivec4.curios.api.SlotContext;
 
 public interface ICurio {
@@ -327,17 +328,20 @@ public interface ICurio {
 
   record SoundInfo(SoundEvent soundEvent, float volume, float pitch) {
 
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "1.20.1")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public SoundEvent getSoundEvent() {
       return soundEvent;
     }
 
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "1.20.1")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public float getVolume() {
       return volume;
     }
 
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "1.20.1")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public float getPitch() {
       return pitch;
     }
@@ -381,7 +385,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#curioTick(SlotContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void curioTick(String identifier, int index, LivingEntity livingEntity) {
 
   }
@@ -389,7 +394,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#curioTick(SlotContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void curioAnimate(String identifier, int index, LivingEntity livingEntity) {
 
   }
@@ -397,7 +403,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#curioBreak(SlotContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void curioBreak(ItemStack stack, LivingEntity livingEntity) {
     playBreakAnimation(stack, livingEntity);
   }
@@ -405,7 +412,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#onEquip(SlotContext, ItemStack)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void onEquip(String identifier, int index, LivingEntity livingEntity) {
 
   }
@@ -413,7 +421,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#onUnequip(SlotContext, ItemStack)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void onUnequip(String identifier, int index, LivingEntity livingEntity) {
 
   }
@@ -421,7 +430,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#canEquip(SlotContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default boolean canEquip(String identifier, LivingEntity livingEntity) {
     return true;
   }
@@ -429,7 +439,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#canUnequip(SlotContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default boolean canUnequip(String identifier, LivingEntity livingEntity) {
     return true;
   }
@@ -437,7 +448,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#getSlotsTooltip(List)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default List<Component> getTagsTooltip(List<Component> tagTooltips) {
     return tagTooltips;
   }
@@ -445,7 +457,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#getFortuneLevel(SlotContext, LootContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
                               int index) {
     return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, curio);
@@ -454,7 +467,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#getLootingLevel(SlotContext, DamageSource, LivingEntity, int)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
                               int index) {
     return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.MOB_LOOTING, curio);
@@ -463,7 +477,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#getAttributesTooltip(List)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default boolean showAttributesTooltip(String identifier) {
     return true;
   }
@@ -472,7 +487,8 @@ public interface ICurio {
    * @deprecated See {@link ICurio#getDropRule(SlotContext, DamageSource, int, boolean)}
    */
   @Nonnull
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default DropRule getDropRule(LivingEntity livingEntity) {
     return DropRule.DEFAULT;
   }
@@ -480,7 +496,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#canSync(SlotContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default boolean canSync(String identifier, int index, LivingEntity livingEntity) {
     return false;
   }
@@ -488,7 +505,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#writeSyncData(SlotContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   @Nullable
   default CompoundTag writeSyncData() {
     return new CompoundTag();
@@ -497,7 +515,8 @@ public interface ICurio {
   /**
    * @deprecated See {@link ICurio#readSyncData(SlotContext, CompoundTag)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void readSyncData(CompoundTag compound) {
 
   }
@@ -506,7 +525,8 @@ public interface ICurio {
    * @deprecated See {@link ICurio#canEquipFromUse(SlotContext)} for a more appropriately named
    * alternative with additional context.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default boolean canRightClickEquip() {
     return false;
   }
@@ -517,7 +537,8 @@ public interface ICurio {
    * <br>
    * Also see {@link ICurio#getEquipSound(SlotContext)}.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void playRightClickEquipSound(LivingEntity livingEntity) {
     // Not enough context for id and index so we just pass in artificial values with the entity
     SoundInfo soundInfo = getEquipSound(new SlotContext("", livingEntity, 0, false, true));
@@ -529,7 +550,8 @@ public interface ICurio {
    * @deprecated See {@link ICurio#getAttributeModifiers(SlotContext, UUID)} for an updated
    * alternative with additional context and a slot-unique UUID parameter.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier) {
     return HashMultimap.create();
   }

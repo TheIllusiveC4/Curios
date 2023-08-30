@@ -24,7 +24,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -56,7 +55,7 @@ public class CrownItem extends Item {
           livingEntity
               .addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, -1, true, true));
           stack.hurtAndBreak(1, livingEntity,
-              damager -> CuriosApi.getCuriosHelper().onBrokenCurio(slotContext));
+              damager -> CuriosApi.broadcastCurioBreakEvent(slotContext));
         }
       }
     });

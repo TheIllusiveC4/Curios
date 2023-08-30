@@ -35,9 +35,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
-import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 
@@ -55,7 +55,7 @@ public class CPacketDestroy {
       ServerPlayer sender = ctx.get().getSender();
 
       if (sender != null) {
-        CuriosApi.getCuriosHelper().getCuriosHandler(sender)
+        CuriosApi.getCuriosInventory(sender)
             .ifPresent(handler -> handler.getCurios().values().forEach(stacksHandler -> {
               IDynamicStackHandler stackHandler = stacksHandler.getStacks();
               IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
@@ -68,14 +68,14 @@ public class CPacketDestroy {
                     renderStates.size() > i && renderStates.get(i));
                 ItemStack stack = stackHandler.getStackInSlot(i);
                 Multimap<Attribute, AttributeModifier> map =
-                    CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack);
+                    CuriosApi.getAttributeModifiers(slotContext, uuid, stack);
                 Multimap<String, AttributeModifier> slots = HashMultimap.create();
-                Set<CuriosHelper.SlotAttributeWrapper> toRemove = new HashSet<>();
+                Set<SlotAttribute> toRemove = new HashSet<>();
 
                 for (Attribute attribute : map.keySet()) {
 
-                  if (attribute instanceof CuriosHelper.SlotAttributeWrapper wrapper) {
-                    slots.putAll(wrapper.identifier, map.get(attribute));
+                  if (attribute instanceof SlotAttribute wrapper) {
+                    slots.putAll(wrapper.getIdentifier(), map.get(attribute));
                     toRemove.add(wrapper);
                   }
                 }
@@ -85,7 +85,7 @@ public class CPacketDestroy {
                 }
                 sender.getAttributes().removeAttributeModifiers(map);
                 handler.removeSlotModifiers(slots);
-                CuriosApi.getCuriosHelper().getCurio(stack)
+                CuriosApi.getCurio(stack)
                     .ifPresent(curio -> curio.onUnequip(slotContext, stack));
                 stackHandler.setStackInSlot(i, ItemStack.EMPTY);
                 NetworkHandler.INSTANCE.send(

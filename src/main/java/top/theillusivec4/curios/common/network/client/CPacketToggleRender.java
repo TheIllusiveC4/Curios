@@ -53,7 +53,7 @@ public class CPacketToggleRender {
       ServerPlayer sender = ctx.get().getSender();
 
       if (sender != null) {
-        CuriosApi.getCuriosHelper().getCuriosHandler(sender)
+        CuriosApi.getCuriosInventory(sender)
             .ifPresent(handler -> handler.getStacksHandler(msg.id).ifPresent(stacksHandler -> {
               NonNullList<Boolean> renderStatuses = stacksHandler.getRenders();
 

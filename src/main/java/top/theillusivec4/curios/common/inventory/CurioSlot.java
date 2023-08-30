@@ -22,7 +22,6 @@ package top.theillusivec4.curios.common.inventory;
 import javax.annotation.Nonnull;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +31,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.items.SlotItemHandler;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.CurioEquipEvent;
@@ -59,10 +57,7 @@ public class CurioSlot extends SlotItemHandler {
     this.canToggleRender = canToggleRender;
     this.slotContext = new SlotContext(identifier, player, index, this instanceof CosmeticCurioSlot,
         this instanceof CosmeticCurioSlot || renders.get(index));
-    this.setBackground(InventoryMenu.BLOCK_ATLAS,
-        player.getCommandSenderWorld().isClientSide() ?
-            CuriosApi.getIconHelper().getIcon(identifier)
-            : new ResourceLocation(Curios.MODID, "slot/empty_curio_slot"));
+    this.setBackground(InventoryMenu.BLOCK_ATLAS, CuriosApi.getSlotIcon(identifier));
   }
 
   public String getIdentifier() {
@@ -95,7 +90,7 @@ public class CurioSlot extends SlotItemHandler {
 
     if (!flag && !ItemStack.matches(current, stack) &&
         !((AccessorEntity) this.player).getFirstTick()) {
-      CuriosApi.getCuriosHelper().getCurio(stack)
+      CuriosApi.getCurio(stack)
           .ifPresent(curio -> curio.onEquipFromUse(this.slotContext));
     }
   }
@@ -109,10 +104,9 @@ public class CurioSlot extends SlotItemHandler {
     if (result == Event.Result.DENY) {
       return false;
     }
-    return result == Event.Result.ALLOW ||
-        (CuriosApi.getCuriosHelper().isStackValid(slotContext, stack) &&
-            CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(slotContext))
-                .orElse(true) && super.mayPlace(stack));
+    return result == Event.Result.ALLOW || (CuriosApi.isStackValid(slotContext, stack) &&
+        CuriosApi.getCurio(stack).map(curio -> curio.canEquip(slotContext)).orElse(true) &&
+        super.mayPlace(stack));
   }
 
   @Override
@@ -132,7 +126,7 @@ public class CurioSlot extends SlotItemHandler {
     }
     return result == Event.Result.ALLOW ||
         ((stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) &&
-            CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio.canUnequip(slotContext))
-                .orElse(true) && super.mayPickup(playerIn));
+            CuriosApi.getCurio(stack).map(curio -> curio.canUnequip(slotContext)).orElse(true) &&
+            super.mayPickup(playerIn));
   }
 }

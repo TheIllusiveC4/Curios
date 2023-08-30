@@ -102,7 +102,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
     if (this.minecraft != null) {
 
       if (this.minecraft.player != null) {
-        this.hasScrollBar = CuriosApi.getCuriosHelper().getCuriosHandler(this.minecraft.player)
+        this.hasScrollBar = CuriosApi.getCuriosInventory(this.minecraft.player)
             .map(handler -> handler.getVisibleSlots() > 8).orElse(false);
 
         if (this.hasScrollBar) {
@@ -328,7 +328,7 @@ public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
       guiGraphics.blit(INVENTORY_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
       InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, i + 51, j + 75, 30,
           (float) (i + 51) - mouseX, (float) (j + 75 - 50) - mouseY, this.minecraft.player);
-      CuriosApi.getCuriosHelper().getCuriosHandler(this.minecraft.player).ifPresent(handler -> {
+      CuriosApi.getCuriosInventory(this.minecraft.player).ifPresent(handler -> {
         int slotCount = handler.getVisibleSlots();
 
         if (slotCount > 0) {

@@ -72,7 +72,7 @@ public class SPacketSyncModifiers {
         Entity entity = world.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity livingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
+          CuriosApi.getCuriosInventory(livingEntity)
               .ifPresent(handler -> {
                 Map<String, ICurioStacksHandler> curios = handler.getCurios();
 

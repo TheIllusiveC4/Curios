@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.api.type;
 
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public interface ISlotType extends Comparable<ISlotType> {
@@ -67,25 +68,26 @@ public interface ISlotType extends Comparable<ISlotType> {
   /**
    * @deprecated Check if {@link ISlotType#getSize()} returns 0
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default boolean isLocked() {
     return this.getSize() == 0;
   }
 
   /**
-   * @return The priority of this slot type for ordering
    * @deprecated Use {@link ISlotType#getOrder()}
    */
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   default int getPriority() {
     return this.getOrder();
   }
 
   /**
-   * @return True if the slot type should be visible, false otherwise
    * @deprecated Use {@link ISlotType#useNativeGui()}
    */
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   default boolean isVisible() {
     return this.useNativeGui();
   }

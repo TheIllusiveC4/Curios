@@ -21,10 +21,12 @@ package top.theillusivec4.curios.api.type.capability;
 
 import com.google.common.collect.Multimap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -32,9 +34,14 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import org.jetbrains.annotations.ApiStatus;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
@@ -76,13 +83,79 @@ public interface ICuriosItemHandler {
   void reset();
 
   /**
-   * Gets the an Optional {@link ICurioStacksHandler} associated with the given {@link ISlotType}
+   * Gets the Optional {@link ICurioStacksHandler} associated with the given {@link ISlotType}
    * identifier or Optional.empty() if it doesn't exist.
    *
    * @param identifier The identifier for the {@link ISlotType}
    * @return The stack handler
    */
   Optional<ICurioStacksHandler> getStacksHandler(String identifier);
+
+  /**
+   * Gets a {@link LazyOptional} of an {@link IItemHandlerModifiable} that contains all the
+   * equipped curio stacks (not including cosmetics).
+   *
+   * @return The equipped curio stacks, or empty if there is no curios handler
+   */
+  IItemHandlerModifiable getEquippedCurios();
+
+  /**
+   * Replaces the currently equipped item in a specified curio slot, if it exists.
+   *
+   * @param identifier The identifier of the curio slot
+   * @param index      The index of the curio slot
+   * @param stack      The new stack to place into the slot
+   */
+  void setEquippedCurio(String identifier, int index, ItemStack stack);
+
+  /**
+   * Gets the first matching item equipped in a curio slot.
+   *
+   * @param item The item to search for
+   * @return An optional {@link SlotResult} with the found item, or empty if none were found
+   */
+  Optional<SlotResult> findFirstCurio(Item item);
+
+  /**
+   * Gets the first matching item equipped in a curio slot that matches the filter.
+   *
+   * @param filter The filter to test against
+   * @return An optional {@link SlotResult} with the found item, or empty if none were found
+   */
+  Optional<SlotResult> findFirstCurio(Predicate<ItemStack> filter);
+
+  /**
+   * Gets all matching items equipped in a curio slot.
+   *
+   * @param item The item to search for
+   * @return A list of matching results
+   */
+  List<SlotResult> findCurios(Item item);
+
+  /**
+   * Gets all matching items equipped in a curio slot that matches the filter.
+   *
+   * @param filter The filter to test against
+   * @return A list of matching results
+   */
+  List<SlotResult> findCurios(Predicate<ItemStack> filter);
+
+  /**
+   * Gets all items equipped in all curio slots with specific identifiers.
+   *
+   * @param identifiers The identifiers for the slot types
+   * @return A list of matching results
+   */
+  List<SlotResult> findCurios(String... identifiers);
+
+  /**
+   * Gets the currently equipped item in a specified curio slot, if it exists.
+   *
+   * @param identifier The identifier of the curio slot
+   * @param index      The index of the curio slot
+   * @return The equipped curio stack, or empty if there is none
+   */
+  Optional<SlotResult> findCurio(String identifier, int index);
 
   /**
    * Gets the wearer/owner of this handler instance.
@@ -100,7 +173,7 @@ public interface ICuriosItemHandler {
   void loseInvalidStack(ItemStack stack);
 
   /**
-   * Drops all of the ItemStacks found in the invalid stacks list. Used for handling items found in
+   * Drops all the ItemStacks found in the invalid stacks list. Used for handling items found in
    * disabling/removing slots.
    */
   void handleInvalidStacks();
@@ -194,27 +267,30 @@ public interface ICuriosItemHandler {
   // =============== DEPRECATED =================
 
   /**
-   * @deprecated Locked slots no longer exist
+   * @deprecated Lock states are no longer used
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default Set<String> getLockedSlots() {
     return new HashSet<>();
   }
 
   /**
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void unlockSlotType(String identifier, int amount, boolean visible, boolean cosmetic) {
     growSlotType(identifier, amount);
   }
 
   /**
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void lockSlotType(String identifier) {
     shrinkSlotType(identifier, 1);
   }
@@ -222,59 +298,54 @@ public interface ICuriosItemHandler {
   /**
    * @deprecated Lock states are no longer used
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void processSlots() {
     // NO-OP
   }
 
   /**
-   * @deprecated No longer used for fortune calculations, see {@link ICuriosItemHandler#getFortuneLevel(LootContext)}
+   * @deprecated See {@link ICuriosItemHandler#getFortuneLevel(LootContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default int getFortuneBonus() {
     return 0;
   }
 
   /**
-   * @deprecated No longer used for looting calculations, see {@link ICuriosItemHandler#getLootingLevel(DamageSource, LivingEntity, int)}
+   * @deprecated See {@link ICuriosItemHandler#getLootingLevel(DamageSource, LivingEntity, int)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default int getLootingBonus() {
     return 0;
   }
 
 
   /**
-   * @see ICuriosItemHandler#getLootingLevel(DamageSource, LivingEntity, int)
-   * @see ICuriosItemHandler#getFortuneLevel(LootContext)
-   * @deprecated No longer used for fortune/looting calculations
+   * @deprecated See {@link ICuriosItemHandler#getLootingLevel(DamageSource, LivingEntity, int)} and
+   * {@link ICuriosItemHandler#getFortuneLevel(LootContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLooting) {
     // NO-OP
   }
 
   /**
-   * @param identifier The identifier for the {@link ISlotType}
-   * @param amount     The number of slots to add, must be non-negative
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link ICurio#getAttributeModifiers(SlotContext, UUID)}
-   * <br>
-   * Adds an amount of slots to the {@link ICurioStacksHandler} of a {@link ISlotType} associated
-   * with the identifier.
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   void growSlotType(String identifier, int amount);
 
   /**
-   * @param identifier The identifier for the {@link ISlotType}
-   * @param amount     The number of slots to remove, must be non-negative
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link ICurio#getAttributeModifiers(SlotContext, UUID)}
-   * <p>
-   * Removes an amount of slots from the {@link ICurioStacksHandler} of a {@link ISlotType}
-   * associated with the identifier.
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   void shrinkSlotType(String identifier, int amount);
 }

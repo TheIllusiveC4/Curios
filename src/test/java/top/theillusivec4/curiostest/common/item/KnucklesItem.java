@@ -59,7 +59,7 @@ public class KnucklesItem extends Item {
         atts.put(Attributes.ATTACK_DAMAGE,
             new AttributeModifier(uuid, CuriosTest.MODID + ":attack_damage_bonus", 4,
                 AttributeModifier.Operation.ADDITION));
-        CuriosApi.getCuriosHelper().addSlotModifier(atts, "ring", uuid, 2, AttributeModifier.Operation.ADDITION);
+        CuriosApi.addSlotModifier(atts, "ring", uuid, 2, AttributeModifier.Operation.ADDITION);
         return atts;
       }
     });

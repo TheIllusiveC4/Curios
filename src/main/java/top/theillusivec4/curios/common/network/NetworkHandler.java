@@ -26,10 +26,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import top.theillusivec4.curios.Curios;
-import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
@@ -42,7 +40,6 @@ import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncData;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncOperation;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncRender;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 
@@ -77,8 +74,6 @@ public class NetworkHandler {
         SPacketSyncStack::handle);
     register(SPacketScroll.class, SPacketScroll::encode, SPacketScroll::decode,
         SPacketScroll::handle);
-    register(SPacketSyncOperation.class, SPacketSyncOperation::encode, SPacketSyncOperation::decode,
-        SPacketSyncOperation::handle);
     register(SPacketSyncCurios.class, SPacketSyncCurios::encode, SPacketSyncCurios::decode,
         SPacketSyncCurios::handle);
     register(SPacketBreak.class, SPacketBreak::encode, SPacketBreak::decode, SPacketBreak::handle);
@@ -92,12 +87,6 @@ public class NetworkHandler {
         SPacketSyncModifiers::handle);
     register(SPacketSyncData.class, SPacketSyncData::encode, SPacketSyncData::decode,
         SPacketSyncData::handle);
-
-    // Assignment of curio breaking to the network instance
-    CuriosApi.getCuriosHelper().setBrokenCurioConsumer((slotContext) -> INSTANCE
-        .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(slotContext::entity),
-            new SPacketBreak(slotContext.entity().getId(), slotContext.identifier(),
-                slotContext.index())));
   }
 
   private static <M> void register(Class<M> messageType, BiConsumer<M, FriendlyByteBuf> encoder,

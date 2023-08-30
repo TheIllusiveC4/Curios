@@ -19,11 +19,8 @@
 
 package top.theillusivec4.curios.common;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,32 +28,21 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.CombinedInvWrapper;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.SlotResult;
-import top.theillusivec4.curios.api.SlotTypePreset;
-import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -65,93 +51,45 @@ import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 
 public class CuriosHelper implements ICuriosHelper {
 
-  private static final Map<String, SlotAttributeWrapper> SLOT_ATTRIBUTES = new HashMap<>();
-
-  private static TriConsumer<String, Integer, LivingEntity> brokenCurioConsumerLegacy;
-  private static Consumer<SlotContext> brokenCurioConsumer;
-
   @Override
   public LazyOptional<ICurio> getCurio(ItemStack stack) {
-    return stack.getCapability(CuriosCapability.ITEM);
+    return CuriosApi.getCurio(stack);
   }
 
   @Override
   public LazyOptional<ICuriosItemHandler> getCuriosHandler(
       @Nonnull final LivingEntity livingEntity) {
-    return livingEntity.getCapability(CuriosCapability.INVENTORY);
+    return CuriosApi.getCuriosInventory(livingEntity);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public Set<String> getCurioTags(Item item) {
-    return item.builtInRegistryHolder().tags().map(TagKey::location)
-        .filter(resourceLocation -> resourceLocation.getNamespace().equals(CuriosApi.MODID))
-        .map(ResourceLocation::getPath).collect(Collectors.toSet());
+    return CuriosApi.getItemStackSlots(item.getDefaultInstance()).keySet();
   }
 
   @Override
   public LazyOptional<IItemHandlerModifiable> getEquippedCurios(LivingEntity livingEntity) {
-    return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).lazyMap(handler -> {
-      Map<String, ICurioStacksHandler> curios = handler.getCurios();
-      IItemHandlerModifiable[] itemHandlers = new IItemHandlerModifiable[curios.size()];
-      int index = 0;
-
-      for (ICurioStacksHandler stacksHandler : curios.values()) {
-
-        if (index < itemHandlers.length) {
-          itemHandlers[index] = stacksHandler.getStacks();
-          index++;
-        }
-      }
-      return new CombinedInvWrapper(itemHandlers);
-    });
+    return CuriosApi.getCuriosInventory(livingEntity)
+        .lazyMap(ICuriosItemHandler::getEquippedCurios);
   }
 
   @Override
   public void setEquippedCurio(@NotNull LivingEntity livingEntity, String identifier, int index,
                                ItemStack stack) {
-    getCuriosHandler(livingEntity).ifPresent(handler -> {
-      Map<String, ICurioStacksHandler> curios = handler.getCurios();
-      ICurioStacksHandler stacksHandler = curios.get(identifier);
-
-      if (stacksHandler != null) {
-        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
-
-        if (index < stackHandler.getSlots()) {
-          stackHandler.setStackInSlot(index, stack);
-        }
-      }
-    });
+    CuriosApi.getCuriosInventory(livingEntity)
+        .ifPresent(inv -> inv.setEquippedCurio(identifier, index, stack));
   }
 
   @Override
   public Optional<SlotResult> findFirstCurio(@Nonnull LivingEntity livingEntity, Item item) {
-    return findFirstCurio(livingEntity, (stack) -> stack.getItem() == item);
+    return findFirstCurio(livingEntity, stack -> stack.getItem() == item);
   }
 
   @Override
   public Optional<SlotResult> findFirstCurio(@Nonnull LivingEntity livingEntity,
                                              Predicate<ItemStack> filter) {
-    SlotResult result = getCuriosHandler(livingEntity).map(handler -> {
-      Map<String, ICurioStacksHandler> curios = handler.getCurios();
-
-      for (String id : curios.keySet()) {
-        ICurioStacksHandler stacksHandler = curios.get(id);
-        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
-
-        for (int i = 0; i < stackHandler.getSlots(); i++) {
-          ItemStack stack = stackHandler.getStackInSlot(i);
-
-          if (!stack.isEmpty() && filter.test(stack)) {
-            NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-            return new SlotResult(new SlotContext(id, livingEntity, i, false,
-                renderStates.size() > i && renderStates.get(i)), stack);
-          }
-        }
-      }
-      return new SlotResult(null, ItemStack.EMPTY);
-    }).orElse(new SlotResult(null, ItemStack.EMPTY));
-    return result.stack().isEmpty() ? Optional.empty() : Optional.of(result);
+    return CuriosApi.getCuriosInventory(livingEntity).map(inv -> inv.findFirstCurio(filter))
+        .orElse(Optional.empty());
   }
 
   @Override
@@ -162,79 +100,21 @@ public class CuriosHelper implements ICuriosHelper {
   @Override
   public List<SlotResult> findCurios(@Nonnull LivingEntity livingEntity,
                                      Predicate<ItemStack> filter) {
-    List<SlotResult> result = new ArrayList<>();
-    getCuriosHandler(livingEntity).ifPresent(handler -> {
-      Map<String, ICurioStacksHandler> curios = handler.getCurios();
-
-      for (String id : curios.keySet()) {
-        ICurioStacksHandler stacksHandler = curios.get(id);
-        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
-
-        for (int i = 0; i < stackHandler.getSlots(); i++) {
-          ItemStack stack = stackHandler.getStackInSlot(i);
-
-          if (!stack.isEmpty() && filter.test(stack)) {
-            NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-            result.add(new SlotResult(new SlotContext(id, livingEntity, i, false,
-                renderStates.size() > i && renderStates.get(i)), stack));
-          }
-        }
-      }
-    });
-    return result;
+    return CuriosApi.getCuriosInventory(livingEntity).map(inv -> inv.findCurios(filter))
+        .orElse(Collections.emptyList());
   }
 
   @Override
   public List<SlotResult> findCurios(@NotNull LivingEntity livingEntity, String... identifiers) {
-    List<SlotResult> result = new ArrayList<>();
-    Set<String> ids = new HashSet<>(List.of(identifiers));
-    getCuriosHandler(livingEntity).ifPresent(handler -> {
-      Map<String, ICurioStacksHandler> curios = handler.getCurios();
-
-      for (String id : curios.keySet()) {
-
-        if (ids.contains(id)) {
-          ICurioStacksHandler stacksHandler = curios.get(id);
-          IDynamicStackHandler stackHandler = stacksHandler.getStacks();
-
-          for (int i = 0; i < stackHandler.getSlots(); i++) {
-            ItemStack stack = stackHandler.getStackInSlot(i);
-
-            if (!stack.isEmpty()) {
-              NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-              result.add(new SlotResult(new SlotContext(id, livingEntity, i, false,
-                  renderStates.size() > i && renderStates.get(i)), stack));
-            }
-          }
-        }
-      }
-    });
-    return result;
+    return CuriosApi.getCuriosInventory(livingEntity).map(inv -> inv.findCurios(identifiers))
+        .orElse(Collections.emptyList());
   }
 
   @Override
   public Optional<SlotResult> findCurio(@Nonnull LivingEntity livingEntity,
                                         String identifier, int index) {
-    SlotResult result = getCuriosHandler(livingEntity).map(handler -> {
-      Map<String, ICurioStacksHandler> curios = handler.getCurios();
-      ICurioStacksHandler stacksHandler = curios.get(identifier);
-
-      if (stacksHandler != null) {
-        IDynamicStackHandler stackHandler = stacksHandler.getStacks();
-
-        if (index < stackHandler.getSlots()) {
-          ItemStack stack = stackHandler.getStackInSlot(index);
-
-          if (!stack.isEmpty()) {
-            NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-            return new SlotResult(new SlotContext(identifier, livingEntity, index, false,
-                renderStates.size() > index && renderStates.get(index)), stack);
-          }
-        }
-      }
-      return new SlotResult(null, ItemStack.EMPTY);
-    }).orElse(new SlotResult(null, ItemStack.EMPTY));
-    return result.stack().isEmpty() ? Optional.empty() : Optional.of(result);
+    return CuriosApi.getCuriosInventory(livingEntity).map(inv -> inv.findCurio(identifier, index))
+        .orElse(Optional.empty());
   }
 
   @Nonnull
@@ -275,160 +155,56 @@ public class CuriosHelper implements ICuriosHelper {
   @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier,
                                                                       ItemStack stack) {
-    return getAttributeModifiers(new SlotContext(identifier, null, 0, false, true),
+    return this.getAttributeModifiers(new SlotContext(identifier, null, 0, false, true),
         UUID.randomUUID(), stack);
   }
 
   @Override
   public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                       UUID uuid, ItemStack stack) {
-    Multimap<Attribute, AttributeModifier> multimap = HashMultimap.create();
-
-    if (stack.getTag() != null && stack.getTag().contains("CurioAttributeModifiers", 9)) {
-      ListTag listnbt = stack.getTag().getList("CurioAttributeModifiers", 10);
-      String identifier = slotContext.identifier();
-
-      for (int i = 0; i < listnbt.size(); ++i) {
-        CompoundTag compoundnbt = listnbt.getCompound(i);
-
-        if (compoundnbt.getString("Slot").equals(identifier)) {
-          ResourceLocation rl = ResourceLocation.tryParse(compoundnbt.getString("AttributeName"));
-          UUID id = uuid;
-
-          if (rl != null) {
-
-            if (compoundnbt.contains("UUID")) {
-              id = compoundnbt.getUUID("UUID");
-            }
-
-            if (id.getLeastSignificantBits() != 0L && id.getMostSignificantBits() != 0L) {
-              AttributeModifier.Operation operation =
-                  AttributeModifier.Operation.fromValue(compoundnbt.getInt("Operation"));
-              double amount = compoundnbt.getDouble("Amount");
-              String name = compoundnbt.getString("Name");
-
-              if (rl.getNamespace().equals("curios")) {
-                String identifier1 = rl.getPath();
-
-                if (CuriosApi.getSlot(identifier1).isPresent()) {
-                  CuriosApi.getCuriosHelper()
-                      .addSlotModifier(multimap, identifier1, id, amount, operation);
-                }
-              } else {
-                Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(rl);
-
-                if (attribute != null) {
-                  multimap.put(attribute, new AttributeModifier(id, name, amount, operation));
-                }
-              }
-            }
-          }
-        }
-      }
-    } else {
-      multimap = getCurio(stack).map(curio -> curio.getAttributeModifiers(slotContext, uuid))
-          .orElse(multimap);
-    }
-    CurioAttributeModifierEvent evt =
-        new CurioAttributeModifierEvent(stack, slotContext, uuid, multimap);
-    MinecraftForge.EVENT_BUS.post(evt);
-    return evt.getModifiers();
+    return CuriosApi.getAttributeModifiers(slotContext, uuid, stack);
   }
 
   @Override
   public void addSlotModifier(Multimap<Attribute, AttributeModifier> map, String identifier,
                               UUID uuid, double amount, AttributeModifier.Operation operation) {
-    map.put(getOrCreateSlotAttribute(identifier),
-        new AttributeModifier(uuid, identifier, amount, operation));
+    CuriosApi.addSlotModifier(map, identifier, uuid, amount, operation);
   }
 
   @Override
   public void addSlotModifier(ItemStack stack, String identifier, String name, UUID uuid,
                               double amount, AttributeModifier.Operation operation, String slot) {
-    addModifier(stack, getOrCreateSlotAttribute(identifier), name, uuid, amount, operation, slot);
+    this.addModifier(stack, SlotAttribute.getOrCreate(identifier), name, uuid, amount, operation, slot);
   }
 
   @Override
   public void addModifier(ItemStack stack, Attribute attribute, String name, UUID uuid,
                           double amount, AttributeModifier.Operation operation, String slot) {
-    CompoundTag tag = stack.getOrCreateTag();
-
-    if (!tag.contains("CurioAttributeModifiers", 9)) {
-      tag.put("CurioAttributeModifiers", new ListTag());
-    }
-    ListTag listtag = tag.getList("CurioAttributeModifiers", 10);
-    CompoundTag compoundtag = new CompoundTag();
-    compoundtag.putString("Name", name);
-    compoundtag.putDouble("Amount", amount);
-    compoundtag.putInt("Operation", operation.toValue());
-
-    if (uuid != null) {
-      compoundtag.putUUID("UUID", uuid);
-    }
-    String id = "";
-
-    if (attribute instanceof SlotAttributeWrapper wrapper) {
-      id = "curios:" + wrapper.identifier;
-    } else {
-      ResourceLocation rl = ForgeRegistries.ATTRIBUTES.getKey(attribute);
-
-      if (rl != null) {
-        id = rl.toString();
-      }
-    }
-
-    if (!id.isEmpty()) {
-      compoundtag.putString("AttributeName", id);
-    }
-    compoundtag.putString("Slot", slot);
-    listtag.add(compoundtag);
+    CuriosApi.addModifier(stack, attribute, name, uuid, amount, operation, slot);
   }
 
   @Override
   public boolean isStackValid(SlotContext slotContext, ItemStack stack) {
-    String id = slotContext.identifier();
-    Set<String> tags = getCurioTags(stack.getItem());
-    return (!tags.isEmpty() && id.equals(SlotTypePreset.CURIO.getIdentifier())) ||
-        tags.contains(id) || tags.contains(SlotTypePreset.CURIO.getIdentifier());
+    return CuriosApi.isStackValid(slotContext, stack);
   }
 
   @Override
   public void onBrokenCurio(SlotContext slotContext) {
-    brokenCurioConsumer.accept(slotContext);
+    CuriosApi.broadcastCurioBreakEvent(slotContext);
   }
 
   @Override
   public void setBrokenCurioConsumer(Consumer<SlotContext> consumer) {
-
-    if (brokenCurioConsumer == null) {
-      brokenCurioConsumer = consumer;
-    }
+    // NO-OP
   }
 
   @Override
   public void onBrokenCurio(String id, int index, LivingEntity damager) {
-    brokenCurioConsumerLegacy.accept(id, index, damager);
+    CuriosApi.broadcastCurioBreakEvent(new SlotContext(id, damager, index, false, true));
   }
 
   @Override
   public void setBrokenCurioConsumer(TriConsumer<String, Integer, LivingEntity> consumer) {
-
-    if (brokenCurioConsumerLegacy == null) {
-      brokenCurioConsumerLegacy = consumer;
-    }
-  }
-
-  public static SlotAttributeWrapper getOrCreateSlotAttribute(String identifier) {
-    return SLOT_ATTRIBUTES.computeIfAbsent(identifier, SlotAttributeWrapper::new);
-  }
-
-  public static class SlotAttributeWrapper extends Attribute {
-
-    public final String identifier;
-
-    private SlotAttributeWrapper(String identifier) {
-      super("curios.slot." + identifier, 0);
-      this.identifier = identifier;
-    }
+    // NO-OP
   }
 }

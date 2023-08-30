@@ -93,7 +93,7 @@ public class CuriosContainer extends InventoryMenu {
     this.slots.clear();
     this.player = playerInventory.player;
     this.isLocalWorld = this.player.level().isClientSide;
-    this.curiosHandler = CuriosApi.getCuriosHelper().getCuriosHandler(this.player);
+    this.curiosHandler = CuriosApi.getCuriosInventory(this.player);
     this.addSlot(
         new ResultSlot(playerInventory.player, this.craftMatrix, this.craftResult, 0, 154,
             28));
@@ -419,8 +419,7 @@ public class CuriosContainer extends InventoryMenu {
         if (!this.moveItemStackTo(itemstack1, i, i + 1, false)) {
           return ItemStack.EMPTY;
         }
-      } else if (index < 46 && !CuriosApi.getCuriosHelper().getCurioTags(itemstack.getItem())
-          .isEmpty()) {
+      } else if (index < 46 && !CuriosApi.getItemStackSlots(itemstack).isEmpty()) {
 
         if (!this.moveItemStackTo(itemstack1, 46, this.slots.size(), false)) {
           return ItemStack.EMPTY;

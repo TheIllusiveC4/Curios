@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITagManager;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -17,12 +18,12 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
-public class CuriosMixinHooks {
+public class CuriosUtilMixinHooks {
 
   private static final ITagManager<Item> ITEM_TAGS = ForgeRegistries.ITEMS.tags();
 
   public static boolean canNeutralizePiglins(LivingEntity livingEntity) {
-    return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).map(handler -> {
+    return CuriosApi.getCuriosInventory(livingEntity).map(handler -> {
 
       for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
         IDynamicStackHandler stacks = entry.getValue().getStacks();
@@ -31,7 +32,7 @@ public class CuriosMixinHooks {
           final int index = i;
           NonNullList<Boolean> renderStates = entry.getValue().getRenders();
           boolean canNeutralize =
-              CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(curio -> curio
+              CuriosApi.getCurio(stacks.getStackInSlot(i)).map(curio -> curio
                       .makesPiglinsNeutral(new SlotContext(entry.getKey(), livingEntity, index, false,
                           renderStates.size() > index && renderStates.get(index))))
                   .orElse(false);
@@ -46,7 +47,7 @@ public class CuriosMixinHooks {
   }
 
   public static boolean canWalkOnPowderSnow(LivingEntity livingEntity) {
-    return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).map(handler -> {
+    return CuriosApi.getCuriosInventory(livingEntity).map(handler -> {
 
       for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
         IDynamicStackHandler stacks = entry.getValue().getStacks();
@@ -55,7 +56,7 @@ public class CuriosMixinHooks {
           final int index = i;
           NonNullList<Boolean> renderStates = entry.getValue().getRenders();
           boolean canWalk =
-              CuriosApi.getCuriosHelper().getCurio(stacks.getStackInSlot(i)).map(curio -> curio
+              CuriosApi.getCurio(stacks.getStackInSlot(i)).map(curio -> curio
                       .canWalkOnPowderedSnow(new SlotContext(entry.getKey(), livingEntity, index, false,
                           renderStates.size() > index && renderStates.get(index))))
                   .orElse(false);
@@ -70,7 +71,7 @@ public class CuriosMixinHooks {
   }
 
   public static int getFortuneLevel(Player player) {
-    return CuriosApi.getCuriosHelper().getCuriosHandler(player)
+    return CuriosApi.getCuriosInventory(player)
         .map(handler -> handler.getFortuneLevel(null)).orElse(0);
   }
 
@@ -78,7 +79,7 @@ public class CuriosMixinHooks {
     Entity entity = lootContext.getParamOrNull(LootContextParams.THIS_ENTITY);
 
     if (entity instanceof LivingEntity livingEntity) {
-      return CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
+      return CuriosApi.getCuriosInventory(livingEntity)
           .map(handler -> handler.getFortuneLevel(lootContext)).orElse(0);
     } else {
       return 0;
@@ -86,10 +87,11 @@ public class CuriosMixinHooks {
   }
 
   public static boolean isFreezeImmune(LivingEntity livingEntity) {
-    return CuriosApi.getCuriosHelper().getEquippedCurios(livingEntity).map(curios -> {
+    return CuriosApi.getCuriosInventory(livingEntity).map(curios -> {
+      IItemHandlerModifiable handler = curios.getEquippedCurios();
 
-      for (int i = 0; i < curios.getSlots(); i++) {
-        ItemStack stack = curios.getStackInSlot(i);
+      for (int i = 0; i < handler.getSlots(); i++) {
+        ItemStack stack = handler.getStackInSlot(i);
 
         if (ITEM_TAGS != null &&
             ITEM_TAGS.getTag(ItemTags.FREEZE_IMMUNE_WEARABLES).contains(stack.getItem())) {

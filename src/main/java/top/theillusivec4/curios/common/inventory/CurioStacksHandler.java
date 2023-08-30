@@ -42,13 +42,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import org.apache.commons.lang3.EnumUtils;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
-import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 public class CurioStacksHandler implements ICurioStacksHandler {
@@ -567,14 +567,14 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       if (!stack.isEmpty()) {
         UUID uuid = UUID.nameUUIDFromBytes((identifier + i).getBytes());
         Multimap<Attribute, AttributeModifier> map =
-            CuriosApi.getCuriosHelper().getAttributeModifiers(slotContext, uuid, stack);
+            CuriosApi.getAttributeModifiers(slotContext, uuid, stack);
         Multimap<String, AttributeModifier> slots = HashMultimap.create();
-        Set<CuriosHelper.SlotAttributeWrapper> toRemove = new HashSet<>();
+        Set<SlotAttribute> toRemove = new HashSet<>();
 
         for (Attribute attribute : map.keySet()) {
 
-          if (attribute instanceof CuriosHelper.SlotAttributeWrapper wrapper) {
-            slots.putAll(wrapper.identifier, map.get(attribute));
+          if (attribute instanceof SlotAttribute wrapper) {
+            slots.putAll(wrapper.getIdentifier(), map.get(attribute));
             toRemove.add(wrapper);
           }
         }
@@ -584,8 +584,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
         }
         this.itemHandler.getWearer().getAttributes().removeAttributeModifiers(map);
         this.itemHandler.removeSlotModifiers(slots);
-        CuriosApi.getCuriosHelper().getCurio(stack)
-            .ifPresent(curio -> curio.onUnequip(slotContext, ItemStack.EMPTY));
+        CuriosApi.getCurio(stack).ifPresent(curio -> curio.onUnequip(slotContext, ItemStack.EMPTY));
       }
       stackHandler.setStackInSlot(i, ItemStack.EMPTY);
     }

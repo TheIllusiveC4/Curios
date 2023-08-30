@@ -73,7 +73,7 @@ public class SPacketSyncStack {
         Entity entity = world.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity).ifPresent(
+          CuriosApi.getCuriosInventory((LivingEntity) entity).ifPresent(
               handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacksHandler -> {
                 ItemStack stack = msg.stack;
                 CompoundTag compoundNBT = msg.compound;
@@ -82,7 +82,7 @@ public class SPacketSyncStack {
 
                 if (!compoundNBT.isEmpty()) {
                   NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-                  CuriosApi.getCuriosHelper().getCurio(stack).ifPresent(curio -> curio.readSyncData(
+                  CuriosApi.getCurio(stack).ifPresent(curio -> curio.readSyncData(
                       new SlotContext(msg.curioId, (LivingEntity) entity, slot, cosmetic,
                           renderStates.size() > slot && renderStates.get(slot)), compoundNBT));
                 }

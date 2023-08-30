@@ -46,9 +46,9 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
@@ -88,7 +88,7 @@ public class ClientEventHandler {
         i = tag.getInt("HideFlags");
       }
 
-      Set<String> curioTags = CuriosApi.getCuriosHelper().getCurioTags(stack.getItem());
+      Set<String> curioTags = CuriosApi.getItemStackSlots(stack).keySet();
       List<String> slots = new ArrayList<>(curioTags);
 
       if (!slots.isEmpty()) {
@@ -110,7 +110,7 @@ public class ClientEventHandler {
         }
         tagTooltips.add(slotsTooltip);
 
-        LazyOptional<ICurio> optionalCurio = CuriosApi.getCuriosHelper().getCurio(stack);
+        LazyOptional<ICurio> optionalCurio = CuriosApi.getCurio(stack);
         optionalCurio.ifPresent(curio -> {
           List<Component> actualSlotsTooltip = curio.getSlotsTooltip(tagTooltips);
 
@@ -125,8 +125,8 @@ public class ClientEventHandler {
         List<Component> attributeTooltip = new ArrayList<>();
 
         for (String identifier : slots) {
-          Multimap<Attribute, AttributeModifier> multimap = CuriosApi.getCuriosHelper()
-              .getAttributeModifiers(new SlotContext(identifier, player, 0, false, true),
+          Multimap<Attribute, AttributeModifier> multimap =
+              CuriosApi.getAttributeModifiers(new SlotContext(identifier, player, 0, false, true),
                   UUID.randomUUID(), stack);
 
           if (!multimap.isEmpty() && (i & 2) == 0) {
@@ -184,14 +184,15 @@ public class ClientEventHandler {
                   d1 = amount * 100.0D;
                 }
 
-                if (entry.getKey() instanceof CuriosHelper.SlotAttributeWrapper wrapper) {
+                if (entry.getKey() instanceof SlotAttribute slotAttribute) {
 
                   if (amount > 0.0D) {
                     attributeTooltip.add((Component.translatable(
                         "curios.modifiers.slots.plus." +
                             attributemodifier.getOperation().toValue(),
                         ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                        Component.translatable("curios.identifier." + wrapper.identifier)))
+                        Component.translatable(
+                            "curios.identifier." + slotAttribute.getIdentifier())))
                         .withStyle(ChatFormatting.BLUE));
                   } else {
                     d1 = d1 * -1.0D;
@@ -199,7 +200,8 @@ public class ClientEventHandler {
                         "curios.modifiers.slots.take." +
                             attributemodifier.getOperation().toValue(),
                         ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                        Component.translatable("curios.identifier." + wrapper.identifier)))
+                        Component.translatable(
+                            "curios.identifier." + slotAttribute.getIdentifier())))
                         .withStyle(ChatFormatting.RED));
                   }
                 } else if (flag) {

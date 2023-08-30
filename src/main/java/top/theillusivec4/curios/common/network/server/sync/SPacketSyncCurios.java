@@ -89,7 +89,7 @@ public class SPacketSyncCurios {
         Entity entity = world.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity)
+          CuriosApi.getCuriosInventory((LivingEntity) entity)
               .ifPresent(handler -> {
                 Map<String, ICurioStacksHandler> stacks = new LinkedHashMap<>();
 

@@ -63,10 +63,10 @@ public class SPacketBreak {
         Entity entity = Minecraft.getInstance().level.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity livingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity)
+          CuriosApi.getCuriosInventory(livingEntity)
               .ifPresent(handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacks -> {
                 ItemStack stack = stacks.getStacks().getStackInSlot(msg.slotId);
-                LazyOptional<ICurio> possibleCurio = CuriosApi.getCuriosHelper().getCurio(stack);
+                LazyOptional<ICurio> possibleCurio = CuriosApi.getCurio(stack);
                 NonNullList<Boolean> renderStates = stacks.getRenders();
                 possibleCurio.ifPresent(curio -> curio.curioBreak(
                     new SlotContext(msg.curioId, livingEntity, msg.slotId, false,

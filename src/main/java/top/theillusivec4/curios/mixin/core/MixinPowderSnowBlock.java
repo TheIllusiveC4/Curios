@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import top.theillusivec4.curios.mixin.CuriosMixinHooks;
+import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 
 @Mixin(PowderSnowBlock.class)
 public class MixinPowderSnowBlock {
@@ -16,7 +16,7 @@ public class MixinPowderSnowBlock {
   private static void curios$canEntityWalkOnPowderSnow(Entity entity,
                                                        CallbackInfoReturnable<Boolean> cir) {
 
-    if (entity instanceof LivingEntity livingEntity && CuriosMixinHooks.canWalkOnPowderSnow(livingEntity)) {
+    if (entity instanceof LivingEntity livingEntity && CuriosUtilMixinHooks.canWalkOnPowderSnow(livingEntity)) {
       cir.setReturnValue(true);
     }
   }

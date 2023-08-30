@@ -30,6 +30,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.common.data.CuriosSlotManager;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 
 public class SPacketSetIcons {
@@ -68,11 +69,14 @@ public class SPacketSetIcons {
 
       if (world != null) {
         CuriosApi.getIconHelper().clearIcons();
+        Map<String, ResourceLocation> icons = new HashMap<>();
 
         for (Map.Entry<String, ResourceLocation> entry : msg.map.entrySet()) {
           CuriosApi.getIconHelper().addIcon(entry.getKey(), entry.getValue());
+          icons.put(entry.getKey(), entry.getValue());
           slotIds.add(entry.getKey());
         }
+        CuriosSlotManager.INSTANCE.setIcons(icons);
       }
       CurioArgumentType.slotIds = slotIds;
     });

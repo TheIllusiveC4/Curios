@@ -34,6 +34,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraftforge.registries.ForgeRegistries;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.common.CuriosHelper;
 
 public class SetCurioAttributesFunction extends LootItemConditionalFunction {
@@ -73,11 +74,11 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
       UUID uuid = modifier.id;
       String slot = Util.getRandom(modifier.slots, random);
 
-      if (modifier.attribute instanceof CuriosHelper.SlotAttributeWrapper wrapper) {
-        CuriosApi.getCuriosHelper().addSlotModifier(stack, wrapper.identifier, modifier.name, uuid,
+      if (modifier.attribute instanceof SlotAttribute wrapper) {
+        CuriosApi.addSlotModifier(stack, wrapper.getIdentifier(), modifier.name, uuid,
             modifier.amount.getFloat(context), modifier.operation, slot);
       } else {
-        CuriosApi.getCuriosHelper().addModifier(stack, modifier.attribute, modifier.name, uuid,
+        CuriosApi.addModifier(stack, modifier.attribute, modifier.name, uuid,
             modifier.amount.getFloat(context), modifier.operation, slot);
       }
     }
@@ -108,8 +109,8 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
       jsonobject.addProperty("name", this.name);
       ResourceLocation rl;
 
-      if (this.attribute instanceof CuriosHelper.SlotAttributeWrapper wrapper) {
-        rl = new ResourceLocation(CuriosApi.MODID, wrapper.identifier);
+      if (this.attribute instanceof SlotAttribute wrapper) {
+        rl = new ResourceLocation(CuriosApi.MODID, wrapper.getIdentifier());
       } else {
         rl = ForgeRegistries.ATTRIBUTES.getKey(this.attribute);
       }
@@ -149,7 +150,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
         if (CuriosApi.getSlot(identifier).isEmpty()) {
           throw new JsonSyntaxException("Unknown curios slot type: " + identifier);
         }
-        attribute = CuriosHelper.getOrCreateSlotAttribute(identifier);
+        attribute = SlotAttribute.getOrCreate(identifier);
       } else {
         attribute = ForgeRegistries.ATTRIBUTES.getValue(resourcelocation);
       }

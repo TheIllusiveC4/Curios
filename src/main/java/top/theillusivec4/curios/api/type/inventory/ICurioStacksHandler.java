@@ -226,32 +226,21 @@ public interface ICurioStacksHandler {
   // ============ DEPRECATED ================
 
   /**
-   * @return The number of the size offset for this instance
-   * @deprecated Use the new attribute modifier system through {@link ICurioStacksHandler#getModifiers()}
-   * <br>
-   * Gets the size offset for this instance. This value is used to persist size changes for this
-   * handler even when the underlying size changes.
+   * @deprecated See {@link ICurioStacksHandler#getModifiers()}
    */
   @Deprecated
   int getSizeShift();
 
   /**
-   * @param amount The number of slots to add to the handler
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
-   * <p>
-   * Increases the number of slots by the given amount.
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
    */
   @Deprecated
   void grow(int amount);
 
   /**
-   * @param amount The number of slots to remove from the handler
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
-   * <p>
-   * Decreases the number of slots by the given amount. This should not decrease the final number of
-   * slots below 1.
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
    */
   @Deprecated
   void shrink(int amount);

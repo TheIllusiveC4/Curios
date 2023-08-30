@@ -36,249 +36,186 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.jetbrains.annotations.ApiStatus;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
+@Deprecated(since = "1.20.1", forRemoval = true)
+@ApiStatus.ScheduledForRemoval(inVersion = "1.22")
 public interface ICuriosHelper {
 
   /**
-   * Gets a {@link LazyOptional} of the curio capability attached to the {@link ItemStack}.
-   *
-   * @param stack The {@link ItemStack} to get the curio capability from
-   * @return {@link LazyOptional} of the curio capability
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getCurio(ItemStack)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   LazyOptional<ICurio> getCurio(ItemStack stack);
 
   /**
-   * Gets a {@link LazyOptional} of the curio inventory capability attached to the entity.
-   *
-   * @param livingEntity The {@link LivingEntity} to get the curio inventory capability from
-   * @return {@link LazyOptional} of the curio inventory capability
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getCuriosInventory(LivingEntity)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   LazyOptional<ICuriosItemHandler> getCuriosHandler(LivingEntity livingEntity);
 
   /**
-   * Retrieves a set of string identifiers from the curio tags associated with the given item.
-   *
-   * @param item The {@link Item} to retrieve curio tags for
-   * @return Set of unique curio identifiers associated with the item
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getItemStackSlots(ItemStack)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   Set<String> getCurioTags(Item item);
 
   /**
-   * Gets a {@link LazyOptional} of an {@link IItemHandlerModifiable} that contains all the
-   * equipped curio stacks (not including cosmetics).
-   *
-   * @param livingEntity The wearer of the curios
-   * @return The equipped curio stacks, or empty if there is no curios handler
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#getEquippedCurios()}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   LazyOptional<IItemHandlerModifiable> getEquippedCurios(LivingEntity livingEntity);
 
   /**
-   * Replaces the currently equipped item in a specified curio slot, if it exists.
-   *
-   * @param livingEntity The wearer of the curio
-   * @param identifier   The identifier of the curio slot
-   * @param index        The index of the curio slot
-   * @param stack        The new stack to place into the slot
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#setEquippedCurio(String, int, ItemStack)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   void setEquippedCurio(@Nonnull LivingEntity livingEntity, String identifier, int index,
                         ItemStack stack);
 
   /**
-   * Gets the first matching item equipped in a curio slot.
-   *
-   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
-   * @param item         The item to search for
-   * @return An optional {@link SlotResult} with the found item, or empty if none were found
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#findFirstCurio(Item)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   Optional<SlotResult> findFirstCurio(@Nonnull LivingEntity livingEntity, Item item);
 
   /**
-   * Gets the first matching item equipped in a curio slot that matches the filter.
-   *
-   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
-   * @param filter       The filter to test against
-   * @return An optional {@link SlotResult} with the found item, or empty if none were found
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#findFirstCurio(Predicate)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   Optional<SlotResult> findFirstCurio(@Nonnull LivingEntity livingEntity,
                                       Predicate<ItemStack> filter);
 
   /**
-   * Gets all matching items equipped in a curio slot.
-   *
-   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
-   * @param item         The item to search for
-   * @return A list of matching results
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#findCurios(Item)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   List<SlotResult> findCurios(@Nonnull LivingEntity livingEntity, Item item);
 
   /**
-   * Gets all matching items equipped in a curio slot that matches the filter.
-   *
-   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
-   * @param filter       The filter to test against
-   * @return A list of matching results
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#findCurios(Predicate)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   List<SlotResult> findCurios(@Nonnull LivingEntity livingEntity, Predicate<ItemStack> filter);
 
   /**
-   * Gets all items equipped in all curio slots with specific identifiers.
-   *
-   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
-   * @param identifiers  The identifiers for the slot types
-   * @return A list of matching results
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#findCurios(String...)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   List<SlotResult> findCurios(@Nonnull LivingEntity livingEntity, String... identifiers);
 
   /**
-   * Gets the currently equipped item in a specified curio slot, if it exists.
-   *
-   * @param livingEntity The wearer of the curio
-   * @param identifier   The identifier of the curio slot
-   * @param index        The index of the curio slot
-   * @return The equipped curio stack, or empty if there is none
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#findCurio(String, int)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   Optional<SlotResult> findCurio(@Nonnull LivingEntity livingEntity, String identifier, int index);
 
   /**
-   * Retrieves a map of attribute modifiers for the ItemStack.
-   * <br>
-   * Note that only the identifier is guaranteed to be present in the slot context. For instances
-   * where the ItemStack may not be in a curio slot, such as when retrieving item tooltips, the
-   * index is -1 and the wearer may be null.
-   *
-   * @param slotContext Context about the slot that the ItemStack is equipped in or may potentially
-   *                    be equipped in
-   * @param uuid        Slot-unique UUID
-   * @param stack       The ItemStack in question
-   * @return A map of attribute modifiers
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getAttributeModifiers(SlotContext, UUID, ItemStack)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext, UUID uuid,
                                                                ItemStack stack);
 
   /**
-   * Adds a slot modifier to a specified attribute map.
-   *
-   * @param map        A {@link Multimap} of attributes to attribute modifiers
-   * @param identifier The identifier of the slot to add the modifier onto
-   * @param uuid       A UUID associated wth the slot
-   * @param amount     The amount of the modifier
-   * @param operation  The operation of the modifier
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   void addSlotModifier(Multimap<Attribute, AttributeModifier> map, String identifier, UUID uuid,
                        double amount, AttributeModifier.Operation operation);
 
   /**
-   * Adds a slot modifier to an ItemStack's tag data.
-   *
-   * @param stack      The ItemStack to add the modifier to
-   * @param identifier The identifier of the slot to add the modifier onto
-   * @param name       The name for the modifier
-   * @param uuid       A UUID associated wth the modifier, or null if the slot UUID should be used
-   * @param amount     The amount of the modifier
-   * @param operation  The operation of the modifier
-   * @param slot       The slot that the ItemStack provides the modifier from
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#addSlotModifier(ItemStack, String, String, UUID, double, AttributeModifier.Operation, String)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   void addSlotModifier(ItemStack stack, String identifier, String name, UUID uuid, double amount,
                        AttributeModifier.Operation operation, String slot);
 
   /**
-   * Adds an attribute modifier to an ItemStack's tag data.
-   *
-   * @param stack     The ItemStack to add the modifier to
-   * @param attribute The attribute to add the modifier onto
-   * @param name      The name for the modifier
-   * @param uuid      A UUID associated wth the modifier, or null if the slot UUID should be used
-   * @param amount    The amount of the modifier
-   * @param operation The operation of the modifier
-   * @param slot      The slot that the ItemStack provides the modifier from
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#addModifier(ItemStack, Attribute, String, UUID, double, AttributeModifier.Operation, String)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   void addModifier(ItemStack stack, Attribute attribute, String name, UUID uuid, double amount,
                    AttributeModifier.Operation operation, String slot);
 
   /**
-   * Checks if the ItemStack is valid for a particular stack and slot context.
-   *
-   * @param slotContext Context about the slot that the ItemStack is being checked for
-   * @param stack       The ItemStack in question
-   * @return True if the ItemStack is valid for the slot, false otherwise
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#isStackValid(SlotContext, ItemStack)}
    */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   boolean isStackValid(SlotContext slotContext, ItemStack stack);
 
   /**
-   * Performs breaking behavior used from the single-input consumer in {@link ItemStack#hurtAndBreak(int, LivingEntity, Consumer)}
-   * <br>
-   * This will be necessary in order to trigger break animations in curio slots
-   * <br>
-   * Example: { stack.damageItem(amount, entity, damager -> CuriosApi.getCuriosHelper().onBrokenCurio(slotContext)); }
-   *
-   * @param slotContext Context about the slot that the curio is in
-   */
-  void onBrokenCurio(SlotContext slotContext);
-
-  /**
-   * Sets the {@link Consumer} that should be used with {@link ItemStack#hurtAndBreak(int,
-   * LivingEntity, Consumer)} when triggering break animations in curio slots
-   *
-   * @param consumer The {@link Consumer} taking a {@link SlotContext}
-   */
-  void setBrokenCurioConsumer(Consumer<SlotContext> consumer);
-
-  // ========= DEPRECATED =============
-
-  /**
-   * @param item         The {@link Item} to find
-   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
-   * @return An {@link Optional} wrapper of the found triplet, or {@link Optional#empty()} is
-   * nothing was found.
-   * @deprecated Use {@link ICuriosHelper#findFirstCurio(LivingEntity, Item)}
-   * <p>
-   * Gets the first found {@link ItemStack} of the {@link Item} type equipped in a curio slot, or
-   * {@link Optional#empty()} if no matches were found.
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#findFirstCurio(Item)}
    */
   @Nonnull
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(Item item,
                                                                           @Nonnull
-                                                                              LivingEntity livingEntity);
+                                                                          LivingEntity livingEntity);
 
   /**
-   * @param filter       The filter to test against
-   * @param livingEntity The wearer as a {@link LivingEntity} of the item to be found
-   * @return An {@link Optional#empty()} wrapper of the found triplet, or {@link Optional#empty()}
-   * is nothing was found.
-   * @deprecated Use {@link ICuriosHelper#findFirstCurio(LivingEntity, Predicate)}
-   * <p>
-   * Gets the first found {@link ItemStack} of the item type equipped in a curio slot that matches
-   * the filter, or {@link Optional#empty()} if no matches were found.
+   * @deprecated Use {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#findFirstCurio(Predicate)}
    */
   @Nonnull
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   Optional<ImmutableTriple<String, Integer, ItemStack>> findEquippedCurio(
       Predicate<ItemStack> filter, @Nonnull LivingEntity livingEntity);
 
 
   /**
-   * @deprecated See {@link ICuriosHelper#onBrokenCurio(SlotContext)} for a slot context-sensitive
-   * alternative
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#broadcastCurioBreakEvent(SlotContext)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   void onBrokenCurio(String id, int index, LivingEntity damager);
 
   /**
-   * @deprecated See {@link ICuriosHelper#setBrokenCurioConsumer(Consumer)} for a slot
-   * context-sensitive alternative
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#broadcastCurioBreakEvent(SlotContext)}
    */
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
+  void onBrokenCurio(SlotContext slotContext);
+
+  /**
+   * @deprecated Moved to internal code and removed from the API
+   */
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
+  void setBrokenCurioConsumer(Consumer<SlotContext> consumer);
+
+  /**
+   * @deprecated Moved to internal code and removed from the API
+   */
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   void setBrokenCurioConsumer(TriConsumer<String, Integer, LivingEntity> consumer);
 
   /**
-   * @deprecated See {@link ICuriosHelper#getAttributeModifiers(SlotContext, UUID, ItemStack)} for
-   * an alternative method with additional context and a slot-unique UUID.
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getAttributeModifiers(SlotContext, UUID, ItemStack)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   Multimap<Attribute, AttributeModifier> getAttributeModifiers(String identifier, ItemStack stack);
 }

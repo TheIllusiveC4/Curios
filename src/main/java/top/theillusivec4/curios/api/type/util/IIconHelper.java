@@ -20,26 +20,33 @@
 package top.theillusivec4.curios.api.type.util;
 
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 
+/**
+ * @deprecated Moved to internal code
+ */
+@Deprecated(forRemoval = true, since = "1.20.1")
+@ApiStatus.ScheduledForRemoval(inVersion = "1.22")
 public interface IIconHelper {
 
   /**
-   * Clears all of the registered icons.
+   * @deprecated Moved to internal code and removed from the API
    */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   void clearIcons();
 
   /**
-   * Adds a {@link ResourceLocation} for the icon to the given {@link
-   * top.theillusivec4.curios.api.type.ISlotType} identifier
-   *
-   * @param identifier       The {@link top.theillusivec4.curios.api.type.ISlotType} identifier
-   * @param resourceLocation The {@link ResourceLocation} for to the icon
+   * @deprecated Moved to internal code and removed from the API
    */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   void addIcon(String identifier, ResourceLocation resourceLocation);
 
   /**
-   * @param identifier The identifier of the {@link top.theillusivec4.curios.api.type.ISlotType}
-   * @return The resource location of the icon registered to the identifier
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getSlotIcon(String)}
    */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   ResourceLocation getIcon(String identifier);
 }

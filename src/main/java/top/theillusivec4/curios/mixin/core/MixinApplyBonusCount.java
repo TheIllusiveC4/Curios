@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import top.theillusivec4.curios.mixin.CuriosMixinHooks;
+import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 
 @Mixin(ApplyBonusCount.class)
 public class MixinApplyBonusCount {
@@ -27,7 +27,7 @@ public class MixinApplyBonusCount {
   private int curios$applyFortune(int enchantmentLevel, ItemStack stack, LootContext lootContext) {
 
     if (this.enchantment == Enchantments.BLOCK_FORTUNE) {
-      return enchantmentLevel + CuriosMixinHooks.getFortuneLevel(lootContext);
+      return enchantmentLevel + CuriosUtilMixinHooks.getFortuneLevel(lootContext);
     } else {
       return enchantmentLevel;
     }

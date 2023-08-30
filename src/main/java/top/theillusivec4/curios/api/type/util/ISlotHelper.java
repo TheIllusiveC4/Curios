@@ -25,154 +25,140 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.UUID;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import top.theillusivec4.curios.api.SlotContext;
+import org.jetbrains.annotations.ApiStatus;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
+@Deprecated(forRemoval = true, since = "1.20.1")
+@ApiStatus.ScheduledForRemoval(inVersion = "1.22")
 public interface ISlotHelper {
 
   /**
-   * Registers a {@link ISlotType} instance.
-   * <br>
-   * Modders: DO NOT USE DIRECTLY - Use IMC to send the appropriate {@link
-   * top.theillusivec4.curios.api.SlotTypeMessage}
-   *
-   * @param slotType The {@link ISlotType} instance
+   * @see <a href="https://docs.illusivesoulworks.com/category/curios">Curios Documentation</a>
+   * @deprecated Use the datapack-based approach to slot registration
    */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   void addSlotType(ISlotType slotType);
 
+  /**
+   * @deprecated Moved to internal code and removed from the API
+   */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   void clear();
 
   /**
-   * Gets the {@link ISlotType} registered to the given identifier, or {@link Optional#empty()} if
-   * none is registered.
-   *
-   * @param identifier The {@link ISlotType} identifier
-   * @return The {@link ISlotType} registered to the identifier
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getSlot(String)}
    */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   Optional<ISlotType> getSlotType(String identifier);
 
   /**
-   * @return A collection of all registered {@link ISlotType}
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getSlots()}
    */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   Collection<ISlotType> getSlotTypes();
 
   /**
-   * @return A collection of all registered {@link ISlotType} for a specific entity
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getEntitySlots(EntityType)}
    */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   Collection<ISlotType> getSlotTypes(LivingEntity livingEntity);
 
   /**
-   * Gets all unique registered {@link ISlotType} identifiers.
-   *
-   * @return A set of identifiers
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getSlots()}
    */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   Set<String> getSlotTypeIds();
 
   /**
-   * Retrieves the number of slots that an entity has for a specific curio type.
-   *
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   * @param id           The identifier of the {@link ISlotType}
-   * @return The number of slots
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#getCurios()}
    */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   int getSlotsForType(LivingEntity livingEntity, String id);
 
   /**
-   * Sets the number of slots that an entity has for a specific curio type.
-   *
-   * @param id           The identifier of the {@link ISlotType}
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   * @param amount       The number of slots
+   * @deprecated See {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
    */
+  @Deprecated(forRemoval = true, since = "1.20.1")
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   void setSlotsForType(String id, LivingEntity livingEntity, int amount);
 
-  // ============ DEPRECATED ================
-
   /**
-   * @return A map sorted by {@link ISlotType} with instances of {@link ICurioStacksHandler} using
-   * default settings
-   * @deprecated Use {@link ISlotHelper#getSlotTypes(LivingEntity)}
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getEntitySlots(EntityType)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   SortedMap<ISlotType, ICurioStacksHandler> createSlots(LivingEntity livingEntity);
 
   /**
-   * @return A map sorted by {@link ISlotType} with instances of {@link ICurioStacksHandler} using
-   * default settings
-   * @deprecated Use {@link ISlotHelper#getSlotTypes()}
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#getSlots()}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   SortedMap<ISlotType, ICurioStacksHandler> createSlots();
 
   /**
-   * @param id           The identifier of the {@link ISlotType}
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
-   * <br>
-   * Adds a single slot to the {@link ISlotType} with the associated identifier. If the slot to
-   * be added is for a type that is not enabled on the entity, it will not be added. For adding
-   * slot(s) for types that are not yet available, there must first be a call to {@link
-   * ISlotHelper#unlockSlotType(String, LivingEntity)}
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   void growSlotType(String id, LivingEntity livingEntity);
 
   /**
-   * @param id           The identifier of the {@link ISlotType}
-   * @param amount       The number of slots to add
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
-   * <br>
-   * Adds multiple slots to the {@link ISlotType} with the associated identifier. If the slot to be
-   * added is for a type that is not enabled on the entity, it will not be added. For adding slot(s)
-   * for types that are not yet available, there must first be a call to {@link
-   * ISlotHelper#unlockSlotType(String, LivingEntity)}
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   void growSlotType(String id, int amount, LivingEntity livingEntity);
 
   /**
-   * @param id           The identifier of the {@link ISlotType}
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
-   * <br>
-   * Removes a single slot to the {@link ISlotType} with the associated identifier. If the slot to
-   * be removed is the last slot available, it will not be removed. For the removal of the last
-   * slot, please see {@link ISlotHelper#lockSlotType(String, LivingEntity)}
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   void shrinkSlotType(String id, LivingEntity livingEntity);
 
   /**
-   * @param id           The identifier of the {@link ISlotType}
-   * @param livingEntity The holder of the slot(s) as a {@link LivingEntity}
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
-   * <br>
-   * Removes multiple slots from the {@link ISlotType} with the associated identifier. If the slot
-   * to be removed is the last slot available, it will not be removed. For the removal of the last
-   * slot, please see {@link ISlotHelper#lockSlotType(String, LivingEntity)}
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   void shrinkSlotType(String id, int amount, LivingEntity livingEntity);
 
   /**
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   void unlockSlotType(String id, LivingEntity livingEntity);
 
   /**
-   * @deprecated Add a slot modifier instead using {@link top.theillusivec4.curios.api.type.util.ICuriosHelper#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
-   * when overriding {@link top.theillusivec4.curios.api.type.capability.ICurio#getAttributeModifiers(SlotContext, UUID)}
+   * @deprecated See {@link top.theillusivec4.curios.api.CuriosApi#addSlotModifier(Multimap, String, UUID, double, AttributeModifier.Operation)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addPermanentSlotModifiers(Multimap)}
+   * and {@link top.theillusivec4.curios.api.type.capability.ICuriosItemHandler#addTransientSlotModifiers(Multimap)}
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   void lockSlotType(String id, final LivingEntity livingEntity);
 }

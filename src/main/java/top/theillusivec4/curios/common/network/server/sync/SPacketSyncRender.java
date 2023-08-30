@@ -63,7 +63,7 @@ public class SPacketSyncRender {
         Entity entity = world.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity) entity).ifPresent(
+          CuriosApi.getCuriosInventory((LivingEntity) entity).ifPresent(
               handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacksHandler -> {
                 int index = msg.slotId;
                 NonNullList<Boolean> renderStatuses = stacksHandler.getRenders();

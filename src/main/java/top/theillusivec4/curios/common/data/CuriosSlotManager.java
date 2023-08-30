@@ -19,6 +19,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.commons.lang3.EnumUtils;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.slottype.LegacySlotManager;
@@ -30,6 +31,7 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
       (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
   public static final CuriosSlotManager INSTANCE = new CuriosSlotManager();
   private Map<String, ISlotType> slots = ImmutableMap.of();
+  private Map<String, ResourceLocation> icons = ImmutableMap.of();
   private Map<String, Set<String>> idToMods = ImmutableMap.of();
 
   public CuriosSlotManager() {
@@ -104,6 +106,19 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
 
   public Optional<ISlotType> getSlot(String id) {
     return Optional.ofNullable(this.slots.get(id));
+  }
+
+  public void setIcons(Map<String, ResourceLocation> icons) {
+    this.icons = ImmutableMap.copyOf(icons);
+  }
+
+  public Map<String, ResourceLocation> getIcons() {
+    return this.icons;
+  }
+
+  public ResourceLocation getIcon(String identifier) {
+    return this.icons.getOrDefault(identifier,
+        new ResourceLocation(CuriosApi.MODID, "slot/empty_curio_slot"));
   }
 
   public Map<String, Set<String>> getModsFromSlots() {

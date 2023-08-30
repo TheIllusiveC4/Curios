@@ -20,12 +20,14 @@
 package top.theillusivec4.curios.api;
 
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
- * @deprecated Use the datapack-based approach to slot registration instead of IMC
  * @see <a href="https://docs.illusivesoulworks.com/category/curios">Curios Documentation</a>
+ * @deprecated Use the datapack-based approach to slot registration instead of IMC
  */
-@Deprecated
+@Deprecated(since = "1.20.1", forRemoval = true)
+@ApiStatus.ScheduledForRemoval(inVersion = "1.22")
 public final class SlotTypeMessage {
 
   public static final String REGISTER_TYPE = "register_type";
@@ -47,22 +49,26 @@ public final class SlotTypeMessage {
     this.icon = builder.icon;
   }
 
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   public String getIdentifier() {
     return this.identifier;
   }
 
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   public ResourceLocation getIcon() {
     return this.icon;
   }
 
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   public Integer getPriority() {
     return this.priority;
   }
 
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   public int getSize() {
     return this.size;
   }
@@ -70,22 +76,26 @@ public final class SlotTypeMessage {
   /**
    * @deprecated Check if {@link SlotTypeMessage#getSize()} returns 0 instead
    */
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   public boolean isLocked() {
     return getSize() == 0;
   }
 
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   public boolean isVisible() {
     return this.visible;
   }
 
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   public boolean hasCosmetic() {
     return this.cosmetic;
   }
 
-  @Deprecated
+  @Deprecated(since = "1.20.1", forRemoval = true)
+  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
   public static class Builder {
 
     private final String identifier;
@@ -95,51 +105,56 @@ public final class SlotTypeMessage {
     private boolean cosmetic = false;
     private ResourceLocation icon = null;
 
-    @Deprecated
+    @Deprecated(since = "1.20.1", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public Builder(String identifier) {
       this.identifier = identifier;
     }
 
-    @Deprecated
+    @Deprecated(since = "1.20.1", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public Builder icon(ResourceLocation icon) {
       this.icon = icon;
       return this;
     }
 
-    @Deprecated
+    @Deprecated(since = "1.20.1", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public Builder priority(int priority) {
       this.priority = priority;
       return this;
     }
 
-    @Deprecated
+    @Deprecated(since = "1.20.1", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public Builder size(int size) {
       this.size = size;
       return this;
     }
 
-    /**
-     * @deprecated Lock slots by setting size to 0 using {@link SlotTypeMessage.Builder#size(int)}
-     */
-    @Deprecated
+    @Deprecated(since = "1.20.1", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public Builder lock() {
       this.size = 0;
       return this;
     }
 
-    @Deprecated
+    @Deprecated(since = "1.20.1", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public Builder hide() {
       this.visible = false;
       return this;
     }
 
-    @Deprecated
+    @Deprecated(since = "1.20.1", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public Builder cosmetic() {
       this.cosmetic = true;
       return this;
     }
 
-    @Deprecated
+    @Deprecated(since = "1.20.1", forRemoval = true)
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
     public SlotTypeMessage build() {
       return new SlotTypeMessage(this);
     }
