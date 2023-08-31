@@ -19,19 +19,22 @@
 
 package top.theillusivec4.curios.common.inventory;
 
+import java.util.function.BiPredicate;
 import javax.annotation.Nonnull;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class DynamicStackHandler extends ItemStackHandler implements IDynamicStackHandler {
 
   protected NonNullList<ItemStack> previousStacks;
+  protected BiPredicate<Integer, ItemStack> validator;
 
-  public DynamicStackHandler(int size) {
+  public DynamicStackHandler(int size, BiPredicate<Integer, ItemStack> validator) {
     super(size);
     this.previousStacks = NonNullList.withSize(size, ItemStack.EMPTY);
+    this.validator = validator;
   }
 
   @Override
@@ -41,16 +44,16 @@ public class DynamicStackHandler extends ItemStackHandler implements IDynamicSta
     this.onContentsChanged(slot);
   }
 
-  @Override
-  public int getSlots() {
-    return stacks.size();
-  }
-
   @Nonnull
   @Override
   public ItemStack getPreviousStackInSlot(int slot) {
     this.validateSlotIndex(slot);
     return this.previousStacks.get(slot);
+  }
+
+  @Override
+  public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+    return this.validator.test(slot, stack);
   }
 
   @Override

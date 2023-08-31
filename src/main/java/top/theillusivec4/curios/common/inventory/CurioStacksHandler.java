@@ -87,8 +87,18 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     this.identifier = identifier;
     this.canToggleRender = canToggleRender;
     this.dropRule = dropRule;
-    this.stackHandler = new DynamicStackHandler(size);
-    this.cosmeticStackHandler = new DynamicStackHandler(size);
+    this.stackHandler = new DynamicStackHandler(size, (slot, stack) -> {
+      NonNullList<Boolean> list = getRenders();
+      SlotContext ctx = new SlotContext(identifier, itemHandler.getWearer(), slot, false,
+          list.size() > slot && list.get(slot));
+      return CuriosApi.isStackValid(ctx, stack);
+    });
+    this.cosmeticStackHandler = new DynamicStackHandler(size, (slot, stack) -> {
+      NonNullList<Boolean> list = getRenders();
+      SlotContext ctx = new SlotContext(identifier, itemHandler.getWearer(), slot, true,
+          list.size() > slot && list.get(slot));
+      return CuriosApi.isStackValid(ctx, stack);
+    });
     this.renderHandler = NonNullList.withSize(size, true);
   }
 
