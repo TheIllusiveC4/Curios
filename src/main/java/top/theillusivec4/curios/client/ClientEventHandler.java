@@ -48,6 +48,7 @@ import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
@@ -88,7 +89,9 @@ public class ClientEventHandler {
         i = tag.getInt("HideFlags");
       }
 
-      Set<String> curioTags = CuriosApi.getItemStackSlots(stack).keySet();
+      Map<String, ISlotType> map = player != null ? CuriosApi.getItemStackSlots(stack, player) :
+          CuriosApi.getItemStackSlots(stack);
+      Set<String> curioTags = map.keySet();
       List<String> slots = new ArrayList<>(curioTags);
 
       if (!slots.isEmpty()) {
