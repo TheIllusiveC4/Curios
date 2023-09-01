@@ -50,23 +50,51 @@ public final class CuriosApi {
 
   public static final String MODID = "curios";
 
+  /**
+   * Gets the registered slot type server-side for the identifier, if it exists.
+   * <br>
+   * This will always be empty client-side.
+   *
+   * @param id The slot type identifier
+   * @return The registered slot type or empty if it doesn't exist
+   */
   public static Optional<ISlotType> getSlot(String id) {
     apiError();
     return Optional.empty();
   }
 
+  /**
+   * Gets the registered slot type icon client-side for the identifier.
+   * <br>
+   * This will always return the default curio icon server-side. For accurate server-side calls,
+   * see {@link CuriosApi#getSlot(String)} and {@link ISlotType#getIcon()}.
+   *
+   * @param id The slot type identifier
+   * @return The registered slot type or empty if it doesn't exist
+   */
   @Nonnull
   public static ResourceLocation getSlotIcon(String id) {
     apiError();
     return new ResourceLocation(MODID, "slot/empty_curio_slot");
   }
 
+  /**
+   * Gets all the registered slot types server-side.
+   * <br>
+   * This will always be empty client-side.
+   *
+   * @return The registered slot types
+   */
   public static Map<String, ISlotType> getSlots() {
     apiError();
     return new HashMap<>();
   }
 
   /**
+   * Gets all the registered slot types provided to player entities server-side.
+   * <br>
+   * This will always be empty client-side.
+   *
    * @return The slot types provided to player entities
    */
   public static Map<String, ISlotType> getPlayerSlots() {
@@ -75,29 +103,63 @@ public final class CuriosApi {
   }
 
   /**
-   * @return The slot types provided to the given entity type
+   * Gets all the registered slot types provided to an entity type server-side.
+   * <br>
+   * This will always be empty client-side.
+   *
+   * @param type The entity type for the slot types
+   * @return The slot types provided to the entity type
    */
   public static Map<String, ISlotType> getEntitySlots(EntityType<?> type) {
     apiError();
     return new HashMap<>();
   }
 
+  /**
+   * Gets all the registered slot types for the provided ItemStack server-side.
+   * <br>
+   * This will always be empty client-side.
+   *
+   * @param stack The ItemStack for the slot types
+   * @return The slot types for the provided ItemStack
+   */
   public static Map<String, ISlotType> getItemStackSlots(ItemStack stack) {
     apiError();
     return new HashMap<>();
   }
 
+  /**
+   * Gets all the registered slot types for the provided ItemStack and entity server-side.
+   * <br>
+   * This will always be empty client-side.
+   *
+   * @param stack The ItemStack for the slot types
+   * @param livingEntity The entity with the slot types
+   * @return The slot types for the provided ItemStack and entity
+   */
   public static Map<String, ISlotType> getItemStackSlots(ItemStack stack,
                                                          LivingEntity livingEntity) {
     apiError();
     return new HashMap<>();
   }
 
+  /**
+   * Gets a {@link LazyOptional} of the curio capability attached to the {@link ItemStack}.
+   *
+   * @param stack The {@link ItemStack} to get the curio capability from
+   * @return {@link LazyOptional} of the curio capability
+   */
   public static LazyOptional<ICurio> getCurio(ItemStack stack) {
     apiError();
     return LazyOptional.empty();
   }
 
+  /**
+   * Gets a {@link LazyOptional} of the curio inventory capability attached to the entity.
+   *
+   * @param livingEntity The {@link LivingEntity} to get the curio inventory capability from
+   * @return {@link LazyOptional} of the curio inventory capability
+   */
   public static LazyOptional<ICuriosItemHandler> getCuriosInventory(LivingEntity livingEntity) {
     apiError();
     return LazyOptional.empty();
