@@ -14,7 +14,7 @@ public class SlotAttribute extends Attribute {
     return SLOT_ATTRIBUTES.computeIfAbsent(id, SlotAttribute::new);
   }
 
-  private SlotAttribute(String identifier) {
+  protected SlotAttribute(String identifier) {
     super("curios.slot." + identifier, 0);
     this.identifier = identifier;
   }
