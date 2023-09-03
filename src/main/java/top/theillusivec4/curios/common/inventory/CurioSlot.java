@@ -25,16 +25,11 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.items.SlotItemHandler;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.event.CurioEquipEvent;
-import top.theillusivec4.curios.api.event.CurioUnequipEvent;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.mixin.core.AccessorEntity;
 
@@ -96,37 +91,7 @@ public class CurioSlot extends SlotItemHandler {
   }
 
   @Override
-  public boolean mayPlace(@Nonnull ItemStack stack) {
-    CurioEquipEvent equipEvent = new CurioEquipEvent(stack, slotContext);
-    MinecraftForge.EVENT_BUS.post(equipEvent);
-    Event.Result result = equipEvent.getResult();
-
-    if (result == Event.Result.DENY) {
-      return false;
-    }
-    return result == Event.Result.ALLOW || (CuriosApi.isStackValid(slotContext, stack) &&
-        CuriosApi.getCurio(stack).map(curio -> curio.canEquip(slotContext)).orElse(true) &&
-        super.mayPlace(stack));
-  }
-
-  @Override
   public boolean allowModification(@Nonnull Player pPlayer) {
     return true;
-  }
-
-  @Override
-  public boolean mayPickup(Player playerIn) {
-    ItemStack stack = this.getItem();
-    CurioUnequipEvent unequipEvent = new CurioUnequipEvent(stack, slotContext);
-    MinecraftForge.EVENT_BUS.post(unequipEvent);
-    Event.Result result = unequipEvent.getResult();
-
-    if (result == Event.Result.DENY) {
-      return false;
-    }
-    return result == Event.Result.ALLOW ||
-        ((stack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(stack)) &&
-            CuriosApi.getCurio(stack).map(curio -> curio.canUnequip(slotContext)).orElse(true) &&
-            super.mayPickup(playerIn));
   }
 }
