@@ -36,6 +36,8 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
@@ -171,6 +173,19 @@ public final class CuriosApi {
   }
 
   /**
+   * Creates a new {@link ICapabilityProvider} for the given {@link ICurio} instance, to be used in
+   * capability initialization.
+   *
+   * @param curio The ICurio implementation to use
+   * @return The ICapabilityProvider that provides the ICurio implementation
+   */
+  @Nonnull
+  public static ICapabilityProvider createCurioProvider(final ICurio curio) {
+    CuriosApi.apiError();
+    return Items.AIR.getDefaultInstance();
+  }
+
+  /**
    * Gets a {@link LazyOptional} of the curio inventory capability attached to the entity.
    *
    * @param livingEntity The {@link LivingEntity} to get the curio inventory capability from
@@ -274,7 +289,7 @@ public final class CuriosApi {
     apiError();
   }
 
-  private static void apiError() {
+  static void apiError() {
     LOGGER.error("Missing Curios API implementation!");
   }
 

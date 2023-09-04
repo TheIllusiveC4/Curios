@@ -91,7 +91,6 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
-import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
 import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
@@ -255,7 +254,7 @@ public class CuriosEventHandler {
     if (curioItem != null && curioItem.hasCurioCapability(stack)) {
       ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(curioItem, stack);
       evt.addCapability(CuriosCapability.ID_ITEM,
-          CurioItemCapability.createProvider(itemizedCapability));
+          CuriosApi.createCurioProvider(itemizedCapability));
     }
   }
 

@@ -30,7 +30,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.common.capability.CurioItemCapability;
 
 public class CrownItem extends Item {
 
@@ -40,7 +39,7 @@ public class CrownItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag unused) {
-    return CurioItemCapability.createProvider(new ICurio() {
+    return CuriosApi.createCurioProvider(new ICurio() {
 
       @Override
       public ItemStack getStack() {

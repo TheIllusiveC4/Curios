@@ -27,14 +27,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curiostest.CuriosTest;
 
 public class KnucklesItem extends Item {
@@ -45,7 +43,7 @@ public class KnucklesItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag unused) {
-    return CurioItemCapability.createProvider(new ICurio() {
+    return CuriosApi.createCurioProvider(new ICurio() {
 
       @Override
       public ItemStack getStack() {

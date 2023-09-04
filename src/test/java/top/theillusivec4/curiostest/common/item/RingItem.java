@@ -41,7 +41,6 @@ import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.common.capability.CurioItemCapability;
 import top.theillusivec4.curiostest.CuriosTest;
 
 public class RingItem extends Item {
@@ -52,7 +51,7 @@ public class RingItem extends Item {
 
   @Override
   public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag unused) {
-    return CurioItemCapability.createProvider(new ICurio() {
+    return CuriosApi.createCurioProvider(new ICurio() {
 
       @Override
       public void curioTick(SlotContext slotContext) {
