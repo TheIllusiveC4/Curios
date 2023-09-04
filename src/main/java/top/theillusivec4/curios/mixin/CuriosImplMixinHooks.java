@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -29,6 +30,7 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
@@ -36,6 +38,16 @@ import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.SPacketBreak;
 
 public class CuriosImplMixinHooks {
+
+  private static final Map<Item, ICurioItem> REGISTRY = new ConcurrentHashMap<>();
+
+  public static void registerCurio(Item item, ICurioItem icurio) {
+    REGISTRY.put(item, icurio);
+  }
+
+  public static Optional<ICurioItem> getCurioFromRegistry(Item item) {
+    return Optional.ofNullable(REGISTRY.get(item));
+  }
 
   public static Optional<ISlotType> getSlot(String id) {
     return Optional.ofNullable(CuriosApi.getSlots().get(id));

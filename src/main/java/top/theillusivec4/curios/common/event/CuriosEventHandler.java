@@ -48,6 +48,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -103,6 +104,7 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
 import top.theillusivec4.curios.common.util.EquipCurioTrigger;
+import top.theillusivec4.curios.mixin.CuriosImplMixinHooks;
 
 public class CuriosEventHandler {
 
@@ -243,14 +245,17 @@ public class CuriosEventHandler {
   @SubscribeEvent
   public void attachStackCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
     ItemStack stack = evt.getObject();
+    Item item = stack.getItem();
+    ICurioItem curioItem = CuriosImplMixinHooks.getCurioFromRegistry(item).orElse(null);
 
-    if (stack.getItem() instanceof ICurioItem itemCurio) {
+    if (curioItem == null && item instanceof ICurioItem itemCurio) {
+      curioItem = itemCurio;
+    }
 
-      if (itemCurio.hasCurioCapability(stack)) {
-        ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(itemCurio, stack);
-        evt.addCapability(CuriosCapability.ID_ITEM,
-            CurioItemCapability.createProvider(itemizedCapability));
-      }
+    if (curioItem != null && curioItem.hasCurioCapability(stack)) {
+      ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(curioItem, stack);
+      evt.addCapability(CuriosCapability.ID_ITEM,
+          CurioItemCapability.createProvider(itemizedCapability));
     }
   }
 

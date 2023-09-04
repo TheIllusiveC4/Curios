@@ -28,17 +28,20 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 import top.theillusivec4.curios.api.type.util.IIconHelper;
@@ -49,6 +52,19 @@ public final class CuriosApi {
   private static final Logger LOGGER = LogUtils.getLogger();
 
   public static final String MODID = "curios";
+
+  /**
+   * Registers a {@link ICurioItem} instance to an item.
+   * <br>
+   * This will override any existing {@link ICurioItem} interfaces implemented on an item, however
+   * it will NOT override {@link ICurio} instances initialized in {@link net.minecraftforge.common.extensions.IForgeItem#initCapabilities(ItemStack, CompoundTag)}.
+   *
+   * @param item  The item to register the ICurio instance to
+   * @param curio The ICurio instance that provides curio behavior for the item
+   */
+  public static void registerCurio(Item item, ICurioItem curio) {
+    apiError();
+  }
 
   /**
    * Gets the registered slot type server-side for the identifier, if it exists.
@@ -133,7 +149,7 @@ public final class CuriosApi {
    * <br>
    * This will always be empty client-side.
    *
-   * @param stack The ItemStack for the slot types
+   * @param stack        The ItemStack for the slot types
    * @param livingEntity The entity with the slot types
    * @return The slot types for the provided ItemStack and entity
    */
