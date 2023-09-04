@@ -38,6 +38,7 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
@@ -144,7 +145,10 @@ public class Curios {
   }
 
   private void reload(final AddReloadListenerEvent evt) {
+    ICondition.IContext ctx = evt.getConditionContext();
+    CuriosSlotManager.INSTANCE = new CuriosSlotManager(ctx);
     evt.addListener(CuriosSlotManager.INSTANCE);
+    CuriosEntityManager.INSTANCE = new CuriosEntityManager(ctx);
     evt.addListener(CuriosEntityManager.INSTANCE);
     evt.addListener(new SimplePreparableReloadListener<Void>() {
       @Nonnull

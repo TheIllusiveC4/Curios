@@ -24,6 +24,8 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITagManager;
 import top.theillusivec4.curios.Curios;
@@ -35,12 +37,18 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
   private static final Gson GSON =
       (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
-  public static final CuriosEntityManager INSTANCE = new CuriosEntityManager();
+  public static CuriosEntityManager INSTANCE = new CuriosEntityManager();
   private Map<EntityType<?>, Map<String, ISlotType>> server = ImmutableMap.of();
   private Map<EntityType<?>, Set<String>> client = ImmutableMap.of();
+  private ICondition.IContext ctx = ICondition.IContext.EMPTY;
 
   public CuriosEntityManager() {
     super(GSON, "curios/entities");
+  }
+
+  public CuriosEntityManager(ICondition.IContext ctx) {
+    super(GSON, "curios/entities");
+    this.ctx = ctx;
   }
 
   protected void apply(Map<ResourceLocation, JsonElement> pObject,
@@ -57,7 +65,8 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
 
       try {
         for (Map.Entry<EntityType<?>, Map<String, ISlotType>> entry1 : getSlotsForEntities(
-            GsonHelper.convertToJsonObject(entry.getValue(), "top element")).entrySet()) {
+            GsonHelper.convertToJsonObject(entry.getValue(), "top element"), resourcelocation,
+            this.ctx).entrySet()) {
           map.computeIfAbsent(entry1.getKey(), (k) -> ImmutableMap.builder())
               .putAll(entry1.getValue());
         }
@@ -127,8 +136,15 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
   }
 
   private static Map<EntityType<?>, Map<String, ISlotType>> getSlotsForEntities(
-      JsonObject jsonObject) {
+      JsonObject jsonObject, ResourceLocation resourceLocation, ICondition.IContext ctx) {
     Map<EntityType<?>, Map<String, ISlotType>> map = new HashMap<>();
+
+    if (!CraftingHelper.processConditions(
+        GsonHelper.getAsJsonArray(jsonObject, "conditions", new JsonArray()), ctx)) {
+      Curios.LOGGER.debug("Skipping loading entity file {} as its conditions were not met",
+          resourceLocation);
+      return map;
+    }
     JsonArray jsonEntities = GsonHelper.getAsJsonArray(jsonObject, "entities", new JsonArray());
     ITagManager<EntityType<?>> tagManager =
         Objects.requireNonNull(ForgeRegistries.ENTITY_TYPES.tags());

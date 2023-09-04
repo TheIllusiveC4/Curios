@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -17,6 +18,8 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.apache.commons.lang3.EnumUtils;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -29,13 +32,19 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
 
   private static final Gson GSON =
       (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
-  public static final CuriosSlotManager INSTANCE = new CuriosSlotManager();
+  public static CuriosSlotManager INSTANCE = new CuriosSlotManager();
   private Map<String, ISlotType> slots = ImmutableMap.of();
   private Map<String, ResourceLocation> icons = ImmutableMap.of();
   private Map<String, Set<String>> idToMods = ImmutableMap.of();
+  private ICondition.IContext ctx = ICondition.IContext.EMPTY;
 
   public CuriosSlotManager() {
     super(GSON, "curios/slots");
+  }
+
+  public CuriosSlotManager(ICondition.IContext ctx) {
+    super(GSON, "curios/slots");
+    this.ctx = ctx;
   }
 
   protected void apply(@Nonnull Map<ResourceLocation, JsonElement> pObject,
@@ -51,6 +60,14 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
 
         try {
           String id = resourcelocation.getPath();
+
+          if (!CraftingHelper.processConditions(
+              GsonHelper.getAsJsonArray(entry.getValue().getAsJsonObject(), "conditions",
+                  new JsonArray()), this.ctx)) {
+            Curios.LOGGER.debug("Skipping loading slot {} as its conditions were not met",
+                resourcelocation);
+            continue;
+          }
           fromJson(map.computeIfAbsent(id, (k) -> new SlotType.Builder(id)),
               GsonHelper.convertToJsonObject(entry.getValue(), "top element"));
           modMap.computeIfAbsent(id, (k) -> ImmutableSet.builder())
@@ -85,6 +102,14 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
 
       try {
         String id = resourcelocation.getPath();
+
+        if (!CraftingHelper.processConditions(
+            GsonHelper.getAsJsonArray(entry.getValue().getAsJsonObject(), "conditions",
+                new JsonArray()), this.ctx)) {
+          Curios.LOGGER.debug("Skipping loading slot {} as its conditions were not met",
+              resourcelocation);
+          continue;
+        }
         fromJson(map.computeIfAbsent(id, (k) -> new SlotType.Builder(id)),
             GsonHelper.convertToJsonObject(entry.getValue(), "top element"));
         modMap.computeIfAbsent(id, (k) -> ImmutableSet.builder())
