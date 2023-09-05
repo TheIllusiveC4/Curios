@@ -1,3 +1,6 @@
+import javax.net.ssl.HttpsURLConnection
+import java.nio.charset.StandardCharsets
+
 plugins {
     id 'eclipse'
     id 'idea'
@@ -149,7 +152,8 @@ jar.finalizedBy('reobfJar')
 
 task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
     apiToken = findProperty('curseKey')
-    def projectId = "${curse_id}".toString()
+//    debugMode = true
+    def projectId = "${cf_id}".toString()
     def mainFile = upload(projectId, jar)
     mainFile.changelogType = 'markdown'
     mainFile.changelog = file('CHANGELOG_LATEST.md')
@@ -159,10 +163,18 @@ task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge)
     }
     mainFile.withAdditionalFile(sourcesJar)
     mainFile.withAdditionalFile(apiJar)
+
+    doLast {
+
+        if (project.hasProperty('cf_page') && mainFile.curseFileId != null) {
+            project.ext.curse_link = "${cf_page}/files/${mainFile.curseFileId}"
+        }
+    }
 }
 
 modrinth {
     token = findProperty('modrinthKey') ?: 0
+//    debugMode = true
     projectId = "${modrinth_id}"
     versionName = getArchivesBaseName() + "-" + getVersion()
     versionType = "${release_type}"
@@ -170,6 +182,13 @@ modrinth {
     uploadFile = jar
     additionalFiles = [sourcesJar, apiJar]
     gameVersions = "${release_versions}".split(",") as List<String>
+}
+
+tasks.modrinth.doLast {
+
+    if (project.hasProperty('modrinth_page') && tasks.modrinth.newVersion != null) {
+        project.ext.modrinth_link = "${modrinth_page}/version/${tasks.modrinth.newVersion.id}"
+    }
 }
 
 publishing {
@@ -205,4 +224,92 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+def publishDiscord() {
+    try {
+        def cfLinks = new StringJoiner('\\\\n')
+
+        if (project.hasProperty('curse_link')) {
+            cfLinks.add("[Download](${project.findProperty('curse_link')})")
+        }
+        def modrinthLinks = new StringJoiner('\\\\n')
+
+        if (project.hasProperty('modrinth_link')) {
+            modrinthLinks.add("[Download](${project.findProperty('modrinth_link')})")
+        }
+        println(cfLinks)
+        println(modrinthLinks)
+        def changelog = file("CHANGELOG_LATEST.md").getText()
+        changelog = changelog.substring(changelog.indexOf("##"))
+        changelog = changelog.replaceAll("\r\n","\\\\r\\\\n").replaceAll("\"","\\\\\"")
+
+        if (changelog.length() >= 1024) {
+            changelog = changelog.substring(0, changelog.length() - 100)
+            changelog = changelog + "...[(See more)](https://github.com/TheIllusiveC4/Curios/blob/1.20.x/CHANGELOG_LATEST.md)"
+        }
+        println(changelog)
+        final String message = """
+            {
+              "embeds": [
+                {
+                  "title": "${mod_name} ${version}",
+                  "color": 65392,
+                  "fields": [
+                    {
+                      "name": "Minecraft Versions",
+                      "value": "${release_versions.replaceAll(",", ", ")}"
+                    },
+                    {
+                      "name": "CurseForge",
+                      "value": "${cfLinks}",
+                      "inline": true
+                    },
+                    {
+                      "name": "Modrinth",
+                      "value": "${modrinthLinks}",
+                      "inline": true
+                    },
+                    {
+                      "name": "Changelog",
+                      "value": "${changelog}"
+                    }
+                  ],
+                  "thumbnail": {
+                    "url": "${discord_thumbnail}"
+                  }
+                }
+              ]
+            }
+            """
+        println(message)
+        final URL url = new URL("${discordWebhook}")
+        final HttpsURLConnection connection = (HttpsURLConnection) url.openConnection()
+        connection.addRequestProperty("Content-Type", "application/json; charset=UTF-8")
+        connection.addRequestProperty("User-Agent", "${mod_name} Gradle Upload")
+        connection.setDoOutput(true)
+        connection.setRequestMethod("POST")
+        connection.connect()
+
+        try (OutputStream out = connection.getOutputStream()) {
+            out.write(message.getBytes(StandardCharsets.UTF_8))
+        }
+        connection.getInputStream().close()
+        connection.disconnect()
+    } catch (IOException e) {
+        e.printStackTrace()
+    }
+}
+
+tasks.named('publishCurseForge').configure {
+    mustRunAfter('assemble')
+}
+
+tasks.register('publishForge') {
+    dependsOn 'modrinth'
+    dependsOn 'publishCurseForge'
+
+    doLast {
+        publishDiscord()
+    }
 }
