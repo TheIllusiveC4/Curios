@@ -3,11 +3,6 @@ Prior to version 5.2.0, this project used [Forge Recommended Versioning](https:/
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.20.x/docs/CHANGELOG.md).
 
-## [5.3.0+1.20.1] - 2023.09.04
-### Added
-- [API] Added `CuriosApi#registerCurio` method for more modular curio definitions
-- [API] Added `CuriosApi#createCurioProvider` method for more convenient Curios capability attachments
-- Added support for `"conditions"` in slot data and entity slot data in datapacks
+## [5.3.1+1.20.1] - 2023.09.04
 ### Fixed
-- Fixed item insertions handled directly through item handlers not being validated [#238](https://github.com/TheIllusiveC4/Curios/issues/238)
-- Fixed backwards compatibility with mods using `top.theillusivec4.curios.common.CuriosHelper.SlotAttributeWrapper`
+- Fixed multiplayer client-side command argument errors

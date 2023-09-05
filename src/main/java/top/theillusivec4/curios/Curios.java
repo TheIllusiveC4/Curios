@@ -27,8 +27,6 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.commands.synchronization.ArgumentTypeInfos;
-import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -107,8 +105,6 @@ public class Curios {
     MinecraftForge.EVENT_BUS.register(new CuriosEventHandler());
     NetworkHandler.register();
     evt.enqueueWork(() -> {
-      ArgumentTypeInfos.registerByClass(CurioArgumentType.class,
-          SingletonArgumentInfo.contextFree(CurioArgumentType::slot));
       CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
       CuriosSelectorOptions.register();
       SetCurioAttributesFunction.register();

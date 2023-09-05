@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.common;
 
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
@@ -41,7 +42,8 @@ public class CuriosRegistry {
 
   public static final RegistryObject<ArgumentTypeInfo<?, ?>>
       CURIO_SLOT_ARGUMENT = ARGUMENT_TYPES.register("slot_type",
-      () -> SingletonArgumentInfo.contextFree(CurioArgumentType::slot));
+      () -> ArgumentTypeInfos.registerByClass(CurioArgumentType.class,
+          SingletonArgumentInfo.contextFree(CurioArgumentType::slot)));
   public static final RegistryObject<MenuType<CuriosContainer>> CURIO_MENU =
       MENU_TYPES.register("curios_container",
           () -> IForgeMenuType.create(CuriosContainer::new));
