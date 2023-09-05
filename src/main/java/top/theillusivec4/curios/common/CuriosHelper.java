@@ -210,12 +210,18 @@ public class CuriosHelper implements ICuriosHelper {
     // NO-OP
   }
 
+  /**
+   * @deprecated See {@link SlotAttribute#getOrCreate(String)}
+   */
   @Deprecated(since = "1.20.1", forRemoval = true)
   @ApiStatus.ScheduledForRemoval(inVersion = "1.20.2")
   public static SlotAttributeWrapper getOrCreateSlotAttribute(String identifier) {
     return (SlotAttributeWrapper) SlotAttribute.getOrCreate(identifier);
   }
 
+  /**
+   * @deprecated See {@link SlotAttribute}
+   */
   @Deprecated(since = "1.20.1", forRemoval = true)
   @ApiStatus.ScheduledForRemoval(inVersion = "1.20.2")
   public static class SlotAttributeWrapper extends SlotAttribute {
