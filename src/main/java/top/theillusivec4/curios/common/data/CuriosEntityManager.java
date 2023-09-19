@@ -15,8 +15,8 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -39,7 +39,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
 
   public static CuriosEntityManager INSTANCE = new CuriosEntityManager();
   private Map<EntityType<?>, Map<String, ISlotType>> server = ImmutableMap.of();
-  private Map<EntityType<?>, Set<String>> client = ImmutableMap.of();
+  private Map<EntityType<?>, Map<String, Integer>> client = ImmutableMap.of();
   private ICondition.IContext ctx = ICondition.IContext.EMPTY;
 
   public CuriosEntityManager() {
@@ -98,12 +98,12 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
       if (rl != null) {
         CompoundTag entity = new CompoundTag();
         entity.putString("Entity", rl.toString());
-        ListTag list = new ListTag();
+        CompoundTag tag1 = new CompoundTag();
 
-        for (String s : entry.getValue().keySet()) {
-          list.add(StringTag.valueOf(s));
+        for (Map.Entry<String, ISlotType> val : entry.getValue().entrySet()) {
+          tag1.put(val.getKey(), IntTag.valueOf(val.getValue().getSize()));
         }
-        entity.put("Slots", list);
+        entity.put("Slots", tag1);
         tag.add(entity);
       }
     }
@@ -111,7 +111,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
   }
 
   public static void applySyncPacket(ListTag tag) {
-    Map<EntityType<?>, ImmutableSet.Builder<String>> map = new HashMap<>();
+    Map<EntityType<?>, ImmutableMap.Builder<String, Integer>> map = new HashMap<>();
 
     for (Tag tag1 : tag) {
 
@@ -120,13 +120,11 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
             ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(entity.getString("Entity")));
 
         if (type != null) {
-          ListTag list = entity.getList("Slots", Tag.TAG_STRING);
+          CompoundTag slots = entity.getCompound("Slots");
 
-          for (Tag tag2 : list) {
-
-            if (tag2 instanceof StringTag slot) {
-              map.computeIfAbsent(type, (k) -> ImmutableSet.builder()).add(slot.getAsString());
-            }
+          for (String key : slots.getAllKeys()) {
+            int size = slots.getInt(key);
+            map.computeIfAbsent(type, (k) -> ImmutableMap.builder()).put(key, size);
           }
         }
       }
@@ -186,6 +184,14 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
 
   public boolean hasSlots(EntityType<?> type) {
     return this.client.containsKey(type);
+  }
+
+  public Map<String, Integer> getClientSlots(EntityType<?> type) {
+
+    if (this.client.containsKey(type)) {
+      return this.client.get(type);
+    }
+    return ImmutableMap.of();
   }
 
   public Map<String, ISlotType> getEntitySlots(EntityType<?> type) {

@@ -67,6 +67,7 @@ import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.ISlotType;
+import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
@@ -93,17 +94,29 @@ public class CurioInventoryCapability {
     @Override
     public void reset() {
 
-      if (this.wearer != null && !this.wearer.getCommandSenderWorld().isClientSide()) {
+      if (this.wearer != null) {
         this.curios.clear();
         this.invalidStacks.clear();
-        SortedSet<ISlotType> sorted =
-            new TreeSet<>(CuriosApi.getEntitySlots(this.wearer.getType()).values());
 
-        for (ISlotType slotType : sorted) {
-          this.curios.put(slotType.getIdentifier(),
-              new CurioStacksHandler(this, slotType.getIdentifier(), slotType.getSize(),
-                  slotType.useNativeGui(), slotType.hasCosmetic(), slotType.canToggleRendering(),
-                  slotType.getDropRule()));
+        if (!this.wearer.level().isClientSide()) {
+          SortedSet<ISlotType> sorted =
+              new TreeSet<>(CuriosApi.getEntitySlots(this.wearer.getType()).values());
+
+          for (ISlotType slotType : sorted) {
+            this.curios.put(slotType.getIdentifier(),
+                new CurioStacksHandler(this, slotType.getIdentifier(), slotType.getSize(),
+                    slotType.useNativeGui(), slotType.hasCosmetic(), slotType.canToggleRendering(),
+                    slotType.getDropRule()));
+          }
+        } else {
+          Map<String, Integer> slots =
+              CuriosEntityManager.INSTANCE.getClientSlots(this.wearer.getType());
+
+          for (Map.Entry<String, Integer> entry : slots.entrySet()) {
+            this.curios.put(entry.getKey(),
+                new CurioStacksHandler(this, entry.getKey(), entry.getValue(), true, true, true,
+                    ICurio.DropRule.DEFAULT));
+          }
         }
       }
     }
