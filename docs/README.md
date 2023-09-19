@@ -15,9 +15,7 @@ Curios is a flexible and expandable accessory/equipment API for users and develo
 
 ## Documentation
 
-* [How to Use: Users](https://github.com/TheIllusiveC4/Curios/wiki/How-to-Use:-Users)
-* [How to Use: Developers](https://github.com/TheIllusiveC4/Curios/wiki/How-to-Use:-Developers)
-* [Commands](https://github.com/TheIllusiveC4/Curios/wiki/Commands)
+* [1.20.x Curios Documentation](https://docs.illusivesoulworks.com/category/curios)
 
 ## Adding to Your Project:
 
