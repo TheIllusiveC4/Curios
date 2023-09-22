@@ -3,6 +3,6 @@ Prior to version 5.2.0, this project used [Forge Recommended Versioning](https:/
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.20.x/docs/CHANGELOG.md).
 
-## [5.3.2+1.20.1] - 2023.09.19
+## [5.3.3+1.20.1] - 2023.09.21
 ### Fixed
-- Fixed slot loading on client-only entities
+- Fixed the `"replace"` field causing incorrect slot amounts during slot loading
