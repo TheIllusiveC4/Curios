@@ -136,7 +136,8 @@ public final class CuriosApi {
   /**
    * Gets all the registered slot types for the provided ItemStack server-side.
    * <br>
-   * This will always be empty client-side.
+   * Client-side, the map will be populated by filler {@link ISlotType} that contain only the
+   * identifier and the rest of the information is placeholder.
    *
    * @param stack The ItemStack for the slot types
    * @return The slot types for the provided ItemStack
@@ -149,7 +150,8 @@ public final class CuriosApi {
   /**
    * Gets all the registered slot types for the provided ItemStack and entity server-side.
    * <br>
-   * This will always be empty client-side.
+   * Client-side, the map will be populated by filler {@link ISlotType} that contain only the
+   * identifier and the rest of the information is placeholder.
    *
    * @param stack        The ItemStack for the slot types
    * @param livingEntity The entity with the slot types

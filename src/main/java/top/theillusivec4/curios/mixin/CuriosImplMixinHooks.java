@@ -36,6 +36,7 @@ import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.SPacketBreak;
+import top.theillusivec4.curios.common.slottype.SlotType;
 
 public class CuriosImplMixinHooks {
 
@@ -84,6 +85,8 @@ public class CuriosImplMixinHooks {
 
         if (slotType != null) {
           result.put(id, slotType);
+        } else {
+          result.put(id, new SlotType.Builder(id).build());
         }
       }
     }
@@ -106,6 +109,8 @@ public class CuriosImplMixinHooks {
 
         if (slotType != null) {
           result.put(id, slotType);
+        } else {
+          result.put(id, new SlotType.Builder(id).build());
         }
       }
     }
