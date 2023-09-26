@@ -10,8 +10,7 @@
     "MixinLivingEntity",
     "MixinPiglinAi",
     "MixinPowderSnowBlock",
-    "MixinShearsItem",
-    "MixinSlotAttribute"
+    "MixinShearsItem"
   ],
   "minVersion": "0.8"
 }

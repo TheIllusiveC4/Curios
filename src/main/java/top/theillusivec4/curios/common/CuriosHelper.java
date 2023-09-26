@@ -38,7 +38,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
@@ -208,29 +207,5 @@ public class CuriosHelper implements ICuriosHelper {
   @Override
   public void setBrokenCurioConsumer(TriConsumer<String, Integer, LivingEntity> consumer) {
     // NO-OP
-  }
-
-  /**
-   * @deprecated See {@link SlotAttribute#getOrCreate(String)}
-   */
-  @Deprecated(since = "1.20.1", forRemoval = true)
-  @ApiStatus.ScheduledForRemoval(inVersion = "1.20.2")
-  public static SlotAttributeWrapper getOrCreateSlotAttribute(String identifier) {
-    return (SlotAttributeWrapper) SlotAttribute.getOrCreate(identifier);
-  }
-
-  /**
-   * @deprecated See {@link SlotAttribute}
-   */
-  @Deprecated(since = "1.20.1", forRemoval = true)
-  @ApiStatus.ScheduledForRemoval(inVersion = "1.20.2")
-  public static class SlotAttributeWrapper extends SlotAttribute {
-
-    public final String identifier;
-
-    public SlotAttributeWrapper(String identifier) {
-      super(identifier);
-      this.identifier = identifier;
-    }
   }
 }

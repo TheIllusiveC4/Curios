@@ -249,12 +249,13 @@ def publishDiscord() {
             changelog = changelog + "...[(See more)](https://github.com/TheIllusiveC4/Curios/blob/1.20.x/CHANGELOG_LATEST.md)"
         }
         println(changelog)
+        def color = release_type == "beta" ? 9458158 : 65392
         final String message = """
             {
               "embeds": [
                 {
                   "title": "${mod_name} ${version}",
-                  "color": 65392,
+                  "color": ${color},
                   "fields": [
                     {
                       "name": "Minecraft Versions",
