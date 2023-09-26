@@ -191,13 +191,12 @@ public class CuriosEventHandler {
   public void playerLoggedIn(PlayerLoggedInEvent evt) {
     Player playerEntity = evt.getEntity();
 
-    if (playerEntity instanceof ServerPlayer) {
+    if (playerEntity instanceof ServerPlayer serverPlayer) {
       Collection<ISlotType> slotTypes = CuriosApi.getPlayerSlots().values();
       Map<String, ResourceLocation> icons = new HashMap<>();
       slotTypes.forEach(type -> icons.put(type.getIdentifier(), type.getIcon()));
-      NetworkHandler.INSTANCE
-          .send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) playerEntity),
-              new SPacketSetIcons(icons));
+      NetworkHandler.INSTANCE.send(new SPacketSetIcons(icons),
+          PacketDistributor.PLAYER.with(serverPlayer));
     }
   }
 
@@ -211,20 +210,19 @@ public class CuriosEventHandler {
 
         CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
           handler.readTag(handler.writeTag());
-          NetworkHandler.INSTANCE.send(
-              PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
-              new SPacketSyncCurios(player.getId(), handler.getCurios()));
+          NetworkHandler.INSTANCE.send(new SPacketSyncCurios(player.getId(), handler.getCurios()),
+              PacketDistributor.TRACKING_ENTITY_AND_SELF.with(player));
 
           if (player.containerMenu instanceof CuriosContainer curiosContainer) {
             curiosContainer.resetSlots();
           }
         });
-        NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
-            new SPacketSyncData(CuriosEntityManager.getSyncPacket()));
+        NetworkHandler.INSTANCE.send(new SPacketSyncData(CuriosEntityManager.getSyncPacket()),
+            PacketDistributor.PLAYER.with(player));
       }
     } else {
-      NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(evt::getPlayer),
-          new SPacketSyncData(CuriosEntityManager.getSyncPacket()));
+      NetworkHandler.INSTANCE.send(new SPacketSyncData(CuriosEntityManager.getSyncPacket()),
+          PacketDistributor.PLAYER.with(evt.getPlayer()));
     }
   }
 
@@ -266,8 +264,8 @@ public class CuriosEventHandler {
     if (entity instanceof ServerPlayer serverPlayerEntity) {
       CuriosApi.getCuriosInventory(serverPlayerEntity).ifPresent(handler -> {
         ServerPlayer mp = (ServerPlayer) entity;
-        NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
-            new SPacketSyncCurios(mp.getId(), handler.getCurios()));
+        NetworkHandler.INSTANCE.send(new SPacketSyncCurios(mp.getId(), handler.getCurios()),
+            PacketDistributor.PLAYER.with(mp));
       });
     }
   }
@@ -278,11 +276,10 @@ public class CuriosEventHandler {
     Entity target = evt.getTarget();
     Player player = evt.getEntity();
 
-    if (player instanceof ServerPlayer && target instanceof LivingEntity livingBase) {
-      CuriosApi.getCuriosInventory(livingBase).ifPresent(
-          handler -> NetworkHandler.INSTANCE
-              .send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),
-                  new SPacketSyncCurios(target.getId(), handler.getCurios())));
+    if (player instanceof ServerPlayer serverPlayer && target instanceof LivingEntity livingBase) {
+      CuriosApi.getCuriosInventory(livingBase).ifPresent(handler -> NetworkHandler.INSTANCE.send(
+          new SPacketSyncCurios(target.getId(), handler.getCurios()),
+          PacketDistributor.PLAYER.with(serverPlayer)));
     }
   }
 
@@ -641,9 +638,8 @@ public class CuriosEventHandler {
             Set<ICurioStacksHandler> updates = handler.getUpdatingInventories();
 
             if (!updates.isEmpty()) {
-              NetworkHandler.INSTANCE.send(
-                  PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-                  new SPacketSyncModifiers(livingEntity.getId(), updates));
+              NetworkHandler.INSTANCE.send(new SPacketSyncModifiers(livingEntity.getId(), updates),
+                  PacketDistributor.TRACKING_ENTITY_AND_SELF.with(livingEntity));
               updates.clear();
             }
           }
@@ -663,9 +659,8 @@ public class CuriosEventHandler {
       CompoundTag tag = curio.writeSyncData(slotContext);
       return tag != null ? tag : new CompoundTag();
     }).orElse(new CompoundTag()) : new CompoundTag();
-    NetworkHandler.INSTANCE
-        .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-            new SPacketSyncStack(livingEntity.getId(), identifier, index, stack, type,
-                syncTag));
+    NetworkHandler.INSTANCE.send(
+        new SPacketSyncStack(livingEntity.getId(), identifier, index, stack, type, syncTag),
+        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(livingEntity));
   }
 }

@@ -44,6 +44,7 @@ import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.api.distmarker.Dist;
@@ -293,9 +294,8 @@ public class CuriosContainer extends InventoryMenu {
       }
 
       if (!this.isLocalWorld) {
-        NetworkHandler.INSTANCE
-            .send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.player),
-                new SPacketScroll(this.containerId, indexIn));
+        NetworkHandler.INSTANCE.send(new SPacketScroll(this.containerId, indexIn),
+            PacketDistributor.PLAYER.with((ServerPlayer) this.player));
       }
       this.lastScrollIndex = indexIn;
     });
@@ -316,8 +316,8 @@ public class CuriosContainer extends InventoryMenu {
       }
 
       if (this.isLocalWorld) {
-        NetworkHandler.INSTANCE
-            .send(PacketDistributor.SERVER.noArg(), new CPacketScroll(this.containerId, j));
+        NetworkHandler.INSTANCE.send(new CPacketScroll(this.containerId, j),
+            PacketDistributor.SERVER.noArg());
       }
     });
   }
@@ -333,19 +333,25 @@ public class CuriosContainer extends InventoryMenu {
       if (server == null) {
         return;
       }
-      Optional<CraftingRecipe> recipe = server.getRecipeManager()
+      Optional<RecipeHolder<CraftingRecipe>> recipe = server.getRecipeManager()
           .getRecipeFor(RecipeType.CRAFTING, this.craftMatrix, this.player.level());
 
       if (recipe.isPresent()) {
-        CraftingRecipe craftingRecipe = recipe.get();
+        RecipeHolder<CraftingRecipe> recipeholder = recipe.get();
+        CraftingRecipe craftingRecipe = recipeholder.f_291008_();
 
-        if (this.craftResult.setRecipeUsed(this.player.level(), playerMP, craftingRecipe)) {
-          stack = craftingRecipe.assemble(this.craftMatrix, this.player.level().registryAccess());
+        if (this.craftResult.m_294416_(this.player.level(), playerMP, recipeholder)) {
+          ItemStack itemstack1 =
+              craftingRecipe.assemble(this.craftMatrix, this.player.level().registryAccess());
+
+          if (itemstack1.isItemEnabled(this.player.level().enabledFeatures())) {
+            stack = itemstack1;
+          }
         }
       }
       this.craftResult.setItem(0, stack);
       this.setRemoteSlot(0, stack);
-      playerMP.connection.send(
+      playerMP.connection.m_141995_(
           new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), 0,
               stack));
     }
@@ -479,8 +485,8 @@ public class CuriosContainer extends InventoryMenu {
   }
 
   @Override
-  public boolean recipeMatches(Recipe<? super CraftingContainer> recipeIn) {
-    return recipeIn.matches(this.craftMatrix, this.player.level());
+  public boolean recipeMatches(RecipeHolder<? extends Recipe<CraftingContainer>> recipeHolder) {
+    return recipeHolder.f_291008_().matches(this.craftMatrix, this.player.level());
   }
 
   @Override

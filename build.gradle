@@ -5,7 +5,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle' version '[6.0.13, 6.2)'
+    id 'net.minecraftforge.gradle' version '[6.0, 6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     id 'com.modrinth.minotaur' version '2.+'
     id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
@@ -82,15 +82,15 @@ minecraft {
 }
 
 dependencies {
-    minecraft "net.neoforged:forge:${version_forge}"
+    minecraft "net.minecraftforge:forge:${version_forge}"
 
     annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 
     // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.20.1-common-api:${version_jei}")
-    compileOnly fg.deobf("mezz.jei:jei-1.20.1-forge-api:${version_jei}")
+    compileOnly fg.deobf("mezz.jei:jei-1.20.2-common-api:${version_jei}")
+    compileOnly fg.deobf("mezz.jei:jei-1.20.2-forge-api:${version_jei}")
     // at runtime, use the full JEI jar for Forge
-    runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:${version_jei}")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.20.2-forge:${version_jei}")
 }
 
 mixin {

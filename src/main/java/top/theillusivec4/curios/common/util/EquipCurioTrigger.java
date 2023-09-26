@@ -1,19 +1,17 @@
 package top.theillusivec4.curios.common.util;
 
 import com.google.gson.JsonObject;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
 import net.minecraft.advancements.critereon.ContextAwarePredicate;
 import net.minecraft.advancements.critereon.DeserializationContext;
-import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import top.theillusivec4.curios.Curios;
 
 /**
  * This should be triggered whenever player successfully equips any item in their curios slot. In
@@ -25,25 +23,15 @@ import top.theillusivec4.curios.Curios;
 
 public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.Instance> {
 
-  public static final ResourceLocation ID = new ResourceLocation(Curios.MODID, "equip_curio");
   public static final EquipCurioTrigger INSTANCE = new EquipCurioTrigger();
 
-  private EquipCurioTrigger() {
-  }
-
   @Nonnull
   @Override
-  public ResourceLocation getId() {
-    return ID;
-  }
-
-  @Nonnull
-  @Override
-  public EquipCurioTrigger.Instance createInstance(@Nonnull JsonObject json,
-                                                   @Nonnull ContextAwarePredicate playerPred,
-                                                   @Nonnull DeserializationContext conditions) {
-    return new EquipCurioTrigger.Instance(playerPred, ItemPredicate.fromJson(json.get("item")),
-        LocationPredicate.fromJson(json.get("location")));
+  protected Instance createInstance(@Nonnull JsonObject pJson,
+                                    @Nonnull Optional<ContextAwarePredicate> p_297533_,
+                                    @Nonnull DeserializationContext pDeserializationContext) {
+    return new EquipCurioTrigger.Instance(p_297533_, ItemPredicate.fromJson(pJson.get("item")),
+        LocationPredicate.fromJson(pJson.get("location")));
   }
 
   public void trigger(ServerPlayer player, ItemStack stack, ServerLevel world, double x,
@@ -53,24 +41,22 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
 
   static class Instance extends AbstractCriterionTriggerInstance {
 
-    private final ItemPredicate item;
-    private final LocationPredicate location;
+    private final Optional<ItemPredicate> item;
+    private final Optional<LocationPredicate> location;
 
-    Instance(ContextAwarePredicate playerPred, ItemPredicate count,
-             LocationPredicate indexPos) {
-      super(ID, playerPred);
-      this.item = count;
-      this.location = indexPos;
-    }
-
-    @Nonnull
-    @Override
-    public ResourceLocation getCriterion() {
-      return ID;
+    Instance(Optional<ContextAwarePredicate> player, Optional<ItemPredicate> item,
+             Optional<LocationPredicate> location) {
+      super(player);
+      this.item = item;
+      this.location = location;
     }
 
     boolean test(ItemStack stack, ServerLevel world, double x, double y, double z) {
-      return this.item.matches(stack) && this.location.matches(world, x, y, z);
+
+      if (this.item.isPresent() && !this.item.get().matches(stack)) {
+        return false;
+      }
+      return this.location.isEmpty() || this.location.get().matches(world, x, y, z);
     }
   }
 }

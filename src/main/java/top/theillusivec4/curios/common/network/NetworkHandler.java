@@ -21,12 +21,12 @@ package top.theillusivec4.curios.common.network;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.minecraftforge.network.Channel;
+import net.minecraftforge.network.ChannelBuilder;
+import net.minecraftforge.network.SimpleChannel;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
@@ -45,17 +45,16 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 
 public class NetworkHandler {
 
-  private static final String PTC_VERSION = "1";
+  private static final int PTC_VERSION = 1;
 
   public static SimpleChannel INSTANCE;
 
-  private static int id = 0;
-
   public static void register() {
 
-    INSTANCE = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(Curios.MODID, "main"))
-        .networkProtocolVersion(() -> PTC_VERSION).clientAcceptedVersions(PTC_VERSION::equals)
-        .serverAcceptedVersions(PTC_VERSION::equals).simpleChannel();
+    INSTANCE = ChannelBuilder.named(new ResourceLocation(Curios.MODID, "main"))
+        .networkProtocolVersion(PTC_VERSION)
+        .clientAcceptedVersions(Channel.VersionTest.exact(PTC_VERSION))
+        .serverAcceptedVersions(Channel.VersionTest.exact(PTC_VERSION)).simpleChannel();
 
     //Client Packets
     register(CPacketOpenCurios.class, CPacketOpenCurios::encode, CPacketOpenCurios::decode,
@@ -91,7 +90,11 @@ public class NetworkHandler {
 
   private static <M> void register(Class<M> messageType, BiConsumer<M, FriendlyByteBuf> encoder,
                                    Function<FriendlyByteBuf, M> decoder,
-                                   BiConsumer<M, Supplier<NetworkEvent.Context>> messageConsumer) {
-    INSTANCE.registerMessage(id++, messageType, encoder, decoder, messageConsumer);
+                                   BiConsumer<M, CustomPayloadEvent.Context> messageConsumer) {
+    INSTANCE.messageBuilder(messageType)
+        .decoder(decoder)
+        .encoder(encoder)
+        .consumerNetworkThread(messageConsumer)
+        .add();
   }
 }

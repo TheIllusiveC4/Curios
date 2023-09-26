@@ -24,6 +24,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 
@@ -35,10 +36,9 @@ public class RenderButton extends ImageButton {
   private final CurioSlot slot;
 
   public RenderButton(CurioSlot slot, int xIn, int yIn, int widthIn, int heightIn, int xTexStartIn,
-                      int yTexStartIn, int yDiffTextIn, ResourceLocation resourceLocationIn,
+                      int yTexStartIn, ResourceLocation resourceLocationIn,
                       Button.OnPress onPressIn) {
-    super(xIn, yIn, widthIn, heightIn, xTexStartIn, yTexStartIn, yDiffTextIn, resourceLocationIn,
-        256, 256, onPressIn);
+    super(xIn, yIn, widthIn, heightIn, RecipeBookComponent.f_291154_, onPressIn);
     this.resourceLocation = resourceLocationIn;
     this.yTexStart = yTexStartIn;
     this.xTexStart = xTexStartIn;
@@ -60,8 +60,7 @@ public class RenderButton extends ImageButton {
       j += 8;
     }
     guiGraphics.blit(this.resourceLocation, this.getX(), this.getY(), (float) j,
-        (float) this.yTexStart,
-        this.width, this.height, 256, 256);
+        (float) this.yTexStart, this.width, this.height, 256, 256);
     RenderSystem.enableDepthTest();
   }
 }

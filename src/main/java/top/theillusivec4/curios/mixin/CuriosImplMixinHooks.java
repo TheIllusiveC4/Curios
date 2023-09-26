@@ -237,8 +237,8 @@ public class CuriosImplMixinHooks {
 
   public static void broadcastCurioBreakEvent(SlotContext slotContext) {
     NetworkHandler.INSTANCE.send(
-        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(slotContext::entity),
         new SPacketBreak(slotContext.entity().getId(), slotContext.identifier(),
-            slotContext.index()));
+            slotContext.index()),
+        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(slotContext.entity()));
   }
 }

@@ -55,12 +55,8 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
     implements RecipeUpdateListener {
 
   static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID,
-      "textures/gui/inventory.png");
-  static final ResourceLocation RECIPE_BUTTON_TEXTURE = new ResourceLocation(
-      "minecraft:textures/gui/recipe_button.png");
-
-  private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
-      "textures/gui/container/creative_inventory/tabs.png");
+      "textures/gui/curios/inventory.png");
+  private static final ResourceLocation SCROLLER = new ResourceLocation("container/creative_inventory/scroller");
 
   private static float currentScroll;
 
@@ -142,14 +138,14 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
       }
 
       Tuple<Integer, Integer> offsets = getButtonOffset(false);
-      this.buttonCurios = new CuriosButton(this, this.getGuiLeft() + offsets.getA(),
-          this.height / 2 + offsets.getB(), 14, 14, 50, 0, 14, CURIO_INVENTORY);
+      this.buttonCurios = new CuriosButton(this, this.getGuiLeft() + offsets.getA() - 2,
+          this.height / 2 + offsets.getB() - 2, 10, 10, CuriosButton.BIG);
       this.addRenderableWidget(this.buttonCurios);
 
       if (!this.menu.player.isCreative()) {
         this.addRenderableWidget(
-            new ImageButton(this.leftPos + 104, this.height / 2 - 22, 20, 18, 0, 0, 19,
-                RECIPE_BUTTON_TEXTURE, (button) -> {
+            new ImageButton(this.leftPos + 104, this.height / 2 - 22, 20, 18,
+                RecipeBookComponent.f_291154_, (button) -> {
               this.recipeBookGui.toggleVisibility();
               this.updateScreenPosition();
               button.setPosition(this.leftPos + 104, this.height / 2 - 22);
@@ -174,10 +170,10 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
 
         if (curioSlot.canToggleRender()) {
           this.addRenderableWidget(new RenderButton(curioSlot, this.leftPos + inventorySlot.x + 11,
-              this.topPos + inventorySlot.y - 3, 8, 8, 75, 0, 8, CURIO_INVENTORY,
-              (button) -> NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-                  new CPacketToggleRender(curioSlot.getIdentifier(),
-                      inventorySlot.getSlotIndex()))));
+              this.topPos + inventorySlot.y - 3, 8, 8, 75, 0, CURIO_INVENTORY,
+              (button) -> NetworkHandler.INSTANCE.send(
+                  new CPacketToggleRender(curioSlot.getIdentifier(), inventorySlot.getSlotIndex()),
+                  PacketDistributor.SERVER.noArg())));
         }
       }
     }
@@ -228,10 +224,9 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
   @Override
   public void render(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
                      float partialTicks) {
-    this.renderBackground(guiGraphics);
 
     if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
-      this.renderBg(guiGraphics, partialTicks, mouseX, mouseY);
+      this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
       this.recipeBookGui.render(guiGraphics, mouseX, mouseY, partialTicks);
     } else {
       this.recipeBookGui.render(guiGraphics, mouseX, mouseY, partialTicks);
@@ -326,8 +321,8 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
       int i = this.leftPos;
       int j = this.topPos;
       guiGraphics.blit(INVENTORY_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
-      InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, i + 51, j + 75, 30,
-          (float) (i + 51) - mouseX, (float) (j + 75 - 50) - mouseY, this.minecraft.player);
+      InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, i + 26, j + 8, i + 75,
+          j + 78, 30, 0.0625F, mouseX, mouseY, this.minecraft.player);
       CuriosApi.getCuriosInventory(this.minecraft.player).ifPresent(handler -> {
         int slotCount = handler.getVisibleSlots();
 
@@ -349,8 +344,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
                 width, 7);
           } else {
             guiGraphics.blit(CURIO_INVENTORY, i + xOffset - 16, j + 4, 27, 0, 23, 158);
-            guiGraphics.blit(CREATIVE_INVENTORY_TABS, i + xOffset - 8,
-                j + 12 + (int) (127f * currentScroll), 232, 0, 12, 15);
+            guiGraphics.m_292816_(SCROLLER, i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 12, 15);
           }
 
           for (Slot slot : this.menu.slots) {
@@ -431,13 +425,13 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
 
   @Override
   public boolean mouseScrolled(double pMouseScrolled1, double pMouseScrolled3,
-                               double pMouseScrolled5) {
+                               double pMouseScrolled5, double dragY) {
 
     if (!this.needsScrollBars()) {
       return false;
     } else {
       int i = (this.menu).curiosHandler.map(ICuriosItemHandler::getVisibleSlots).orElse(1);
-      currentScroll = (float) (currentScroll - pMouseScrolled5 / i);
+      currentScroll = (float) (currentScroll - dragY / i);
       currentScroll = Mth.clamp(currentScroll, 0.0F, 1.0F);
       this.menu.scrollTo(currentScroll);
       return true;

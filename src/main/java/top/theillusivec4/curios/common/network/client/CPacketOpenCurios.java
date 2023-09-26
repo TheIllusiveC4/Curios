@@ -19,12 +19,10 @@
 
 package top.theillusivec4.curios.common.network.client;
 
-import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainerProvider;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -46,22 +44,22 @@ public class CPacketOpenCurios {
     return new CPacketOpenCurios(buf.readItem());
   }
 
-  public static void handle(CPacketOpenCurios msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer sender = ctx.get().getSender();
+  public static void handle(CPacketOpenCurios msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer sender = ctx.getSender();
 
       if (sender != null) {
         ItemStack stack = sender.isCreative() ? msg.carried : sender.containerMenu.getCarried();
         sender.containerMenu.setCarried(ItemStack.EMPTY);
-        NetworkHooks.openScreen(sender, new CuriosContainerProvider());
+        sender.openMenu(new CuriosContainerProvider());
 
         if (!stack.isEmpty()) {
           sender.containerMenu.setCarried(stack);
-          NetworkHandler.INSTANCE
-              .send(PacketDistributor.PLAYER.with(() -> sender), new SPacketGrabbedItem(stack));
+          NetworkHandler.INSTANCE.send(new SPacketGrabbedItem(stack),
+              PacketDistributor.PLAYER.with(sender));
         }
       }
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 }

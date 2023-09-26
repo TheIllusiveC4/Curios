@@ -19,11 +19,10 @@
 
 package top.theillusivec4.curios.common.network.client;
 
-import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
 public class CPacketScroll {
@@ -45,9 +44,9 @@ public class CPacketScroll {
     return new CPacketScroll(buf.readInt(), buf.readInt());
   }
 
-  public static void handle(CPacketScroll msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer sender = ctx.get().getSender();
+  public static void handle(CPacketScroll msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer sender = ctx.getSender();
 
       if (sender != null) {
         AbstractContainerMenu container = sender.containerMenu;
@@ -57,6 +56,6 @@ public class CPacketScroll {
         }
       }
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 }

@@ -19,12 +19,11 @@
 
 package top.theillusivec4.curios.common.network.server;
 
-import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 
 public class SPacketGrabbedItem {
 
@@ -42,15 +41,14 @@ public class SPacketGrabbedItem {
     return new SPacketGrabbedItem(buf.readItem());
   }
 
-  public static void handle(SPacketGrabbedItem msg, Supplier<NetworkEvent.Context> ctx) {
-
-    ctx.get().enqueueWork(() -> {
+  public static void handle(SPacketGrabbedItem msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
       LocalPlayer clientPlayer = Minecraft.getInstance().player;
 
       if (clientPlayer != null) {
         clientPlayer.containerMenu.setCarried(msg.stack);
       }
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 }

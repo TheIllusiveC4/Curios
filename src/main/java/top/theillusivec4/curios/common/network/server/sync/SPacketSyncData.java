@@ -1,11 +1,10 @@
 package top.theillusivec4.curios.common.network.server.sync;
 
-import java.util.function.Supplier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import top.theillusivec4.curios.common.data.CuriosEntityManager;
 
 public class SPacketSyncData {
@@ -31,8 +30,8 @@ public class SPacketSyncData {
     return new SPacketSyncData(new ListTag());
   }
 
-  public static void handle(SPacketSyncData msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> CuriosEntityManager.applySyncPacket(msg.data));
-    ctx.get().setPacketHandled(true);
+  public static void handle(SPacketSyncData msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> CuriosEntityManager.applySyncPacket(msg.data));
+    ctx.setPacketHandled(true);
   }
 }

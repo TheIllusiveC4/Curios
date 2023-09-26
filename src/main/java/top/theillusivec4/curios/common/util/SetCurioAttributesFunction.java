@@ -2,25 +2,25 @@ package top.theillusivec4.curios.common.util;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.codecs.PrimitiveCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -28,22 +28,26 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctions;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
+import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
 import net.minecraftforge.registries.ForgeRegistries;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
-import top.theillusivec4.curios.common.CuriosHelper;
 
 public class SetCurioAttributesFunction extends LootItemConditionalFunction {
 
+  public static final Codec<SetCurioAttributesFunction> CODEC = RecordCodecBuilder.create(
+      (instance) -> m_294820_(instance).and(
+              ExtraCodecs.nonEmptyList(Modifier.MODIFIER_CODEC.listOf()).fieldOf("modifiers")
+                  .forGetter((function) -> function.modifiers))
+          .apply(instance, SetCurioAttributesFunction::new));
   public static LootItemFunctionType TYPE = null;
 
   final List<Modifier> modifiers;
 
-  SetCurioAttributesFunction(LootItemCondition[] conditions, List<Modifier> modifiers) {
+  SetCurioAttributesFunction(List<LootItemCondition> conditions, List<Modifier> modifiers) {
     super(conditions);
     this.modifiers = ImmutableList.copyOf(modifiers);
   }
@@ -51,7 +55,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
   public static void register() {
     TYPE = Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE,
         new ResourceLocation(CuriosApi.MODID, "set_curio_attributes"),
-        new LootItemFunctionType(new SetCurioAttributesFunction.Serializer()));
+        new LootItemFunctionType(CODEC));
   }
 
   @Nonnull
@@ -71,7 +75,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
     RandomSource random = context.getRandom();
 
     for (Modifier modifier : this.modifiers) {
-      UUID uuid = modifier.id;
+      UUID uuid = modifier.id.orElse(null);
       String slot = Util.getRandom(modifier.slots, random);
 
       if (modifier.attribute instanceof SlotAttribute wrapper) {
@@ -85,173 +89,63 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
     return stack;
   }
 
-  static class Modifier {
-    final String name;
-    final Attribute attribute;
-    final AttributeModifier.Operation operation;
-    final NumberProvider amount;
-    @Nullable
-    final UUID id;
-    final String[] slots;
+  record Modifier(String name, Attribute attribute, AttributeModifier.Operation operation,
+                  NumberProvider amount, Optional<UUID> id, List<String> slots) {
 
-    Modifier(String name, Attribute attribute, AttributeModifier.Operation operation,
-             NumberProvider amount, String[] slots, @Nullable UUID uuid) {
-      this.name = name;
-      this.attribute = attribute;
-      this.operation = operation;
-      this.amount = amount;
-      this.id = uuid;
-      this.slots = slots;
-    }
+    private static final Codec<List<String>> SLOTS_CODEC = ExtraCodecs.nonEmptyList(
+        Codec.either(Codec.STRING, Codec.list(Codec.STRING))
+            .xmap((either) -> either.map(List::of, Function.identity()),
+                (list) -> list.size() == 1 ? Either.left(list.get(0)) : Either.right(list)));
 
-    public JsonObject serialize(JsonSerializationContext context) {
-      JsonObject jsonobject = new JsonObject();
-      jsonobject.addProperty("name", this.name);
-      ResourceLocation rl;
+    private static final Codec<Attribute> ATTRIBUTE_CODEC = new PrimitiveCodec<>() {
+      @Override
+      public <T> DataResult<Attribute> read(DynamicOps<T> ops, T input) {
+        return ops.getStringValue(input).map(name -> {
+          ResourceLocation rl = ResourceLocation.tryParse(name);
 
-      if (this.attribute instanceof SlotAttribute wrapper) {
-        rl = new ResourceLocation(CuriosApi.MODID, wrapper.getIdentifier());
-      } else {
-        rl = ForgeRegistries.ATTRIBUTES.getKey(this.attribute);
+          if (rl == null) {
+            return null;
+          }
+          Attribute attribute;
+
+          if (rl.getNamespace().equals("curios")) {
+            String identifier = rl.getPath();
+
+            if (CuriosApi.getSlot(identifier).isEmpty()) {
+              throw new JsonSyntaxException("Unknown curios slot type: " + identifier);
+            }
+            attribute = SlotAttribute.getOrCreate(identifier);
+          } else {
+            attribute = ForgeRegistries.ATTRIBUTES.getValue(rl);
+          }
+          return attribute;
+        });
       }
 
-      if (rl != null) {
-        jsonobject.addProperty("attribute", rl.toString());
-      }
-      jsonobject.addProperty("operation", operationToString(this.operation));
-      jsonobject.add("amount", context.serialize(this.amount));
+      @Override
+      public <T> T write(DynamicOps<T> ops, Attribute value) {
+        ResourceLocation rl;
 
-      if (this.id != null) {
-        jsonobject.addProperty("id", this.id.toString());
-      }
-
-      if (this.slots.length == 1) {
-        jsonobject.addProperty("slot", this.slots[0]);
-      } else {
-        JsonArray jsonarray = new JsonArray();
-
-        for (String slot : this.slots) {
-          jsonarray.add(new JsonPrimitive(slot));
-        }
-        jsonobject.add("slot", jsonarray);
-      }
-      return jsonobject;
-    }
-
-    public static Modifier deserialize(JsonObject object, JsonDeserializationContext context) {
-      String s = GsonHelper.getAsString(object, "name");
-      ResourceLocation resourcelocation =
-          new ResourceLocation(GsonHelper.getAsString(object, "attribute"));
-      Attribute attribute;
-
-      if (resourcelocation.getNamespace().equals("curios")) {
-        String identifier = resourcelocation.getPath();
-
-        if (CuriosApi.getSlot(identifier).isEmpty()) {
-          throw new JsonSyntaxException("Unknown curios slot type: " + identifier);
-        }
-        attribute = SlotAttribute.getOrCreate(identifier);
-      } else {
-        attribute = ForgeRegistries.ATTRIBUTES.getValue(resourcelocation);
-      }
-
-      if (attribute == null) {
-        throw new JsonSyntaxException("Unknown attribute: " + resourcelocation);
-      } else {
-        AttributeModifier.Operation operation =
-            operationFromString(GsonHelper.getAsString(object, "operation"));
-        NumberProvider numberprovider =
-            GsonHelper.getAsObject(object, "amount", context, NumberProvider.class);
-        UUID uuid = null;
-        String[] slots;
-
-        if (GsonHelper.isStringValue(object, "slot")) {
-          slots = new String[] {GsonHelper.getAsString(object, "slot")};
+        if (value instanceof SlotAttribute wrapper) {
+          rl = new ResourceLocation(CuriosApi.MODID, wrapper.getIdentifier());
         } else {
-
-          if (!GsonHelper.isArrayNode(object, "slot")) {
-            throw new JsonSyntaxException(
-                "Invalid or missing attribute modifier slot; must be either string or array of strings.");
-          }
-          JsonArray jsonarray = GsonHelper.getAsJsonArray(object, "slot");
-          slots = new String[jsonarray.size()];
-          int i = 0;
-
-          for (JsonElement jsonelement : jsonarray) {
-            slots[i++] = GsonHelper.convertToString(jsonelement, "slot");
-          }
-
-          if (slots.length == 0) {
-            throw new JsonSyntaxException(
-                "Invalid attribute modifier slot; must contain at least one entry.");
-          }
+          rl = ForgeRegistries.ATTRIBUTES.getKey(value);
         }
-
-        if (object.has("id")) {
-          String s1 = GsonHelper.getAsString(object, "id");
-
-          try {
-            uuid = UUID.fromString(s1);
-          } catch (IllegalArgumentException illegalargumentexception) {
-            throw new JsonSyntaxException(
-                "Invalid attribute modifier id '" + s1 + "' (must be UUID format, with dashes)");
-          }
-        }
-        return new Modifier(s, attribute, operation, numberprovider, slots, uuid);
+        return rl != null ? ops.createString(rl.toString()) : ops.empty();
       }
-    }
-
-    private static String operationToString(AttributeModifier.Operation operation) {
-      return switch (operation) {
-        case ADDITION -> "addition";
-        case MULTIPLY_BASE -> "multiply_base";
-        case MULTIPLY_TOTAL -> "multiply_total";
-      };
-    }
-
-    private static AttributeModifier.Operation operationFromString(String operation) {
-      return switch (operation) {
-        case "addition" -> AttributeModifier.Operation.ADDITION;
-        case "multiply_base" -> AttributeModifier.Operation.MULTIPLY_BASE;
-        case "multiply_total" -> AttributeModifier.Operation.MULTIPLY_TOTAL;
-        default -> throw new JsonSyntaxException(
-            "Unknown attribute modifier operation " + operation);
-      };
-    }
-  }
-
-  public static class Serializer
-      extends LootItemConditionalFunction.Serializer<SetCurioAttributesFunction> {
-
-    public void serialize(@Nonnull JsonObject object,
-                          @Nonnull SetCurioAttributesFunction function,
-                          @Nonnull JsonSerializationContext context) {
-      super.serialize(object, function, context);
-      JsonArray jsonarray = new JsonArray();
-
-      for (Modifier modifier : function.modifiers) {
-        jsonarray.add(modifier.serialize(context));
-      }
-      object.add("modifiers", jsonarray);
-    }
-
-    @Nonnull
-    public SetCurioAttributesFunction deserialize(@Nonnull JsonObject object,
-                                                  @Nonnull JsonDeserializationContext context,
-                                                  @Nonnull LootItemCondition[] conditions) {
-      JsonArray jsonarray = GsonHelper.getAsJsonArray(object, "modifiers");
-      List<Modifier> list = Lists.newArrayListWithExpectedSize(jsonarray.size());
-
-      for (JsonElement jsonelement : jsonarray) {
-        list.add(
-            Modifier.deserialize(GsonHelper.convertToJsonObject(jsonelement, "modifier"), context));
-      }
-
-      if (list.isEmpty()) {
-        throw new JsonSyntaxException("Invalid attribute modifiers array; cannot be empty");
-      } else {
-        return new SetCurioAttributesFunction(conditions, list);
-      }
-    }
+    };
+    public static final Codec<SetCurioAttributesFunction.Modifier> MODIFIER_CODEC =
+        RecordCodecBuilder.create((instance) -> instance.group(
+                Codec.STRING.fieldOf("name").forGetter(Modifier::name),
+                ATTRIBUTE_CODEC.fieldOf("attribute")
+                    .forGetter(Modifier::attribute),
+                AttributeModifier.Operation.f_290595_.fieldOf("operation")
+                    .forGetter(Modifier::operation),
+                NumberProviders.f_291751_.fieldOf("amount")
+                    .forGetter(Modifier::amount),
+                ExtraCodecs.m_294263_(
+                    UUIDUtil.STRING_CODEC, "id").forGetter(Modifier::id),
+                SLOTS_CODEC.fieldOf("slot").forGetter(Modifier::slots))
+            .apply(instance, Modifier::new));
   }
 }

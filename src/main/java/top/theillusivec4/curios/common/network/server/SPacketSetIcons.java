@@ -23,12 +23,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
@@ -62,8 +61,8 @@ public class SPacketSetIcons {
     return new SPacketSetIcons(map);
   }
 
-  public static void handle(SPacketSetIcons msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
+  public static void handle(SPacketSetIcons msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
       ClientLevel world = Minecraft.getInstance().level;
       Set<String> slotIds = new HashSet<>();
 
@@ -80,6 +79,6 @@ public class SPacketSetIcons {
       }
       CurioArgumentType.slotIds = slotIds;
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 }

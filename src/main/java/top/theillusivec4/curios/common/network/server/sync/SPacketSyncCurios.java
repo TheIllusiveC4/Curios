@@ -21,7 +21,6 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -29,8 +28,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.network.NetworkEvent;
-import top.theillusivec4.curios.Curios;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
@@ -81,8 +79,8 @@ public class SPacketSyncCurios {
     return new SPacketSyncCurios(map, entityId);
   }
 
-  public static void handle(SPacketSyncCurios msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
+  public static void handle(SPacketSyncCurios msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
       ClientLevel world = Minecraft.getInstance().level;
 
       if (world != null) {
@@ -109,6 +107,6 @@ public class SPacketSyncCurios {
         }
       }
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 }

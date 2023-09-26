@@ -19,11 +19,11 @@
 
 package top.theillusivec4.curios.client.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -32,18 +32,23 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 
 public class CuriosButton extends ImageButton {
 
+  public static final WidgetSprites BIG =
+      new WidgetSprites(new ResourceLocation(CuriosApi.MODID, "button"),
+          new ResourceLocation(CuriosApi.MODID, "button_highlighted"));
+  public static final WidgetSprites SMALL =
+      new WidgetSprites(new ResourceLocation(CuriosApi.MODID, "button_small"),
+          new ResourceLocation(CuriosApi.MODID, "button_small_highlighted"));
   private final AbstractContainerScreen<?> parentGui;
 
-  CuriosButton(AbstractContainerScreen<?> parentGui, int xIn, int yIn, int widthIn, int heightIn,
-               int textureOffsetX, int textureOffsetY, int yDiffText, ResourceLocation resource) {
-
-    super(xIn, yIn, widthIn, heightIn, textureOffsetX, textureOffsetY, yDiffText, resource,
+  CuriosButton(AbstractContainerScreen<?> parentGui, int xIn, int yIn, int widthIn, int heightIn, WidgetSprites sprites) {
+    super(xIn, yIn, widthIn, heightIn, sprites,
         (button) -> {
           Minecraft mc = Minecraft.getInstance();
 
@@ -55,8 +60,8 @@ public class CuriosButton extends ImageButton {
               InventoryScreen inventory = new InventoryScreen(mc.player);
               mc.setScreen(inventory);
               mc.player.containerMenu.setCarried(stack);
-              NetworkHandler.INSTANCE
-                  .send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla(stack));
+              NetworkHandler.INSTANCE.send(new CPacketOpenVanilla(stack),
+                  PacketDistributor.SERVER.noArg());
             } else {
 
               if (parentGui instanceof InventoryScreen inventory) {
@@ -66,8 +71,8 @@ public class CuriosButton extends ImageButton {
                   recipeBookGui.toggleVisibility();
                 }
               }
-              NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-                  new CPacketOpenCurios(stack));
+              NetworkHandler.INSTANCE.send(new CPacketOpenCurios(stack),
+                  PacketDistributor.SERVER.noArg());
             }
           }
         });
@@ -79,8 +84,8 @@ public class CuriosButton extends ImageButton {
                            float partialTicks) {
     Tuple<Integer, Integer> offsets =
         CuriosScreen.getButtonOffset(parentGui instanceof CreativeModeInventoryScreen);
-    this.setX(parentGui.getGuiLeft() + offsets.getA());
-    int yOffset = parentGui instanceof CreativeModeInventoryScreen ? 68 : 83;
+    this.setX(parentGui.getGuiLeft() + offsets.getA() + 2);
+    int yOffset = parentGui instanceof CreativeModeInventoryScreen ? 70 : 85;
     this.setY(parentGui.getGuiTop() + offsets.getB() + yOffset);
 
     if (parentGui instanceof CreativeModeInventoryScreen gui) {

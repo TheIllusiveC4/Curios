@@ -19,7 +19,6 @@
 
 package top.theillusivec4.curios.common.network.server;
 
-import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.NonNullList;
@@ -28,7 +27,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -55,8 +54,8 @@ public class SPacketBreak {
     return new SPacketBreak(buf.readInt(), buf.readUtf(25), buf.readInt());
   }
 
-  public static void handle(SPacketBreak msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
+  public static void handle(SPacketBreak msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
       ClientLevel world = Minecraft.getInstance().level;
 
       if (world != null) {
@@ -79,6 +78,6 @@ public class SPacketBreak {
         }
       }
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 }

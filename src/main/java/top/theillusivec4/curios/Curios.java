@@ -27,6 +27,7 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -105,7 +106,7 @@ public class Curios {
     MinecraftForge.EVENT_BUS.register(new CuriosEventHandler());
     NetworkHandler.register();
     evt.enqueueWork(() -> {
-      CriteriaTriggers.register(EquipCurioTrigger.INSTANCE);
+      CriteriaTriggers.register("curios:equip_curio", EquipCurioTrigger.INSTANCE);
       CuriosSelectorOptions.register();
       SetCurioAttributesFunction.register();
     });
@@ -180,14 +181,15 @@ public class Curios {
 
     @SubscribeEvent
     public static void addLayers(EntityRenderersEvent.AddLayers evt) {
-      addPlayerLayer(evt, "default");
-      addPlayerLayer(evt, "slim");
+      for (PlayerSkin.Model skin : evt.getSkins()) {
+        addPlayerLayer(evt, skin);
+      }
       CuriosRendererRegistry.load();
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void addPlayerLayer(EntityRenderersEvent.AddLayers evt, String skin) {
-      EntityRenderer<? extends Player> renderer = evt.getSkin(skin);
+    private static void addPlayerLayer(EntityRenderersEvent.AddLayers evt, PlayerSkin.Model model) {
+      EntityRenderer<? extends Player> renderer = evt.getSkin(model);
 
       if (renderer instanceof LivingEntityRenderer livingRenderer) {
         livingRenderer.addLayer(new CuriosLayer<>(livingRenderer));

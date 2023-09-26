@@ -19,7 +19,6 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
-import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.NonNullList;
@@ -28,7 +27,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 
@@ -65,8 +64,8 @@ public class SPacketSyncStack {
         buf.readItem(), HandlerType.fromValue(buf.readInt()), buf.readNbt());
   }
 
-  public static void handle(SPacketSyncStack msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
+  public static void handle(SPacketSyncStack msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
       ClientLevel world = Minecraft.getInstance().level;
 
       if (world != null) {
@@ -96,7 +95,7 @@ public class SPacketSyncStack {
         }
       }
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 
   public enum HandlerType {

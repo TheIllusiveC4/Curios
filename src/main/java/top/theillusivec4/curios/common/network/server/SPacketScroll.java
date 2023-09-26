@@ -19,13 +19,12 @@
 
 package top.theillusivec4.curios.common.network.server;
 
-import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
@@ -48,8 +47,8 @@ public class SPacketScroll {
     return new SPacketScroll(buf.readInt(), buf.readInt());
   }
 
-  public static void handle(SPacketScroll msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
+  public static void handle(SPacketScroll msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
       Minecraft mc = Minecraft.getInstance();
       LocalPlayer clientPlayer = mc.player;
       Screen screen = mc.screen;
@@ -66,6 +65,6 @@ public class SPacketScroll {
         ((CuriosScreen) screen).updateRenderButtons();
       }
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 }

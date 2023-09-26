@@ -19,11 +19,10 @@
 
 package top.theillusivec4.curios.common.network.client;
 
-import java.util.function.Supplier;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.common.network.NetworkHandler;
@@ -48,9 +47,9 @@ public class CPacketToggleRender {
     return new CPacketToggleRender(buf.readUtf(100), buf.readInt());
   }
 
-  public static void handle(CPacketToggleRender msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer sender = ctx.get().getSender();
+  public static void handle(CPacketToggleRender msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer sender = ctx.getSender();
 
       if (sender != null) {
         CuriosApi.getCuriosInventory(sender)
@@ -60,13 +59,13 @@ public class CPacketToggleRender {
               if (renderStatuses.size() > msg.index) {
                 boolean value = !renderStatuses.get(msg.index);
                 renderStatuses.set(msg.index, value);
-                NetworkHandler.INSTANCE
-                    .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sender),
-                        new SPacketSyncRender(sender.getId(), msg.id, msg.index, value));
+                NetworkHandler.INSTANCE.send(
+                    new SPacketSyncRender(sender.getId(), msg.id, msg.index, value),
+                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(sender));
               }
             }));
       }
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 }

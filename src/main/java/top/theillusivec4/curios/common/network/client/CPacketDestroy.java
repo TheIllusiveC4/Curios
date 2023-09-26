@@ -24,7 +24,6 @@ import com.google.common.collect.Multimap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -32,7 +31,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
@@ -50,9 +49,9 @@ public class CPacketDestroy {
     return new CPacketDestroy();
   }
 
-  public static void handle(CPacketDestroy msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
-      ServerPlayer sender = ctx.get().getSender();
+  public static void handle(CPacketDestroy msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
+      ServerPlayer sender = ctx.getSender();
 
       if (sender != null) {
         CuriosApi.getCuriosInventory(sender)
@@ -89,18 +88,18 @@ public class CPacketDestroy {
                     .ifPresent(curio -> curio.onUnequip(slotContext, stack));
                 stackHandler.setStackInSlot(i, ItemStack.EMPTY);
                 NetworkHandler.INSTANCE.send(
-                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sender),
                     new SPacketSyncStack(sender.getId(), id, i, ItemStack.EMPTY,
-                        SPacketSyncStack.HandlerType.EQUIPMENT, new CompoundTag()));
+                        SPacketSyncStack.HandlerType.EQUIPMENT, new CompoundTag()),
+                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(sender));
                 cosmeticStackHandler.setStackInSlot(i, ItemStack.EMPTY);
                 NetworkHandler.INSTANCE.send(
-                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sender),
                     new SPacketSyncStack(sender.getId(), id, i, ItemStack.EMPTY,
-                        SPacketSyncStack.HandlerType.COSMETIC, new CompoundTag()));
+                        SPacketSyncStack.HandlerType.COSMETIC, new CompoundTag()),
+                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(sender));
               }
             }));
       }
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 }

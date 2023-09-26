@@ -1,5 +1,6 @@
 package top.theillusivec4.curios.mixin.core;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -17,7 +18,7 @@ public class MixinApplyBonusCount {
 
   @Shadow
   @Final
-  Enchantment enchantment;
+  private Holder<Enchantment> enchantment;
 
   @ModifyVariable(
       at = @At(
@@ -26,7 +27,7 @@ public class MixinApplyBonusCount {
       method = "run")
   private int curios$applyFortune(int enchantmentLevel, ItemStack stack, LootContext lootContext) {
 
-    if (this.enchantment == Enchantments.BLOCK_FORTUNE) {
+    if (this.enchantment.get() == Enchantments.BLOCK_FORTUNE) {
       return enchantmentLevel + CuriosUtilMixinHooks.getFortuneLevel(lootContext);
     } else {
       return enchantmentLevel;

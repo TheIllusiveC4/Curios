@@ -3,7 +3,6 @@ package top.theillusivec4.curios.common.network.server.sync;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -11,9 +10,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -64,8 +62,8 @@ public class SPacketSyncModifiers {
     return new SPacketSyncModifiers(map, entityId);
   }
 
-  public static void handle(SPacketSyncModifiers msg, Supplier<NetworkEvent.Context> ctx) {
-    ctx.get().enqueueWork(() -> {
+  public static void handle(SPacketSyncModifiers msg, CustomPayloadEvent.Context ctx) {
+    ctx.enqueueWork(() -> {
       ClientLevel world = Minecraft.getInstance().level;
 
       if (world != null) {
@@ -100,6 +98,6 @@ public class SPacketSyncModifiers {
         }
       }
     });
-    ctx.get().setPacketHandled(true);
+    ctx.setPacketHandled(true);
   }
 }
