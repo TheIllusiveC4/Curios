@@ -313,12 +313,15 @@ public class CuriosEventHandler {
             evt.getLootingLevel(), evt.isRecentlyHit());
         MinecraftForge.EVENT_BUS.post(dropRulesEvent);
         List<Tuple<Predicate<ItemStack>, DropRule>> dropRules = dropRulesEvent.getOverrides();
+        boolean keepInventory = false;
 
-        boolean keepInventory = livingEntity.level().getGameRules()
-            .getBoolean(GameRules.RULE_KEEPINVENTORY);
+        if (livingEntity instanceof Player) {
+          keepInventory =
+              livingEntity.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
 
-        if (CuriosConfig.SERVER.keepCurios.get() != CuriosConfig.KeepCurios.DEFAULT) {
-          keepInventory = CuriosConfig.SERVER.keepCurios.get() == CuriosConfig.KeepCurios.ON;
+          if (CuriosConfig.SERVER.keepCurios.get() != CuriosConfig.KeepCurios.DEFAULT) {
+            keepInventory = CuriosConfig.SERVER.keepCurios.get() == CuriosConfig.KeepCurios.ON;
+          }
         }
         boolean finalKeepInventory = keepInventory;
         curios.forEach((id, stacksHandler) -> {

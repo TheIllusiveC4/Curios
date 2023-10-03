@@ -3,6 +3,6 @@ Prior to version 5.2.0, this project used [Forge Recommended Versioning](https:/
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.20.x/docs/CHANGELOG.md).
 
-## [5.3.4+1.20.1] - 2023.09.24
+## [5.3.5+1.20.1] - 2023.10.03
 ### Fixed
-- Fixed items not showing their curio tooltips on clients connected to dedicated servers [#337](https://github.com/TheIllusiveC4/Curios/issues/337)
+- Fixed `keepInventory` gamerule applying to non-player entities for curios slots
