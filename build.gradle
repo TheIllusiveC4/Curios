@@ -22,7 +22,7 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'parchment', version: '2023.08.20-1.20.1'
+    mappings channel: 'parchment', version: '2023.10.22-1.20.2'
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
