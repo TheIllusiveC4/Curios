@@ -24,6 +24,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.commands.CommandBuildContext;
@@ -38,6 +40,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+import top.theillusivec4.curios.common.data.CuriosEntityManager;
+import top.theillusivec4.curios.common.data.CuriosSlotManager;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.slottype.LegacySlotManager;
@@ -51,7 +55,17 @@ public class CuriosCommand {
         .requires(player -> player.hasPermission(2));
 
     curiosCommand.then(Commands.literal("list").executes(context -> {
-      Map<String, Set<String>> map = LegacySlotManager.getIdsToMods();
+      Map<String, Set<String>> map = new HashMap<>(LegacySlotManager.getIdsToMods());
+
+      for (Map.Entry<String, Set<String>> entry : CuriosSlotManager.INSTANCE.getModsFromSlots()
+          .entrySet()) {
+        map.computeIfAbsent(entry.getKey(), (k) -> new HashSet<>()).addAll(entry.getValue());
+      }
+
+      for (Map.Entry<String, Set<String>> entry : CuriosEntityManager.INSTANCE.getModsFromSlots()
+          .entrySet()) {
+        map.computeIfAbsent(entry.getKey(), (k) -> new HashSet<>()).addAll(entry.getValue());
+      }
 
       for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
         context.getSource().sendSuccess(
