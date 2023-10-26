@@ -13,9 +13,8 @@
     "ring",
     "test"
   ],
-  "conditions": [
-    {
-      "type": "forge:true"
-    }
-  ]
+  "forge:condition": {
+    "type": "forge:true",
+    "value": {}
+  }
 }

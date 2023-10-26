@@ -145,7 +145,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
       if (!this.menu.player.isCreative()) {
         this.addRenderableWidget(
             new ImageButton(this.leftPos + 104, this.height / 2 - 22, 20, 18,
-                RecipeBookComponent.f_291154_, (button) -> {
+                RecipeBookComponent.RECIPE_BUTTON_SPRITES, (button) -> {
               this.recipeBookGui.toggleVisibility();
               this.updateScreenPosition();
               button.setPosition(this.leftPos + 104, this.height / 2 - 22);
@@ -344,7 +344,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
                 width, 7);
           } else {
             guiGraphics.blit(CURIO_INVENTORY, i + xOffset - 16, j + 4, 27, 0, 23, 158);
-            guiGraphics.m_292816_(SCROLLER, i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 12, 15);
+            guiGraphics.blitSprite(SCROLLER, i + xOffset - 8, j + 12 + (int) (127f * currentScroll), 12, 15);
           }
 
           for (Slot slot : this.menu.slots) {

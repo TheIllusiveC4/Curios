@@ -1,19 +1,20 @@
 package top.theillusivec4.curios.common.data;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mojang.serialization.JsonOps;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
@@ -24,7 +25,6 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.EntityType;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITagManager;
@@ -137,8 +137,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
       JsonObject jsonObject, ResourceLocation resourceLocation, ICondition.IContext ctx) {
     Map<EntityType<?>, Map<String, ISlotType>> map = new HashMap<>();
 
-    if (!CraftingHelper.processConditions(
-        GsonHelper.getAsJsonArray(jsonObject, "conditions", new JsonArray()), ctx)) {
+    if (!readAndTestCondition(jsonObject, ctx)) {
       Curios.LOGGER.debug("Skipping loading entity file {} as its conditions were not met",
           resourceLocation);
       return map;
@@ -180,6 +179,17 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
       map.computeIfAbsent(entityType, (k) -> new HashMap<>()).putAll(slots);
     }
     return map;
+  }
+
+  private static boolean readAndTestCondition(JsonObject json, ICondition.IContext context) {
+
+    if (!json.has(ICondition.DEFAULT_FIELD)) {
+      return true;
+    }
+
+    ICondition condition = Util.getOrThrow(ICondition.SAFE_CODEC.parse(JsonOps.INSTANCE,
+        json.getAsJsonObject(ICondition.DEFAULT_FIELD)), JsonParseException::new);
+    return condition.test(context);
   }
 
   public boolean hasSlots(EntityType<?> type) {

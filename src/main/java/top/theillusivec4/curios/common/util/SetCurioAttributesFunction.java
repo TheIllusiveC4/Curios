@@ -39,7 +39,7 @@ import top.theillusivec4.curios.api.SlotAttribute;
 public class SetCurioAttributesFunction extends LootItemConditionalFunction {
 
   public static final Codec<SetCurioAttributesFunction> CODEC = RecordCodecBuilder.create(
-      (instance) -> m_294820_(instance).and(
+      (instance) -> commonFields(instance).and(
               ExtraCodecs.nonEmptyList(Modifier.MODIFIER_CODEC.listOf()).fieldOf("modifiers")
                   .forGetter((function) -> function.modifiers))
           .apply(instance, SetCurioAttributesFunction::new));
@@ -139,11 +139,11 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
                 Codec.STRING.fieldOf("name").forGetter(Modifier::name),
                 ATTRIBUTE_CODEC.fieldOf("attribute")
                     .forGetter(Modifier::attribute),
-                AttributeModifier.Operation.f_290595_.fieldOf("operation")
+                AttributeModifier.Operation.CODEC.fieldOf("operation")
                     .forGetter(Modifier::operation),
-                NumberProviders.f_291751_.fieldOf("amount")
+                NumberProviders.CODEC.fieldOf("amount")
                     .forGetter(Modifier::amount),
-                ExtraCodecs.m_294263_(
+                ExtraCodecs.strictOptionalField(
                     UUIDUtil.STRING_CODEC, "id").forGetter(Modifier::id),
                 SLOTS_CODEC.fieldOf("slot").forGetter(Modifier::slots))
             .apply(instance, Modifier::new));

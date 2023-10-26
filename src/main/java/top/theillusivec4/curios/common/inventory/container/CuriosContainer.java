@@ -338,9 +338,9 @@ public class CuriosContainer extends InventoryMenu {
 
       if (recipe.isPresent()) {
         RecipeHolder<CraftingRecipe> recipeholder = recipe.get();
-        CraftingRecipe craftingRecipe = recipeholder.f_291008_();
+        CraftingRecipe craftingRecipe = recipeholder.value();
 
-        if (this.craftResult.m_294416_(this.player.level(), playerMP, recipeholder)) {
+        if (this.craftResult.setRecipeUsed(this.player.level(), playerMP, recipeholder)) {
           ItemStack itemstack1 =
               craftingRecipe.assemble(this.craftMatrix, this.player.level().registryAccess());
 
@@ -351,7 +351,7 @@ public class CuriosContainer extends InventoryMenu {
       }
       this.craftResult.setItem(0, stack);
       this.setRemoteSlot(0, stack);
-      playerMP.connection.m_141995_(
+      playerMP.connection.send(
           new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), 0,
               stack));
     }
@@ -486,7 +486,7 @@ public class CuriosContainer extends InventoryMenu {
 
   @Override
   public boolean recipeMatches(RecipeHolder<? extends Recipe<CraftingContainer>> recipeHolder) {
-    return recipeHolder.f_291008_().matches(this.craftMatrix, this.player.level());
+    return recipeHolder.value().matches(this.craftMatrix, this.player.level());
   }
 
   @Override
