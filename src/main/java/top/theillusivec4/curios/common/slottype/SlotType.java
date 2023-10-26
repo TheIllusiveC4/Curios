@@ -200,7 +200,13 @@ public final class SlotType implements ISlotType {
     public Builder size(int size, String operation, boolean replace) {
 
       switch (operation) {
-        case "SET" -> this.size = replace || this.size == null ? size : Math.max(this.size, size);
+        case "SET" -> {
+          this.size = replace || this.size == null ? size : Math.max(this.size, size);
+
+          if (replace) {
+            this.sizeMod = 0;
+          }
+        }
         case "ADD" -> this.sizeMod = replace ? size : this.sizeMod + size;
         case "REMOVE" -> this.sizeMod = replace ? -size : this.sizeMod - size;
       }

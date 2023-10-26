@@ -9,12 +9,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.JsonOps;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
@@ -52,8 +54,24 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
                        @Nonnull ProfilerFiller pProfiler) {
     Map<String, SlotType.Builder> map = new HashMap<>();
     Map<String, ImmutableSet.Builder<String>> modMap = new HashMap<>();
+    Map<ResourceLocation, JsonElement> sorted = new LinkedHashMap<>();
+    pResourceManager.listPacks().forEach(packResources -> {
+      Set<String> namespaces = packResources.getNamespaces(PackType.SERVER_DATA);
+      namespaces.forEach(
+          namespace -> packResources.listResources(PackType.SERVER_DATA, namespace, "curios/slots",
+              (resourceLocation, inputStreamIoSupplier) -> {
+                String path = resourceLocation.getPath();
+                ResourceLocation rl = new ResourceLocation(namespace,
+                    path.substring("curios/slots/".length(), path.length() - ".json".length()));
 
-    for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
+                JsonElement el = pObject.get(rl);
+                if (el != null) {
+                  sorted.put(rl, el);
+                }
+              }));
+    });
+
+    for (Map.Entry<ResourceLocation, JsonElement> entry : sorted.entrySet()) {
       ResourceLocation resourcelocation = entry.getKey();
 
       if (resourcelocation.getNamespace().equals("curios")) {
@@ -90,7 +108,7 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
           .addAll(entry.getValue());
     }
 
-    for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
+    for (Map.Entry<ResourceLocation, JsonElement> entry : sorted.entrySet()) {
       ResourceLocation resourcelocation = entry.getKey();
 
       if (resourcelocation.getPath().startsWith("_") ||
@@ -177,9 +195,14 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
     boolean replace = GsonHelper.getAsBoolean(jsonObject, "replace", false);
     Integer jsonOrder = jsonObject.has("order") ? GsonHelper.getAsInt(jsonObject, "order") : null;
     String jsonIcon = GsonHelper.getAsString(jsonObject, "icon", "");
-    boolean jsonToggle = GsonHelper.getAsBoolean(jsonObject, "render_toggle", true);
-    boolean jsonCosmetic = GsonHelper.getAsBoolean(jsonObject, "add_cosmetic", false);
-    boolean jsonNative = GsonHelper.getAsBoolean(jsonObject, "use_native_gui", true);
+    Boolean jsonToggle =
+        jsonObject.has("render_toggle") ? GsonHelper.getAsBoolean(jsonObject, "render_toggle") :
+            null;
+    Boolean jsonCosmetic =
+        jsonObject.has("add_cosmetic") ? GsonHelper.getAsBoolean(jsonObject, "add_cosmetic") : null;
+    Boolean jsonNative =
+        jsonObject.has("use_native_gui") ? GsonHelper.getAsBoolean(jsonObject, "use_native_gui") :
+            null;
 
     if (jsonOrder != null) {
       builder.order(jsonOrder, replace);
@@ -196,8 +219,17 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
     if (jsonSize != null) {
       builder.size(jsonSize, operation, replace);
     }
-    builder.hasCosmetic(jsonCosmetic, replace);
-    builder.useNativeGui(jsonNative, replace);
-    builder.renderToggle(jsonToggle, replace);
+
+    if (jsonCosmetic != null) {
+      builder.hasCosmetic(jsonCosmetic, replace);
+    }
+
+    if (jsonNative != null) {
+      builder.useNativeGui(jsonNative, replace);
+    }
+
+    if (jsonToggle != null) {
+      builder.renderToggle(jsonToggle, replace);
+    }
   }
 }

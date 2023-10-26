@@ -10,6 +10,7 @@ import com.google.gson.JsonParseException;
 import com.mojang.serialization.JsonOps;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -20,6 +21,7 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
@@ -55,25 +57,22 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
                        @Nonnull ResourceManager pResourceManager,
                        @Nonnull ProfilerFiller pProfiler) {
     Map<EntityType<?>, ImmutableMap.Builder<String, ISlotType>> map = new HashMap<>();
-
-    for (Map.Entry<ResourceLocation, JsonElement> entry : pObject.entrySet()) {
-      ResourceLocation resourcelocation = entry.getKey();
-
-      if (resourcelocation.getPath().startsWith("_")) {
-        continue;
-      }
-
-      try {
-        for (Map.Entry<EntityType<?>, Map<String, ISlotType>> entry1 : getSlotsForEntities(
-            GsonHelper.convertToJsonObject(entry.getValue(), "top element"), resourcelocation,
-            this.ctx).entrySet()) {
-          map.computeIfAbsent(entry1.getKey(), (k) -> ImmutableMap.builder())
-              .putAll(entry1.getValue());
-        }
-      } catch (IllegalArgumentException | JsonParseException e) {
-        Curios.LOGGER.error("Parsing error loading curio entity {}", resourcelocation, e);
-      }
-    }
+    Map<ResourceLocation, JsonElement> sorted = new LinkedHashMap<>();
+    pResourceManager.listPacks().forEach(packResources -> {
+      Set<String> namespaces = packResources.getNamespaces(PackType.SERVER_DATA);
+      namespaces.forEach(
+          namespace -> packResources.listResources(PackType.SERVER_DATA, namespace,
+              "curios/entities",
+              (resourceLocation, inputStreamIoSupplier) -> {
+                String path = resourceLocation.getPath();
+                ResourceLocation rl = new ResourceLocation(namespace,
+                    path.substring("curios/entities/".length(), path.length() - ".json".length()));
+                JsonElement el = pObject.get(rl);
+                if (el != null) {
+                  sorted.put(rl, el);
+                }
+              }));
+    });
 
     // Legacy IMC slot registrations - players only
     for (String s : LegacySlotManager.getImcBuilders().keySet()) {
@@ -83,6 +82,32 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
           () -> Curios.LOGGER.error("{} is not a registered slot type!", s));
     }
 
+    for (Map.Entry<ResourceLocation, JsonElement> entry : sorted.entrySet()) {
+      ResourceLocation resourcelocation = entry.getKey();
+
+      if (resourcelocation.getPath().startsWith("_")) {
+        continue;
+      }
+
+      try {
+        JsonObject jsonObject = GsonHelper.convertToJsonObject(entry.getValue(), "top element");
+
+        for (Map.Entry<EntityType<?>, Map<String, ISlotType>> entry1 : getSlotsForEntities(
+            jsonObject, resourcelocation, this.ctx).entrySet()) {
+
+          if (GsonHelper.getAsBoolean(jsonObject, "replace", false)) {
+            ImmutableMap.Builder<String, ISlotType> builder = ImmutableMap.builder();
+            builder.putAll(entry1.getValue());
+            map.put(entry1.getKey(), builder);
+          } else {
+            map.computeIfAbsent(entry1.getKey(), (k) -> ImmutableMap.builder())
+                .putAll(entry1.getValue());
+          }
+        }
+      } catch (IllegalArgumentException | JsonParseException e) {
+        Curios.LOGGER.error("Parsing error loading curio entity {}", resourcelocation, e);
+      }
+    }
     this.server = map.entrySet().stream().collect(
         ImmutableMap.toImmutableMap(Map.Entry::getKey,
             (entry) -> entry.getValue().buildKeepingLast()));
