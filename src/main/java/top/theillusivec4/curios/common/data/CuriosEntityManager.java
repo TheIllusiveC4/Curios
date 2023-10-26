@@ -1,6 +1,7 @@
 package top.theillusivec4.curios.common.data;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -33,6 +34,7 @@ import net.minecraftforge.registries.tags.ITagManager;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.common.slottype.LegacySlotManager;
+import top.theillusivec4.curios.common.slottype.SlotType;
 
 public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
 
@@ -41,6 +43,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
 
   public static CuriosEntityManager INSTANCE = new CuriosEntityManager();
   private Map<EntityType<?>, Map<String, ISlotType>> server = ImmutableMap.of();
+  private Map<String, Set<String>> idToMods = ImmutableMap.of();
   private Map<EntityType<?>, Map<String, Integer>> client = ImmutableMap.of();
   private ICondition.IContext ctx = ICondition.IContext.EMPTY;
 
@@ -57,6 +60,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
                        @Nonnull ResourceManager pResourceManager,
                        @Nonnull ProfilerFiller pProfiler) {
     Map<EntityType<?>, ImmutableMap.Builder<String, ISlotType>> map = new HashMap<>();
+    Map<String, ImmutableSet.Builder<String>> modMap = new HashMap<>();
     Map<ResourceLocation, JsonElement> sorted = new LinkedHashMap<>();
     pResourceManager.listPacks().forEach(packResources -> {
       Set<String> namespaces = packResources.getNamespaces(PackType.SERVER_DATA);
@@ -103,6 +107,8 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
             map.computeIfAbsent(entry1.getKey(), (k) -> ImmutableMap.builder())
                 .putAll(entry1.getValue());
           }
+          modMap.computeIfAbsent(resourcelocation.getPath(), (k) -> ImmutableSet.builder())
+              .add(resourcelocation.getNamespace());
         }
       } catch (IllegalArgumentException | JsonParseException e) {
         Curios.LOGGER.error("Parsing error loading curio entity {}", resourcelocation, e);
@@ -111,6 +117,8 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
     this.server = map.entrySet().stream().collect(
         ImmutableMap.toImmutableMap(Map.Entry::getKey,
             (entry) -> entry.getValue().buildKeepingLast()));
+    this.idToMods = modMap.entrySet().stream()
+        .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().build()));
     Curios.LOGGER.info("Loaded {} curio entities", map.size());
   }
 
@@ -235,5 +243,9 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
       return this.server.get(type);
     }
     return ImmutableMap.of();
+  }
+
+  public Map<String, Set<String>> getModsFromSlots() {
+    return ImmutableMap.copyOf(idToMods);
   }
 }
