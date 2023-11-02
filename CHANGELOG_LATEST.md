@@ -3,6 +3,6 @@ Prior to version 5.2.0, this project used [Forge Recommended Versioning](https:/
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.20.x/docs/CHANGELOG.md).
 
-## [5.4.1+1.20.1] - 2023.10.25
+## [5.4.2+1.20.1] - 2023.11.02
 ### Fixed
-- Fixed `list` command not outputting all possible data
+- Fixed network decoding errors [#346](https://github.com/TheIllusiveC4/Curios/issues/346)
