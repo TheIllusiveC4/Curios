@@ -61,7 +61,7 @@ public class SPacketSyncStack {
   }
 
   public static SPacketSyncStack decode(FriendlyByteBuf buf) {
-    return new SPacketSyncStack(buf.readInt(), buf.readUtf(25), buf.readInt(),
+    return new SPacketSyncStack(buf.readInt(), buf.readUtf(), buf.readInt(),
         buf.readItem(), HandlerType.fromValue(buf.readInt()), buf.readNbt());
   }
 

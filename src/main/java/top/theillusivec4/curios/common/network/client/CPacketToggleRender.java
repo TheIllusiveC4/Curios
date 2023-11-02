@@ -45,7 +45,7 @@ public class CPacketToggleRender {
   }
 
   public static CPacketToggleRender decode(FriendlyByteBuf buf) {
-    return new CPacketToggleRender(buf.readUtf(100), buf.readInt());
+    return new CPacketToggleRender(buf.readUtf(), buf.readInt());
   }
 
   public static void handle(CPacketToggleRender msg, Supplier<NetworkEvent.Context> ctx) {
