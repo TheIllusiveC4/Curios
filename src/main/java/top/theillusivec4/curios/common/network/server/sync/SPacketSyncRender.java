@@ -51,7 +51,7 @@ public class SPacketSyncRender {
   }
 
   public static SPacketSyncRender decode(FriendlyByteBuf buf) {
-    return new SPacketSyncRender(buf.readInt(), buf.readUtf(25), buf.readInt(),
+    return new SPacketSyncRender(buf.readInt(), buf.readUtf(), buf.readInt(),
         buf.readBoolean());
   }
 

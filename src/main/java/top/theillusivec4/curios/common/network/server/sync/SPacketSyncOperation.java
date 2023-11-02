@@ -70,7 +70,7 @@ public class SPacketSyncOperation {
   }
 
   public static SPacketSyncOperation decode(FriendlyByteBuf buf) {
-    return new SPacketSyncOperation(buf.readInt(), buf.readUtf(25),
+    return new SPacketSyncOperation(buf.readInt(), buf.readUtf(),
         Operation.fromValue(buf.readInt()), buf.readInt(), buf.readBoolean(), buf.readBoolean());
   }
 
