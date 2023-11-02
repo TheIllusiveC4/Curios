@@ -57,7 +57,7 @@ public class SPacketSyncModifiers {
     Map<String, CompoundTag> map = new LinkedHashMap<>();
 
     for (int i = 0; i < entrySize; i++) {
-      String key = buf.readUtf(25);
+      String key = buf.readUtf();
       map.put(key, buf.readNbt());
     }
     return new SPacketSyncModifiers(map, entityId);

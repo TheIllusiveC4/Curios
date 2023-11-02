@@ -52,7 +52,7 @@ public class SPacketBreak {
   }
 
   public static SPacketBreak decode(FriendlyByteBuf buf) {
-    return new SPacketBreak(buf.readInt(), buf.readUtf(25), buf.readInt());
+    return new SPacketBreak(buf.readInt(), buf.readUtf(), buf.readInt());
   }
 
   public static void handle(SPacketBreak msg, Supplier<NetworkEvent.Context> ctx) {
