@@ -36,9 +36,11 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
+import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curiostest.client.CuriosLayerDefinitions;
 import top.theillusivec4.curiostest.client.model.AmuletModel;
 import top.theillusivec4.curiostest.client.model.CrownModel;
@@ -70,6 +72,8 @@ public class CuriosTest {
       evt.clearModifiers();
       evt.addModifier(Attributes.MAX_HEALTH, new AttributeModifier(evt.getUuid(), "test", 10.0d,
           AttributeModifier.Operation.ADDITION));
+      evt.addModifier(SlotAttribute.getOrCreate("ring"),
+          new AttributeModifier(evt.getUuid(), "test", 1.0d, AttributeModifier.Operation.ADDITION));
     }
   }
 
