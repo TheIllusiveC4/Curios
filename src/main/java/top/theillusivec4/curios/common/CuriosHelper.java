@@ -332,7 +332,7 @@ public class CuriosHelper implements ICuriosHelper {
     CurioAttributeModifierEvent evt =
         new CurioAttributeModifierEvent(stack, slotContext, uuid, multimap);
     MinecraftForge.EVENT_BUS.post(evt);
-    return evt.getModifiers();
+    return HashMultimap.create(evt.getModifiers());
   }
 
   @Override
