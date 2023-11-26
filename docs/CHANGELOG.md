@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.19.2-5.1.4.3] - 2023.11.26
+### Fixed
+- Fixed `CurioAttributeModifierEvent` crashing when used for slot modifiers [#351](https://github.com/TheIllusiveC4/Curios/issues/351)
+
 ## [1.19.2-5.1.4.2] - 2023.11.02
 ### Fixed
 - Fixed network decoding errors [#346](https://github.com/TheIllusiveC4/Curios/issues/346)
