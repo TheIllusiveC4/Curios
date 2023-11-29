@@ -33,7 +33,6 @@ import net.minecraftforge.registries.tags.ITagManager;
 import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.common.slottype.LegacySlotManager;
-import top.theillusivec4.curios.common.slottype.SlotType;
 
 public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
 

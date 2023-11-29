@@ -59,7 +59,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.EnderManAngerEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -208,7 +207,8 @@ public class CuriosEventHandler {
       PlayerList playerList = evt.getPlayerList();
 
       for (ServerPlayer player : playerList.getPlayers()) {
-
+        NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+            new SPacketSyncData(CuriosEntityManager.getSyncPacket()));
         CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
           handler.readTag(handler.writeTag());
           NetworkHandler.INSTANCE.send(
@@ -219,12 +219,14 @@ public class CuriosEventHandler {
             curiosContainer.resetSlots();
           }
         });
-        NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
-            new SPacketSyncData(CuriosEntityManager.getSyncPacket()));
       }
     } else {
-      NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(evt::getPlayer),
+      ServerPlayer mp = evt.getPlayer();
+      NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
           new SPacketSyncData(CuriosEntityManager.getSyncPacket()));
+      CuriosApi.getCuriosInventory(mp).ifPresent(
+          handler -> NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
+              new SPacketSyncCurios(mp.getId(), handler.getCurios())));
     }
   }
 
@@ -255,20 +257,6 @@ public class CuriosEventHandler {
       ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(curioItem, stack);
       evt.addCapability(CuriosCapability.ID_ITEM,
           CuriosApi.createCurioProvider(itemizedCapability));
-    }
-  }
-
-  @SubscribeEvent
-  public void entityJoinWorld(EntityJoinLevelEvent evt) {
-
-    Entity entity = evt.getEntity();
-
-    if (entity instanceof ServerPlayer serverPlayerEntity) {
-      CuriosApi.getCuriosInventory(serverPlayerEntity).ifPresent(handler -> {
-        ServerPlayer mp = (ServerPlayer) entity;
-        NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
-            new SPacketSyncCurios(mp.getId(), handler.getCurios()));
-      });
     }
   }
 
