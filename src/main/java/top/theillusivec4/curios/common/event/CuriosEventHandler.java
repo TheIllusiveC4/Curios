@@ -219,6 +219,11 @@ public class CuriosEventHandler {
             curiosContainer.resetSlots();
           }
         });
+        Collection<ISlotType> slotTypes = CuriosApi.getPlayerSlots().values();
+        Map<String, ResourceLocation> icons = new HashMap<>();
+        slotTypes.forEach(type -> icons.put(type.getIdentifier(), type.getIcon()));
+        NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player),
+            new SPacketSetIcons(icons));
       }
     } else {
       ServerPlayer mp = evt.getPlayer();
@@ -227,6 +232,11 @@ public class CuriosEventHandler {
       CuriosApi.getCuriosInventory(mp).ifPresent(
           handler -> NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
               new SPacketSyncCurios(mp.getId(), handler.getCurios())));
+      Collection<ISlotType> slotTypes = CuriosApi.getPlayerSlots().values();
+      Map<String, ResourceLocation> icons = new HashMap<>();
+      slotTypes.forEach(type -> icons.put(type.getIdentifier(), type.getIcon()));
+      NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
+          new SPacketSetIcons(icons));
     }
   }
 
