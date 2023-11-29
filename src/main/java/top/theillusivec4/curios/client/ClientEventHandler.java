@@ -22,6 +22,7 @@ package top.theillusivec4.curios.client;
 import static net.minecraft.world.item.ItemStack.ATTRIBUTE_MODIFIER_FORMAT;
 
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.platform.InputConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Set;
 import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -40,16 +42,19 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.PacketDistributor;
+import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
@@ -61,17 +66,29 @@ public class ClientEventHandler {
       .fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
 
   @SubscribeEvent
-  public void onKeyInput(TickEvent.ClientTickEvent evt) {
+  public void onClientTick(TickEvent.ClientTickEvent evt) {
 
     if (evt.phase != TickEvent.Phase.END) {
       return;
     }
-
     Minecraft mc = Minecraft.getInstance();
 
     if (KeyRegistry.openCurios.consumeClick() && mc.isWindowActive()) {
       NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
           new CPacketOpenCurios(ItemStack.EMPTY));
+    }
+  }
+
+  @SubscribeEvent
+  public void onKeyInput(InputEvent.Key evt) {
+    Minecraft mc = Minecraft.getInstance();
+    LocalPlayer localPlayer = mc.player;
+
+    if (localPlayer != null && localPlayer.hasContainerOpen() &&
+        !(localPlayer.containerMenu instanceof CuriosContainer) &&
+        evt.getKey() == KeyRegistry.openCurios.getKey().getValue() &&
+        evt.getAction() == InputConstants.PRESS) {
+      localPlayer.closeContainer();
     }
   }
 
