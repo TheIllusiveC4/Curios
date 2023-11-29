@@ -3,6 +3,9 @@ Prior to version 5.2.0, this project used [Forge Recommended Versioning](https:/
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.20.x/docs/CHANGELOG.md).
 
-## [5.4.3+1.20.1] - 2023.11.26
+## [5.4.4+1.20.1] - 2023.11.28
+### Changed
+- Curios inventory keybinding now also closes the current container to mimic the behavior of the vanilla inventory keybinding [#352](https://github.com/TheIllusiveC4/Curios/issues/352)
 ### Fixed
-- Fixed `CurioAttributeModifierEvent` crashing when used for slot modifiers [#351](https://github.com/TheIllusiveC4/Curios/issues/351)
+- Fixed slots failing to sync after world load [#347](https://github.com/TheIllusiveC4/Curios/issues/347)
+- Fixed lost icons when reloading datapacks
