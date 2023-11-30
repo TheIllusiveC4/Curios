@@ -59,6 +59,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.EnderManAngerEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -237,6 +238,19 @@ public class CuriosEventHandler {
       slotTypes.forEach(type -> icons.put(type.getIdentifier(), type.getIcon()));
       NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
           new SPacketSetIcons(icons));
+    }
+  }
+
+  @SubscribeEvent
+  public void entityJoinWorld(EntityJoinLevelEvent evt) {
+    Entity entity = evt.getEntity();
+
+    if (entity instanceof ServerPlayer serverPlayerEntity) {
+      CuriosApi.getCuriosInventory(serverPlayerEntity).ifPresent(handler -> {
+        ServerPlayer mp = (ServerPlayer) entity;
+        NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
+            new SPacketSyncCurios(mp.getId(), handler.getCurios()));
+      });
     }
   }
 
