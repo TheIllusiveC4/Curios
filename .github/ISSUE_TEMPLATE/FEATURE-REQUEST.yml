@@ -1,0 +1,19 @@
+name: Feature Request
+description: Make a suggestion for a new feature or improvements to existing ones
+title: "[Feature]: "
+labels: ["type: enhancement", "status: triage"]
+assignees:
+ - TheIllusiveC4
+body: 
+- type: markdown
+  attributes:
+    value: |
+      Hello, and thanks for trying to make this mod better. Please respond to the following questions to the best of your ability.
+- type: textarea
+  id: feature-description
+  attributes:
+    label: What is the new feature or improvement?
+    description: Also, please explain why it would be a good addition to the mod.
+    placeholder: An amazing idea for the mod!
+  validations:
+    required: true

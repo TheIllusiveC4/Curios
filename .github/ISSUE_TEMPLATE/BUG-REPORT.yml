@@ -1,0 +1,83 @@
+name: Bug Report
+description: Create a report for bugs, crashes, and other unintended behavior
+title: "[Bug]: "
+labels: ["type: bug", "status: triage"]
+assignees:
+ - TheIllusiveC4
+body: 
+- type: markdown
+  attributes:
+    value: |
+      Hello, and thanks for filling out this bug report. Please respond to the following questions to the best of your ability.
+- type: dropdown
+  id: mc-version
+  attributes:
+    label: Minecraft Version
+    description: What version of Minecraft are you running? (Unlisted versions are unsupported)
+    options:
+      - 1.20.2
+      - 1.20.1
+      - 1.19.2
+      - 1.18.2
+  validations:
+    required: true
+- type: textarea
+  id: what-happened
+  attributes:
+    label: What happened?
+    description: Also tell us, what did you expect to happen?
+    placeholder: A bug happened and I didn't expect that!
+  validations:
+    required: true
+- type: textarea
+  id: reproduction-steps
+  attributes:
+    label: How do you trigger this bug?
+    description: Please make sure to remove all unnecessary mods first.
+    placeholder: A step by step walkthrough to trigger the bug.
+    value: |
+      1.
+      2.
+      3.
+      ...
+  validations:
+    required: true
+- type: dropdown
+  id: loader
+  attributes:
+    label: Loader
+    description: Are you using Forge or NeoForge?
+    options:
+      - Forge
+      - NeoForge
+  validations:
+    required: true
+- type: input
+  id: loader-version
+  attributes:
+    label: Loader Version
+    description: Which version of the above loader are you using?
+    placeholder: |
+      Example: Forge - 37.0.65
+  validations:
+    required: true
+- type: input
+  id: mod-version
+  attributes:
+    label: Mod Version
+    description: What version of the mod are you using?
+    placeholder: |
+      Example: Curios 6.0.0+1.20.1
+  validations:
+    required: true
+- type: textarea
+  id: logs
+  attributes:
+    label: Relevant Log Outputs
+    description: |
+      Please share any relevant log outputs using a paste site:
+      » GitHub Gist
+      » Paste.gg
+      » Paste.ee
+      » Pastebin.com
+      » Hastebin.com

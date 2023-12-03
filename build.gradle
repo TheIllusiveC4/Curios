@@ -2,260 +2,140 @@ import javax.net.ssl.HttpsURLConnection
 import java.nio.charset.StandardCharsets
 
 plugins {
-    id 'eclipse'
-    id 'idea'
-    id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0, 6.2)'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-    id 'com.modrinth.minotaur' version '2.+'
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
-    id 'net.darkhax.curseforgegradle' version '1.+'
+    // Required for NeoGradle
+    id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.7"
 }
 
-version = "${mod_version}"
-group = "top.theillusivec4.${mod_id}"
+subprojects {
+    apply plugin: 'java'
 
-base {
-    archivesName = "${mod_id}-forge"
-}
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-minecraft {
-    mappings channel: 'parchment', version: '2023.10.22-1.20.2'
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
-    runs {
-        client {
-            workingDirectory project.file('run')
-
-            arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                curios {
-                    source sourceSets.main
-                }
-                curiostest {
-                    source sourceSets.test
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run')
-
-            arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                curios {
-                    source sourceSets.main
-                }
-                curiostest {
-                    source sourceSets.test
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-
-            args '--mod', 'curios', '--all', '--output', file('src/generated/resources/')
-
-            arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                curios {
-                    source sourceSets.main
-                }
-                curiostest {
-                    source sourceSets.test
-                }
-            }
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+    java.withSourcesJar()
+    java.withJavadocJar()
+        
+    jar {
+        from(rootProject.file("LICENSE"))
+        from(rootProject.file("COPYING"))
+        from(rootProject.file("COPYING.LESSER"))
+        from(rootProject.file("README.md"))
+        from(rootProject.file("CHANGELOG.md"))
+        manifest {
+            attributes([
+                'Specification-Title'     : mod_name,
+                'Specification-Vendor'    : mod_author,
+                'Specification-Version'   : project.jar.archiveVersion,
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_author,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'Timestamp'               : System.currentTimeMillis(),
+                'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
+                'Built-On-Minecraft'      : minecraft_version
+            ])
         }
     }
-}
 
-dependencies {
-    minecraft "net.minecraftforge:forge:${version_forge}"
-
-    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
-
-    // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.20.2-common-api:${version_jei}")
-    compileOnly fg.deobf("mezz.jei:jei-1.20.2-forge-api:${version_jei}")
-    // at runtime, use the full JEI jar for Forge
-    runtimeOnly fg.deobf("mezz.jei:jei-1.20.2-forge:${version_jei}")
-}
-
-mixin {
-    add sourceSets.main, "${mod_id}.refmap.json"
-}
-
-repositories {
-    maven {
-        // location of the maven that hosts JEI files since January 2023
-        name = "Jared's maven"
-        url = "https://maven.blamejared.com/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.dev"
-    }
-}
-
-sourceSets {
-    main {
-        resources {
-            srcDirs += 'docs'
-        }
-    }
-}
-
-jar {
-    manifest {
-        attributes(["Specification-Title"     : "${mod_id}",
-                    "Specification-Vendor"    : "${mod_author}",
-                    "Specification-Version"   : "1",
-                    "Implementation-Title"    : "${mod_id}",
-                    "Implementation-Version"  : "${mod_version}",
-                    "Implementation-Vendor"   : "${mod_author}",
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                    "MixinConfigs"            : "${mod_id}.mixins.json"],)
-    }
-}
-
-task apiJar(type: Jar) {
-    archiveClassifier.set('api')
-    include 'top/theillusivec4/curios/api/**/*'
-    from sourceSets.main.allSource
-    from sourceSets.main.output
-}
-
-task sourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allJava
-}
-
-artifacts {
-    archives apiJar
-    archives sourcesJar
-}
-
-jar.finalizedBy('reobfJar')
-
-task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
-    apiToken = findProperty('curseKey')
-//    debugMode = true
-    def projectId = "${cf_id}".toString()
-    def mainFile = upload(projectId, jar)
-    mainFile.changelogType = 'markdown'
-    mainFile.changelog = file('CHANGELOG_LATEST.md')
-    mainFile.releaseType = "${release_type}"
-    "${release_versions}".split(',').each {
-        mainFile.addGameVersion("${it}")
-    }
-    mainFile.withAdditionalFile(sourcesJar)
-    mainFile.withAdditionalFile(apiJar)
-
-    doLast {
-
-        if (project.hasProperty('cf_page') && mainFile.curseFileId != null) {
-            project.ext.curse_link = "${cf_page}/files/${mainFile.curseFileId}"
-        }
-    }
-}
-
-modrinth {
-    token = findProperty('modrinthKey') ?: 0
-//    debugMode = true
-    projectId = "${modrinth_id}"
-    versionName = getArchivesBaseName() + "-" + getVersion()
-    versionType = "${release_type}"
-    changelog = file('CHANGELOG_LATEST.md').text
-    uploadFile = jar
-    additionalFiles = [sourcesJar, apiJar]
-    gameVersions = "${release_versions}".split(",") as List<String>
-}
-
-tasks.modrinth.doLast {
-
-    if (project.hasProperty('modrinth_page') && tasks.modrinth.newVersion != null) {
-        project.ext.modrinth_link = "${modrinth_page}/version/${tasks.modrinth.newVersion.id}"
-    }
-}
-
-publishing {
-
-    publications {
-
-        mavenJava(MavenPublication) {
-            artifactId project.archivesBaseName
-
-            artifact jar
-            artifact sourcesJar
-            artifact apiJar
-        }
+    sourcesJar {
+        from(rootProject.file("LICENSE"))
+        from(rootProject.file("COPYING"))
+        from(rootProject.file("COPYING.LESSER"))
+        from(rootProject.file("README.md"))
+        from(rootProject.file("CHANGELOG.md"))
     }
 
     repositories {
-
-        if (project.hasProperty('urlMaven')) {
-
-            if (project.hasProperty('userMaven') && project.hasProperty('passMaven')) {
-
-                maven {
-                    url urlMaven
-                    credentials {
-                        username userMaven
-                        password passMaven
-                    }
-                }
-            }
+        mavenCentral()
+        mavenLocal()
+        maven {
+            name = 'Sponge / Mixin'
+            url = 'https://repo.spongepowered.org/repository/maven-public/'
+        }
+        maven {
+            name = 'BlameJared Maven (JEI / CraftTweaker / Bookshelf)'
+            url = 'https://maven.blamejared.com'
         }
     }
-}
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = 'UTF-8'
+        it.options.getRelease().set(17)
+    }
+
+    processResources {
+        def expandProps = [
+                "version": version,
+                "group": project.group, //Else we target the task's group.
+                "minecraft_version": minecraft_version,
+                "forge_version": forge_version,
+                "forge_version_range": forge_version_range,
+                "minecraft_version_range": minecraft_version_range,
+                "minecraft_version_range_alt": minecraft_version_range_alt,
+                "mod_name": mod_name,
+                "mod_author": mod_author,
+                "mod_id": mod_id,
+                "license": license,
+                "issues_url": issues_url,
+                "sources_url": sources_url,
+                "description": project.description,
+                "neoforge_version": neoforge_version,
+                "neoforge_version_range": neoforge_version_range
+        ]
+
+        filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', '*.mixins.json']) {
+            expand expandProps
+        }
+        inputs.properties(expandProps)
+    }
+
+    // Disables Gradle's custom module metadata from being published to maven. The
+    // metadata includes mapped dependencies which are not reasonably consumable by
+    // other mod developers.
+    tasks.withType(GenerateModuleMetadata).configureEach {
+        enabled = false
+    }
+
+    tasks.withType(Jar).all {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
 }
 
 def publishDiscord() {
     try {
-        def cfLinks = new StringJoiner('\\\\n')
+        def cfLinks = new StringJoiner('\\n')
 
-        if (project.hasProperty('curse_link')) {
-            cfLinks.add("[Download](${project.findProperty('curse_link')})")
+        if (project(':forge').hasProperty('curse_link')) {
+            cfLinks.add("[Forge](${project(':forge').findProperty('curse_link')})")
         }
-        def modrinthLinks = new StringJoiner('\\\\n')
 
-        if (project.hasProperty('modrinth_link')) {
-            modrinthLinks.add("[Download](${project.findProperty('modrinth_link')})")
+        if (project(':neoforge').hasProperty('curse_link')) {
+            cfLinks.add("[NeoForge](${project(':neoforge').findProperty('curse_link')})")
+        }
+        def modrinthLinks = new StringJoiner('\\n')
+
+        if (project(':forge').hasProperty('modrinth_link')) {
+            modrinthLinks.add("[Forge](${project(':forge').findProperty('modrinth_link')})")
+        }
+
+        if (project(':neoforge').hasProperty('curse_link')) {
+            modrinthLinks.add("[NeoForge](${project(':neoforge').findProperty('modrinth_link')})")
         }
         println(cfLinks)
         println(modrinthLinks)
         def changelog = file("CHANGELOG_LATEST.md").getText()
         changelog = changelog.substring(changelog.indexOf("##"))
-        changelog = changelog.replaceAll("\r\n","\\\\r\\\\n").replaceAll("\"","\\\\\"")
+        changelog = changelog.replaceAll("\n","\\\\n")
 
         if (changelog.length() >= 1024) {
             changelog = changelog.substring(0, changelog.length() - 100)
-            changelog = changelog + "...[(See more)](https://github.com/TheIllusiveC4/Curios/blob/1.20.x/CHANGELOG_LATEST.md)"
+            changelog = changelog + "...[(See more)](${changelog_link})"
         }
         println(changelog)
-        def color = release_type == "beta" ? 9458158 : 65392
         final String message = """
             {
               "embeds": [
                 {
                   "title": "${mod_name} ${version}",
-                  "color": ${color},
+                  "color": 65392,
                   "fields": [
                     {
                       "name": "Minecraft Versions",
@@ -302,13 +182,18 @@ def publishDiscord() {
     }
 }
 
-tasks.named('publishCurseForge').configure {
-    mustRunAfter('assemble')
+tasks.getByPath(':forge:publishCurseForge').configure {
+    mustRunAfter(':forge:assemble')
 }
+tasks.getByPath(':neoforge:publishCurseForge').configure {
+    mustRunAfter(':neoforge:assemble')
+    mustRunAfter(':forge:publishCurseForge')
+}
+tasks.getByPath(':neoforge:modrinth').mustRunAfter(':forge:modrinth')
 
-tasks.register('publishForge') {
-    dependsOn 'modrinth'
-    dependsOn 'publishCurseForge'
+tasks.register('publishForgeNeoForge') {
+    dependsOn ':forge:modrinth', ':neoforge:modrinth'
+    dependsOn ':forge:publishCurseForge', ':neoforge:publishCurseForge'
 
     doLast {
         publishDiscord()

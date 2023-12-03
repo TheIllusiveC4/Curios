@@ -11,17 +11,14 @@ out
 *.ipr
 *.iws
 *.iml
-.idea
+.idea/*
+!.idea/scopes
 
 # gradle
 build
 .gradle
-/classes
 
 # other
 eclipse
 run
-logs
-/Users/
-*.bat
-.cache
+runs

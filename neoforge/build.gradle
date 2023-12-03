@@ -1,0 +1,157 @@
+plugins {
+    id 'idea'
+    id 'maven-publish'
+    id 'net.neoforged.gradle.userdev' version '7.0.43'
+    id 'java-library'
+    id 'com.modrinth.minotaur' version '2.+'
+    id 'net.darkhax.curseforgegradle' version '1.+'
+}
+base {
+    archivesName = "${mod_id}-neoforge"
+}
+
+sourceSets {
+    test {
+        runs {
+            modIdentifier 'curiostest'
+        }
+    }
+}
+
+// Automatically enable neoforge AccessTransformers if the file exists
+// This location is hardcoded in FML and can not be changed.
+// https://github.com/neoforged/FancyModLoader/blob/a952595eaaddd571fbc53f43847680b00894e0c1/loader/src/main/java/net/neoforged/fml/loading/moddiscovery/ModFile.java#L118
+if (file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
+    minecraft.accessTransformers.file file('src/main/resources/META-INF/accesstransformer.cfg')
+}
+runs {
+    configureEach {
+        modSource project.sourceSets.main
+        modSource project.sourceSets.test
+    }
+    client {
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+    server {
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        programArgument '--nogui'
+    }
+
+    gameTestServer {
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    data {
+        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neoforge_version}"
+    compileOnly project(":common")
+}
+
+// NeoGradle compiles the game, but we don't want to add our common code to the game's code
+Spec<Task> notNeoTask = { Task it -> !it.name.startsWith("neo") } as Spec<Task>
+
+tasks.withType(JavaCompile).matching(notNeoTask).configureEach {
+    source(project(":common").sourceSets.main.allSource)
+}
+
+tasks.withType(Javadoc).matching(notNeoTask).configureEach {
+    source(project(":common").sourceSets.main.allJava)
+}
+
+tasks.named("sourcesJar", Jar) {
+    from(project(":common").sourceSets.main.allSource)
+}
+
+task apiJar(type: Jar) {
+    archiveClassifier.set('api')
+    include 'top/theillusivec4/curios/api/**/*'
+    from(project(":common").sourceSets.main.allSource)
+    from(project(":common").sourceSets.main.output)
+    from sourceSets.main.allSource
+    from sourceSets.main.output
+}
+
+tasks.withType(ProcessResources).matching(notNeoTask).configureEach {
+    from project(":common").sourceSets.main.resources
+}
+
+artifacts {
+    archives apiJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId base.archivesName.get()
+            artifact jar
+            artifact sourcesJar
+            artifact apiJar
+        }
+    }
+    repositories {
+        maven {
+            url "file://" + System.getenv("local_maven")
+        }
+
+        if (project.hasProperty('urlMaven')) {
+
+            if (project.hasProperty('userMaven') && project.hasProperty('passMaven')) {
+
+                maven {
+                    url urlMaven
+                    credentials {
+                        username userMaven
+                        password passMaven
+                    }
+                }
+            }
+        }
+    }
+}
+
+task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
+    apiToken = findProperty('curseKey')
+    //debugMode = true
+    def projectId = "${cf_id}".toString()
+    def mainFile = upload(projectId, file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+    mainFile.changelogType = 'markdown'
+    mainFile.changelog = file('../CHANGELOG_LATEST.md')
+    mainFile.releaseType = "${release_type}"
+    "${release_versions}".split(',').each {
+        mainFile.addGameVersion("${it}")
+    }
+    mainFile.withAdditionalFile(sourcesJar)
+    mainFile.withAdditionalFile(apiJar)
+
+    doLast {
+
+        if (project.hasProperty('cf_page') && mainFile.curseFileId != null) {
+            project.ext.curse_link = "${cf_page}/files/${mainFile.curseFileId}"
+        }
+    }
+}
+
+modrinth {
+    token = findProperty('modrinthKey') ?: 0
+    //debugMode = true
+    projectId = "${modrinth_id}"
+    versionName = getArchivesBaseName() + "-" + getVersion()
+    versionType = "${release_type}"
+    changelog = file('../CHANGELOG_LATEST.md').text
+    uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    additionalFiles = [sourcesJar, apiJar]
+    gameVersions = "${release_versions}".split(",") as List<String>
+}
+
+tasks.modrinth.doLast {
+
+    if (project.hasProperty('modrinth_page') && tasks.modrinth.newVersion != null) {
+        project.ext.modrinth_link = "${modrinth_page}/version/${tasks.modrinth.newVersion.id}"
+    }
+}
