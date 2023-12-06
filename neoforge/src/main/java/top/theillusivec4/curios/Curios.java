@@ -23,15 +23,19 @@ import com.mojang.logging.LogUtils;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -42,10 +46,10 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
 import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -53,11 +57,11 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import org.slf4j.Logger;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.type.ISlotType;
-import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.client.ClientEventHandler;
 import top.theillusivec4.curios.client.CuriosClientConfig;
 import top.theillusivec4.curios.client.IconHelper;
@@ -68,13 +72,15 @@ import top.theillusivec4.curios.client.render.CuriosLayer;
 import top.theillusivec4.curios.common.CuriosConfig;
 import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.CuriosRegistry;
+import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
+import top.theillusivec4.curios.common.capability.CurioItemHandler;
+import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
 import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.slottype.LegacySlotManager;
-import top.theillusivec4.curios.common.util.EquipCurioTrigger;
-import top.theillusivec4.curios.common.util.SetCurioAttributesFunction;
+import top.theillusivec4.curios.mixin.CuriosImplMixinHooks;
 import top.theillusivec4.curios.server.SlotHelper;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
@@ -104,15 +110,71 @@ public class Curios {
     CuriosApi.setCuriosHelper(new CuriosHelper());
     NeoForge.EVENT_BUS.register(new CuriosEventHandler());
     NetworkHandler.register();
-    evt.enqueueWork(() -> {
-      CriteriaTriggers.register("curios:equip_curio", EquipCurioTrigger.INSTANCE);
-      CuriosSelectorOptions.register();
-    });
+    evt.enqueueWork(CuriosSelectorOptions::register);
   }
 
   private void registerCaps(RegisterCapabilitiesEvent evt) {
-    evt.register(ICuriosItemHandler.class);
-    evt.register(ICurio.class);
+
+    for (EntityType<?> entityType : BuiltInRegistries.ENTITY_TYPE) {
+
+      evt.registerEntity(CuriosCapability.ITEM_HANDLER, entityType,
+          (entity, ctx) -> {
+
+            if (entity instanceof LivingEntity livingEntity) {
+              Level level = livingEntity.level();
+              EntityType<?> type = livingEntity.getType();
+
+              if (!level.isClientSide() &&
+                  CuriosApi.getEntitySlots(type).isEmpty()) {
+                return null;
+              }
+
+              if (level.isClientSide() &&
+                  !CuriosEntityManager.INSTANCE.hasSlots(type)) {
+                return null;
+              }
+              return new CurioItemHandler(livingEntity);
+            }
+            return null;
+          });
+
+      evt.registerEntity(CuriosCapability.INVENTORY, entityType,
+          (entity, ctx) -> {
+
+            if (entity instanceof LivingEntity livingEntity) {
+              Level level = livingEntity.level();
+              EntityType<?> type = livingEntity.getType();
+
+              if (!level.isClientSide() &&
+                  CuriosApi.getEntitySlots(type).isEmpty()) {
+                return null;
+              }
+
+              if (level.isClientSide() &&
+                  !CuriosEntityManager.INSTANCE.hasSlots(type)) {
+                return null;
+              }
+              return new CurioInventoryCapability(livingEntity);
+            }
+            return null;
+          });
+    }
+
+    for (Item item : BuiltInRegistries.ITEM) {
+      evt.registerItem(CuriosCapability.ITEM, (stack, ctx) -> {
+        Item it = stack.getItem();
+        ICurioItem curioItem = CuriosImplMixinHooks.getCurioFromRegistry(item).orElse(null);
+
+        if (curioItem == null && it instanceof ICurioItem itemCurio) {
+          curioItem = itemCurio;
+        }
+
+        if (curioItem != null && curioItem.hasCurioCapability(stack)) {
+          return new ItemizedCurioCapability(curioItem, stack);
+        }
+        return null;
+      }, item);
+    }
   }
 
   private void process(InterModProcessEvent evt) {

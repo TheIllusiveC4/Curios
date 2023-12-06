@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,7 +49,6 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -58,8 +58,6 @@ import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.LazyOptional;
-import net.neoforged.neoforge.event.AttachCapabilitiesEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -74,7 +72,6 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
@@ -85,13 +82,11 @@ import top.theillusivec4.curios.api.event.DropRulesEvent;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
-import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.CuriosConfig;
-import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
-import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
+import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
@@ -102,8 +97,6 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncData;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
-import top.theillusivec4.curios.common.util.EquipCurioTrigger;
-import top.theillusivec4.curios.mixin.CuriosImplMixinHooks;
 
 public class CuriosEventHandler {
 
@@ -231,8 +224,15 @@ public class CuriosEventHandler {
       NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
           new SPacketSyncData(CuriosEntityManager.getSyncPacket()));
       CuriosApi.getCuriosInventory(mp).ifPresent(
-          handler -> NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
-              new SPacketSyncCurios(mp.getId(), handler.getCurios())));
+          handler -> {
+            handler.readTag(handler.writeTag());
+            NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> mp),
+                new SPacketSyncCurios(mp.getId(), handler.getCurios()));
+
+            if (mp.containerMenu instanceof CuriosContainer curiosContainer) {
+              curiosContainer.resetSlots();
+            }
+          });
       Collection<ISlotType> slotTypes = CuriosApi.getPlayerSlots().values();
       Map<String, ResourceLocation> icons = new HashMap<>();
       slotTypes.forEach(type -> icons.put(type.getIdentifier(), type.getIcon()));
@@ -255,36 +255,6 @@ public class CuriosEventHandler {
   }
 
   @SubscribeEvent
-  public void attachEntitiesCapabilities(AttachCapabilitiesEvent<Entity> evt) {
-
-    if (evt.getObject() instanceof LivingEntity livingEntity) {
-      evt.addCapability(CuriosCapability.ID_INVENTORY,
-          CurioInventoryCapability.createProvider(livingEntity));
-    }
-  }
-
-  /**
-   * Handler for registering item's capabilities implemented through IItemCurio interface.
-   */
-
-  @SubscribeEvent
-  public void attachStackCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
-    ItemStack stack = evt.getObject();
-    Item item = stack.getItem();
-    ICurioItem curioItem = CuriosImplMixinHooks.getCurioFromRegistry(item).orElse(null);
-
-    if (curioItem == null && item instanceof ICurioItem itemCurio) {
-      curioItem = itemCurio;
-    }
-
-    if (curioItem != null && curioItem.hasCurioCapability(stack)) {
-      ItemizedCurioCapability itemizedCapability = new ItemizedCurioCapability(curioItem, stack);
-      evt.addCapability(CuriosCapability.ID_ITEM,
-          CuriosApi.createCurioProvider(itemizedCapability));
-    }
-  }
-
-  @SubscribeEvent
   public void playerStartTracking(PlayerEvent.StartTracking evt) {
 
     Entity target = evt.getTarget();
@@ -303,8 +273,8 @@ public class CuriosEventHandler {
     Player player = evt.getEntity();
     Player oldPlayer = evt.getOriginal();
     oldPlayer.revive();
-    LazyOptional<ICuriosItemHandler> oldHandler = CuriosApi.getCuriosInventory(oldPlayer);
-    LazyOptional<ICuriosItemHandler> newHandler = CuriosApi.getCuriosInventory(player);
+    Optional<ICuriosItemHandler> oldHandler = CuriosApi.getCuriosInventory(oldPlayer);
+    Optional<ICuriosItemHandler> newHandler = CuriosApi.getCuriosInventory(player);
     oldHandler.ifPresent(
         oldCurios -> newHandler.ifPresent(newCurios -> newCurios.readTag(oldCurios.writeTag())));
   }
@@ -570,7 +540,7 @@ public class CuriosEventHandler {
           SlotContext slotContext = new SlotContext(identifier, livingEntity, i, false,
               renderStates.size() > i && renderStates.get(i));
           ItemStack stack = stackHandler.getStackInSlot(i);
-          LazyOptional<ICurio> currentCurio = CuriosApi.getCurio(stack);
+          Optional<ICurio> currentCurio = CuriosApi.getCurio(stack);
           final int index = i;
 
           if (!stack.isEmpty()) {
@@ -586,7 +556,7 @@ public class CuriosEventHandler {
             ItemStack prevStack = stackHandler.getPreviousStackInSlot(i);
 
             if (!ItemStack.matches(stack, prevStack)) {
-              LazyOptional<ICurio> prevCurio = CuriosApi.getCurio(prevStack);
+              Optional<ICurio> prevCurio = CuriosApi.getCurio(prevStack);
               syncCurios(livingEntity, stack, currentCurio, prevCurio, identifier, index, false,
                   renderStates.size() > index && renderStates.get(index), HandlerType.EQUIPMENT);
               NeoForge.EVENT_BUS
@@ -637,9 +607,7 @@ public class CuriosEventHandler {
                 currentCurio.ifPresent(curio -> curio.onEquip(slotContext, prevStack));
 
                 if (livingEntity instanceof ServerPlayer) {
-                  EquipCurioTrigger.INSTANCE.trigger((ServerPlayer) livingEntity, stack,
-                      (ServerLevel) livingEntity.level(), livingEntity.getX(),
-                      livingEntity.getY(), livingEntity.getZ());
+                  CuriosRegistry.EQUIP_TRIGGER.get().trigger((ServerPlayer) livingEntity, stack);
                 }
               }
               stackHandler.setPreviousStackInSlot(i, stack.copy());
@@ -669,7 +637,7 @@ public class CuriosEventHandler {
   }
 
   private static void syncCurios(LivingEntity livingEntity, ItemStack stack,
-                                 LazyOptional<ICurio> currentCurio, LazyOptional<ICurio> prevCurio,
+                                 Optional<ICurio> currentCurio, Optional<ICurio> prevCurio,
                                  String identifier, int index, boolean cosmetic, boolean visible,
                                  HandlerType type) {
     SlotContext slotContext = new SlotContext(identifier, livingEntity, index, cosmetic, visible);

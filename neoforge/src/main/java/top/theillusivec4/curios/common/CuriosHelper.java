@@ -34,7 +34,6 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -52,12 +51,12 @@ import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 public class CuriosHelper implements ICuriosHelper {
 
   @Override
-  public LazyOptional<ICurio> getCurio(ItemStack stack) {
+  public Optional<ICurio> getCurio(ItemStack stack) {
     return CuriosApi.getCurio(stack);
   }
 
   @Override
-  public LazyOptional<ICuriosItemHandler> getCuriosHandler(
+  public Optional<ICuriosItemHandler> getCuriosHandler(
       @Nonnull final LivingEntity livingEntity) {
     return CuriosApi.getCuriosInventory(livingEntity);
   }
@@ -68,9 +67,9 @@ public class CuriosHelper implements ICuriosHelper {
   }
 
   @Override
-  public LazyOptional<IItemHandlerModifiable> getEquippedCurios(LivingEntity livingEntity) {
+  public Optional<IItemHandlerModifiable> getEquippedCurios(LivingEntity livingEntity) {
     return CuriosApi.getCuriosInventory(livingEntity)
-        .lazyMap(ICuriosItemHandler::getEquippedCurios);
+        .map(ICuriosItemHandler::getEquippedCurios);
   }
 
   @Override

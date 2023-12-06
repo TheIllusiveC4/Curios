@@ -72,8 +72,9 @@ public class SPacketSyncStack {
         Entity entity = world.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosInventory((LivingEntity) entity).ifPresent(
-              handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacksHandler -> {
+          CuriosApi.getCuriosInventory((LivingEntity) entity)
+              .flatMap(handler -> handler.getStacksHandler(msg.curioId))
+              .ifPresent(stacksHandler -> {
                 ItemStack stack = msg.stack;
                 CompoundTag compoundNBT = msg.compound;
                 int slot = msg.slotId;
@@ -91,7 +92,7 @@ public class SPacketSyncStack {
                 } else {
                   stacksHandler.getStacks().setStackInSlot(slot, stack);
                 }
-              }));
+              });
         }
       }
     });

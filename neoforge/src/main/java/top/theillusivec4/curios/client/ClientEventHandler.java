@@ -26,6 +26,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.ChatFormatting;
@@ -44,7 +45,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -129,7 +129,7 @@ public class ClientEventHandler {
         }
         tagTooltips.add(slotsTooltip);
 
-        LazyOptional<ICurio> optionalCurio = CuriosApi.getCurio(stack);
+        Optional<ICurio> optionalCurio = CuriosApi.getCurio(stack);
         optionalCurio.ifPresent(curio -> {
           List<Component> actualSlotsTooltip = curio.getSlotsTooltip(tagTooltips);
 
@@ -138,7 +138,7 @@ public class ClientEventHandler {
           }
         });
 
-        if (!optionalCurio.isPresent()) {
+        if (optionalCurio.isEmpty()) {
           tooltip.addAll(1, tagTooltips);
         }
         List<Component> attributeTooltip = new ArrayList<>();

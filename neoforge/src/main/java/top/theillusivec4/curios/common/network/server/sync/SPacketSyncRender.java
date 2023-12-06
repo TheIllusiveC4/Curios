@@ -62,15 +62,16 @@ public class SPacketSyncRender {
         Entity entity = world.getEntity(msg.entityId);
 
         if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosInventory((LivingEntity) entity).ifPresent(
-              handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacksHandler -> {
+          CuriosApi.getCuriosInventory((LivingEntity) entity)
+              .flatMap(handler -> handler.getStacksHandler(msg.curioId))
+              .ifPresent(stacksHandler -> {
                 int index = msg.slotId;
                 NonNullList<Boolean> renderStatuses = stacksHandler.getRenders();
 
                 if (renderStatuses.size() > index) {
                   renderStatuses.set(index, msg.value);
                 }
-              }));
+              });
         }
       }
     });

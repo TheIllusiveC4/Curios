@@ -52,8 +52,8 @@ public class CPacketToggleRender {
       ServerPlayer sender = ctx.getSender();
 
       if (sender != null) {
-        CuriosApi.getCuriosInventory(sender)
-            .ifPresent(handler -> handler.getStacksHandler(msg.id).ifPresent(stacksHandler -> {
+        CuriosApi.getCuriosInventory(sender).flatMap(handler -> handler.getStacksHandler(msg.id))
+            .ifPresent(stacksHandler -> {
               NonNullList<Boolean> renderStatuses = stacksHandler.getRenders();
 
               if (renderStatuses.size() > msg.index) {
@@ -63,7 +63,7 @@ public class CPacketToggleRender {
                     .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sender),
                         new SPacketSyncRender(sender.getId(), msg.id, msg.index, value));
               }
-            }));
+            });
       }
     });
     ctx.setPacketHandled(true);

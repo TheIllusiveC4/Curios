@@ -19,48 +19,14 @@
 
 package top.theillusivec4.curiostest.common.item;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import java.util.UUID;
 import javax.annotation.Nonnull;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curiostest.CuriosTest;
 
 public class KnucklesItem extends Item {
 
   public KnucklesItem() {
     super(new Item.Properties().stacksTo(1));
-  }
-
-  @Override
-  public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag unused) {
-    return CuriosApi.createCurioProvider(new ICurio() {
-
-      @Override
-      public ItemStack getStack() {
-        return stack;
-      }
-
-      @Override
-      public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
-                                                                          UUID uuid) {
-        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
-        atts.put(Attributes.ATTACK_DAMAGE,
-            new AttributeModifier(uuid, CuriosTest.MODID + ":attack_damage_bonus", 4,
-                AttributeModifier.Operation.ADDITION));
-        CuriosApi.addSlotModifier(atts, "ring", uuid, 2, AttributeModifier.Operation.ADDITION);
-        return atts;
-      }
-    });
   }
 
   @Override

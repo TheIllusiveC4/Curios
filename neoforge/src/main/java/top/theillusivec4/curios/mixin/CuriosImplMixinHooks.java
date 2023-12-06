@@ -39,7 +39,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
@@ -127,12 +126,12 @@ public class CuriosImplMixinHooks {
     return result;
   }
 
-  public static LazyOptional<ICurio> getCurio(ItemStack stack) {
-    return stack.getCapability(CuriosCapability.ITEM);
+  public static Optional<ICurio> getCurio(ItemStack stack) {
+    return Optional.ofNullable(stack.getCapability(CuriosCapability.ITEM));
   }
 
-  public static LazyOptional<ICuriosItemHandler> getCuriosInventory(LivingEntity livingEntity) {
-    return livingEntity.getCapability(CuriosCapability.INVENTORY);
+  public static Optional<ICuriosItemHandler> getCuriosInventory(LivingEntity livingEntity) {
+    return Optional.ofNullable(livingEntity.getCapability(CuriosCapability.INVENTORY));
   }
 
   public static boolean isStackValid(SlotContext slotContext, ItemStack stack) {

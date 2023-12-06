@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 C4
+ * Copyright (c) 2018-2020 C4
  *
  * This file is part of Curios, a mod made for Minecraft.
  *
@@ -36,9 +36,6 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import top.theillusivec4.curios.api.type.ISlotType;
@@ -59,7 +56,7 @@ public final class CuriosApi {
    * Registers a {@link ICurioItem} instance to an item.
    * <br>
    * This will override any existing {@link ICurioItem} interfaces implemented on an item, however
-   * it will NOT override {@link ICurio} instances initialized in {@link net.neoforged.neoforge.common.extensions.IItemExtension#initCapabilities(ItemStack, CompoundTag)}.
+   * it will NOT override {@link ICurio} instances initialized in {@link net.minecraftforge.common.extensions.IForgeItem#initCapabilities(ItemStack, CompoundTag)}.
    *
    * @param item  The item to register the ICurio instance to
    * @param curio The ICurio instance that provides curio behavior for the item
@@ -164,38 +161,25 @@ public final class CuriosApi {
   }
 
   /**
-   * Gets a {@link LazyOptional} of the curio capability attached to the {@link ItemStack}.
+   * Gets a {@link Optional} of the curio capability attached to the {@link ItemStack}.
    *
    * @param stack The {@link ItemStack} to get the curio capability from
-   * @return {@link LazyOptional} of the curio capability
+   * @return {@link Optional} of the curio capability
    */
-  public static LazyOptional<ICurio> getCurio(ItemStack stack) {
+  public static Optional<ICurio> getCurio(ItemStack stack) {
     apiError();
-    return LazyOptional.empty();
+    return Optional.empty();
   }
 
   /**
-   * Creates a new {@link ICapabilityProvider} for the given {@link ICurio} instance, to be used in
-   * capability initialization.
-   *
-   * @param curio The ICurio implementation to use
-   * @return The ICapabilityProvider that provides the ICurio implementation
-   */
-  @Nonnull
-  public static ICapabilityProvider createCurioProvider(final ICurio curio) {
-    CuriosApi.apiError();
-    return Items.AIR.getDefaultInstance();
-  }
-
-  /**
-   * Gets a {@link LazyOptional} of the curio inventory capability attached to the entity.
+   * Gets a {@link Optional} of the curio inventory capability attached to the entity.
    *
    * @param livingEntity The {@link LivingEntity} to get the curio inventory capability from
-   * @return {@link LazyOptional} of the curio inventory capability
+   * @return {@link Optional} of the curio inventory capability
    */
-  public static LazyOptional<ICuriosItemHandler> getCuriosInventory(LivingEntity livingEntity) {
+  public static Optional<ICuriosItemHandler> getCuriosInventory(LivingEntity livingEntity) {
     apiError();
-    return LazyOptional.empty();
+    return Optional.empty();
   }
 
   /**

@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curios.common.network.server;
 
+import java.util.Optional;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.NonNullList;
@@ -26,7 +27,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
@@ -63,18 +63,18 @@ public class SPacketBreak {
 
         if (entity instanceof LivingEntity livingEntity) {
           CuriosApi.getCuriosInventory(livingEntity)
-              .ifPresent(handler -> handler.getStacksHandler(msg.curioId).ifPresent(stacks -> {
+              .flatMap(handler -> handler.getStacksHandler(msg.curioId)).ifPresent(stacks -> {
                 ItemStack stack = stacks.getStacks().getStackInSlot(msg.slotId);
-                LazyOptional<ICurio> possibleCurio = CuriosApi.getCurio(stack);
+                Optional<ICurio> possibleCurio = CuriosApi.getCurio(stack);
                 NonNullList<Boolean> renderStates = stacks.getRenders();
                 possibleCurio.ifPresent(curio -> curio.curioBreak(
                     new SlotContext(msg.curioId, livingEntity, msg.slotId, false,
                         renderStates.size() > msg.slotId && renderStates.get(msg.slotId))));
 
-                if (!possibleCurio.isPresent()) {
+                if (possibleCurio.isEmpty()) {
                   ICurio.playBreakAnimation(stack, livingEntity);
                 }
-              }));
+              });
         }
       }
     });

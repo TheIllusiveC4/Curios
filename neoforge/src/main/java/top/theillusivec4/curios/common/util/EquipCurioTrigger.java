@@ -19,17 +19,16 @@
 
 package top.theillusivec4.curios.common.util;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
 import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.DeserializationContext;
+import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -40,42 +39,35 @@ import net.minecraft.world.item.ItemStack;
  * Current implementation allows to perform item and location tests in criteria.
  */
 
-public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.Instance> {
+public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.TriggerInstance> {
 
   public static final EquipCurioTrigger INSTANCE = new EquipCurioTrigger();
 
   @Nonnull
   @Override
-  protected Instance createInstance(@Nonnull JsonObject pJson,
-                                    @Nonnull Optional<ContextAwarePredicate> p_297533_,
-                                    @Nonnull DeserializationContext pDeserializationContext) {
-    return new Instance(p_297533_, ItemPredicate.fromJson(pJson.get("item")),
-        LocationPredicate.fromJson(pJson.get("location")));
+  public Codec<EquipCurioTrigger.TriggerInstance> codec() {
+    return EquipCurioTrigger.TriggerInstance.CODEC;
   }
 
-  public void trigger(ServerPlayer player, ItemStack stack, ServerLevel world, double x,
-                      double y, double z) {
-    this.trigger(player, instance -> instance.test(stack, world, x, y, z));
+  public void trigger(ServerPlayer serverPlayer, ItemStack stack) {
+    this.trigger(serverPlayer, instance -> instance.matches(stack));
   }
 
-  static class Instance extends AbstractCriterionTriggerInstance {
+  public record TriggerInstance(Optional<ContextAwarePredicate> player,
+                                Optional<ItemPredicate> item)
+      implements SimpleCriterionTrigger.SimpleInstance {
+    public static final Codec<EquipCurioTrigger.TriggerInstance> CODEC = RecordCodecBuilder.create(
+        p_311432_ -> p_311432_.group(
+                ExtraCodecs.strictOptionalField(EntityPredicate.ADVANCEMENT_CODEC, "player")
+                    .forGetter(EquipCurioTrigger.TriggerInstance::player),
+                ExtraCodecs.strictOptionalField(ItemPredicate.CODEC, "item")
+                    .forGetter(EquipCurioTrigger.TriggerInstance::item)
+            )
+            .apply(p_311432_, EquipCurioTrigger.TriggerInstance::new)
+    );
 
-    private final Optional<ItemPredicate> item;
-    private final Optional<LocationPredicate> location;
-
-    Instance(Optional<ContextAwarePredicate> player, Optional<ItemPredicate> item,
-             Optional<LocationPredicate> location) {
-      super(player);
-      this.item = item;
-      this.location = location;
-    }
-
-    boolean test(ItemStack stack, ServerLevel world, double x, double y, double z) {
-
-      if (this.item.isPresent() && !this.item.get().matches(stack)) {
-        return false;
-      }
-      return this.location.isEmpty() || this.location.get().matches(world, x, y, z);
+    public boolean matches(ItemStack stack) {
+      return this.item.isEmpty() || this.item.get().matches(stack);
     }
   }
 }
