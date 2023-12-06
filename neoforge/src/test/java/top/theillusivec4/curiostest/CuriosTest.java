@@ -60,7 +60,6 @@ import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curiostest.client.CuriosLayerDefinitions;
 import top.theillusivec4.curiostest.client.model.AmuletModel;
 import top.theillusivec4.curiostest.client.model.CrownModel;

@@ -9,5 +9,3 @@ This is a copy of the changelog for the most recent version. For the full versio
   - Capabilities can be found in `top.theillusivec4.curios.api.CuriosCapability`
   - `LazyOptional` fields converted to regular `Optional` fields
   - Removed `CuriosApi#createProvider`
-### Removed
-- Removed `"location"` from `"curios:equip_curio"` triggers

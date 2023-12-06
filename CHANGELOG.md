@@ -11,8 +11,6 @@ Prior to version 5.2.0, this projected used [Forge Recommended Versioning](https
   - Capabilities can be found in `top.theillusivec4.curios.api.CuriosCapability`
   - `LazyOptional` fields converted to regular `Optional` fields
   - Removed `CuriosApi#createProvider`
-### Removed
-- Removed `"location"` from `"curios:equip_curio"` triggers
 
 ## [6.1.0+1.20.2] - 2023.12.02
 ### Added

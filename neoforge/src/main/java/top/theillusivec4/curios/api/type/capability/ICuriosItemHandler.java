@@ -89,8 +89,7 @@ public interface ICuriosItemHandler {
   Optional<ICurioStacksHandler> getStacksHandler(String identifier);
 
   /**
-   * Gets a {@link net.neoforged.neoforge.common.util.LazyOptional} of an {@link IItemHandlerModifiable}
-   * that contains all the equipped curio stacks (not including cosmetics).
+   * Gets an {@link IItemHandlerModifiable} that contains all the equipped curio stacks (not including cosmetics).
    *
    * @return The equipped curio stacks, or empty if there is no curios handler
    */

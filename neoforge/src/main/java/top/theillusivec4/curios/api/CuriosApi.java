@@ -55,8 +55,8 @@ public final class CuriosApi {
   /**
    * Registers a {@link ICurioItem} instance to an item.
    * <br>
-   * This will override any existing {@link ICurioItem} interfaces implemented on an item, however
-   * it will NOT override {@link ICurio} instances initialized in {@link net.minecraftforge.common.extensions.IForgeItem#initCapabilities(ItemStack, CompoundTag)}.
+   * This will override any existing {@link ICurioItem} interfaces implemented on an item, unless
+   * those items are registered at a higher than normal priority in {@link net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent}
    *
    * @param item  The item to register the ICurio instance to
    * @param curio The ICurio instance that provides curio behavior for the item

@@ -24,12 +24,17 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import net.minecraft.advancements.critereon.ContextAwarePredicate;
+import net.minecraft.advancements.critereon.CriterionValidator;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 /**
  * This should be triggered whenever player successfully equips any item in their curios slot. In
@@ -50,24 +55,45 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
   }
 
   public void trigger(ServerPlayer serverPlayer, ItemStack stack) {
-    this.trigger(serverPlayer, instance -> instance.matches(stack));
+    LootParams lootparams = new LootParams.Builder(serverPlayer.serverLevel())
+        .withParameter(LootContextParams.ORIGIN, serverPlayer.blockPosition().getCenter())
+        .withParameter(LootContextParams.THIS_ENTITY, serverPlayer)
+        .withParameter(LootContextParams.BLOCK_STATE, serverPlayer.getBlockStateOn())
+        .withParameter(LootContextParams.TOOL, stack)
+        .create(LootContextParamSets.ADVANCEMENT_LOCATION);
+    LootContext lootcontext = new LootContext.Builder(lootparams).create(Optional.empty());
+    this.trigger(serverPlayer, instance -> instance.matches(stack, lootcontext));
   }
 
   public record TriggerInstance(Optional<ContextAwarePredicate> player,
-                                Optional<ItemPredicate> item)
+                                Optional<ItemPredicate> item,
+                                Optional<ContextAwarePredicate> location)
       implements SimpleCriterionTrigger.SimpleInstance {
     public static final Codec<EquipCurioTrigger.TriggerInstance> CODEC = RecordCodecBuilder.create(
         p_311432_ -> p_311432_.group(
                 ExtraCodecs.strictOptionalField(EntityPredicate.ADVANCEMENT_CODEC, "player")
                     .forGetter(EquipCurioTrigger.TriggerInstance::player),
                 ExtraCodecs.strictOptionalField(ItemPredicate.CODEC, "item")
-                    .forGetter(EquipCurioTrigger.TriggerInstance::item)
+                    .forGetter(EquipCurioTrigger.TriggerInstance::item),
+                ExtraCodecs.strictOptionalField(ContextAwarePredicate.CODEC, "location").forGetter(
+                    EquipCurioTrigger.TriggerInstance::location)
             )
             .apply(p_311432_, EquipCurioTrigger.TriggerInstance::new)
     );
 
-    public boolean matches(ItemStack stack) {
-      return this.item.isEmpty() || this.item.get().matches(stack);
+    public boolean matches(ItemStack stack, LootContext lootContext) {
+
+      if (this.location.isEmpty() || this.location.get().matches(lootContext)) {
+        return this.item.isEmpty() || this.item.get().matches(stack);
+      }
+      return false;
+    }
+
+    @Override
+    public void validate(@Nonnull CriterionValidator validator) {
+      SimpleCriterionTrigger.SimpleInstance.super.validate(validator);
+      this.location.ifPresent(
+          loc -> validator.validate(loc, LootContextParamSets.ADVANCEMENT_LOCATION, ".location"));
     }
   }
 }
