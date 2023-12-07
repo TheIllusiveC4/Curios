@@ -103,18 +103,18 @@ def publishDiscord() {
     try {
         def cfLinks = new StringJoiner('\\n')
 
-        if (project(':forge').hasProperty('curse_link')) {
-            cfLinks.add("[Forge](${project(':forge').findProperty('curse_link')})")
-        }
+//        if (project(':forge').hasProperty('curse_link')) {
+//            cfLinks.add("[Forge](${project(':forge').findProperty('curse_link')})")
+//        }
 
         if (project(':neoforge').hasProperty('curse_link')) {
             cfLinks.add("[NeoForge](${project(':neoforge').findProperty('curse_link')})")
         }
         def modrinthLinks = new StringJoiner('\\n')
 
-        if (project(':forge').hasProperty('modrinth_link')) {
-            modrinthLinks.add("[Forge](${project(':forge').findProperty('modrinth_link')})")
-        }
+//        if (project(':forge').hasProperty('modrinth_link')) {
+//            modrinthLinks.add("[Forge](${project(':forge').findProperty('modrinth_link')})")
+//        }
 
         if (project(':neoforge').hasProperty('curse_link')) {
             modrinthLinks.add("[NeoForge](${project(':neoforge').findProperty('modrinth_link')})")
@@ -130,12 +130,19 @@ def publishDiscord() {
             changelog = changelog + "...[(See more)](${changelog_link})"
         }
         println(changelog)
+        int color = 65392
+
+        if (release_type == "beta") {
+            color = 16763904
+        } else if (release_type == "alpha") {
+            color = 16724273
+        }
         final String message = """
             {
               "embeds": [
                 {
                   "title": "${mod_name} ${version}",
-                  "color": 65392,
+                  "color": ${color},
                   "fields": [
                     {
                       "name": "Minecraft Versions",

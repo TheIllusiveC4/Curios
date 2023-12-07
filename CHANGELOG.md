@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 5.2.0, this projected used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [7.0.0-beta.2+1.20.4] - 2023.12.07
+### Changed
+- Updated to Minecraft 1.20.4
+
 ## [7.0.0-beta+1.20.3] - 2023.12.05
 ### Changed
 - Updated to Minecraft 1.20.3
