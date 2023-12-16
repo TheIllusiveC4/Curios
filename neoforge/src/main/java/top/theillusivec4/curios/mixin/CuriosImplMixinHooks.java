@@ -131,7 +131,12 @@ public class CuriosImplMixinHooks {
   }
 
   public static Optional<ICuriosItemHandler> getCuriosInventory(LivingEntity livingEntity) {
-    return Optional.ofNullable(livingEntity.getCapability(CuriosCapability.INVENTORY));
+
+    if (livingEntity != null) {
+      return Optional.ofNullable(livingEntity.getCapability(CuriosCapability.INVENTORY));
+    } else {
+      return Optional.empty();
+    }
   }
 
   public static boolean isStackValid(SlotContext slotContext, ItemStack stack) {
