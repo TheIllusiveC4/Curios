@@ -13,6 +13,8 @@ logoBlur=false
     description='''${description}'''
 [[mixins]]
     config = "${mod_id}.neoforge.mixins.json"
+[[mixins]]
+    config = "${mod_id}.mixins.json"
 [[dependencies.${mod_id}]]
     modId="neoforge"
     mandatory=true

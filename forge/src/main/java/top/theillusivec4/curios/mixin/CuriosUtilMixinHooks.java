@@ -21,7 +21,11 @@ package top.theillusivec4.curios.mixin;
 
 import java.util.Map;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -29,6 +33,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITagManager;
@@ -119,5 +124,40 @@ public class CuriosUtilMixinHooks {
       }
       return false;
     }).orElse(false);
+  }
+
+  public static CompoundTag mergeCuriosInventory(CompoundTag compoundTag, Entity entity) {
+
+    if (entity instanceof LivingEntity livingEntity) {
+      ListTag list = compoundTag.getList("Inventory", Tag.TAG_COMPOUND);
+      return CuriosApi.getCuriosInventory(livingEntity).map(inv -> {
+        IItemHandler handler = inv.getEquippedCurios();
+
+        for (int i = 0; i < handler.getSlots(); i++) {
+          ItemStack stack = handler.getStackInSlot(i);
+
+          if (!stack.isEmpty()) {
+            CompoundTag tag = new CompoundTag();
+            tag.putByte("Slot", (byte) (4444 + i));
+            stack.save(tag);
+            list.add(tag);
+          }
+        }
+        return compoundTag;
+      }).orElse(compoundTag);
+    }
+    return compoundTag;
+  }
+
+  public static boolean containsStack(Player player, ItemStack stack) {
+    return CuriosApi.getCuriosInventory(player).map(inv -> inv.findFirstCurio(
+            stack2 -> !stack2.isEmpty() && ItemStack.isSameItemSameTags(stack, stack2)).isPresent())
+        .orElse(false);
+  }
+
+  public static boolean containsTag(Player player, TagKey<Item> tagKey) {
+    return CuriosApi.getCuriosInventory(player).map(
+            inv -> inv.findFirstCurio(stack2 -> !stack2.isEmpty() && stack2.is(tagKey)).isPresent())
+        .orElse(false);
   }
 }
