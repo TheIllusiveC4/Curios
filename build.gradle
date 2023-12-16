@@ -182,7 +182,7 @@ modrinth {
     versionType = "${release_type}"
     changelog = file('CHANGELOG_LATEST.md').text
     uploadFile = jar
-    loaders = ["Forge", "NeoForge"]
+    loaders = ["forge", "neoforge"]
     additionalFiles = [sourcesJar, apiJar]
     gameVersions = "${release_versions}".split(",") as List<String>
 }
