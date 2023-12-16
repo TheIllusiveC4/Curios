@@ -19,7 +19,6 @@
 
 package top.theillusivec4.curios;
 
-import com.mojang.logging.LogUtils;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -55,7 +54,6 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import org.slf4j.Logger;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotTypeMessage;
@@ -86,11 +84,8 @@ import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
 import top.theillusivec4.curios.server.command.CuriosSelectorOptions;
 
-@Mod(Curios.MODID)
+@Mod(CuriosConstants.MOD_ID)
 public class Curios {
-
-  public static final String MODID = CuriosApi.MODID;
-  public static final Logger LOGGER = LogUtils.getLogger();
 
   public Curios() {
     CuriosRegistry.init();
@@ -223,7 +218,7 @@ public class Curios {
     });
   }
 
-  @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+  @Mod.EventBusSubscriber(modid = CuriosConstants.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
   public static class ClientProxy {
 
     @SubscribeEvent

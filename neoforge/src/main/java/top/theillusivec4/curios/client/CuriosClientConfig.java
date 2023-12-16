@@ -21,13 +21,13 @@ package top.theillusivec4.curios.client;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
-import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.CuriosConstants;
 
 public class CuriosClientConfig {
 
   public static final ModConfigSpec CLIENT_SPEC;
   public static final Client CLIENT;
-  private static final String CONFIG_PREFIX = "gui." + Curios.MODID + ".config.";
+  private static final String CONFIG_PREFIX = "gui." + CuriosConstants.MOD_ID + ".config.";
 
   static {
     final Pair<Client, ModConfigSpec> specPair = new ModConfigSpec.Builder()

@@ -51,10 +51,17 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 dependencies {
     implementation "net.neoforged:neoforge:${neoforge_version}"
     compileOnly project(":common")
+    testCompileOnly project(":common")
+
+    // compile against the JEI API but do not include it at runtime
+    compileOnly "mezz.jei:jei-1.20.2-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-1.20.2-forge-api:${jei_version}"
+    // at runtime, use the full JEI jar for Forge
+    // runtimeOnly fg.deobf("mezz.jei:jei-1.20.2-forge:${jei_version}")
 }
 
 // NeoGradle compiles the game, but we don't want to add our common code to the game's code
-Spec<Task> notNeoTask = { Task it -> !it.name.startsWith("neo") } as Spec<Task>
+Spec<Task> notNeoTask = { Task it -> !it.name.startsWith("neo") && !it.name.contains("Test") } as Spec<Task>
 
 tasks.withType(JavaCompile).matching(notNeoTask).configureEach {
     source(project(":common").sourceSets.main.allSource)
@@ -72,7 +79,6 @@ task apiJar(type: Jar) {
     archiveClassifier.set('api')
     include 'top/theillusivec4/curios/api/**/*'
     from(project(":common").sourceSets.main.allSource)
-    from(project(":common").sourceSets.main.output)
     from sourceSets.main.allSource
     from sourceSets.main.output
 }

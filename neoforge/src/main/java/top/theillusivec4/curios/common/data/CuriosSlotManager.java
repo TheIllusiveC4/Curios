@@ -41,7 +41,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import org.apache.commons.lang3.EnumUtils;
-import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -98,7 +98,7 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
           String id = resourcelocation.getPath();
 
           if (!ICondition.conditionsMatched(JsonOps.INSTANCE, entry.getValue().getAsJsonObject())) {
-            Curios.LOGGER.debug("Skipping loading slot {} as its conditions were not met",
+            CuriosConstants.LOG.debug("Skipping loading slot {} as its conditions were not met",
                 resourcelocation);
             continue;
           }
@@ -107,7 +107,7 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
           modMap.computeIfAbsent(id, (k) -> ImmutableSet.builder())
               .add(resourcelocation.getNamespace());
         } catch (IllegalArgumentException | JsonParseException e) {
-          Curios.LOGGER.error("Parsing error loading curio slot {}", resourcelocation, e);
+          CuriosConstants.LOG.error("Parsing error loading curio slot {}", resourcelocation, e);
         }
       }
     }
@@ -138,7 +138,7 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
         String id = resourcelocation.getPath();
 
         if (!ICondition.conditionsMatched(JsonOps.INSTANCE, entry.getValue().getAsJsonObject())) {
-          Curios.LOGGER.debug("Skipping loading slot {} as its conditions were not met",
+          CuriosConstants.LOG.debug("Skipping loading slot {} as its conditions were not met",
               resourcelocation);
           continue;
         }
@@ -147,14 +147,14 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
         modMap.computeIfAbsent(id, (k) -> ImmutableSet.builder())
             .add(resourcelocation.getNamespace());
       } catch (IllegalArgumentException | JsonParseException e) {
-        Curios.LOGGER.error("Parsing error loading curio slot {}", resourcelocation, e);
+        CuriosConstants.LOG.error("Parsing error loading curio slot {}", resourcelocation, e);
       }
     }
     this.slots = map.entrySet().stream()
         .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().build()));
     this.idToMods = modMap.entrySet().stream()
         .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().build()));
-    Curios.LOGGER.info("Loaded {} curio slots", map.size());
+    CuriosConstants.LOG.info("Loaded {} curio slots", map.size());
   }
 
   public Map<String, ISlotType> getSlots() {

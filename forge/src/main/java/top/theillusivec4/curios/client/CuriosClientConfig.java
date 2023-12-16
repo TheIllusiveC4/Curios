@@ -25,12 +25,13 @@ import net.minecraftforge.common.ForgeConfigSpec.EnumValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import org.apache.commons.lang3.tuple.Pair;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.CuriosConstants;
 
 public class CuriosClientConfig {
 
   public static final ForgeConfigSpec CLIENT_SPEC;
   public static final Client CLIENT;
-  private static final String CONFIG_PREFIX = "gui." + Curios.MODID + ".config.";
+  private static final String CONFIG_PREFIX = "gui." + CuriosConstants.MOD_ID + ".config.";
 
   static {
     final Pair<Client, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder()

@@ -28,6 +28,7 @@ import net.minecraftforge.network.Channel;
 import net.minecraftforge.network.ChannelBuilder;
 import net.minecraftforge.network.SimpleChannel;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
@@ -51,7 +52,7 @@ public class NetworkHandler {
 
   public static void register() {
 
-    INSTANCE = ChannelBuilder.named(new ResourceLocation(Curios.MODID, "main"))
+    INSTANCE = ChannelBuilder.named(new ResourceLocation(CuriosConstants.MOD_ID, "main"))
         .networkProtocolVersion(PTC_VERSION)
         .clientAcceptedVersions(Channel.VersionTest.exact(PTC_VERSION))
         .serverAcceptedVersions(Channel.VersionTest.exact(PTC_VERSION)).simpleChannel();

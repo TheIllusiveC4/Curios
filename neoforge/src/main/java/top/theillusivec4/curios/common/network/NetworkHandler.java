@@ -23,7 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.NetworkRegistry;
 import net.neoforged.neoforge.network.simple.MessageFunctions;
 import net.neoforged.neoforge.network.simple.SimpleChannel;
-import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
@@ -49,9 +49,10 @@ public class NetworkHandler {
 
   public static void register() {
 
-    INSTANCE = NetworkRegistry.ChannelBuilder.named(new ResourceLocation(Curios.MODID, "main"))
-        .networkProtocolVersion(() -> PTC_VERSION).clientAcceptedVersions(PTC_VERSION::equals)
-        .serverAcceptedVersions(PTC_VERSION::equals).simpleChannel();
+    INSTANCE =
+        NetworkRegistry.ChannelBuilder.named(new ResourceLocation(CuriosConstants.MOD_ID, "main"))
+            .networkProtocolVersion(() -> PTC_VERSION).clientAcceptedVersions(PTC_VERSION::equals)
+            .serverAcceptedVersions(PTC_VERSION::equals).simpleChannel();
 
     //Client Packets
     register(CPacketOpenCurios.class, CPacketOpenCurios::encode, CPacketOpenCurios::decode,

@@ -81,11 +81,8 @@ import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
 import top.theillusivec4.curios.server.command.CuriosSelectorOptions;
 
-@Mod(Curios.MODID)
+@Mod(CuriosConstants.MOD_ID)
 public class Curios {
-
-  public static final String MODID = CuriosApi.MODID;
-  public static final Logger LOGGER = LogUtils.getLogger();
 
   public Curios() {
     CuriosRegistry.init();
@@ -163,7 +160,7 @@ public class Curios {
     });
   }
 
-  @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Bus.MOD)
+  @Mod.EventBusSubscriber(modid = CuriosConstants.MOD_ID, value = Dist.CLIENT, bus = Bus.MOD)
   public static class ClientProxy {
 
     @SubscribeEvent
@@ -189,7 +186,7 @@ public class Curios {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static void addPlayerLayer(EntityRenderersEvent.AddLayers evt, PlayerSkin.Model model) {
-      EntityRenderer<? extends Player> renderer = evt.getSkin(model);
+      EntityRenderer<? extends Player> renderer = evt.getPlayerSkin(model);
 
       if (renderer instanceof LivingEntityRenderer livingRenderer) {
         livingRenderer.addLayer(new CuriosLayer<>(livingRenderer));

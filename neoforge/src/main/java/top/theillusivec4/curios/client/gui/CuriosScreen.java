@@ -39,6 +39,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.client.CuriosClientConfig;
 import top.theillusivec4.curios.client.CuriosClientConfig.Client;
@@ -53,7 +54,7 @@ import top.theillusivec4.curios.common.network.client.CPacketToggleRender;
 public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer>
     implements RecipeUpdateListener {
 
-  static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(Curios.MODID,
+  static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(CuriosConstants.MOD_ID,
       "textures/gui/curios/inventory.png");
   private static final ResourceLocation SCROLLER =
       new ResourceLocation("container/creative_inventory/scroller");

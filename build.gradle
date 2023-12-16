@@ -103,18 +103,18 @@ def publishDiscord() {
     try {
         def cfLinks = new StringJoiner('\\n')
 
-//        if (project(':forge').hasProperty('curse_link')) {
-//            cfLinks.add("[Forge](${project(':forge').findProperty('curse_link')})")
-//        }
+        if (project(':forge').hasProperty('curse_link')) {
+            cfLinks.add("[Forge](${project(':forge').findProperty('curse_link')})")
+        }
 
         if (project(':neoforge').hasProperty('curse_link')) {
             cfLinks.add("[NeoForge](${project(':neoforge').findProperty('curse_link')})")
         }
         def modrinthLinks = new StringJoiner('\\n')
 
-//        if (project(':forge').hasProperty('modrinth_link')) {
-//            modrinthLinks.add("[Forge](${project(':forge').findProperty('modrinth_link')})")
-//        }
+        if (project(':forge').hasProperty('modrinth_link')) {
+            modrinthLinks.add("[Forge](${project(':forge').findProperty('modrinth_link')})")
+        }
 
         if (project(':neoforge').hasProperty('curse_link')) {
             modrinthLinks.add("[NeoForge](${project(':neoforge').findProperty('modrinth_link')})")
@@ -189,23 +189,23 @@ def publishDiscord() {
     }
 }
 
-//tasks.getByPath(':forge:publishCurseForge').configure {
-//    mustRunAfter(':forge:assemble')
-//}
+tasks.getByPath(':forge:publishCurseForge').configure {
+    mustRunAfter(':forge:assemble')
+}
 tasks.getByPath(':neoforge:publishCurseForge').configure {
     mustRunAfter(':neoforge:assemble')
-//    mustRunAfter(':forge:publishCurseForge')
+    mustRunAfter(':forge:publishCurseForge')
 }
-//tasks.getByPath(':neoforge:modrinth').mustRunAfter(':forge:modrinth')
-//
-//tasks.register('publishForgeNeoForge') {
-//    dependsOn ':forge:modrinth', ':neoforge:modrinth'
-//    dependsOn ':forge:publishCurseForge', ':neoforge:publishCurseForge'
-//
-//    doLast {
-//        publishDiscord()
-//    }
-//}
+tasks.getByPath(':neoforge:modrinth').mustRunAfter(':forge:modrinth')
+
+tasks.register('publishForgeNeoForge') {
+    dependsOn ':forge:modrinth', ':neoforge:modrinth'
+    dependsOn ':forge:publishCurseForge', ':neoforge:publishCurseForge'
+
+    doLast {
+        publishDiscord()
+    }
+}
 
 tasks.register('publishNeoForge') {
     dependsOn ':neoforge:modrinth'

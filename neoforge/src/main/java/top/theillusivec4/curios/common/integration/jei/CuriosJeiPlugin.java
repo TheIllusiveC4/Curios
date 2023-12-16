@@ -24,7 +24,6 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import net.minecraft.resources.ResourceLocation;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 

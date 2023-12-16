@@ -36,6 +36,23 @@ dependencies {
 }
 ```
 
+Curios uses mixins and developers will need to make sure to tweak their run configurations in order to launch the game
+in their development environment with Curios as a dependency in Forge.
+
+#### 1. Add these lines to your run configurations
+
+Add both of these lines to both the `client {}` and `server {}` run configuration blocks in the `build.gradle`. These
+can be placed anywhere within each run configuration, the order does not matter.
+
+```
+property 'mixin.env.remapRefMap', 'true'
+property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
+```
+
+#### 2. Regenerate your run configurations
+
+Run the Gradle task `genIntellijRuns`, `genEclipseRuns`, or `genVSCodeRuns` depending on the chosen IDE.
+
 ### NeoForge (1.20.2+)
 ```
 dependencies {

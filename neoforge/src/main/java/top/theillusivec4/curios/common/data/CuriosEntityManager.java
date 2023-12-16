@@ -50,7 +50,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.neoforge.common.conditions.ICondition;
-import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.common.slottype.LegacySlotManager;
 
@@ -101,7 +101,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
       ImmutableMap.Builder<String, ISlotType> builder =
           map.computeIfAbsent(EntityType.PLAYER, (k) -> ImmutableMap.builder());
       CuriosSlotManager.INSTANCE.getSlot(s).ifPresentOrElse(slot -> builder.put(s, slot),
-          () -> Curios.LOGGER.error("{} is not a registered slot type!", s));
+          () -> CuriosConstants.LOG.error("{} is not a registered slot type!", s));
     }
 
     for (Map.Entry<ResourceLocation, JsonElement> entry : sorted.entrySet()) {
@@ -129,7 +129,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
               .add(resourcelocation.getNamespace());
         }
       } catch (IllegalArgumentException | JsonParseException e) {
-        Curios.LOGGER.error("Parsing error loading curio entity {}", resourcelocation, e);
+        CuriosConstants.LOG.error("Parsing error loading curio entity {}", resourcelocation, e);
       }
     }
 
@@ -138,7 +138,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
             (entry) -> entry.getValue().buildKeepingLast()));
     this.idToMods = modMap.entrySet().stream()
         .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().build()));
-    Curios.LOGGER.info("Loaded {} curio entities", map.size());
+    CuriosConstants.LOG.info("Loaded {} curio entities", map.size());
   }
 
   public static ListTag getSyncPacket() {
@@ -188,7 +188,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
     Map<EntityType<?>, Map<String, ISlotType>> map = new HashMap<>();
 
     if (!ICondition.conditionsMatched(JsonOps.INSTANCE, jsonObject)) {
-      Curios.LOGGER.debug("Skipping loading entity file {} as its conditions were not met",
+      CuriosConstants.LOG.debug("Skipping loading entity file {} as its conditions were not met",
           resourceLocation);
       return map;
     }
@@ -213,7 +213,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
         if (type != null) {
           toAdd.add(type);
         } else {
-          Curios.LOGGER.error("{} is not a registered entity type!", entity);
+          CuriosConstants.LOG.error("{} is not a registered entity type!", entity);
         }
       }
     }
@@ -223,7 +223,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
     for (JsonElement jsonSlot : jsonSlots) {
       String id = jsonSlot.getAsString();
       CuriosSlotManager.INSTANCE.getSlot(id).ifPresentOrElse(slot -> slots.put(id, slot),
-          () -> Curios.LOGGER.error("{} is not a registered slot type!", id));
+          () -> CuriosConstants.LOG.error("{} is not a registered slot type!", id));
     }
 
     for (EntityType<?> entityType : toAdd) {

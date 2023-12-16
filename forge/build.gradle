@@ -13,7 +13,7 @@ base {
 mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
 
-    config("${mod_id}.mixins.json")
+    config("${mod_id}.forge.mixins.json")
 }
 
 minecraft {
@@ -40,9 +40,6 @@ minecraft {
                     source sourceSets.main
                     source project(":common").sourceSets.main
                 }
-                curiostest {
-                    source sourceSets.test
-                }
             }
         }
 
@@ -56,9 +53,6 @@ minecraft {
                 modServerRun {
                     source sourceSets.main
                     source project(":common").sourceSets.main
-                }
-                curiostest {
-                    source sourceSets.test
                 }
             }
         }
@@ -75,9 +69,6 @@ minecraft {
                     source sourceSets.main
                     source project(":common").sourceSets.main
                 }
-                curiostest {
-                    source sourceSets.test
-                }
             }
         }
     }
@@ -88,13 +79,14 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly project(":common")
+    testCompileOnly project(":common")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 
     // compile against the JEI API but do not include it at runtime
     compileOnly fg.deobf("mezz.jei:jei-1.20.2-common-api:${jei_version}")
     compileOnly fg.deobf("mezz.jei:jei-1.20.2-forge-api:${jei_version}")
     // at runtime, use the full JEI jar for Forge
-    runtimeOnly fg.deobf("mezz.jei:jei-1.20.2-forge:${jei_version}")
+    // runtimeOnly fg.deobf("mezz.jei:jei-1.20.2-forge:${jei_version}")
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -111,7 +103,6 @@ task apiJar(type: Jar) {
     archiveClassifier.set('api')
     include 'top/theillusivec4/curios/api/**/*'
     from(project(":common").sourceSets.main.allSource)
-    from(project(":common").sourceSets.main.output)
     from sourceSets.main.allSource
     from sourceSets.main.output
 }
@@ -133,7 +124,6 @@ publishing {
             artifact jar
             artifact sourcesJar
             artifact apiJar
-            fg.component(it)
         }
     }
     repositories {
@@ -193,4 +183,10 @@ tasks.modrinth.doLast {
     if (project.hasProperty('modrinth_page') && tasks.modrinth.newVersion != null) {
         project.ext.modrinth_link = "${modrinth_page}/version/${tasks.modrinth.newVersion.id}"
     }
+}
+
+sourceSets.each {
+    def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
+    it.output.resourcesDir = dir
+    it.java.destinationDirectory = dir
 }
