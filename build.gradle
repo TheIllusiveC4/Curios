@@ -161,6 +161,8 @@ task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge)
     "${release_versions}".split(',').each {
         mainFile.addGameVersion("${it}")
     }
+    mainFile.addModLoader("Forge")
+    mainFile.addModLoader("NeoForge")
     mainFile.withAdditionalFile(sourcesJar)
     mainFile.withAdditionalFile(apiJar)
 
@@ -180,6 +182,7 @@ modrinth {
     versionType = "${release_type}"
     changelog = file('CHANGELOG_LATEST.md').text
     uploadFile = jar
+    loaders = ["Forge", "NeoForge"]
     additionalFiles = [sourcesJar, apiJar]
     gameVersions = "${release_versions}".split(",") as List<String>
 }
