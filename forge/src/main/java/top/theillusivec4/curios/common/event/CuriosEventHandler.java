@@ -463,7 +463,7 @@ public class CuriosEventHandler {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
 
-      if (!stack.isEmpty() && stacks.isItemValid(i, stack)) {
+      if (!stack.isEmpty() && !stacks.isItemValid(i, stack)) {
         stacks.setStackInSlot(i, ItemStack.EMPTY);
         ItemHandlerHelper.giveItemToPlayer(player, stack);
       }
