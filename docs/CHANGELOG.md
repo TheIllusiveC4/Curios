@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.18.2-5.0.9.2] - 2023.12.25
+### Fixed
+- Fixed validity checks not working in some cases
+
 ## [1.18.2-5.0.9.1] - 2023.06.15
 ### Fixed
 - Fixed possible NullPointerException crash from SlotResult
