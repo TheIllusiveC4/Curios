@@ -47,15 +47,18 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.event.CurioEquipEvent;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -467,7 +470,7 @@ public class CurioInventoryCapability {
 
               if (!prevStack.isEmpty()) {
 
-                if (curiosHelper.isStackValid(slotContext, prevStack)) {
+                if (this.canEquip(slotContext, prevStack)) {
                   newStacksHandler.getStacks().setStackInSlot(index, prevStack);
                 } else {
                   this.loseInvalidStack(prevStack);
@@ -479,7 +482,7 @@ public class CurioInventoryCapability {
 
               if (!prevCosmetic.isEmpty()) {
 
-                if (curiosHelper.isStackValid(slotContext, prevCosmetic)) {
+                if (this.canEquip(slotContext, prevCosmetic)) {
                   newStacksHandler.getCosmeticStacks().setStackInSlot(index,
                       prevStacksHandler.getCosmeticStacks().getStackInSlot(index));
                 } else {
@@ -528,6 +531,20 @@ public class CurioInventoryCapability {
             (slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler));
         this.setCurios(curios);
       }
+    }
+
+    private boolean canEquip(SlotContext slotContext, ItemStack stack) {
+      CurioEquipEvent equipEvent = new CurioEquipEvent(stack, slotContext);
+      MinecraftForge.EVENT_BUS.post(equipEvent);
+      Event.Result result = equipEvent.getResult();
+
+      if (result == Event.Result.DENY) {
+        return false;
+      }
+      return result == Event.Result.ALLOW ||
+          (CuriosApi.getCuriosHelper().isStackValid(slotContext, stack) &&
+              CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(slotContext))
+                  .orElse(true));
     }
   }
 
