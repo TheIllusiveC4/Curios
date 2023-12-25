@@ -80,7 +80,7 @@ import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 import top.theillusivec4.curios.api.event.CurioDropsEvent;
-import top.theillusivec4.curios.api.event.CurioEquipEvent;
+import top.theillusivec4.curios.api.event.CurioUnequipEvent;
 import top.theillusivec4.curios.api.event.DropRulesEvent;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -387,17 +387,8 @@ public class CuriosEventHandler {
               NonNullList<Boolean> renderStates = entry.getValue().getRenders();
               SlotContext slotContext = new SlotContext(id, player, i, false,
                   renderStates.size() > i && renderStates.get(i));
-              CurioEquipEvent equipEvent = new CurioEquipEvent(stack, slotContext);
-              MinecraftForge.EVENT_BUS.post(equipEvent);
-              Event.Result result = equipEvent.getResult();
 
-              if (result == Event.Result.DENY) {
-                continue;
-              }
-
-              if (result == Event.Result.ALLOW ||
-                  (CuriosApi.isStackValid(slotContext, stack) && curio.canEquip(slotContext) &&
-                      curio.canEquipFromUse(slotContext))) {
+              if (stackHandler.isItemValid(i, stack) && curio.canEquipFromUse(slotContext)) {
                 ItemStack present = stackHandler.getStackInSlot(i);
 
                 if (present.isEmpty()) {
@@ -413,16 +404,16 @@ public class CuriosEventHandler {
                   evt.setCanceled(true);
                   return;
                 } else if (firstSlot == null) {
-                  CurioEquipEvent unequipEvent = new CurioEquipEvent(present, slotContext);
+                  CurioUnequipEvent unequipEvent = new CurioUnequipEvent(present, slotContext);
                   MinecraftForge.EVENT_BUS.post(unequipEvent);
-                  result = unequipEvent.getResult();
+                  Event.Result result = unequipEvent.getResult();
 
                   if (result == Event.Result.DENY) {
                     continue;
                   }
 
-                  if (result == Event.Result.ALLOW || CuriosApi.getCurio(present)
-                      .map(c -> c.canUnequip(slotContext)).orElse(true)) {
+                  if (stackHandler.extractItem(i, stack.getMaxStackSize(), true).getCount() ==
+                      stack.getCount()) {
                     firstSlot = new Tuple<>(stackHandler, slotContext);
                   }
                 }
@@ -473,10 +464,8 @@ public class CuriosEventHandler {
                                            NonNullList<Boolean> renders) {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
-      SlotContext slotContext =
-          new SlotContext(id, player, i, cosmetic, renders.size() > i && renders.get(i));
 
-      if (!stack.isEmpty() && !CuriosApi.isStackValid(slotContext, stack)) {
+      if (!stack.isEmpty() && stacks.isItemValid(i, stack)) {
         stacks.setStackInSlot(i, ItemStack.EMPTY);
         ItemHandlerHelper.giveItemToPlayer(player, stack);
       }
