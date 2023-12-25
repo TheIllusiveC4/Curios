@@ -395,11 +395,25 @@ public class CuriosEventHandler {
       SlotContext slotContext =
           new SlotContext(id, player, i, cosmetic, renders.size() > i && renders.get(i));
 
-      if (!stack.isEmpty() && !curiosHelper.isStackValid(slotContext, stack)) {
+      if (!stack.isEmpty() && !canEquip(slotContext, stack)) {
         stacks.setStackInSlot(i, ItemStack.EMPTY);
         ItemHandlerHelper.giveItemToPlayer(player, stack);
       }
     }
+  }
+
+  private static boolean canEquip(SlotContext slotContext, ItemStack stack) {
+    CurioEquipEvent equipEvent = new CurioEquipEvent(stack, slotContext);
+    MinecraftForge.EVENT_BUS.post(equipEvent);
+    Event.Result result = equipEvent.getResult();
+
+    if (result == Event.Result.DENY) {
+      return false;
+    }
+    return result == Event.Result.ALLOW ||
+        (CuriosApi.getCuriosHelper().isStackValid(slotContext, stack) &&
+            CuriosApi.getCuriosHelper().getCurio(stack).map(curio -> curio.canEquip(slotContext))
+                .orElse(true));
   }
 
   @SubscribeEvent
