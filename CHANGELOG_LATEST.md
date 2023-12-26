@@ -2,6 +2,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.19.x/docs/CHANGELOG.md).
 
-## [1.19.2-5.1.4.3] - 2023.11.26
+## [1.19.2-5.1.4.4] - 2023.12.26
 ### Fixed
-- Fixed `CurioAttributeModifierEvent` crashing when used for slot modifiers [#351](https://github.com/TheIllusiveC4/Curios/issues/351)
+- Fixed validity checks not working in some cases
