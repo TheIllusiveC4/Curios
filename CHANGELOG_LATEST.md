@@ -2,11 +2,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.20.4/CHANGELOG.md).
 
-## [7.0.0-beta.3+1.20.4] - 2023.12.15
-### Added
-- Added Forge version
-### Changed
-- NBT predicates and certain inventory checks will now include Curios items automatically [#357](https://github.com/TheIllusiveC4/Curios/issues/357)
+## [7.0.0+1.20.4] - 2023.12.26
 ### Fixed
-- Fixed NPE crashes if a mod tries to get the Curios inventory from a `null` entity [#358](https://github.com/TheIllusiveC4/Curios/issues/358)
-- [NeoForge] Fixed shearing not applying Fortune enchantment bonuses from curios
+- Fixed validity checks not working in some cases
