@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 5.2.0, this projected used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [5.4.7+1.20.1] - 2023.12.25
+### Fixed
+- Fixed validity checks not working in some cases
+- Fixed `CurioUnequipEvent` not firing when swapping items from use
+
 ## [5.4.6+1.20.1] - 2023.12.15
 ### Changed
 - NBT predicates and certain inventory checks will now include Curios items automatically [#357](https://github.com/TheIllusiveC4/Curios/issues/357)
