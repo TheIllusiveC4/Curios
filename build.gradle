@@ -63,7 +63,7 @@ minecraft {
         data {
             workingDirectory project.file('run')
 
-            args '--mod', 'curios', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'curiostest', '--all', '--output', file('src/generated/resources/')
 
             arg "-mixin.config=" + "${mod_id}".toString() + ".mixins.json"
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'

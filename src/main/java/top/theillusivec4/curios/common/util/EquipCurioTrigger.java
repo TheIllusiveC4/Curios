@@ -5,9 +5,9 @@ import javax.annotation.Nonnull;
 import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
 import net.minecraft.advancements.critereon.ContextAwarePredicate;
 import net.minecraft.advancements.critereon.DeserializationContext;
-import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
+import net.minecraft.advancements.critereon.SerializationContext;
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -51,16 +51,25 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
     this.trigger(player, instance -> instance.test(stack, world, x, y, z));
   }
 
-  static class Instance extends AbstractCriterionTriggerInstance {
+  public static class Instance extends AbstractCriterionTriggerInstance {
 
     private final ItemPredicate item;
     private final LocationPredicate location;
 
-    Instance(ContextAwarePredicate playerPred, ItemPredicate count,
-             LocationPredicate indexPos) {
+    public Instance(ContextAwarePredicate playerPred, ItemPredicate count,
+                    LocationPredicate indexPos) {
       super(ID, playerPred);
       this.item = count;
       this.location = indexPos;
+    }
+
+    @Nonnull
+    @Override
+    public JsonObject serializeToJson(@Nonnull SerializationContext pContext) {
+      JsonObject jsonobject = super.serializeToJson(pContext);
+      jsonobject.add("location", this.location.serializeToJson());
+      jsonobject.add("item", this.item.serializeToJson());
+      return jsonobject;
     }
 
     @Nonnull

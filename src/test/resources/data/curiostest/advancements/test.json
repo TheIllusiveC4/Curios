@@ -1,0 +1,20 @@
+{
+  "criteria": {
+    "test": {
+      "conditions": {
+        "item": {
+          "items": [
+            "curiostest:amulet"
+          ]
+        }
+      },
+      "trigger": "curios:equip_curio"
+    }
+  },
+  "requirements": [
+    [
+      "test"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

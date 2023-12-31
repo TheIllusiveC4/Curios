@@ -25,3 +25,4 @@ logs
 /Users/
 *.bat
 .cache
+src/generated/resources

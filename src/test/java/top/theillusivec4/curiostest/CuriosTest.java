@@ -21,12 +21,15 @@ package top.theillusivec4.curiostest;
 
 import java.util.Collection;
 import java.util.List;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.data.ForgeAdvancementProvider;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
@@ -40,7 +43,6 @@ import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
-import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curiostest.client.CuriosLayerDefinitions;
 import top.theillusivec4.curiostest.client.model.AmuletModel;
 import top.theillusivec4.curiostest.client.model.CrownModel;
@@ -49,6 +51,7 @@ import top.theillusivec4.curiostest.client.renderer.CrownRenderer;
 import top.theillusivec4.curiostest.client.renderer.KnucklesRenderer;
 import top.theillusivec4.curiostest.common.CuriosTestRegistry;
 import top.theillusivec4.curiostest.common.item.AmuletItem;
+import top.theillusivec4.curiostest.data.CuriosGenerator;
 
 @Mod(CuriosTest.MODID)
 public class CuriosTest {
@@ -63,7 +66,16 @@ public class CuriosTest {
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::registerLayers);
     eventBus.addListener(this::creativeTab);
+    eventBus.addListener(this::gatherData);
     MinecraftForge.EVENT_BUS.addListener(this::attributeModifier);
+  }
+
+  private void gatherData(final GatherDataEvent evt) {
+    DataGenerator generator = evt.getGenerator();
+
+    generator.addProvider(evt.includeServer(),
+        new ForgeAdvancementProvider(generator.getPackOutput(), evt.getLookupProvider(),
+            evt.getExistingFileHelper(), List.of(new CuriosGenerator())));
   }
 
   private void attributeModifier(final CurioAttributeModifierEvent evt) {
