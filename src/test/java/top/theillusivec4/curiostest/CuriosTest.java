@@ -21,10 +21,12 @@ package top.theillusivec4.curiostest;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
@@ -46,6 +48,7 @@ import top.theillusivec4.curiostest.client.renderer.CrownRenderer;
 import top.theillusivec4.curiostest.client.renderer.KnucklesRenderer;
 import top.theillusivec4.curiostest.common.CuriosTestRegistry;
 import top.theillusivec4.curiostest.common.item.AmuletItem;
+import top.theillusivec4.curiostest.data.CuriosGenerator;
 
 @Mod(CuriosTest.MODID)
 public class CuriosTest {
@@ -59,7 +62,14 @@ public class CuriosTest {
     eventBus.addListener(this::enqueue);
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::registerLayers);
+    eventBus.addListener(this::gatherData);
     MinecraftForge.EVENT_BUS.addListener(this::attributeModifier);
+  }
+
+  private void gatherData(final GatherDataEvent evt) {
+    DataGenerator generator = evt.getGenerator();
+    generator.addProvider(evt.includeServer(),
+        new CuriosGenerator(generator, evt.getExistingFileHelper()));
   }
 
   private void attributeModifier(final CurioAttributeModifierEvent evt) {

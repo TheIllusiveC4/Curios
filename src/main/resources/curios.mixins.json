@@ -6,6 +6,7 @@
   "mixins": [
     "AccessorEntity",
     "MixinApplyBonusCount",
+    "MixinCuriosTriggers",
     "MixinLivingEntity",
     "MixinPiglinAi",
     "MixinPowderSnowBlock",

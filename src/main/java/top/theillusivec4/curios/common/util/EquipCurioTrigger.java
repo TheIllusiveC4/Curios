@@ -2,16 +2,17 @@ package top.theillusivec4.curios.common.util;
 
 import com.google.gson.JsonObject;
 import javax.annotation.Nonnull;
-import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
+import net.minecraft.advancements.critereon.DeserializationContext;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.advancements.critereon.DeserializationContext;
+import net.minecraft.advancements.critereon.SerializationContext;
+import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.Curios;
 
 /**
@@ -39,9 +40,9 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
   @Nonnull
   @Override
   public EquipCurioTrigger.Instance createInstance(@Nonnull JsonObject json,
-                                                       @Nonnull
-                                                           EntityPredicate.Composite playerPred,
-                                                       @Nonnull DeserializationContext conditions) {
+                                                   @Nonnull
+                                                   EntityPredicate.Composite playerPred,
+                                                   @Nonnull DeserializationContext conditions) {
     return new EquipCurioTrigger.Instance(playerPred, ItemPredicate.fromJson(json.get("item")),
         LocationPredicate.fromJson(json.get("location")));
   }
@@ -51,16 +52,25 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
     this.trigger(player, instance -> instance.test(stack, world, x, y, z));
   }
 
-  static class Instance extends AbstractCriterionTriggerInstance {
+  public static class Instance extends AbstractCriterionTriggerInstance {
 
     private final ItemPredicate item;
     private final LocationPredicate location;
 
-    Instance(EntityPredicate.Composite playerPred, ItemPredicate count,
-             LocationPredicate indexPos) {
+    public Instance(EntityPredicate.Composite playerPred, ItemPredicate count,
+                    LocationPredicate indexPos) {
       super(ID, playerPred);
       this.item = count;
       this.location = indexPos;
+    }
+
+    @Nonnull
+    @Override
+    public JsonObject serializeToJson(@Nonnull SerializationContext pConditions) {
+      JsonObject jsonobject = super.serializeToJson(pConditions);
+      jsonobject.add("location", this.location.serializeToJson());
+      jsonobject.add("item", this.item.serializeToJson());
+      return jsonobject;
     }
 
     @Nonnull
