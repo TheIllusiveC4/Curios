@@ -19,7 +19,6 @@ public class CuriosGenerator implements ForgeAdvancementProvider.AdvancementGene
   public void generate(@Nonnull HolderLookup.Provider registries,
                        @Nonnull Consumer<Advancement> saver,
                        @Nonnull ExistingFileHelper existingFileHelper) {
-
     Advancement.Builder.advancement()
         .addCriterion("test",
             CuriosTriggers.equipAtLocation(

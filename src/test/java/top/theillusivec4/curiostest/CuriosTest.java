@@ -52,6 +52,7 @@ import top.theillusivec4.curiostest.client.renderer.KnucklesRenderer;
 import top.theillusivec4.curiostest.common.CuriosTestRegistry;
 import top.theillusivec4.curiostest.common.item.AmuletItem;
 import top.theillusivec4.curiostest.data.CuriosGenerator;
+import top.theillusivec4.curiostest.data.CuriosTestProvider;
 
 @Mod(CuriosTest.MODID)
 public class CuriosTest {
@@ -76,6 +77,10 @@ public class CuriosTest {
     generator.addProvider(evt.includeServer(),
         new ForgeAdvancementProvider(generator.getPackOutput(), evt.getLookupProvider(),
             evt.getExistingFileHelper(), List.of(new CuriosGenerator())));
+
+    generator.addProvider(evt.includeServer(),
+        new CuriosTestProvider("curiostest", generator.getPackOutput(), evt.getExistingFileHelper(),
+            evt.getLookupProvider()));
   }
 
   private void attributeModifier(final CurioAttributeModifierEvent evt) {

@@ -5,7 +5,7 @@ import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
 
-public class CuriosTriggers {
+public final class CuriosTriggers {
 
   @Nonnull
   public static CriterionTriggerInstance equip(ItemPredicate.Builder itemPredicate) {
