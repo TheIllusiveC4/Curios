@@ -18,12 +18,14 @@ logoBlur=false
 [[dependencies.${mod_id}]]
     modId="neoforge"
     mandatory=true
+    type="required"
     versionRange="${neoforge_version_range}"
     ordering="NONE"
     side="BOTH"
 [[dependencies.${mod_id}]]
     modId="minecraft"
     mandatory=true
+    type="required"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
