@@ -21,7 +21,6 @@ package top.theillusivec4.curios.common;
 
 import java.util.function.Supplier;
 import net.minecraft.advancements.CriterionTrigger;
-import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;

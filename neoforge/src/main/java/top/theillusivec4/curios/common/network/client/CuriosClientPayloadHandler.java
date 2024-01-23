@@ -253,10 +253,13 @@ public class CuriosClientPayloadHandler {
                           renderStates.size() > slot && renderStates.get(slot)), compoundNBT));
                 }
 
-                if (cosmetic) {
-                  stacksHandler.getCosmeticStacks().setStackInSlot(slot, stack);
-                } else {
-                  stacksHandler.getStacks().setStackInSlot(slot, stack);
+                if (!(livingEntity instanceof LocalPlayer)) {
+
+                  if (cosmetic) {
+                    stacksHandler.getCosmeticStacks().setStackInSlot(slot, stack);
+                  } else {
+                    stacksHandler.getStacks().setStackInSlot(slot, stack);
+                  }
                 }
               });
         }

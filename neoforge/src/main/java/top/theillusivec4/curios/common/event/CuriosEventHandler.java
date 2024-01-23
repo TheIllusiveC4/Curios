@@ -524,21 +524,6 @@ public class CuriosEventHandler {
       handler.handleInvalidStacks();
       Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
-      if (livingEntity instanceof ServerPlayer serverPlayer) {
-        IItemHandlerModifiable doa = handler.getEquippedCurios();
-        int j = 0;
-        for (int i = 0; i < doa.getSlots(); i++) {
-
-          if (!doa.getStackInSlot(i).isEmpty()) {
-            j++;
-          }
-        }
-
-        if (j > 0) {
-          CuriosConstants.LOG.info("=========== " + j);
-        }
-      }
-
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
         ICurioStacksHandler stacksHandler = entry.getValue();
         String identifier = entry.getKey();
