@@ -44,5 +44,6 @@
   "curios.modifiers.slots.take.2": "-%s%% %s Slots",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Open/Close Curios Inventory",
-  "gui.curios.toggle": "Toggle Visibility"
+  "gui.curios.toggle": "Toggle Visibility",
+  "curios.networking.failed": "Curios Networking Failure"
 }

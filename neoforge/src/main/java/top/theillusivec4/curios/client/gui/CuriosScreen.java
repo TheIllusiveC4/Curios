@@ -38,7 +38,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.neoforged.neoforge.network.PacketDistributor;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.client.CuriosClientConfig;
@@ -48,7 +47,6 @@ import top.theillusivec4.curios.client.KeyRegistry;
 import top.theillusivec4.curios.common.inventory.CosmeticCurioSlot;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
-import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketToggleRender;
 
 public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer>
@@ -172,7 +170,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
         if (curioSlot.canToggleRender()) {
           this.addRenderableWidget(new RenderButton(curioSlot, this.leftPos + inventorySlot.x + 11,
               this.topPos + inventorySlot.y - 3, 8, 8, 75, 0, CURIO_INVENTORY,
-              (button) -> NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
+              (button) -> PacketDistributor.SERVER.noArg().send(
                   new CPacketToggleRender(curioSlot.getIdentifier(),
                       inventorySlot.getSlotIndex()))));
         }

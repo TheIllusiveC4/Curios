@@ -19,49 +19,30 @@
 
 package top.theillusivec4.curios.common.network.client;
 
+import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.NetworkEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class CPacketOpenVanilla {
+public record CPacketOpenVanilla(ItemStack carried) implements CustomPacketPayload {
 
-  private final ItemStack carried;
+  public static final ResourceLocation ID =
+      new ResourceLocation(CuriosConstants.MOD_ID, "open_vanilla");
 
-  public CPacketOpenVanilla(ItemStack stack) {
-    this.carried = stack;
+  public CPacketOpenVanilla(final FriendlyByteBuf buf) {
+    this(buf.readItem());
   }
 
-  public static void encode(CPacketOpenVanilla msg, FriendlyByteBuf buf) {
-    buf.writeItem(msg.carried);
+  @Override
+  public void write(FriendlyByteBuf buf) {
+    buf.writeItem(this.carried());
   }
 
-  public static CPacketOpenVanilla decode(FriendlyByteBuf buf) {
-    return new CPacketOpenVanilla(buf.readItem());
-  }
-
-  public static void handle(CPacketOpenVanilla msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      ServerPlayer sender = ctx.getSender();
-
-      if (sender != null) {
-        ItemStack stack = sender.isCreative() ? msg.carried : sender.containerMenu.getCarried();
-        sender.containerMenu.setCarried(ItemStack.EMPTY);
-        sender.doCloseContainer();
-
-        if (!stack.isEmpty()) {
-
-          if (!sender.isCreative()) {
-            sender.containerMenu.setCarried(stack);
-          }
-          NetworkHandler.INSTANCE
-              .send(PacketDistributor.PLAYER.with(() -> sender), new SPacketGrabbedItem(stack));
-        }
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

@@ -12,12 +12,14 @@ A test mod for Curios
 [[dependencies.curiostest]]
     modId="neoforge"
     mandatory=true
+    type="required"
     versionRange="[20.2,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curiostest]]
     modId="minecraft"
     mandatory=true
+    type="required"
     versionRange="[1.20.2,)"
     ordering="NONE"
     side="BOTH"

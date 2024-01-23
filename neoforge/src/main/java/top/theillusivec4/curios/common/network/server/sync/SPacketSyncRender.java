@@ -19,62 +19,33 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.NonNullList;
+import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.neoforge.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosApi;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class SPacketSyncRender {
+public record SPacketSyncRender(int entityId, String curioId, int slotId, boolean value) implements
+    CustomPacketPayload {
 
-  private int entityId;
-  private int slotId;
-  private String curioId;
-  private boolean value;
+  public static final ResourceLocation ID =
+      new ResourceLocation(CuriosConstants.MOD_ID, "sync_render");
 
-  public SPacketSyncRender(int entityId, String curioId, int slotId, boolean value) {
-    this.entityId = entityId;
-    this.slotId = slotId;
-    this.curioId = curioId;
-    this.value = value;
+  public SPacketSyncRender(final FriendlyByteBuf buf) {
+    this(buf.readInt(), buf.readUtf(), buf.readInt(), buf.readBoolean());
   }
 
-  public static void encode(SPacketSyncRender msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.entityId);
-    buf.writeUtf(msg.curioId);
-    buf.writeInt(msg.slotId);
-    buf.writeBoolean(msg.value);
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    buf.writeInt(this.entityId());
+    buf.writeUtf(this.curioId());
+    buf.writeInt(this.slotId());
+    buf.writeBoolean(this.value());
   }
 
-  public static SPacketSyncRender decode(FriendlyByteBuf buf) {
-    return new SPacketSyncRender(buf.readInt(), buf.readUtf(), buf.readInt(),
-        buf.readBoolean());
-  }
-
-  public static void handle(SPacketSyncRender msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      ClientLevel world = Minecraft.getInstance().level;
-
-      if (world != null) {
-        Entity entity = world.getEntity(msg.entityId);
-
-        if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosInventory((LivingEntity) entity)
-              .flatMap(handler -> handler.getStacksHandler(msg.curioId))
-              .ifPresent(stacksHandler -> {
-                int index = msg.slotId;
-                NonNullList<Boolean> renderStatuses = stacksHandler.getRenders();
-
-                if (renderStatuses.size() > index) {
-                  renderStatuses.set(index, msg.value);
-                }
-              });
-        }
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

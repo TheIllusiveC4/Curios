@@ -54,6 +54,7 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotTypeMessage;
@@ -93,6 +94,7 @@ public class Curios {
     eventBus.addListener(this::setup);
     eventBus.addListener(this::process);
     eventBus.addListener(this::registerCaps);
+    eventBus.addListener(this::registerPayloadHandler);
     NeoForge.EVENT_BUS.addListener(this::serverAboutToStart);
     NeoForge.EVENT_BUS.addListener(this::serverStopped);
     NeoForge.EVENT_BUS.addListener(this::registerCommands);
@@ -101,10 +103,13 @@ public class Curios {
     ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, CuriosConfig.SERVER_SPEC);
   }
 
+  private void registerPayloadHandler(final RegisterPayloadHandlerEvent evt) {
+    NetworkHandler.register(evt.registrar(CuriosConstants.MOD_ID));
+  }
+
   private void setup(FMLCommonSetupEvent evt) {
     CuriosApi.setCuriosHelper(new CuriosHelper());
     NeoForge.EVENT_BUS.register(new CuriosEventHandler());
-    NetworkHandler.register();
     evt.enqueueWork(CuriosSelectorOptions::register);
   }
 

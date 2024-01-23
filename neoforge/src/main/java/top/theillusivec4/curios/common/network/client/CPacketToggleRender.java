@@ -19,53 +19,30 @@
 
 package top.theillusivec4.curios.common.network.client;
 
-import net.minecraft.core.NonNullList;
+import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.NetworkEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncRender;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class CPacketToggleRender {
+public record CPacketToggleRender(String identifier, int index) implements CustomPacketPayload {
 
-  String id;
-  int index;
+  public static final ResourceLocation ID =
+      new ResourceLocation(CuriosConstants.MOD_ID, "toggle_render");
 
-  public CPacketToggleRender(String id, int index) {
-    this.id = id;
-    this.index = index;
+  public CPacketToggleRender(final FriendlyByteBuf buf) {
+    this(buf.readUtf(), buf.readInt());
   }
 
-  public static void encode(CPacketToggleRender msg, FriendlyByteBuf buf) {
-    buf.writeUtf(msg.id);
-    buf.writeInt(msg.index);
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    buf.writeUtf(this.identifier());
+    buf.writeInt(this.index());
   }
 
-  public static CPacketToggleRender decode(FriendlyByteBuf buf) {
-    return new CPacketToggleRender(buf.readUtf(), buf.readInt());
-  }
-
-  public static void handle(CPacketToggleRender msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      ServerPlayer sender = ctx.getSender();
-
-      if (sender != null) {
-        CuriosApi.getCuriosInventory(sender).flatMap(handler -> handler.getStacksHandler(msg.id))
-            .ifPresent(stacksHandler -> {
-              NonNullList<Boolean> renderStatuses = stacksHandler.getRenders();
-
-              if (renderStatuses.size() > msg.index) {
-                boolean value = !renderStatuses.get(msg.index);
-                renderStatuses.set(msg.index, value);
-                NetworkHandler.INSTANCE
-                    .send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sender),
-                        new SPacketSyncRender(sender.getId(), msg.id, msg.index, value));
-              }
-            });
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

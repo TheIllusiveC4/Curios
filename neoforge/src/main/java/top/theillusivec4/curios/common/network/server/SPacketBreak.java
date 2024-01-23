@@ -19,65 +19,31 @@
 
 package top.theillusivec4.curios.common.network.server;
 
-import java.util.Optional;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.NonNullList;
+import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.type.capability.ICurio;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class SPacketBreak {
+public record SPacketBreak(int entityId, String curioId, int slotId) implements
+    CustomPacketPayload {
 
-  private int entityId;
-  private int slotId;
-  private String curioId;
+  public static final ResourceLocation ID = new ResourceLocation(CuriosConstants.MOD_ID, "break");
 
-  public SPacketBreak(int entityId, String curioId, int slotId) {
-    this.entityId = entityId;
-    this.slotId = slotId;
-    this.curioId = curioId;
+  public SPacketBreak(final FriendlyByteBuf buf) {
+    this(buf.readInt(), buf.readUtf(), buf.readInt());
   }
 
-  public static void encode(SPacketBreak msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.entityId);
-    buf.writeUtf(msg.curioId);
-    buf.writeInt(msg.slotId);
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    buf.writeInt(this.entityId());
+    buf.writeUtf(this.curioId());
+    buf.writeInt(this.slotId());
   }
 
-  public static SPacketBreak decode(FriendlyByteBuf buf) {
-    return new SPacketBreak(buf.readInt(), buf.readUtf(), buf.readInt());
-  }
-
-  public static void handle(SPacketBreak msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      ClientLevel world = Minecraft.getInstance().level;
-
-      if (world != null) {
-        Entity entity = Minecraft.getInstance().level.getEntity(msg.entityId);
-
-        if (entity instanceof LivingEntity livingEntity) {
-          CuriosApi.getCuriosInventory(livingEntity)
-              .flatMap(handler -> handler.getStacksHandler(msg.curioId)).ifPresent(stacks -> {
-                ItemStack stack = stacks.getStacks().getStackInSlot(msg.slotId);
-                Optional<ICurio> possibleCurio = CuriosApi.getCurio(stack);
-                NonNullList<Boolean> renderStates = stacks.getRenders();
-                possibleCurio.ifPresent(curio -> curio.curioBreak(
-                    new SlotContext(msg.curioId, livingEntity, msg.slotId, false,
-                        renderStates.size() > msg.slotId && renderStates.get(msg.slotId))));
-
-                if (possibleCurio.isEmpty()) {
-                  ICurio.playBreakAnimation(stack, livingEntity);
-                }
-              });
-        }
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

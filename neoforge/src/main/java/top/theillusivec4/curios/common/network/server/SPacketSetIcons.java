@@ -20,65 +20,50 @@
 package top.theillusivec4.curios.common.network.server;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
+import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.common.data.CuriosSlotManager;
-import top.theillusivec4.curios.server.command.CurioArgumentType;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class SPacketSetIcons {
+public class SPacketSetIcons implements CustomPacketPayload {
 
-  private int entrySize;
-  private Map<String, ResourceLocation> map;
+  public static final ResourceLocation ID =
+      new ResourceLocation(CuriosConstants.MOD_ID, "set_icons");
+
+  private final int entrySize;
+  public final Map<String, ResourceLocation> map;
 
   public SPacketSetIcons(Map<String, ResourceLocation> map) {
     this.entrySize = map.size();
     this.map = map;
   }
 
-  public static void encode(SPacketSetIcons msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.entrySize);
-
-    for (Map.Entry<String, ResourceLocation> entry : msg.map.entrySet()) {
-      buf.writeUtf(entry.getKey());
-      buf.writeUtf(entry.getValue().toString());
-    }
-  }
-
-  public static SPacketSetIcons decode(FriendlyByteBuf buf) {
+  public SPacketSetIcons(final FriendlyByteBuf buf) {
     int entrySize = buf.readInt();
     Map<String, ResourceLocation> map = new HashMap<>();
 
     for (int i = 0; i < entrySize; i++) {
       map.put(buf.readUtf(), new ResourceLocation(buf.readUtf()));
     }
-    return new SPacketSetIcons(map);
+    this.entrySize = map.size();
+    this.map = map;
   }
 
-  public static void handle(SPacketSetIcons msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      ClientLevel world = Minecraft.getInstance().level;
-      Set<String> slotIds = new HashSet<>();
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    buf.writeInt(this.entrySize);
 
-      if (world != null) {
-        CuriosApi.getIconHelper().clearIcons();
-        Map<String, ResourceLocation> icons = new HashMap<>();
+    for (Map.Entry<String, ResourceLocation> entry : this.map.entrySet()) {
+      buf.writeUtf(entry.getKey());
+      buf.writeUtf(entry.getValue().toString());
+    }
+  }
 
-        for (Map.Entry<String, ResourceLocation> entry : msg.map.entrySet()) {
-          CuriosApi.getIconHelper().addIcon(entry.getKey(), entry.getValue());
-          icons.put(entry.getKey(), entry.getValue());
-          slotIds.add(entry.getKey());
-        }
-        CuriosSlotManager.INSTANCE.setIcons(icons);
-      }
-      CurioArgumentType.slotIds = slotIds;
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

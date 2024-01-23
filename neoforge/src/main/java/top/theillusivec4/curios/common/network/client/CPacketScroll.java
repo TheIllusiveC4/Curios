@@ -19,43 +19,30 @@
 
 package top.theillusivec4.curios.common.network.client;
 
+import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.neoforge.network.NetworkEvent;
-import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class CPacketScroll {
+public record CPacketScroll(int windowId, int index) implements CustomPacketPayload {
 
-  private int windowId;
-  private int index;
+  public static final ResourceLocation ID =
+      new ResourceLocation(CuriosConstants.MOD_ID, "scroll");
 
-  public CPacketScroll(int windowId, int index) {
-    this.windowId = windowId;
-    this.index = index;
+  public CPacketScroll(final FriendlyByteBuf buf) {
+    this(buf.readInt(), buf.readInt());
   }
 
-  public static void encode(CPacketScroll msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.windowId);
-    buf.writeInt(msg.index);
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    buf.writeInt(this.windowId());
+    buf.writeInt(this.index());
   }
 
-  public static CPacketScroll decode(FriendlyByteBuf buf) {
-    return new CPacketScroll(buf.readInt(), buf.readInt());
-  }
-
-  public static void handle(CPacketScroll msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      ServerPlayer sender = ctx.getSender();
-
-      if (sender != null) {
-        AbstractContainerMenu container = sender.containerMenu;
-
-        if (container instanceof CuriosContainer && container.containerId == msg.windowId) {
-          ((CuriosContainer) container).scrollToIndex(msg.index);
-        }
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

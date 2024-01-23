@@ -21,12 +21,12 @@ package top.theillusivec4.curios.common.inventory.container;
 
 import com.mojang.datafixers.util.Pair;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -36,6 +36,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.RecipeBookType;
 import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.ResultSlot;
@@ -57,11 +58,10 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.CuriosRegistry;
 import top.theillusivec4.curios.common.inventory.CosmeticCurioSlot;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
-import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketScroll;
 import top.theillusivec4.curios.common.network.server.SPacketScroll;
 
-public class CuriosContainer extends InventoryMenu {
+public class CuriosContainer extends RecipeBookMenu<CraftingContainer> {
 
   private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[] {
       InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS, InventoryMenu.EMPTY_ARMOR_SLOT_LEGGINGS,
@@ -77,7 +77,7 @@ public class CuriosContainer extends InventoryMenu {
 
   private final CraftingContainer craftMatrix = new TransientCraftingContainer(this, 2, 2);
   private final ResultContainer craftResult = new ResultContainer();
-  private int lastScrollIndex;
+  public int lastScrollIndex;
   private boolean cosmeticColumn;
 
   public CuriosContainer(int windowId, Inventory playerInventory, FriendlyByteBuf packetBuffer) {
@@ -85,12 +85,7 @@ public class CuriosContainer extends InventoryMenu {
   }
 
   public CuriosContainer(int windowId, Inventory playerInventory) {
-    super(playerInventory, playerInventory.player.level().isClientSide, playerInventory.player);
-    this.menuType = CuriosRegistry.CURIO_MENU.get();
-    this.containerId = windowId;
-    this.remoteSlots.clear();
-    this.lastSlots.clear();
-    this.slots.clear();
+    super(CuriosRegistry.CURIO_MENU.get(), windowId);
     this.player = playerInventory.player;
     this.isLocalWorld = this.player.level().isClientSide;
     this.curiosHandler = CuriosApi.getCuriosInventory(this.player).orElse(null);
@@ -293,9 +288,8 @@ public class CuriosContainer extends InventoryMenu {
       }
 
       if (!this.isLocalWorld) {
-        NetworkHandler.INSTANCE.send(
-            PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.player),
-            new SPacketScroll(this.containerId, indexIn));
+        PacketDistributor.PLAYER.with((ServerPlayer) this.player)
+            .send(new SPacketScroll(this.containerId, indexIn));
       }
       this.lastScrollIndex = indexIn;
     }
@@ -316,8 +310,7 @@ public class CuriosContainer extends InventoryMenu {
       }
 
       if (this.isLocalWorld) {
-        NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-            new CPacketScroll(this.containerId, j));
+        PacketDistributor.SERVER.noArg().send(new CPacketScroll(this.containerId, j));
       }
     }
   }
@@ -326,34 +319,30 @@ public class CuriosContainer extends InventoryMenu {
   public void slotsChanged(@Nonnull Container inventoryIn) {
 
     if (!this.player.level().isClientSide) {
-      ServerPlayer playerMP = (ServerPlayer) this.player;
-      ItemStack stack = ItemStack.EMPTY;
-      MinecraftServer server = this.player.level().getServer();
+      ServerPlayer serverplayer = (ServerPlayer) this.player;
+      ItemStack itemstack = ItemStack.EMPTY;
+      Optional<RecipeHolder<CraftingRecipe>> optional =
+          Objects.requireNonNull(this.player.level().getServer()).getRecipeManager()
+              .getRecipeFor(RecipeType.CRAFTING, this.craftMatrix, this.player.level());
 
-      if (server == null) {
-        return;
-      }
-      Optional<RecipeHolder<CraftingRecipe>> recipe = server.getRecipeManager()
-          .getRecipeFor(RecipeType.CRAFTING, this.craftMatrix, this.player.level());
+      if (optional.isPresent()) {
+        RecipeHolder<CraftingRecipe> recipeholder = optional.get();
+        CraftingRecipe craftingrecipe = recipeholder.value();
 
-      if (recipe.isPresent()) {
-        RecipeHolder<CraftingRecipe> recipeholder = recipe.get();
-        CraftingRecipe craftingRecipe = recipeholder.value();
-
-        if (this.craftResult.setRecipeUsed(this.player.level(), playerMP, recipeholder)) {
+        if (this.craftResult.setRecipeUsed(this.player.level(), serverplayer, recipeholder)) {
           ItemStack itemstack1 =
-              craftingRecipe.assemble(this.craftMatrix, this.player.level().registryAccess());
+              craftingrecipe.assemble(this.craftMatrix, this.player.level().registryAccess());
 
           if (itemstack1.isItemEnabled(this.player.level().enabledFeatures())) {
-            stack = itemstack1;
+            itemstack = itemstack1;
           }
         }
       }
-      this.craftResult.setItem(0, stack);
-      this.setRemoteSlot(0, stack);
-      playerMP.connection.send(
+      this.craftResult.setItem(0, itemstack);
+      this.setRemoteSlot(0, itemstack);
+      serverplayer.connection.send(
           new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), 0,
-              stack));
+              itemstack));
     }
   }
 
@@ -376,17 +365,16 @@ public class CuriosContainer extends InventoryMenu {
   }
 
   @Override
-  public boolean stillValid(@Nonnull Player playerIn) {
-
-    return true;
-  }
-
-  @Override
   public void setItem(int pSlotId, int pStateId, @Nonnull ItemStack pStack) {
 
     if (this.slots.size() > pSlotId) {
       super.setItem(pSlotId, pStateId, pStack);
     }
+  }
+
+  @Override
+  public boolean stillValid(@Nonnull Player player) {
+    return true;
   }
 
   @Nonnull
@@ -471,6 +459,11 @@ public class CuriosContainer extends InventoryMenu {
   }
 
   @Override
+  public boolean shouldMoveToInventory(int index) {
+    return index != this.getResultSlotIndex();
+  }
+
+  @Override
   public void fillCraftSlotsStackedContents(@Nonnull StackedContents itemHelperIn) {
     this.craftMatrix.fillStackedContents(itemHelperIn);
   }
@@ -487,6 +480,11 @@ public class CuriosContainer extends InventoryMenu {
   }
 
   @Override
+  public int getResultSlotIndex() {
+    return 0;
+  }
+
+  @Override
   public int getGridWidth() {
     return this.craftMatrix.getWidth();
   }
@@ -496,4 +494,8 @@ public class CuriosContainer extends InventoryMenu {
     return this.craftMatrix.getHeight();
   }
 
+  @Override
+  public int getSize() {
+    return 5;
+  }
 }

@@ -33,7 +33,6 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
 
@@ -61,8 +60,7 @@ public class CuriosButton extends ImageButton {
               InventoryScreen inventory = new InventoryScreen(mc.player);
               mc.setScreen(inventory);
               mc.player.containerMenu.setCarried(stack);
-              NetworkHandler.INSTANCE
-                  .send(PacketDistributor.SERVER.noArg(), new CPacketOpenVanilla(stack));
+              PacketDistributor.SERVER.noArg().send(new CPacketOpenVanilla(stack));
             } else {
 
               if (parentGui instanceof InventoryScreen inventory) {
@@ -72,8 +70,7 @@ public class CuriosButton extends ImageButton {
                   recipeBookGui.toggleVisibility();
                 }
               }
-              NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-                  new CPacketOpenCurios(stack));
+              PacketDistributor.SERVER.noArg().send(new CPacketOpenCurios(stack));
             }
           }
         });

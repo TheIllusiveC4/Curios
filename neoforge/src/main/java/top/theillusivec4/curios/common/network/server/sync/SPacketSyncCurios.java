@@ -21,24 +21,22 @@ package top.theillusivec4.curios.common.network.server.sync;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.LocalPlayer;
+import javax.annotation.Nonnull;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.neoforge.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosApi;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
-import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
-import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
-public class SPacketSyncCurios {
+public class SPacketSyncCurios implements CustomPacketPayload {
 
-  private int entityId;
-  private int entrySize;
-  private Map<String, CompoundTag> map;
+  public static final ResourceLocation ID =
+      new ResourceLocation(CuriosConstants.MOD_ID, "sync_curios");
+
+  public final int entityId;
+  public final int entrySize;
+  public final Map<String, CompoundTag> map;
 
   public SPacketSyncCurios(int entityId, Map<String, ICurioStacksHandler> map) {
     Map<String, CompoundTag> result = new LinkedHashMap<>();
@@ -57,17 +55,7 @@ public class SPacketSyncCurios {
     this.map = map;
   }
 
-  public static void encode(SPacketSyncCurios msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.entityId);
-    buf.writeInt(msg.entrySize);
-
-    for (Map.Entry<String, CompoundTag> entry : msg.map.entrySet()) {
-      buf.writeUtf(entry.getKey());
-      buf.writeNbt(entry.getValue());
-    }
-  }
-
-  public static SPacketSyncCurios decode(FriendlyByteBuf buf) {
+  public SPacketSyncCurios(final FriendlyByteBuf buf) {
     int entityId = buf.readInt();
     int entrySize = buf.readInt();
     Map<String, CompoundTag> map = new LinkedHashMap<>();
@@ -76,37 +64,25 @@ public class SPacketSyncCurios {
       String key = buf.readUtf();
       map.put(key, buf.readNbt());
     }
-    return new SPacketSyncCurios(map, entityId);
+    this.entityId = entityId;
+    this.entrySize = map.size();
+    this.map = map;
   }
 
-  public static void handle(SPacketSyncCurios msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      ClientLevel world = Minecraft.getInstance().level;
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    buf.writeInt(this.entityId);
+    buf.writeInt(this.entrySize);
 
-      if (world != null) {
-        Entity entity = world.getEntity(msg.entityId);
+    for (Map.Entry<String, CompoundTag> entry : this.map.entrySet()) {
+      buf.writeUtf(entry.getKey());
+      buf.writeNbt(entry.getValue());
+    }
+  }
 
-        if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosInventory((LivingEntity) entity)
-              .ifPresent(handler -> {
-                Map<String, ICurioStacksHandler> stacks = new LinkedHashMap<>();
-
-                for (Map.Entry<String, CompoundTag> entry : msg.map.entrySet()) {
-                  ICurioStacksHandler stacksHandler =
-                      new CurioStacksHandler(handler, entry.getKey());
-                  stacksHandler.applySyncTag(entry.getValue());
-                  stacks.put(entry.getKey(), stacksHandler);
-                }
-                handler.setCurios(stacks);
-
-                if (entity instanceof LocalPlayer player &&
-                    player.containerMenu instanceof CuriosContainer curiosContainer) {
-                  curiosContainer.resetSlots();
-                }
-              });
-        }
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

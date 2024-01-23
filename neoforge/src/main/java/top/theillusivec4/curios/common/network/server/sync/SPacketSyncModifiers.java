@@ -22,25 +22,22 @@ package top.theillusivec4.curios.common.network.server.sync;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.LocalPlayer;
+import javax.annotation.Nonnull;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
-import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
 
-public class SPacketSyncModifiers {
+public class SPacketSyncModifiers implements CustomPacketPayload {
 
-  private int entityId;
-  private int entrySize;
-  private Map<String, CompoundTag> updates;
+  public static final ResourceLocation ID =
+      new ResourceLocation(CuriosConstants.MOD_ID, "sync_modifiers");
+
+  public final int entityId;
+  public final int entrySize;
+  public final Map<String, CompoundTag> updates;
 
   public SPacketSyncModifiers(int entityId, Set<ICurioStacksHandler> updates) {
     Map<String, CompoundTag> result = new LinkedHashMap<>();
@@ -59,17 +56,7 @@ public class SPacketSyncModifiers {
     this.updates = map;
   }
 
-  public static void encode(SPacketSyncModifiers msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.entityId);
-    buf.writeInt(msg.entrySize);
-
-    for (Map.Entry<String, CompoundTag> entry : msg.updates.entrySet()) {
-      buf.writeUtf(entry.getKey());
-      buf.writeNbt(entry.getValue());
-    }
-  }
-
-  public static SPacketSyncModifiers decode(FriendlyByteBuf buf) {
+  public SPacketSyncModifiers(final FriendlyByteBuf buf) {
     int entityId = buf.readInt();
     int entrySize = buf.readInt();
     Map<String, CompoundTag> map = new LinkedHashMap<>();
@@ -78,45 +65,25 @@ public class SPacketSyncModifiers {
       String key = buf.readUtf();
       map.put(key, buf.readNbt());
     }
-    return new SPacketSyncModifiers(map, entityId);
+    this.entityId = entityId;
+    this.entrySize = map.size();
+    this.updates = map;
   }
 
-  public static void handle(SPacketSyncModifiers msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      ClientLevel world = Minecraft.getInstance().level;
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    buf.writeInt(this.entityId);
+    buf.writeInt(this.entrySize);
 
-      if (world != null) {
-        Entity entity = world.getEntity(msg.entityId);
+    for (Map.Entry<String, CompoundTag> entry : this.updates.entrySet()) {
+      buf.writeUtf(entry.getKey());
+      buf.writeNbt(entry.getValue());
+    }
+  }
 
-        if (entity instanceof LivingEntity livingEntity) {
-          CuriosApi.getCuriosInventory(livingEntity)
-              .ifPresent(handler -> {
-                Map<String, ICurioStacksHandler> curios = handler.getCurios();
-
-                for (Map.Entry<String, CompoundTag> entry : msg.updates.entrySet()) {
-                  String id = entry.getKey();
-                  ICurioStacksHandler stacksHandler = curios.get(id);
-
-                  if (stacksHandler != null) {
-                    stacksHandler.applySyncTag(entry.getValue());
-                  }
-                }
-
-                if (!msg.updates.isEmpty()) {
-                  NeoForge.EVENT_BUS.post(
-                      new SlotModifiersUpdatedEvent(livingEntity, msg.updates.keySet()));
-                }
-
-                if (entity instanceof LocalPlayer player) {
-
-                  if (player.containerMenu instanceof CuriosContainer) {
-                    ((CuriosContainer) player.containerMenu).resetSlots();
-                  }
-                }
-              });
-        }
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

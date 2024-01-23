@@ -19,84 +19,39 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.NonNullList;
+import javax.annotation.Nonnull;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class SPacketSyncStack {
+public record SPacketSyncStack(int entityId, String curioId, int slotId, ItemStack stack,
+                               int handlerType, CompoundTag compoundTag) implements
+    CustomPacketPayload {
 
-  private int entityId;
-  private int slotId;
-  private String curioId;
-  private ItemStack stack;
-  private int handlerType;
-  private CompoundTag compound;
+  public static final ResourceLocation ID =
+      new ResourceLocation(CuriosConstants.MOD_ID, "sync_stack");
 
-  public SPacketSyncStack(int entityId, String curioId, int slotId, ItemStack stack,
-                          HandlerType handlerType, CompoundTag data) {
-    this.entityId = entityId;
-    this.slotId = slotId;
-    this.stack = stack.copy();
-    this.curioId = curioId;
-    this.handlerType = handlerType.ordinal();
-    this.compound = data;
+  public SPacketSyncStack(final FriendlyByteBuf buf) {
+    this(buf.readInt(), buf.readUtf(), buf.readInt(), buf.readItem(), buf.readInt(), buf.readNbt());
   }
 
-  public static void encode(SPacketSyncStack msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.entityId);
-    buf.writeUtf(msg.curioId);
-    buf.writeInt(msg.slotId);
-    buf.writeItem(msg.stack);
-    buf.writeInt(msg.handlerType);
-    buf.writeNbt(msg.compound);
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    buf.writeInt(this.entityId());
+    buf.writeUtf(this.curioId());
+    buf.writeInt(this.slotId());
+    buf.writeItem(this.stack());
+    buf.writeInt(this.handlerType());
+    buf.writeNbt(this.compoundTag());
   }
 
-  public static SPacketSyncStack decode(FriendlyByteBuf buf) {
-    return new SPacketSyncStack(buf.readInt(), buf.readUtf(), buf.readInt(),
-        buf.readItem(), HandlerType.fromValue(buf.readInt()), buf.readNbt());
-  }
-
-  public static void handle(SPacketSyncStack msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      ClientLevel world = Minecraft.getInstance().level;
-
-      if (world != null) {
-        Entity entity = world.getEntity(msg.entityId);
-
-        if (entity instanceof LivingEntity) {
-          CuriosApi.getCuriosInventory((LivingEntity) entity)
-              .flatMap(handler -> handler.getStacksHandler(msg.curioId))
-              .ifPresent(stacksHandler -> {
-                ItemStack stack = msg.stack;
-                CompoundTag compoundNBT = msg.compound;
-                int slot = msg.slotId;
-                boolean cosmetic = HandlerType.fromValue(msg.handlerType) == HandlerType.COSMETIC;
-
-                if (!compoundNBT.isEmpty()) {
-                  NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-                  CuriosApi.getCurio(stack).ifPresent(curio -> curio.readSyncData(
-                      new SlotContext(msg.curioId, (LivingEntity) entity, slot, cosmetic,
-                          renderStates.size() > slot && renderStates.get(slot)), compoundNBT));
-                }
-
-                if (cosmetic) {
-                  stacksHandler.getCosmeticStacks().setStackInSlot(slot, stack);
-                } else {
-                  stacksHandler.getStacks().setStackInSlot(slot, stack);
-                }
-              });
-        }
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 
   public enum HandlerType {

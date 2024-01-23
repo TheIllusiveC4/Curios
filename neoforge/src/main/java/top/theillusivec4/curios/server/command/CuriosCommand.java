@@ -42,7 +42,6 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
-import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.slottype.LegacySlotManager;
 
@@ -270,8 +269,8 @@ public class CuriosCommand {
   private static int resetSlotsForPlayer(CommandSourceStack source, ServerPlayer playerMP) {
     CuriosApi.getCuriosHelper().getCuriosHandler(playerMP).ifPresent(handler -> {
       handler.reset();
-      NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> playerMP),
-          new SPacketSyncCurios(playerMP.getId(), handler.getCurios()));
+      PacketDistributor.PLAYER.with(playerMP)
+          .send(new SPacketSyncCurios(playerMP.getId(), handler.getCurios()));
     });
     source.sendSuccess(
         () -> Component.translatable("commands.curios.reset.success", playerMP.getDisplayName()),

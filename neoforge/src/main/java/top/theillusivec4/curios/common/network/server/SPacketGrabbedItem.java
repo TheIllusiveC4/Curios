@@ -19,36 +19,30 @@
 
 package top.theillusivec4.curios.common.network.server;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
+import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.NetworkEvent;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class SPacketGrabbedItem {
+public record SPacketGrabbedItem(ItemStack stack) implements CustomPacketPayload {
 
-  private final ItemStack stack;
+  public static final ResourceLocation ID =
+      new ResourceLocation(CuriosConstants.MOD_ID, "grabbed_item");
 
-  public SPacketGrabbedItem(ItemStack stackIn) {
-    this.stack = stackIn;
+  public SPacketGrabbedItem(final FriendlyByteBuf buf) {
+    this(buf.readItem());
   }
 
-  public static void encode(SPacketGrabbedItem msg, FriendlyByteBuf buf) {
-    buf.writeItem(msg.stack);
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    buf.writeItem(this.stack());
   }
 
-  public static SPacketGrabbedItem decode(FriendlyByteBuf buf) {
-    return new SPacketGrabbedItem(buf.readItem());
-  }
-
-  public static void handle(SPacketGrabbedItem msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      LocalPlayer clientPlayer = Minecraft.getInstance().player;
-
-      if (clientPlayer != null) {
-        clientPlayer.containerMenu.setCarried(msg.stack);
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

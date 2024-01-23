@@ -54,7 +54,6 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
-import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
 public class ClientEventHandler {
@@ -73,8 +72,7 @@ public class ClientEventHandler {
     Minecraft mc = Minecraft.getInstance();
 
     if (KeyRegistry.openCurios.consumeClick() && mc.isWindowActive()) {
-      NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-          new CPacketOpenCurios(ItemStack.EMPTY));
+      PacketDistributor.SERVER.noArg().send(new CPacketOpenCurios(ItemStack.EMPTY));
     }
   }
 

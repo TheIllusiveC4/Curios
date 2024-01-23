@@ -19,52 +19,29 @@
 
 package top.theillusivec4.curios.common.network.server;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.LocalPlayer;
+import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.neoforge.network.NetworkEvent;
-import top.theillusivec4.curios.client.gui.CuriosScreen;
-import top.theillusivec4.curios.common.inventory.container.CuriosContainer;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class SPacketScroll {
+public record SPacketScroll(int windowId, int index) implements CustomPacketPayload {
 
-  private int windowId;
-  private int index;
+  public static final ResourceLocation ID = new ResourceLocation(CuriosConstants.MOD_ID, "server_scroll");
 
-  public SPacketScroll(int windowId, int index) {
-    this.windowId = windowId;
-    this.index = index;
+  public SPacketScroll(final FriendlyByteBuf buf) {
+    this(buf.readInt(), buf.readInt());
   }
 
-  public static void encode(SPacketScroll msg, FriendlyByteBuf buf) {
-    buf.writeInt(msg.windowId);
-    buf.writeInt(msg.index);
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    buf.writeInt(this.windowId());
+    buf.writeInt(this.index());
   }
 
-  public static SPacketScroll decode(FriendlyByteBuf buf) {
-    return new SPacketScroll(buf.readInt(), buf.readInt());
-  }
-
-  public static void handle(SPacketScroll msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      Minecraft mc = Minecraft.getInstance();
-      LocalPlayer clientPlayer = mc.player;
-      Screen screen = mc.screen;
-
-      if (clientPlayer != null) {
-        AbstractContainerMenu container = clientPlayer.containerMenu;
-
-        if (container instanceof CuriosContainer && container.containerId == msg.windowId) {
-          ((CuriosContainer) container).scrollToIndex(msg.index);
-        }
-      }
-
-      if (screen instanceof CuriosScreen) {
-        ((CuriosScreen) screen).updateRenderButtons();
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

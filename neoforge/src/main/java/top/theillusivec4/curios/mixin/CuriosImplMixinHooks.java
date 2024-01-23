@@ -51,7 +51,6 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
-import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.network.server.SPacketBreak;
 import top.theillusivec4.curios.common.slottype.SlotType;
 
@@ -250,8 +249,7 @@ public class CuriosImplMixinHooks {
   }
 
   public static void broadcastCurioBreakEvent(SlotContext slotContext) {
-    NetworkHandler.INSTANCE.send(
-        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(slotContext::entity),
+    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(slotContext.entity()).send(
         new SPacketBreak(slotContext.entity().getId(), slotContext.identifier(),
             slotContext.index()));
   }

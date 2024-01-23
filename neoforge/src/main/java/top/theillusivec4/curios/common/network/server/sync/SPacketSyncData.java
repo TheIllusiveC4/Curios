@@ -19,38 +19,46 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
+import javax.annotation.Nonnull;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.neoforged.neoforge.network.NetworkEvent;
-import top.theillusivec4.curios.common.data.CuriosEntityManager;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class SPacketSyncData {
+public class SPacketSyncData implements CustomPacketPayload {
 
-  private final ListTag data;
+  public static final ResourceLocation ID =
+      new ResourceLocation(CuriosConstants.MOD_ID, "sync_data");
+
+  public final ListTag data;
 
   public SPacketSyncData(ListTag data) {
     this.data = data;
   }
 
-  public static void encode(SPacketSyncData msg, FriendlyByteBuf buf) {
-    CompoundTag tag = new CompoundTag();
-    tag.put("Data", msg.data);
-    buf.writeNbt(tag);
-  }
-
-  public static SPacketSyncData decode(FriendlyByteBuf buf) {
+  public SPacketSyncData(final FriendlyByteBuf buf) {
     CompoundTag tag = buf.readNbt();
 
     if (tag != null) {
-      return new SPacketSyncData(tag.getList("Data", Tag.TAG_COMPOUND));
+      this.data = tag.getList("Data", Tag.TAG_COMPOUND);
+    } else {
+      this.data = new ListTag();
     }
-    return new SPacketSyncData(new ListTag());
   }
 
-  public static void handle(SPacketSyncData msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> CuriosEntityManager.applySyncPacket(msg.data));
-    ctx.setPacketHandled(true);
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    CompoundTag tag = new CompoundTag();
+    tag.put("Data", this.data);
+    buf.writeNbt(tag);
+  }
+
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }

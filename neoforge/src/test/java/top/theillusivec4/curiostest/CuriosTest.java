@@ -44,7 +44,6 @@ import net.neoforged.fml.InterModComms;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -75,9 +74,8 @@ public class CuriosTest {
   public static final String MODID = "curiostest";
   public static final Logger LOGGER = LogManager.getLogger();
 
-  public CuriosTest() {
+  public CuriosTest(IEventBus eventBus) {
     CuriosTestRegistry.init();
-    final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::enqueue);
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::registerLayers);

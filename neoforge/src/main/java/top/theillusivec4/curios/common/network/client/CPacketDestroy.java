@@ -19,87 +19,32 @@
 
 package top.theillusivec4.curios.common.network.client;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
+import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.NetworkEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotAttribute;
-import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
-import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import top.theillusivec4.curios.CuriosConstants;
 
-public class CPacketDestroy {
+public class CPacketDestroy implements CustomPacketPayload {
 
-  public static void encode(CPacketDestroy msg, FriendlyByteBuf buf) {
+  public static final ResourceLocation ID = new ResourceLocation(CuriosConstants.MOD_ID, "destroy");
+
+  public CPacketDestroy() {
+    // NO-OP
   }
 
-  public static CPacketDestroy decode(FriendlyByteBuf buf) {
-    return new CPacketDestroy();
+  public CPacketDestroy(final FriendlyByteBuf buf) {
+    // NO-OP
   }
 
-  public static void handle(CPacketDestroy msg, NetworkEvent.Context ctx) {
-    ctx.enqueueWork(() -> {
-      ServerPlayer sender = ctx.getSender();
+  @Override
+  public void write(@Nonnull FriendlyByteBuf buf) {
+    // NO-OP
+  }
 
-      if (sender != null) {
-        CuriosApi.getCuriosInventory(sender)
-            .ifPresent(handler -> handler.getCurios().values().forEach(stacksHandler -> {
-              IDynamicStackHandler stackHandler = stacksHandler.getStacks();
-              IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
-              String id = stacksHandler.getIdentifier();
-
-              for (int i = 0; i < stackHandler.getSlots(); i++) {
-                UUID uuid = UUID.nameUUIDFromBytes((id + i).getBytes());
-                NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-                SlotContext slotContext = new SlotContext(id, sender, i, false,
-                    renderStates.size() > i && renderStates.get(i));
-                ItemStack stack = stackHandler.getStackInSlot(i);
-                Multimap<Attribute, AttributeModifier> map =
-                    CuriosApi.getAttributeModifiers(slotContext, uuid, stack);
-                Multimap<String, AttributeModifier> slots = HashMultimap.create();
-                Set<SlotAttribute> toRemove = new HashSet<>();
-
-                for (Attribute attribute : map.keySet()) {
-
-                  if (attribute instanceof SlotAttribute wrapper) {
-                    slots.putAll(wrapper.getIdentifier(), map.get(attribute));
-                    toRemove.add(wrapper);
-                  }
-                }
-
-                for (Attribute attribute : toRemove) {
-                  map.removeAll(attribute);
-                }
-                sender.getAttributes().removeAttributeModifiers(map);
-                handler.removeSlotModifiers(slots);
-                CuriosApi.getCurio(stack)
-                    .ifPresent(curio -> curio.onUnequip(slotContext, stack));
-                stackHandler.setStackInSlot(i, ItemStack.EMPTY);
-                NetworkHandler.INSTANCE.send(
-                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sender),
-                    new SPacketSyncStack(sender.getId(), id, i, ItemStack.EMPTY,
-                        SPacketSyncStack.HandlerType.EQUIPMENT, new CompoundTag()));
-                cosmeticStackHandler.setStackInSlot(i, ItemStack.EMPTY);
-                NetworkHandler.INSTANCE.send(
-                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sender),
-                    new SPacketSyncStack(sender.getId(), id, i, ItemStack.EMPTY,
-                        SPacketSyncStack.HandlerType.COSMETIC, new CompoundTag()));
-              }
-            }));
-      }
-    });
-    ctx.setPacketHandled(true);
+  @Nonnull
+  @Override
+  public ResourceLocation id() {
+    return ID;
   }
 }
