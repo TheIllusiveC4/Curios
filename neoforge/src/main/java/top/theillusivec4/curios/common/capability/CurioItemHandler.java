@@ -1,10 +1,13 @@
 package top.theillusivec4.curios.common.capability;
 
+import java.util.Map;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.NotNull;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.CuriosRegistry;
 
 public class CurioItemHandler implements IItemHandler {
@@ -15,12 +18,18 @@ public class CurioItemHandler implements IItemHandler {
   public CurioItemHandler(final LivingEntity livingEntity) {
     this.livingEntity = livingEntity;
     CurioInventory inv = livingEntity.getData(CuriosRegistry.INVENTORY.get());
+    Map<String, ICurioStacksHandler> curios = inv.curios;
+    IItemHandlerModifiable[] itemHandlers = new IItemHandlerModifiable[curios.size()];
+    int index = 0;
 
-    if (inv.curiosItemHandler != null) {
-      this.curios = inv.curiosItemHandler.getEquippedCurios();
-    } else {
-      this.curios = new ItemStackHandler();
+    for (ICurioStacksHandler stacksHandler : curios.values()) {
+
+      if (index < itemHandlers.length) {
+        itemHandlers[index] = stacksHandler.getStacks();
+        index++;
+      }
     }
+    this.curios = new CombinedInvWrapper(itemHandlers);
   }
 
   @Override
