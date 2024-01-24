@@ -47,6 +47,7 @@ import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
@@ -234,7 +235,11 @@ public class Curios {
       CuriosApi.setIconHelper(new IconHelper());
       NeoForge.EVENT_BUS.register(new ClientEventHandler());
       NeoForge.EVENT_BUS.register(new GuiEventHandler());
-      MenuScreens.register(CuriosRegistry.CURIO_MENU.get(), CuriosScreen::new);
+    }
+
+    @SubscribeEvent
+    public static void registerMenuScreens(final RegisterMenuScreensEvent evt) {
+      evt.register(CuriosRegistry.CURIO_MENU.get(), CuriosScreen::new);
     }
 
     @SubscribeEvent
