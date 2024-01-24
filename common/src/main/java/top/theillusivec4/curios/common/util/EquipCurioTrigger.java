@@ -24,9 +24,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.CriterionValidator;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ExtraCodecs;
@@ -35,6 +35,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * This should be triggered whenever player successfully equips any item in their curios slot. In
@@ -67,7 +68,7 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
 
   public record TriggerInstance(Optional<ContextAwarePredicate> player,
                                 Optional<ItemPredicate> item,
-                                Optional<ContextAwarePredicate> location)
+                                Optional<LocationPredicate> location)
       implements SimpleInstance {
     public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(
         p_311432_ -> p_311432_.group(
@@ -75,25 +76,20 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
                     .forGetter(TriggerInstance::player),
                 ExtraCodecs.strictOptionalField(ItemPredicate.CODEC, "item")
                     .forGetter(TriggerInstance::item),
-                ExtraCodecs.strictOptionalField(ContextAwarePredicate.CODEC, "location").forGetter(
+                ExtraCodecs.strictOptionalField(LocationPredicate.CODEC, "location").forGetter(
                     TriggerInstance::location)
             )
             .apply(p_311432_, TriggerInstance::new)
     );
 
     public boolean matches(ItemStack stack, LootContext lootContext) {
+      Vec3 vec3 = lootContext.getParam(LootContextParams.ORIGIN);
 
-      if (this.location.isEmpty() || this.location.get().matches(lootContext)) {
+      if (this.location.isEmpty() ||
+          this.location.get().matches(lootContext.getLevel(), vec3.x, vec3.y, vec3.z)) {
         return this.item.isEmpty() || this.item.get().matches(stack);
       }
       return false;
-    }
-
-    @Override
-    public void validate(@Nonnull CriterionValidator validator) {
-      SimpleInstance.super.validate(validator);
-      this.location.ifPresent(
-          loc -> validator.validate(loc, LootContextParamSets.ADVANCEMENT_LOCATION, ".location"));
     }
   }
 }

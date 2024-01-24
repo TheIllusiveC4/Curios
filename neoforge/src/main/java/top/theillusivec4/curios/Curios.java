@@ -44,7 +44,6 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -88,9 +87,8 @@ import top.theillusivec4.curios.server.command.CuriosSelectorOptions;
 @Mod(CuriosConstants.MOD_ID)
 public class Curios {
 
-  public Curios() {
+  public Curios(IEventBus eventBus) {
     CuriosRegistry.init();
-    final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::setup);
     eventBus.addListener(this::process);
     eventBus.addListener(this::registerCaps);

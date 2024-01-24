@@ -22,3 +22,6 @@ build
 eclipse
 run
 runs
+/neoforge/src/generated/
+/forge/src/generated/
+/common/src/generated/

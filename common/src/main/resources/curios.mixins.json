@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "curios.refmap.json",
   "mixins": [
-    "AccessorEntity"
+    "AccessorEntity",
+    "MixinCuriosTriggers"
   ],
   "minVersion": "0.8"
 }

@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nonnull;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -47,6 +48,8 @@ import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.data.AdvancementProvider;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,6 +70,8 @@ import top.theillusivec4.curiostest.client.renderer.CrownRenderer;
 import top.theillusivec4.curiostest.client.renderer.KnucklesRenderer;
 import top.theillusivec4.curiostest.common.CuriosTestRegistry;
 import top.theillusivec4.curiostest.common.item.AmuletItem;
+import top.theillusivec4.curiostest.data.CuriosGenerator;
+import top.theillusivec4.curiostest.data.CuriosTestProvider;
 
 @Mod(CuriosTest.MODID)
 public class CuriosTest {
@@ -81,7 +86,20 @@ public class CuriosTest {
     eventBus.addListener(this::registerLayers);
     eventBus.addListener(this::creativeTab);
     eventBus.addListener(this::registerCaps);
+    eventBus.addListener(this::gatherData);
     NeoForge.EVENT_BUS.addListener(this::attributeModifier);
+  }
+
+  private void gatherData(final GatherDataEvent evt) {
+    DataGenerator generator = evt.getGenerator();
+
+    generator.addProvider(evt.includeServer(),
+        new AdvancementProvider(generator.getPackOutput(), evt.getLookupProvider(),
+            evt.getExistingFileHelper(), List.of(new CuriosGenerator())));
+
+    generator.addProvider(evt.includeServer(),
+        new CuriosTestProvider("curiostest", generator.getPackOutput(), evt.getExistingFileHelper(),
+            evt.getLookupProvider()));
   }
 
   private void registerCaps(final RegisterCapabilitiesEvent evt) {
