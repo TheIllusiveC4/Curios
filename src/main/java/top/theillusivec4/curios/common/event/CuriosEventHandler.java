@@ -571,8 +571,8 @@ public class CuriosEventHandler {
                 currentCurio.ifPresent(curio -> curio.onEquip(slotContext, prevStack));
 
                 if (livingEntity instanceof ServerPlayer) {
-                  EquipCurioTrigger.INSTANCE.trigger((ServerPlayer) livingEntity, stack,
-                      (ServerLevel) livingEntity.level, livingEntity.getX(),
+                  EquipCurioTrigger.INSTANCE.trigger(slotContext, (ServerPlayer) livingEntity,
+                      stack, (ServerLevel) livingEntity.level, livingEntity.getX(),
                       livingEntity.getY(), livingEntity.getZ());
                 }
               }

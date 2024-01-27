@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
+import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import top.theillusivec4.curios.api.CuriosTriggers;
+import top.theillusivec4.curios.api.SlotPredicate;
 
 public class CuriosGenerator extends AdvancementProvider {
 
@@ -25,9 +27,15 @@ public class CuriosGenerator extends AdvancementProvider {
                                       @Nonnull ExistingFileHelper fileHelper) {
     Advancement.Builder.advancement()
         .addCriterion("test",
-            CuriosTriggers.equipAtLocation(
-                ItemPredicate.Builder.item().of(Items.DIAMOND),
-                LocationPredicate.Builder.location().setBiome(Biomes.BADLANDS)))
+            CuriosTriggers.equip()
+                .withItem(ItemPredicate.Builder.item()
+                    .of(Items.DIAMOND))
+                .withLocation(LocationPredicate.Builder.location()
+                    .setBiome(Biomes.BADLANDS))
+                .withSlot(SlotPredicate.Builder.slot()
+                    .of("ring", "necklace")
+                    .withIndex(MinMaxBounds.Ints.between(0, 10)))
+                .build())
         .save(consumer, new ResourceLocation("curiostest", "test"), fileHelper);
   }
 }

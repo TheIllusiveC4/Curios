@@ -14,6 +14,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.Curios;
+import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.SlotPredicate;
 
 /**
  * This should be triggered whenever player successfully equips any item in their curios slot. In
@@ -44,24 +46,32 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
                                                    EntityPredicate.Composite playerPred,
                                                    @Nonnull DeserializationContext conditions) {
     return new EquipCurioTrigger.Instance(playerPred, ItemPredicate.fromJson(json.get("item")),
-        LocationPredicate.fromJson(json.get("location")));
+        LocationPredicate.fromJson(json.get("location")),
+        SlotPredicate.fromJson(json.get("curios:slot")));
   }
 
   public void trigger(ServerPlayer player, ItemStack stack, ServerLevel world, double x,
                       double y, double z) {
-    this.trigger(player, instance -> instance.test(stack, world, x, y, z));
+    this.trigger(player, instance -> instance.test(null, stack, world, x, y, z));
+  }
+
+  public void trigger(SlotContext slotContext, ServerPlayer player, ItemStack stack,
+                      ServerLevel world, double x, double y, double z) {
+    this.trigger(player, instance -> instance.test(slotContext, stack, world, x, y, z));
   }
 
   public static class Instance extends AbstractCriterionTriggerInstance {
 
     private final ItemPredicate item;
     private final LocationPredicate location;
+    private final SlotPredicate slot;
 
     public Instance(EntityPredicate.Composite playerPred, ItemPredicate count,
-                    LocationPredicate indexPos) {
+                    LocationPredicate indexPos, SlotPredicate slot) {
       super(ID, playerPred);
       this.item = count;
       this.location = indexPos;
+      this.slot = slot;
     }
 
     @Nonnull
@@ -70,6 +80,7 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
       JsonObject jsonobject = super.serializeToJson(pConditions);
       jsonobject.add("location", this.location.serializeToJson());
       jsonobject.add("item", this.item.serializeToJson());
+      jsonobject.add("curios:slot", this.slot.serializeToJson());
       return jsonobject;
     }
 
@@ -79,7 +90,12 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
       return ID;
     }
 
-    boolean test(ItemStack stack, ServerLevel world, double x, double y, double z) {
+    boolean test(SlotContext slotContext, ItemStack stack, ServerLevel world, double x, double y,
+                 double z) {
+
+      if (this.slot != null && !this.slot.matches(slotContext)) {
+        return false;
+      }
       return this.item.matches(stack) && this.location.matches(world, x, y, z);
     }
   }
