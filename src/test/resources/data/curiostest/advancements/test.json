@@ -2,6 +2,15 @@
   "criteria": {
     "test": {
       "conditions": {
+        "curios:slot": {
+          "index": {
+            "max": 10,
+            "min": 0
+          },
+          "slots": [
+            "necklace"
+          ]
+        },
         "item": {
           "items": [
             "curiostest:amulet"

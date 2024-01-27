@@ -11,16 +11,58 @@ import net.minecraft.resources.ResourceLocation;
 public final class CuriosTriggers {
 
   @Nonnull
+  public static EquipBuilder equip() {
+    return new EquipBuilder();
+  }
+
+  /**
+   * @deprecated Use {@link CuriosTriggers#equip()} to build the needed parameters
+   */
+  @Deprecated
+  @Nonnull
   public static CriterionTriggerInstance equip(ItemPredicate.Builder itemPredicate) {
     CuriosApi.apiError();
     return new EmptyInstance();
   }
 
+  /**
+   * @deprecated Use {@link CuriosTriggers#equip()} to build the needed parameters
+   */
+  @Deprecated
   @Nonnull
   public static CriterionTriggerInstance equipAtLocation(ItemPredicate.Builder itemPredicate,
                                                          LocationPredicate.Builder locationPredicate) {
     CuriosApi.apiError();
     return new EmptyInstance();
+  }
+
+  public static final class EquipBuilder {
+
+    private ItemPredicate.Builder itemPredicate;
+    private LocationPredicate.Builder locationPredicate;
+    private SlotPredicate.Builder slotPredicate;
+
+    private EquipBuilder() {
+    }
+
+    public EquipBuilder withItem(ItemPredicate.Builder builder) {
+      this.itemPredicate = builder;
+      return this;
+    }
+
+    public EquipBuilder withLocation(LocationPredicate.Builder builder) {
+      this.locationPredicate = builder;
+      return this;
+    }
+
+    public EquipBuilder withSlot(SlotPredicate.Builder builder) {
+      this.slotPredicate = builder;
+      return this;
+    }
+
+    public CriterionTriggerInstance build() {
+      return new EmptyInstance();
+    }
   }
 
   private static final class EmptyInstance extends AbstractCriterionTriggerInstance {
