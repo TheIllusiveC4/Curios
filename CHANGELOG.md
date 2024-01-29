@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 5.2.0, this projected used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [7.2.0+1.20.4] - 2024.01.29
+### Added
+- Added slot predicates to curio advancement equip triggers
+
 ## [7.1.0+1.20.4] - 2024.01.23
 ### Added
 - [API] Added data generation helper methods and classes for generating entities/slots data files and adding curios
