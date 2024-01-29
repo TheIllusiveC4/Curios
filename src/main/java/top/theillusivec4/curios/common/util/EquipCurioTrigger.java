@@ -93,7 +93,7 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
     boolean test(SlotContext slotContext, ItemStack stack, ServerLevel world, double x, double y,
                  double z) {
 
-      if (this.slot != null && !this.slot.matches(slotContext)) {
+      if (this.slot != null && slotContext != null && !this.slot.matches(slotContext)) {
         return false;
       }
       return this.item.matches(stack) && this.location.matches(world, x, y, z);

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.19.2-5.1.6.1] - 2024.01.28
+### Fixed
+- Fixed null checks in equip triggers
+
 ## [1.19.2-5.1.6.0] - 2024.01.28
 ### Added
 - Added slot predicates to curio advancement equip triggers
