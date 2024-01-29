@@ -2,6 +2,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.19.x/docs/CHANGELOG.md).
 
-## [1.19.2-5.1.5.0] - 2024.01.21
+## [1.19.2-5.1.6.0] - 2024.01.28
 ### Added
-- [API] Added data generation helper methods and classes for triggers to advancements
+- Added slot predicates to curio advancement equip triggers
