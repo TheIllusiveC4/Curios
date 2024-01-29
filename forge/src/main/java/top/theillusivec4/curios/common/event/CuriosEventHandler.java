@@ -80,7 +80,6 @@ import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 import top.theillusivec4.curios.api.event.CurioDropsEvent;
-import top.theillusivec4.curios.api.event.CurioEquipEvent;
 import top.theillusivec4.curios.api.event.CurioUnequipEvent;
 import top.theillusivec4.curios.api.event.DropRulesEvent;
 import top.theillusivec4.curios.api.type.ISlotType;
@@ -623,7 +622,8 @@ public class CuriosEventHandler {
                 currentCurio.ifPresent(curio -> curio.onEquip(slotContext, prevStack));
 
                 if (livingEntity instanceof ServerPlayer) {
-                  EquipCurioTrigger.INSTANCE.trigger((ServerPlayer) livingEntity, stack);
+                  EquipCurioTrigger.INSTANCE.trigger(slotContext, (ServerPlayer) livingEntity,
+                      stack);
                 }
               }
               stackHandler.setPreviousStackInSlot(i, stack.copy());

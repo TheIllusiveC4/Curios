@@ -5,7 +5,8 @@
   "refmap": "curios.refmap.json",
   "mixins": [
     "AccessorEntity",
-    "MixinCuriosTriggers"
+    "MixinCuriosTriggers",
+    "MixinCuriosTriggersEquip"
   ],
   "minVersion": "0.8"
 }

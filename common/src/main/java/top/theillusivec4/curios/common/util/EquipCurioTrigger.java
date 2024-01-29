@@ -36,6 +36,8 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.SlotPredicate;
 
 /**
  * This should be triggered whenever player successfully equips any item in their curios slot. In
@@ -63,27 +65,45 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
         .withParameter(LootContextParams.TOOL, stack)
         .create(LootContextParamSets.ADVANCEMENT_LOCATION);
     LootContext lootcontext = new LootContext.Builder(lootparams).create(Optional.empty());
-    this.trigger(serverPlayer, instance -> instance.matches(stack, lootcontext));
+    this.trigger(serverPlayer, instance -> instance.matches(null, stack, lootcontext));
+  }
+
+  public void trigger(SlotContext slotContext, ServerPlayer serverPlayer, ItemStack stack) {
+    LootParams lootparams = new LootParams.Builder(serverPlayer.serverLevel())
+        .withParameter(LootContextParams.ORIGIN, serverPlayer.blockPosition().getCenter())
+        .withParameter(LootContextParams.THIS_ENTITY, serverPlayer)
+        .withParameter(LootContextParams.BLOCK_STATE, serverPlayer.getBlockStateOn())
+        .withParameter(LootContextParams.TOOL, stack)
+        .create(LootContextParamSets.ADVANCEMENT_LOCATION);
+    LootContext lootcontext = new LootContext.Builder(lootparams).create(Optional.empty());
+    this.trigger(serverPlayer, instance -> instance.matches(slotContext, stack, lootcontext));
   }
 
   public record TriggerInstance(Optional<ContextAwarePredicate> player,
                                 Optional<ItemPredicate> item,
-                                Optional<LocationPredicate> location)
+                                Optional<LocationPredicate> location,
+                                Optional<SlotPredicate> slot)
       implements SimpleInstance {
     public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(
-        p_311432_ -> p_311432_.group(
+        instance -> instance.group(
                 ExtraCodecs.strictOptionalField(EntityPredicate.ADVANCEMENT_CODEC, "player")
                     .forGetter(TriggerInstance::player),
                 ExtraCodecs.strictOptionalField(ItemPredicate.CODEC, "item")
                     .forGetter(TriggerInstance::item),
                 ExtraCodecs.strictOptionalField(LocationPredicate.CODEC, "location").forGetter(
-                    TriggerInstance::location)
+                    TriggerInstance::location),
+                ExtraCodecs.strictOptionalField(SlotPredicate.CODEC, "curios:slot")
+                    .forGetter(TriggerInstance::slot)
             )
-            .apply(p_311432_, TriggerInstance::new)
+            .apply(instance, TriggerInstance::new)
     );
 
-    public boolean matches(ItemStack stack, LootContext lootContext) {
+    public boolean matches(SlotContext slotContext, ItemStack stack, LootContext lootContext) {
       Vec3 vec3 = lootContext.getParam(LootContextParams.ORIGIN);
+
+      if (slotContext != null && this.slot().map(slotPredicate -> !slotPredicate.matches(slotContext)).orElse(false)) {
+        return false;
+      }
 
       if (this.location.isEmpty() ||
           this.location.get().matches(lootContext.getLevel(), vec3.x, vec3.y, vec3.z)) {

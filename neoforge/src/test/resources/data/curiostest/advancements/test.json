@@ -1,0 +1,29 @@
+{
+  "criteria": {
+    "test": {
+      "conditions": {
+        "curios:slot": {
+          "index": {
+            "max": 10,
+            "min": 0
+          },
+          "slots": [
+            "necklace"
+          ]
+        },
+        "item": {
+          "items": [
+            "curiostest:amulet"
+          ]
+        }
+      },
+      "trigger": "curios:equip_curio"
+    }
+  },
+  "requirements": [
+    [
+      "test"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

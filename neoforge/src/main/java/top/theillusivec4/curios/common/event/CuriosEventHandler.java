@@ -600,7 +600,8 @@ public class CuriosEventHandler {
                 currentCurio.ifPresent(curio -> curio.onEquip(slotContext, prevStack));
 
                 if (livingEntity instanceof ServerPlayer) {
-                  CuriosRegistry.EQUIP_TRIGGER.get().trigger((ServerPlayer) livingEntity, stack);
+                  CuriosRegistry.EQUIP_TRIGGER.get()
+                      .trigger(slotContext, (ServerPlayer) livingEntity, stack);
                 }
               }
               stackHandler.setPreviousStackInSlot(i, stack.copy());
