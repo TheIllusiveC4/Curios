@@ -39,7 +39,6 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
   public void init(final ICuriosItemHandler curiosItemHandler) {
     this.curiosItemHandler = curiosItemHandler;
     this.curios.clear();
-    this.invalidStacks.clear();
     LivingEntity livingEntity = curiosItemHandler.getWearer();
     EntityType<?> type = livingEntity.getType();
 
