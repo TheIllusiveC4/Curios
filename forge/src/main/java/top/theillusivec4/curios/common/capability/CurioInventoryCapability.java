@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.common.capability;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -491,6 +492,29 @@ public class CurioInventoryCapability {
           }
         }
       }
+    }
+
+    @Override
+    public void addTransientSlotModifier(String slot, UUID uuid, String name, double amount,
+                                         AttributeModifier.Operation operation) {
+      Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
+      map.put(slot, new AttributeModifier(uuid, name, amount, operation));
+      this.addTransientSlotModifiers(map);
+    }
+
+    @Override
+    public void addPermanentSlotModifier(String slot, UUID uuid, String name, double amount,
+                                         AttributeModifier.Operation operation) {
+      Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
+      map.put(slot, new AttributeModifier(uuid, name, amount, operation));
+      this.addPermanentSlotModifiers(map);
+    }
+
+    @Override
+    public void removeSlotModifier(String slot, UUID uuid) {
+      Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
+      map.put(slot, new AttributeModifier(uuid, "", 0, AttributeModifier.Operation.ADDITION));
+      this.removeSlotModifiers(map);
     }
 
     @Override

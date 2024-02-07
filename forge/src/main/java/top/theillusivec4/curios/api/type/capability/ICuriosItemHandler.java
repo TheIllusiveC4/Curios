@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.api.type.capability;
 
 import com.google.common.collect.Multimap;
+import com.mojang.logging.LogUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +41,14 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.ApiStatus;
-import top.theillusivec4.curios.api.SlotContext;
+import org.slf4j.Logger;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
 public interface ICuriosItemHandler {
+
+  Logger LOGGER = LogUtils.getLogger();
 
   /**
    * A map of the current curios, keyed by the {@link ISlotType} identifier.
@@ -211,6 +214,23 @@ public interface ICuriosItemHandler {
    */
   Set<ICurioStacksHandler> getUpdatingInventories();
 
+
+  /**
+   * Adds the specified slot modifier to the handler as temporary slot modifiers.
+   * <br>
+   * These slot modifiers are not serialized and disappear upon deserialization.
+   *
+   * @param slot      Identifier of the {@link ISlotType} to add the slot modifier to
+   * @param uuid      UUID for the {@link AttributeModifier}
+   * @param name      Name for the attribute modifier
+   * @param amount    Amount for the attribute modifier
+   * @param operation Operation for the attribute modifier
+   */
+  default void addTransientSlotModifier(String slot, UUID uuid, String name, double amount,
+                                        AttributeModifier.Operation operation) {
+    LOGGER.error("Missing method implementation!");
+  }
+
   /**
    * Adds the specified slot modifiers to the handler as temporary slot modifiers.
    * <br>
@@ -221,11 +241,37 @@ public interface ICuriosItemHandler {
   void addTransientSlotModifiers(Multimap<String, AttributeModifier> modifiers);
 
   /**
+   * Adds the specified slot modifier to the handler as temporary slot modifiers.
+   * <br>
+   * These slot modifiers are not serialized and disappear upon deserialization.
+   *
+   * @param slot      Identifier of the {@link ISlotType} to add the slot modifier to
+   * @param uuid      UUID for the {@link AttributeModifier}
+   * @param name      Name for the attribute modifier
+   * @param amount    Amount for the attribute modifier
+   * @param operation Operation for the attribute modifier
+   */
+  default void addPermanentSlotModifier(String slot, UUID uuid, String name, double amount,
+                                        AttributeModifier.Operation operation) {
+    LOGGER.error("Missing method implementation!");
+  }
+
+  /**
    * Adds the specified slot modifiers to the handler as permanent slot modifiers.
    *
    * @param modifiers A {@link Multimap} with slot identifiers as keys and attribute modifiers as values
    */
   void addPermanentSlotModifiers(Multimap<String, AttributeModifier> modifiers);
+
+  /**
+   * Removes the specified slot modifier (via UUID) from the handler.
+   *
+   * @param slot Identifier of the {@link ISlotType} to remove the modifier from
+   * @param uuid UUID of the {@link AttributeModifier} to remove
+   */
+  default void removeSlotModifier(String slot, UUID uuid) {
+    LOGGER.error("Missing method implementation!");
+  }
 
   /**
    * Removes the specified slot modifiers from the handler.
