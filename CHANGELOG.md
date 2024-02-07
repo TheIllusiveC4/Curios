@@ -8,6 +8,7 @@ Prior to version 5.2.0, this projected used [Forge Recommended Versioning](https
 ### Added
 - [API] Added more slot modifier methods
 ### Fixed
+- Fixed slots being assigned to entities erroneously
 - [NeoForge] Fixed items being lost if a slot is removed before logging into a world
 
 ## [7.2.0+1.20.4] - 2024.01.29

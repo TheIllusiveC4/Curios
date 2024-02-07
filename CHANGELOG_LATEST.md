@@ -6,4 +6,5 @@ This is a copy of the changelog for the most recent version. For the full versio
 ### Added
 - [API] Added more slot modifier methods
 ### Fixed
+- Fixed slots being assigned to entities erroneously
 - [NeoForge] Fixed items being lost if a slot is removed before logging into a world
