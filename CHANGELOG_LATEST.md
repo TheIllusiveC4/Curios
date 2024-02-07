@@ -2,6 +2,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.20.4/CHANGELOG.md).
 
-## [7.2.0+1.20.4] - 2024.01.29
+## [7.3.0+1.20.4] - 2024.02.07
 ### Added
-- Added slot predicates to curio advancement equip triggers
+- [API] Added more slot modifier methods
+### Fixed
+- [NeoForge] Fixed items being lost if a slot is removed before logging into a world
