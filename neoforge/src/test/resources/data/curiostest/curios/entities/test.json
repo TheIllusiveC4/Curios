@@ -1,5 +1,5 @@
 {
-  "entities": ["player", "armor_stand"],
+  "entities": ["player", "armor_stand", "wither_skeleton"],
   "slots": [
     "back",
     "body",

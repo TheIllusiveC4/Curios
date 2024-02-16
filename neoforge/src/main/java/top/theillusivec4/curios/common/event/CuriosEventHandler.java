@@ -245,6 +245,8 @@ public class CuriosEventHandler {
         PacketDistributor.PLAYER.with(mp)
             .send(new SPacketSyncCurios(mp.getId(), handler.getCurios()));
       });
+    } else if (entity instanceof LivingEntity livingEntity) {
+      CuriosApi.getCuriosInventory(livingEntity).ifPresent(inv -> inv.readTag(inv.writeTag()));
     }
   }
 
