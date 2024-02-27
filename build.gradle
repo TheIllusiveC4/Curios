@@ -207,6 +207,15 @@ tasks.register('publishForgeNeoForge') {
     }
 }
 
+tasks.register('publishForge') {
+    dependsOn ':forge:modrinth'
+    dependsOn ':forge:publishCurseForge'
+
+    doLast {
+        publishDiscord()
+    }
+}
+
 tasks.register('publishNeoForge') {
     dependsOn ':neoforge:modrinth'
     dependsOn ':neoforge:publishCurseForge'
