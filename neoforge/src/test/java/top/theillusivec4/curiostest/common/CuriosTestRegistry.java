@@ -21,6 +21,8 @@ package top.theillusivec4.curiostest.common;
 
 import java.util.function.Supplier;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.Item;
 import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -29,6 +31,7 @@ import top.theillusivec4.curiostest.common.item.AmuletItem;
 import top.theillusivec4.curiostest.common.item.CrownItem;
 import top.theillusivec4.curiostest.common.item.KnucklesItem;
 import top.theillusivec4.curiostest.common.item.RingItem;
+import top.theillusivec4.curiostest.common.item.TestArmor;
 
 public class CuriosTestRegistry {
 
@@ -39,6 +42,10 @@ public class CuriosTestRegistry {
   public static final Supplier<Item> AMULET = ITEMS.register("amulet", AmuletItem::new);
   public static final Supplier<Item> CROWN = ITEMS.register("crown", CrownItem::new);
   public static final Supplier<Item> KNUCKLES = ITEMS.register("knuckles", KnucklesItem::new);
+
+  public static final Supplier<Item> TEST_ARMOR = ITEMS.register("test_armor",
+      () -> new TestArmor(ArmorMaterials.DIAMOND, ArmorItem.Type.CHESTPLATE,
+          new Item.Properties()));
 
   public static void init() {
     ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());

@@ -20,6 +20,7 @@
 package top.theillusivec4.curios.mixin;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.HashMap;
 import java.util.Map;
@@ -196,7 +197,7 @@ public class CuriosImplMixinHooks {
     CurioAttributeModifierEvent evt =
         new CurioAttributeModifierEvent(stack, slotContext, uuid, multimap);
     NeoForge.EVENT_BUS.post(evt);
-    return HashMultimap.create(evt.getModifiers());
+    return LinkedHashMultimap.create(evt.getModifiers());
   }
 
   public static void addSlotModifier(Multimap<Attribute, AttributeModifier> map, String identifier,

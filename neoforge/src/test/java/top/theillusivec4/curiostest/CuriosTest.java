@@ -153,6 +153,7 @@ public class CuriosTest {
             new AttributeModifier(uuid, CuriosTest.MODID + ":knockback_resist", 0.2,
                 AttributeModifier.Operation.ADDITION));
         CuriosApi.addSlotModifier(atts, "ring", uuid, 1, AttributeModifier.Operation.ADDITION);
+        CuriosApi.addSlotModifier(atts, "curio", uuid, -1, AttributeModifier.Operation.ADDITION);
         return atts;
       }
 
@@ -200,11 +201,12 @@ public class CuriosTest {
       @Override
       public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                           UUID uuid) {
-        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
+        Multimap<Attribute, AttributeModifier> atts = LinkedHashMultimap.create();
         atts.put(Attributes.ATTACK_DAMAGE,
             new AttributeModifier(uuid, CuriosTest.MODID + ":attack_damage_bonus", 4,
                 AttributeModifier.Operation.ADDITION));
-        CuriosApi.addSlotModifier(atts, "ring", uuid, 2, AttributeModifier.Operation.ADDITION);
+        CuriosApi.addSlotModifier(atts, "necklace", uuid, 2, AttributeModifier.Operation.ADDITION);
+        CuriosApi.addSlotModifier(atts, "ring", uuid, -1, AttributeModifier.Operation.ADDITION);
         return atts;
       }
     }, CuriosTestRegistry.KNUCKLES.get());

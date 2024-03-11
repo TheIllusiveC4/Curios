@@ -43,6 +43,7 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -63,6 +64,7 @@ import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.EnderManAngerEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.entity.living.LootingLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -627,6 +629,41 @@ public class CuriosEventHandler {
             }
           }
         }
+      }
+    });
+  }
+
+  @SubscribeEvent
+  public void livingEquipmentChange(final LivingEquipmentChangeEvent evt) {
+    CuriosApi.getCuriosInventory(evt.getEntity()).ifPresent(inv -> {
+      ItemStack from = evt.getFrom();
+      ItemStack to = evt.getTo();
+      EquipmentSlot slot = evt.getSlot();
+
+      if (!from.isEmpty()) {
+        Multimap<Attribute, AttributeModifier> map = from.getAttributeModifiers(slot);
+        Multimap<String, AttributeModifier> slots = HashMultimap.create();
+
+        for (Attribute attribute : map.keySet()) {
+
+          if (attribute instanceof SlotAttribute wrapper) {
+            slots.putAll(wrapper.getIdentifier(), map.get(attribute));
+          }
+        }
+        inv.removeSlotModifiers(slots);
+      }
+
+      if (!to.isEmpty()) {
+        Multimap<Attribute, AttributeModifier> map = to.getAttributeModifiers(slot);
+        Multimap<String, AttributeModifier> slots = HashMultimap.create();
+
+        for (Attribute attribute : map.keySet()) {
+
+          if (attribute instanceof SlotAttribute wrapper) {
+            slots.putAll(wrapper.getIdentifier(), map.get(attribute));
+          }
+        }
+        inv.addTransientSlotModifiers(slots);
       }
     });
   }
