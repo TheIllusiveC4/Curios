@@ -20,6 +20,7 @@
 package top.theillusivec4.curiostest.common.item;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.UUID;
 import javax.annotation.Nonnull;
@@ -53,11 +54,12 @@ public class KnucklesItem extends Item {
       @Override
       public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext slotContext,
                                                                           UUID uuid) {
-        Multimap<Attribute, AttributeModifier> atts = HashMultimap.create();
+        Multimap<Attribute, AttributeModifier> atts = LinkedHashMultimap.create();
         atts.put(Attributes.ATTACK_DAMAGE,
             new AttributeModifier(uuid, CuriosTest.MODID + ":attack_damage_bonus", 4,
                 AttributeModifier.Operation.ADDITION));
-        CuriosApi.addSlotModifier(atts, "ring", uuid, 2, AttributeModifier.Operation.ADDITION);
+        CuriosApi.addSlotModifier(atts, "necklace", uuid, 2, AttributeModifier.Operation.ADDITION);
+        CuriosApi.addSlotModifier(atts, "ring", uuid, -1, AttributeModifier.Operation.ADDITION);
         return atts;
       }
     });
