@@ -42,6 +42,7 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -62,6 +63,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.EnderManAngerEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -652,6 +654,41 @@ public class CuriosEventHandler {
             }
           }
         }
+      }
+    });
+  }
+
+  @SubscribeEvent
+  public void livingEquipmentChange(final LivingEquipmentChangeEvent evt) {
+    CuriosApi.getCuriosInventory(evt.getEntity()).ifPresent(inv -> {
+      ItemStack from = evt.getFrom();
+      ItemStack to = evt.getTo();
+      EquipmentSlot slot = evt.getSlot();
+
+      if (!from.isEmpty()) {
+        Multimap<Attribute, AttributeModifier> map = from.getAttributeModifiers(slot);
+        Multimap<String, AttributeModifier> slots = HashMultimap.create();
+
+        for (Attribute attribute : map.keySet()) {
+
+          if (attribute instanceof SlotAttribute wrapper) {
+            slots.putAll(wrapper.getIdentifier(), map.get(attribute));
+          }
+        }
+        inv.removeSlotModifiers(slots);
+      }
+
+      if (!to.isEmpty()) {
+        Multimap<Attribute, AttributeModifier> map = to.getAttributeModifiers(slot);
+        Multimap<String, AttributeModifier> slots = HashMultimap.create();
+
+        for (Attribute attribute : map.keySet()) {
+
+          if (attribute instanceof SlotAttribute wrapper) {
+            slots.putAll(wrapper.getIdentifier(), map.get(attribute));
+          }
+        }
+        inv.addTransientSlotModifiers(slots);
       }
     });
   }

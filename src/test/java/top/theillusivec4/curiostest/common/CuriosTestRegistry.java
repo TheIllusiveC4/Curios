@@ -19,6 +19,8 @@
 
 package top.theillusivec4.curiostest.common;
 
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -30,6 +32,7 @@ import top.theillusivec4.curiostest.common.item.AmuletItem;
 import top.theillusivec4.curiostest.common.item.CrownItem;
 import top.theillusivec4.curiostest.common.item.KnucklesItem;
 import top.theillusivec4.curiostest.common.item.RingItem;
+import top.theillusivec4.curiostest.common.item.TestArmor;
 
 @Mod.EventBusSubscriber(modid = CuriosTest.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CuriosTestRegistry {
@@ -41,6 +44,9 @@ public class CuriosTestRegistry {
   public static final RegistryObject<Item> AMULET = ITEMS.register("amulet", AmuletItem::new);
   public static final RegistryObject<Item> CROWN = ITEMS.register("crown", CrownItem::new);
   public static final RegistryObject<Item> KNUCKLES = ITEMS.register("knuckles", KnucklesItem::new);
+  public static final RegistryObject<Item> TEST_ARMOR = ITEMS.register("test_armor",
+      () -> new TestArmor(ArmorMaterials.DIAMOND, ArmorItem.Type.CHESTPLATE,
+          new Item.Properties()));
 
   public static void init() {
     ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());

@@ -34,6 +34,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -48,7 +49,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.PacketDistributor;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
@@ -99,6 +99,38 @@ public class ClientEventHandler {
 
     if (!stack.isEmpty()) {
       List<Component> tooltip = evt.getToolTip();
+
+      // Process non-Curio equipment items with slot modifier tooltips
+      // todo: There's probably a better way to accomplish this
+      for (int i = 0; i < tooltip.size(); i++) {
+        Component component = tooltip.get(i);
+
+        if (component.getContents() instanceof TranslatableContents contents) {
+          boolean replace = false;
+
+          for (int i1 = 0; i1 < contents.getArgs().length; i1++) {
+            Object arg = contents.getArgs()[i1];
+
+            if (arg instanceof MutableComponent mutableComponent &&
+                mutableComponent.getContents() instanceof TranslatableContents contents1) {
+
+              if (contents1.getKey().startsWith("curios.slot.")) {
+                String actualKey = contents1.getKey().replace(".slot.", ".identifier.");
+                contents.getArgs()[i1] = Component.translatable(actualKey, contents1.getArgs());
+                replace = true;
+                break;
+              }
+            }
+          }
+
+          if (replace) {
+            tooltip.set(i, Component.translatable(
+                contents.getKey().replace("attribute.modifier.", "curios.modifiers.slots."),
+                contents.getArgs()).withStyle(component.getStyle()));
+          }
+        }
+      }
+
       CompoundTag tag = stack.getTag();
       int i = 0;
 
