@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 5.2.0, this projected used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [7.3.4+1.20.4] - 2024.03.11
+### Fixed
+- Fixed tooltip crash [#388](https://github.com/TheIllusiveC4/Curios/issues/388)
+
 ## [7.3.3+1.20.4] - 2024.03.11
 ### Changed
 - Non-curio equippable items (such as armor) now support slot modifiers
