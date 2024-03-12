@@ -105,18 +105,24 @@ public class ClientEventHandler {
 
         if (component.getContents() instanceof TranslatableContents contents) {
           boolean replace = false;
+          Object[] args = contents.getArgs();
 
-          for (int i1 = 0; i1 < contents.getArgs().length; i1++) {
-            Object arg = contents.getArgs()[i1];
+          // https://github.com/TheIllusiveC4/Curios/issues/388
+          // noinspection ConstantConditions
+          if (args != null) {
 
-            if (arg instanceof MutableComponent mutableComponent &&
-                mutableComponent.getContents() instanceof TranslatableContents contents1) {
+            for (int i1 = 0; i1 < args.length; i1++) {
+              Object arg = args[i1];
 
-              if (contents1.getKey().startsWith("curios.slot.")) {
-                String actualKey = contents1.getKey().replace(".slot.", ".identifier.");
-                contents.getArgs()[i1] = Component.translatable(actualKey, contents1.getArgs());
-                replace = true;
-                break;
+              if (arg instanceof MutableComponent mutableComponent &&
+                  mutableComponent.getContents() instanceof TranslatableContents contents1) {
+
+                if (contents1.getKey().startsWith("curios.slot.")) {
+                  String actualKey = contents1.getKey().replace(".slot.", ".identifier.");
+                  contents.getArgs()[i1] = Component.translatable(actualKey, contents1.getArgs());
+                  replace = true;
+                  break;
+                }
               }
             }
           }
