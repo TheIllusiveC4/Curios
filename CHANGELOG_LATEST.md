@@ -3,7 +3,6 @@ Prior to version 5.2.0, this project used [Forge Recommended Versioning](https:/
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.20.x/docs/CHANGELOG.md).
 
-## [5.7.1+1.20.1] - 2024.03.11
-### Changed
-- Non-curio equippable items (such as armor) now support slot modifiers
-- Insertion order of curio attribute modifiers are preserved instead of randomized in tooltips
+## [5.7.2+1.20.1] - 2024.03.11
+### Fixed
+- Fixed tooltip crash [#388](https://github.com/TheIllusiveC4/Curios/issues/388)
