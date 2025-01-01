@@ -42,7 +42,7 @@ to launch the game in their development environment if using this version or new
 
 #### 1. Add these lines to your run configurations
 
-Add both of these lines to both the `client {}` and `server {}` run configuration blocks in the `build.gradle`. These
+Add both of these lines to `client {}`, `server {}`, and `data {}` run configuration blocks in the `build.gradle`. These
 can be placed anywhere within each run configuration, the order does not matter.
 
 ```
