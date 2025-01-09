@@ -35,7 +35,6 @@ import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 
 @Mixin(Inventory.class)
 public class MixinInventory {
-
   @Shadow
   @Final
   public Player player;

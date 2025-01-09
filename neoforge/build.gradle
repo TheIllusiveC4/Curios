@@ -1,8 +1,11 @@
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
 plugins {
     id 'multiloader-loader'
-    id 'net.neoforged.gradle.userdev' version '7.0.142'
+    id 'net.neoforged.gradle.userdev' version '7.0.165'
     id 'com.modrinth.minotaur' version '2.+'
     id 'net.darkhax.curseforgegradle' version '1.+'
+    id 'maven-publish'
 }
 
 // Automatically enable neoforge AccessTransformers if the file exists
@@ -45,14 +48,12 @@ runs {
 
 repositories {
     maven {
+        url "https://www.cursemaven.com"
+    }
+    maven {
         // location of the maven that hosts JEI files since January 2023
         name = "Jared's maven"
         url = "https://maven.blamejared.com/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.dev"
     }
 }
 
@@ -60,13 +61,11 @@ dependencies {
     implementation "net.neoforged:neoforge:${neoforge_version}"
 
     // compile against the JEI API but do not include it at runtime
-    compileOnly "mezz.jei:jei-1.20.4-common-api:${jei_version}"
-    compileOnly "mezz.jei:jei-1.20.4-forge-api:${jei_version}"
-    // at runtime, use the full JEI jar for Forge
-//    runtimeOnly "mezz.jei:jei-1.20.4-forge:${jei_version}"
+    compileOnly "mezz.jei:jei-1.21-neoforge-api:${jei_version}"
+    runtimeOnly "mezz.jei:jei-1.21-neoforge:${jei_version}"
 }
 
-task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
     apiToken = findProperty('curseKey')
     //debugMode = true
     def projectId = "${cf_id}".toString()

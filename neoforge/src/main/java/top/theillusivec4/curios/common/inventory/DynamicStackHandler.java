@@ -25,6 +25,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.TriState;
@@ -63,16 +64,13 @@ public class DynamicStackHandler extends ItemStackHandler implements IDynamicSta
   @Override
   public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
     SlotContext ctx = ctxBuilder.apply(slot);
-    CurioCanEquipEvent equipEvent = new CurioCanEquipEvent(stack, ctx);
-    NeoForge.EVENT_BUS.post(equipEvent);
-    TriState result = equipEvent.getEquipResult();
-
-    if (result == TriState.FALSE) {
-      return false;
-    }
-    return result == TriState.TRUE || (CuriosApi.isStackValid(ctx, stack) &&
+    boolean canEquip = (CuriosApi.isStackValid(ctx, stack) &&
         CuriosApi.getCurio(stack).map(curio -> curio.canEquip(ctx)).orElse(true) &&
         super.isItemValid(slot, stack));
+    CurioCanEquipEvent event =
+        new CurioCanEquipEvent(stack, ctx, canEquip ? TriState.TRUE : TriState.FALSE);
+    NeoForge.EVENT_BUS.post(event);
+    return event.getEquipResult() != TriState.FALSE;
   }
 
   @Override
@@ -89,7 +87,8 @@ public class DynamicStackHandler extends ItemStackHandler implements IDynamicSta
     boolean isCreative = ctx.entity() instanceof Player player && player.isCreative();
 
     if (result == TriState.TRUE ||
-        ((existing.isEmpty() || isCreative || !EnchantmentHelper.hasBindingCurse(existing)) &&
+        ((existing.isEmpty() || isCreative ||
+            !EnchantmentHelper.has(existing, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE)) &&
             CuriosApi.getCurio(existing).map(curio -> curio.canUnequip(ctx)).orElse(true))) {
       return super.extractItem(slot, amount, simulate);
     }

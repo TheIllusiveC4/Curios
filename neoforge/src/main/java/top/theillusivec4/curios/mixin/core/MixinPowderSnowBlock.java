@@ -36,7 +36,8 @@ public class MixinPowderSnowBlock {
   private static void curios$canEntityWalkOnPowderSnow(Entity entity,
                                                        CallbackInfoReturnable<Boolean> cir) {
 
-    if (entity instanceof LivingEntity livingEntity && CuriosUtilMixinHooks.canWalkOnPowderSnow(livingEntity)) {
+    if (entity instanceof LivingEntity livingEntity &&
+        CuriosUtilMixinHooks.canWalkOnPowderSnow(livingEntity)) {
       cir.setReturnValue(true);
     }
   }

@@ -22,8 +22,9 @@ package top.theillusivec4.curiostest.common.item;
 import javax.annotation.Nonnull;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-public class RingItem extends Item {
+public class RingItem extends Item implements ICurioItem {
 
   public RingItem() {
     super(new Item.Properties().stacksTo(1).durability(0));

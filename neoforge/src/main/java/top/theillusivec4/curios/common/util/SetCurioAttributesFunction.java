@@ -31,15 +31,12 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
@@ -86,7 +83,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
 
   public static void register() {
     TYPE = Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE,
-        new ResourceLocation(CuriosApi.MODID, "set_curio_attributes"),
+        ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "set_curio_attributes"),
         new LootItemFunctionType<>(CODEC));
   }
 
@@ -107,14 +104,13 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
     RandomSource random = context.getRandom();
 
     for (Modifier modifier : this.modifiers) {
-      UUID uuid = modifier.id.orElse(null);
       String slot = Util.getRandom(modifier.slots, random);
 
       if (modifier.attribute.value() instanceof SlotAttribute wrapper) {
-        CuriosApi.addSlotModifier(stack, wrapper.getIdentifier(), modifier.name, uuid,
+        CuriosApi.addSlotModifier(stack, wrapper.getIdentifier(), modifier.id,
             modifier.amount.getFloat(context), modifier.operation, slot);
       } else {
-        CuriosApi.addModifier(stack, modifier.attribute, modifier.name, uuid,
+        CuriosApi.addModifier(stack, modifier.attribute, modifier.id,
             modifier.amount.getFloat(context), modifier.operation, slot);
       }
     }
@@ -122,7 +118,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
   }
 
   record Modifier(String name, Holder<Attribute> attribute, AttributeModifier.Operation operation,
-                  NumberProvider amount, Optional<UUID> id, List<String> slots) {
+                  NumberProvider amount, ResourceLocation id, List<String> slots) {
 
     private static final Codec<List<String>> SLOTS_CODEC = ExtraCodecs.nonEmptyList(
         Codec.either(Codec.STRING, Codec.list(Codec.STRING))
@@ -159,7 +155,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
         ResourceLocation rl;
 
         if (value.value() instanceof SlotAttribute wrapper) {
-          rl = new ResourceLocation(CuriosApi.MODID, wrapper.getIdentifier());
+          rl = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, wrapper.getIdentifier());
         } else {
           rl = BuiltInRegistries.ATTRIBUTE.getKey(value.value());
         }
@@ -176,7 +172,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
                     .forGetter(Modifier::operation),
                 NumberProviders.CODEC.fieldOf("amount")
                     .forGetter(Modifier::amount),
-                UUIDUtil.STRING_CODEC.optionalFieldOf("id")
+                ResourceLocation.CODEC.fieldOf("id")
                     .forGetter(Modifier::id),
                 SLOTS_CODEC.fieldOf("slot")
                     .forGetter(Modifier::slots))

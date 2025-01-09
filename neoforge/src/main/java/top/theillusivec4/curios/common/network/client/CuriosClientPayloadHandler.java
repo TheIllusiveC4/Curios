@@ -20,25 +20,8 @@
 
 package top.theillusivec4.curios.common.network.client;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.type.ICuriosMenu;
-import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
-import top.theillusivec4.curios.common.data.CuriosEntityManager;
-import top.theillusivec4.curios.common.data.CuriosSlotManager;
-import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 import top.theillusivec4.curios.common.network.server.SPacketBreak;
 import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
 import top.theillusivec4.curios.common.network.server.SPacketPage;
@@ -61,7 +44,7 @@ public class CuriosClientPayloadHandler {
   private static void handle(final IPayloadContext ctx, Runnable handler) {
     ctx.enqueueWork(handler)
         .exceptionally(e -> {
-          ctx.disconnect(Component.translatable("curios.networking.failed", e.getMessage()));
+          ctx.disconnect(Component.translatable("curios.networking.failed"));
           return null;
         });
   }

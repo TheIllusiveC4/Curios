@@ -67,14 +67,14 @@ public abstract class CuriosDataProvider implements DataProvider {
       List<CompletableFuture<?>> list = new ArrayList<>();
       this.generate(p_255484_, this.fileHelper);
       this.slotBuilders.forEach((slot, slotBuilder) -> {
-        Path path = this.slotsPathProvider.json(new ResourceLocation(this.modId, slot));
-        list.add(
-            DataProvider.saveStable(pOutput, slotBuilder.serialize(p_255484_), path));
+        Path path =
+            this.slotsPathProvider.json(ResourceLocation.fromNamespaceAndPath(this.modId, slot));
+        list.add(DataProvider.saveStable(pOutput, slotBuilder.serialize(p_255484_), path));
       });
       this.entitiesBuilders.forEach((entities, entitiesBuilder) -> {
-        Path path = this.entitiesPathProvider.json(new ResourceLocation(this.modId, entities));
-        list.add(
-            DataProvider.saveStable(pOutput, entitiesBuilder.serialize(p_255484_), path));
+        Path path = this.entitiesPathProvider.json(
+            ResourceLocation.fromNamespaceAndPath(this.modId, entities));
+        list.add(DataProvider.saveStable(pOutput, entitiesBuilder.serialize(p_255484_), path));
       });
       return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
     });

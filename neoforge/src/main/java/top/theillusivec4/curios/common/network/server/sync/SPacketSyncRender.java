@@ -32,7 +32,7 @@ public record SPacketSyncRender(int entityId, String curioId, int slotId, boolea
     CustomPacketPayload {
 
   public static final Type<SPacketSyncRender> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "sync_render"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "sync_render"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, SPacketSyncRender> STREAM_CODEC =
       StreamCodec.composite(ByteBufCodecs.INT, SPacketSyncRender::entityId,

@@ -23,15 +23,16 @@ package top.theillusivec4.curios.common.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import com.mojang.datafixers.util.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
@@ -39,8 +40,8 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -53,6 +54,7 @@ import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
@@ -63,6 +65,7 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.CuriosRegistry;
 
 public class CurioInventoryCapability implements ICuriosItemHandler {
+
   final CurioInventory curioInventory;
   final LivingEntity livingEntity;
 
@@ -140,11 +143,32 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
   @Override
   public Optional<SlotResult> findFirstCurio(Item item) {
-    return findFirstCurio(stack -> stack.getItem() == item);
+    return findFirstCurio(stack -> stack.getItem() == item,
+        Curios.itemCacheKey(item.getDefaultInstance()));
   }
 
   @Override
   public Optional<SlotResult> findFirstCurio(Predicate<ItemStack> filter) {
+    return findFirstCurio(filter, "");
+  }
+
+  static Map<String, Pair<Long, Optional<SlotResult>>> firstCurioCache = new HashMap<>();
+
+  public Optional<SlotResult> findFirstCurio(Predicate<ItemStack> filter, String cacheKey) {
+    // Check cached value first
+    long gameTime = this.livingEntity.level().getGameTime();
+    if (!cacheKey.isEmpty()) {
+      if (firstCurioCache.size() > 500) {
+        firstCurioCache.clear();
+      }
+      if (firstCurioCache.containsKey(cacheKey)) {
+        var pair = firstCurioCache.get(cacheKey);
+        if (pair.getFirst() == gameTime) {
+          return pair.getSecond();
+        }
+      }
+    }
+
     Map<String, ICurioStacksHandler> curios = this.getCurios();
 
     for (String id : curios.keySet()) {
@@ -156,21 +180,45 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
         if (!stack.isEmpty() && filter.test(stack)) {
           NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-          return Optional.of(new SlotResult(new SlotContext(id, this.livingEntity, i, false,
+          var ret = Optional.of(new SlotResult(new SlotContext(id, this.livingEntity, i, false,
               renderStates.size() > i && renderStates.get(i)), stack));
+          firstCurioCache.put(cacheKey, Pair.of(gameTime, ret));
+          return ret;
         }
       }
     }
+    firstCurioCache.put(cacheKey, Pair.of(gameTime, Optional.empty()));
     return Optional.empty();
   }
 
   @Override
   public List<SlotResult> findCurios(Item item) {
-    return findCurios(stack -> stack.getItem() == item);
+    return findCurios(stack -> stack.getItem() == item,
+        Curios.itemCacheKey(item.getDefaultInstance()));
   }
 
   @Override
   public List<SlotResult> findCurios(Predicate<ItemStack> filter) {
+    return findCurios(filter, "");
+  }
+
+  static Map<String, Pair<Long, List<SlotResult>>> findCuriosCache = new HashMap<>();
+
+  public List<SlotResult> findCurios(Predicate<ItemStack> filter, String cacheKey) {
+    // Check cached value first
+    long gameTime = this.livingEntity.level().getGameTime();
+    if (!cacheKey.isEmpty()) {
+      if (findCuriosCache.size() > 500) {
+        findCuriosCache.clear();
+      }
+      if (findCuriosCache.containsKey(cacheKey)) {
+        var pair = findCuriosCache.get(cacheKey);
+        if (pair.getFirst() == gameTime) {
+          return pair.getSecond();
+        }
+      }
+    }
+
     List<SlotResult> result = new ArrayList<>();
     Map<String, ICurioStacksHandler> curios = this.getCurios();
 
@@ -188,6 +236,7 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
         }
       }
     }
+    findCuriosCache.put(cacheKey, Pair.of(gameTime, result));
     return result;
   }
 
@@ -321,22 +370,20 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
   }
 
   @Override
-  public int getLootingLevel(DamageSource source, LivingEntity target, int baseLooting) {
+  public int getLootingLevel(@Nullable LootContext lootContext) {
     int lootingLevel = 0;
     for (Map.Entry<String, ICurioStacksHandler> entry : getCurios().entrySet()) {
       IDynamicStackHandler stacks = entry.getValue().getStacks();
 
       for (int i = 0; i < stacks.getSlots(); i++) {
-        int index = i;
+        final int index = i;
         lootingLevel += CuriosApi.getCurio(stacks.getStackInSlot(i)).map(
-                curio -> {
-                  NonNullList<Boolean> renderStates = entry.getValue().getRenders();
-                  return curio.getLootingLevel(
-                      new SlotContext(entry.getKey(), this.livingEntity, index, false,
-                          renderStates.size() > index && renderStates.get(index)), source, target,
-                      baseLooting);
-                })
-            .orElse(0);
+            curio -> {
+              NonNullList<Boolean> renderStates = entry.getValue().getRenders();
+              return curio.getLootingLevel(
+                  new SlotContext(entry.getKey(), this.livingEntity, index, false,
+                      renderStates.size() > index && renderStates.get(index)), lootContext);
+            }).orElse(0);
       }
     }
     return lootingLevel;
@@ -407,10 +454,10 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
   }
 
   @Override
-  public void addTransientSlotModifier(String slot, UUID uuid, String name, double amount,
+  public void addTransientSlotModifier(String slot, ResourceLocation id, double amount,
                                        AttributeModifier.Operation operation) {
     Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
-    map.put(slot, new AttributeModifier(uuid, name, amount, operation));
+    map.put(slot, new AttributeModifier(id, amount, operation));
     this.addTransientSlotModifiers(map);
   }
 
@@ -431,10 +478,10 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
   }
 
   @Override
-  public void addPermanentSlotModifier(String slot, UUID uuid, String name, double amount,
+  public void addPermanentSlotModifier(String slot, ResourceLocation id, double amount,
                                        AttributeModifier.Operation operation) {
     Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
-    map.put(slot, new AttributeModifier(uuid, name, amount, operation));
+    map.put(slot, new AttributeModifier(id, amount, operation));
     this.addPermanentSlotModifiers(map);
   }
 
@@ -455,9 +502,9 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
   }
 
   @Override
-  public void removeSlotModifier(String slot, UUID uuid) {
+  public void removeSlotModifier(String slot, ResourceLocation id) {
     Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
-    map.put(slot, new AttributeModifier(uuid, "", 0, AttributeModifier.Operation.ADD_VALUE));
+    map.put(slot, new AttributeModifier(id, 0, AttributeModifier.Operation.ADD_VALUE));
     this.removeSlotModifiers(map);
   }
 
@@ -504,9 +551,9 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
           if (!stack.isEmpty()) {
             SlotContext slotContext = new SlotContext(id, this.getWearer(), i, false,
                 renderStates.size() > i && renderStates.get(i));
-            UUID uuid = CuriosApi.getSlotUuid(slotContext);
             Multimap<Holder<Attribute>, AttributeModifier> map =
-                CuriosApi.getAttributeModifiers(slotContext, uuid, stack);
+                CuriosApi.getAttributeModifiers(slotContext, CuriosApi.getSlotId(slotContext),
+                    stack);
 
             for (Holder<Attribute> attribute : map.keySet()) {
 

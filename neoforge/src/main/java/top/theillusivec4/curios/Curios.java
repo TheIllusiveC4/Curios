@@ -26,6 +26,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
@@ -34,11 +35,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
@@ -185,10 +186,9 @@ public class Curios {
   }
 
   private void reload(final AddReloadListenerEvent evt) {
-    ICondition.IContext ctx = evt.getConditionContext();
-    CuriosSlotManager.SERVER = new CuriosSlotManager(ctx);
+    CuriosSlotManager.SERVER = new CuriosSlotManager();
     evt.addListener(CuriosSlotManager.SERVER);
-    CuriosEntityManager.SERVER = new CuriosEntityManager(ctx);
+    CuriosEntityManager.SERVER = new CuriosEntityManager();
     evt.addListener(CuriosEntityManager.SERVER);
     evt.addListener(new SimplePreparableReloadListener<Void>() {
       @Nonnull
@@ -243,5 +243,12 @@ public class Curios {
         livingRenderer.addLayer(new CuriosLayer<>(livingRenderer));
       }
     }
+  }
+
+  public static String itemCacheKey(ItemStack stack) {
+    return BuiltInRegistries.ITEM.getKey(stack.getItem()).toString() +
+        (!stack.getComponents().isEmpty() ?
+            stack.getComponents().stream().map(TypedDataComponent::toString)
+                .reduce((s, s2) -> s + s2) : "");
   }
 }

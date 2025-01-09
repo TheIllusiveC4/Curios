@@ -46,8 +46,9 @@ import top.theillusivec4.curiostest.client.CuriosLayerDefinitions;
 import top.theillusivec4.curiostest.client.model.AmuletModel;
 
 public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
-  private static final ResourceLocation AMULET_TEXTURE = new ResourceLocation(CuriosTest.MODID,
-      "textures/entity/amulet.png");
+  private static final ResourceLocation AMULET_TEXTURE =
+      ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID,
+          "textures/entity/amulet.png");
   private Object model;
 
   public AmuletItem() {
@@ -96,7 +97,6 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
                                                                         float ageInTicks,
                                                                         float netHeadYaw,
                                                                         float headPitch) {
-
     if (this.model == null) {
       this.model = new AmuletModel<>(
           Minecraft.getInstance().getEntityModels().bakeLayer(CuriosLayerDefinitions.AMULET));
@@ -106,11 +106,10 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
       ICurioRenderer.translateIfSneaking(matrixStack, slotContext.entity());
       ICurioRenderer.rotateIfSneaking(matrixStack, slotContext.entity());
       VertexConsumer vertexconsumer = ItemRenderer
-          .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(AMULET_TEXTURE), false,
+          .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(AMULET_TEXTURE),
               stack.hasFoil());
       ((AmuletModel<?>) this.model)
-          .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F,
-              1.0F, 1.0F);
+          .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1);
     }
   }
 }

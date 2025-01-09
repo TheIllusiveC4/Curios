@@ -31,7 +31,7 @@ import top.theillusivec4.curios.CuriosConstants;
 public record SPacketPage(int windowId, int page) implements CustomPacketPayload {
 
   public static final Type<SPacketPage> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "server_page"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "server_page"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, SPacketPage> STREAM_CODEC =
       StreamCodec.composite(ByteBufCodecs.INT, SPacketPage::windowId, ByteBufCodecs.INT,

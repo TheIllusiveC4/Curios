@@ -34,7 +34,7 @@ public class CuriosJeiPlugin implements IModPlugin {
   @Override
   @Nonnull
   public ResourceLocation getPluginUid() {
-    return new ResourceLocation(CuriosConstants.MOD_ID, CuriosConstants.MOD_ID);
+    return ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, CuriosConstants.MOD_ID);
   }
 
   @Override

@@ -102,13 +102,10 @@ processResources {
             "sources_url": sources_url,
             "description": project.description,
             "neoforge_version": neoforge_version,
-            "neoforge_version_range": neoforge_version_range,
-            "forge_version": forge_version,
-            "forge_version_range": forge_version_range,
             "java_version": java_version
     ]
 
-    filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
+    filesMatching(['pack.mcmeta', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {
         expand expandProps
     }
     inputs.properties(expandProps)

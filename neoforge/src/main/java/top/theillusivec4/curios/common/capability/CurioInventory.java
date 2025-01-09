@@ -35,18 +35,14 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
-import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
-import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 
 public class CurioInventory implements INBTSerializable<CompoundTag> {
@@ -75,6 +71,7 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
       }
     } else {
       this.markDeserialized = false;
+
       ListTag tagList = this.deserialized.getList("Curios", Tag.TAG_COMPOUND);
       Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
       SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = new TreeMap<>();

@@ -33,12 +33,6 @@
   "curios.modifiers.charm": "부적으로 쓸 때:",
   "curios.modifiers.hands": "손에 있을 때:",
   "curios.modifiers.bracelet": "팔찌를 찼을 때:",
-  "curios.modifiers.slots.plus.0": "+%s %s 슬롯",
-  "curios.modifiers.slots.plus.1": "+%s%% %s 슬롯",
-  "curios.modifiers.slots.plus.2": "+%s%% %s 슬롯",
-  "curios.modifiers.slots.take.0": "-%s %s 슬롯",
-  "curios.modifiers.slots.take.1": "-%s%% %s 슬롯",
-  "curios.modifiers.slots.take.2": "-%s%% %s 슬롯",
   "key.curios.category": "장신구",
   "key.curios.open.desc": "장신구 인벤토리 열기/닫기",
   "gui.curios.toggle": "보이게/안 보이게 하기"

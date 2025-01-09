@@ -26,12 +26,12 @@ import com.mojang.logging.LogUtils;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.RandomSource;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
@@ -258,12 +258,12 @@ public final class CuriosApi {
    *
    * @param slotContext Context about the slot that the ItemStack is equipped in or may potentially
    *                    be equipped in
-   * @param uuid        Slot-unique UUID
+   * @param id          Slot-unique id
    * @param stack       The ItemStack in question
    * @return A map of attribute modifiers
    */
   public static Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-      SlotContext slotContext, UUID uuid, ItemStack stack) {
+      SlotContext slotContext, ResourceLocation id, ItemStack stack) {
     apiError();
     return HashMultimap.create();
   }
@@ -273,12 +273,12 @@ public final class CuriosApi {
    *
    * @param map        A {@link Multimap} of attributes to attribute modifiers
    * @param identifier The identifier of the slot to add the modifier onto
-   * @param uuid       A UUID associated with the modifier
+   * @param id         id associated with the modifier
    * @param amount     The amount of the modifier
    * @param operation  The operation of the modifier
    */
   public static void addSlotModifier(Multimap<Holder<Attribute>, AttributeModifier> map,
-                                     String identifier, UUID uuid, double amount,
+                                     String identifier, ResourceLocation id, double amount,
                                      AttributeModifier.Operation operation) {
     apiError();
   }
@@ -288,13 +288,12 @@ public final class CuriosApi {
    *
    * @param stack      The ItemStack to add the modifier to
    * @param identifier The identifier of the slot to add the modifier onto
-   * @param name       The name for the modifier
-   * @param uuid       A UUID associated with the modifier
+   * @param id         id associated with the modifier
    * @param amount     The amount of the modifier
    * @param operation  The operation of the modifier
    * @param slot       The slot that the ItemStack provides the modifier from
    */
-  public static void addSlotModifier(ItemStack stack, String identifier, String name, UUID uuid,
+  public static void addSlotModifier(ItemStack stack, String identifier, ResourceLocation id,
                                      double amount, AttributeModifier.Operation operation,
                                      String slot) {
     apiError();
@@ -305,14 +304,14 @@ public final class CuriosApi {
    *
    * @param itemAttributeModifiers A {@link ItemAttributeModifiers} instance
    * @param identifier             The identifier of the slot to add the modifier onto
-   * @param uuid                   A UUID associated with the modifier
+   * @param id                     id associated with the modifier
    * @param amount                 The amount of the modifier
    * @param operation              The operation of the modifier
    * @param slotGroup              The slot to provide the modifier from
    */
   public static ItemAttributeModifiers withSlotModifier(
-      ItemAttributeModifiers itemAttributeModifiers, String identifier, UUID uuid, double amount,
-      AttributeModifier.Operation operation, EquipmentSlotGroup slotGroup) {
+      ItemAttributeModifiers itemAttributeModifiers, String identifier, ResourceLocation id,
+      double amount, AttributeModifier.Operation operation, EquipmentSlotGroup slotGroup) {
     apiError();
     return ItemAttributeModifiers.EMPTY;
   }
@@ -322,14 +321,13 @@ public final class CuriosApi {
    *
    * @param stack     The ItemStack to add the modifier to
    * @param attribute The attribute to add the modifier onto
-   * @param name      The name for the modifier
-   * @param uuid      A UUID associated with the modifier
+   * @param id        id associated with the modifier
    * @param amount    The amount of the modifier
    * @param operation The operation of the modifier
    * @param slot      The slot that the ItemStack provides the modifier from
    */
-  public static void addModifier(ItemStack stack, Holder<Attribute> attribute, String name,
-                                 UUID uuid, double amount, AttributeModifier.Operation operation,
+  public static void addModifier(ItemStack stack, Holder<Attribute> attribute, ResourceLocation id,
+                                 double amount, AttributeModifier.Operation operation,
                                  String slot) {
     apiError();
   }
@@ -382,24 +380,23 @@ public final class CuriosApi {
     return true;
   }
 
-
   /**
-   * Gets a UUID based on the provided {@link SlotContext}.
+   * Gets a {@link ResourceLocation} based on the provided {@link SlotContext}.
    *
-   * @param slotContext The SlotContext to base the UUID on
-   * @return The UUID based on the SlotContext
+   * @param slotContext The SlotContext to base the {@link ResourceLocation} on
+   * @return The ResourceLocation based on the SlotContext
    */
-  public static UUID getSlotUuid(SlotContext slotContext) {
+  public static ResourceLocation getSlotId(SlotContext slotContext) {
     apiError();
-    return UUID.randomUUID();
+    return ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, slotContext.identifier());
   }
 
   /**
-   * Performs breaking behavior used in the runnable through {@link ItemStack#hurtAndBreak(int, RandomSource, LivingEntity, Runnable)}}
+   * Performs breaking behavior used in the runnable through {@link ItemStack#hurtAndBreak(int, ServerLevel, LivingEntity, Consumer<Item>)}}
    * <br>
    * This will be necessary in order to trigger break animations in curio slots
    * <br>
-   * Example: { stack.hurtAndBreak(amount, entity, () -> CuriosApi.broadcastCurioBreakEvent(slotContext)); }
+   * Example: { stack.hurtAndBreak(amount, level entity, item -> CuriosApi.broadcastCurioBreakEvent(slotContext)); }
    *
    * @param slotContext Context about the slot that the curio is in
    */
@@ -409,6 +406,10 @@ public final class CuriosApi {
 
   static void apiError() {
     LOGGER.error("Missing Curios API implementation!");
+
+    for (StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) {
+      LOGGER.error(stackTraceElement.toString());
+    }
   }
 
   // ========= DEPRECATED =============
@@ -426,10 +427,11 @@ public final class CuriosApi {
   /**
    * @deprecated See {@link CuriosApi#getSlot(String, Level)} and {@link ISlotType#getIcon()}.
    */
+  @Deprecated(since = "1.21")
   @Nonnull
   public static ResourceLocation getSlotIcon(String id) {
     return CuriosApi.getSlot(id, true).map(ISlotType::getIcon)
-        .orElse(new ResourceLocation(CuriosApi.MODID, "slot/empty_curio_slot"));
+        .orElse(ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "slot/empty_curio_slot"));
   }
 
   /**

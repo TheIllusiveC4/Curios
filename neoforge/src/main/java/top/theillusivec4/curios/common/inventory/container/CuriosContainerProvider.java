@@ -22,12 +22,11 @@ package top.theillusivec4.curios.common.inventory.container;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.network.chat.Component;
-import top.theillusivec4.curios.common.CuriosConfig;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 
 public class CuriosContainerProvider implements MenuProvider {
 
@@ -40,7 +39,7 @@ public class CuriosContainerProvider implements MenuProvider {
   @Nullable
   @Override
   public AbstractContainerMenu createMenu(int i, @Nonnull Inventory playerInventory,
-                              @Nonnull Player playerEntity) {
+                                          @Nonnull Player playerEntity) {
     return new CuriosContainer(i, playerInventory);
   }
 }

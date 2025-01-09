@@ -35,7 +35,7 @@ public record SPacketSyncStack(int entityId, String curioId, int slotId, ItemSta
     CustomPacketPayload {
 
   public static final Type<SPacketSyncStack> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "sync_stack"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "sync_stack"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, SPacketSyncStack> STREAM_CODEC =
       StreamCodec.composite(ByteBufCodecs.INT, SPacketSyncStack::entityId,

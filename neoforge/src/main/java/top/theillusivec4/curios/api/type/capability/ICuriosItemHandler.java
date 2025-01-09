@@ -27,13 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.util.Tuple;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
@@ -147,6 +145,16 @@ public interface ICuriosItemHandler {
   Optional<SlotResult> findFirstCurio(Predicate<ItemStack> filter);
 
   /**
+   * Gets the first matching item equipped in a curio slot that matches the filter, with results
+   * from a cache using a given key.
+   *
+   * @param filter   The filter to test against
+   * @param cacheKey A cache key for improved performance when doing lots of lookups in the same tick
+   * @return An optional {@link SlotResult} with the found item, or empty if none were found
+   */
+  Optional<SlotResult> findFirstCurio(Predicate<ItemStack> filter, String cacheKey);
+
+  /**
    * Gets all matching items equipped in a curio slot.
    *
    * @param item The item to search for
@@ -208,7 +216,7 @@ public interface ICuriosItemHandler {
   /**
    * Get the amount of Looting levels that are provided by curios.
    */
-  int getLootingLevel(DamageSource source, LivingEntity target, int baseLooting);
+  int getLootingLevel(@Nullable LootContext lootContext);
 
   /**
    * Saves the curios inventory stacks to NBT.
@@ -239,12 +247,11 @@ public interface ICuriosItemHandler {
    * These slot modifiers are not serialized and disappear upon deserialization.
    *
    * @param slot      Identifier of the {@link ISlotType} to add the slot modifier to
-   * @param uuid      UUID for the {@link AttributeModifier}
-   * @param name      Name for the attribute modifier
+   * @param id        id for the {@link AttributeModifier}
    * @param amount    Amount for the attribute modifier
    * @param operation Operation for the attribute modifier
    */
-  default void addTransientSlotModifier(String slot, UUID uuid, String name, double amount,
+  default void addTransientSlotModifier(String slot, ResourceLocation id, double amount,
                                         AttributeModifier.Operation operation) {
     LOGGER.error("Missing method implementation!");
   }
@@ -264,12 +271,11 @@ public interface ICuriosItemHandler {
    * These slot modifiers are not serialized and disappear upon deserialization.
    *
    * @param slot      Identifier of the {@link ISlotType} to add the slot modifier to
-   * @param uuid      UUID for the {@link AttributeModifier}
-   * @param name      Name for the attribute modifier
+   * @param id        id for the {@link AttributeModifier}
    * @param amount    Amount for the attribute modifier
    * @param operation Operation for the attribute modifier
    */
-  default void addPermanentSlotModifier(String slot, UUID uuid, String name, double amount,
+  default void addPermanentSlotModifier(String slot, ResourceLocation id, double amount,
                                         AttributeModifier.Operation operation) {
     LOGGER.error("Missing method implementation!");
   }
@@ -285,9 +291,9 @@ public interface ICuriosItemHandler {
    * Removes the specified slot modifier (via UUID) from the handler.
    *
    * @param slot Identifier of the {@link ISlotType} to remove the modifier from
-   * @param uuid UUID of the {@link AttributeModifier} to remove
+   * @param id   id of the {@link AttributeModifier} to remove
    */
-  default void removeSlotModifier(String slot, UUID uuid) {
+  default void removeSlotModifier(String slot, ResourceLocation id) {
     LOGGER.error("Missing method implementation!");
   }
 
@@ -375,26 +381,6 @@ public interface ICuriosItemHandler {
   @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default int getFortuneBonus() {
     return 0;
-  }
-
-  /**
-   * @deprecated See {@link ICuriosItemHandler#getLootingLevel(DamageSource, LivingEntity, int)}
-   */
-  @Deprecated(forRemoval = true)
-  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
-  default int getLootingBonus() {
-    return 0;
-  }
-
-
-  /**
-   * @deprecated See {@link ICuriosItemHandler#getLootingLevel(DamageSource, LivingEntity, int)} and
-   * {@link ICuriosItemHandler#getFortuneLevel(LootContext)}
-   */
-  @Deprecated(forRemoval = true)
-  @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
-  default void setEnchantmentBonuses(Tuple<Integer, Integer> fortuneAndLooting) {
-    // NO-OP
   }
 
   /**

@@ -47,7 +47,7 @@ public final class SlotType implements ISlotType {
 
   public static ISlotType from(CompoundTag tag) {
     Builder builder = new Builder(tag.getString("Identifier"));
-    builder.icon(new ResourceLocation(tag.getString("Icon")));
+    builder.icon(ResourceLocation.parse(tag.getString("Icon")));
     builder.order(tag.getInt("Order"));
     builder.size(tag.getInt("Size"));
     builder.useNativeGui(tag.getBoolean("UseNativeGui"));
@@ -58,7 +58,7 @@ public final class SlotType implements ISlotType {
     for (Tag tag1 : list) {
 
       if (tag1 instanceof StringTag stringTag) {
-       builder.validator(new ResourceLocation(stringTag.getAsString()));
+        builder.validator(ResourceLocation.parse(stringTag.getAsString()));
       }
     }
     return builder.build();
@@ -180,7 +180,7 @@ public final class SlotType implements ISlotType {
     private Boolean hasCosmetic = null;
     private Boolean renderToggle = null;
     private ResourceLocation icon =
-        new ResourceLocation(CuriosConstants.MOD_ID, "slot/empty_curio_slot");
+        ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "slot/empty_curio_slot");
     private ICurio.DropRule dropRule = ICurio.DropRule.DEFAULT;
     private Set<ResourceLocation> validators = null;
 
@@ -351,7 +351,8 @@ public final class SlotType implements ISlotType {
       }
 
       if (this.validators == null) {
-        this.validators = Set.of(new ResourceLocation(CuriosConstants.MOD_ID, "tag"));
+        this.validators =
+            Set.of(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "tag"));
       }
       return new SlotType(this);
     }

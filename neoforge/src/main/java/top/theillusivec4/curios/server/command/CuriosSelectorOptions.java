@@ -32,7 +32,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -65,7 +64,8 @@ public class CuriosSelectorOptions {
       min = Math.max(0, listTag.getInt(0));
       max = Math.max(min + 1, listTag.getInt(1));
     }
-    CompoundTag stack = compoundtag.contains("item") ? compoundtag.getCompound("item") : new CompoundTag();
+    CompoundTag stack =
+        compoundtag.contains("item") ? compoundtag.getCompound("item") : new CompoundTag();
     boolean exclusive = compoundtag.getBoolean("exclusive");
     int finalMin = min;
     int finalMax = max;

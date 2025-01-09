@@ -32,7 +32,7 @@ public record SPacketBreak(int entityId, String curioId, int slotId) implements
     CustomPacketPayload {
 
   public static final Type<SPacketBreak> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "break"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "break"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, SPacketBreak> STREAM_CODEC =
       StreamCodec.composite(ByteBufCodecs.INT, SPacketBreak::entityId, ByteBufCodecs.STRING_UTF8,

@@ -36,7 +36,7 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 public class SPacketSyncModifiers implements CustomPacketPayload {
 
   public static final Type<SPacketSyncModifiers> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "sync_modifiers"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "sync_modifiers"));
   public static final StreamCodec<RegistryFriendlyByteBuf, SPacketSyncModifiers> STREAM_CODEC =
       new StreamCodec<>() {
         @Nonnull

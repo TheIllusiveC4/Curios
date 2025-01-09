@@ -23,14 +23,16 @@ package top.theillusivec4.curios.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import javax.annotation.Nonnull;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 
 public class RenderButton extends ImageButton {
-
+  public static final WidgetSprites BUTTON_SPRITES = new WidgetSprites(
+      ResourceLocation.withDefaultNamespace("recipe_book/filter_enabled"),
+      ResourceLocation.withDefaultNamespace("recipe_book/filter_enabled_highlighted")
+  );
   private final ResourceLocation resourceLocation;
   private final int yTexStart;
   private final int xTexStart;
@@ -39,7 +41,7 @@ public class RenderButton extends ImageButton {
   public RenderButton(CurioSlot slot, int xIn, int yIn, int widthIn, int heightIn, int xTexStartIn,
                       int yTexStartIn, ResourceLocation resourceLocationIn,
                       OnPress onPressIn) {
-    super(xIn, yIn, widthIn, heightIn, RecipeBookComponent.RECIPE_BUTTON_SPRITES, onPressIn);
+    super(xIn, yIn, widthIn, heightIn, BUTTON_SPRITES, onPressIn);
     this.resourceLocation = resourceLocationIn;
     this.yTexStart = yTexStartIn;
     this.xTexStart = xTexStartIn;

@@ -36,12 +36,6 @@
   "curios.modifiers.charm": "Когда надето в качестве амулета:",
   "curios.modifiers.hands": "Когда на руках:",
   "curios.modifiers.bracelet": "Когда надето в качестве браслета:",
-  "curios.modifiers.slots.plus.0": "+%s к слотам %s",
-  "curios.modifiers.slots.plus.1": "+%s%% к слотам %s",
-  "curios.modifiers.slots.plus.2": "+%s%% к слотам %s",
-  "curios.modifiers.slots.take.0": "-%s к слотам %s",
-  "curios.modifiers.slots.take.1": "-%s%% к слотам %s",
-  "curios.modifiers.slots.take.2": "-%s%% к слотам %s",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Открыть/Закрыть инвентарь Curios",
   "gui.curios.toggle": "Переключить видимость"

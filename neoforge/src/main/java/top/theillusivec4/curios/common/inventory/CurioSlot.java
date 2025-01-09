@@ -40,8 +40,8 @@ public class CurioSlot extends SlotItemHandler {
   private final Player player;
   private final SlotContext slotContext;
 
-  private NonNullList<Boolean> renderStatuses;
-  private boolean canToggleRender;
+  private final NonNullList<Boolean> renderStatuses;
+  private final boolean canToggleRender;
   private boolean showCosmeticToggle;
   private boolean isCosmetic;
 
@@ -103,12 +103,11 @@ public class CurioSlot extends SlotItemHandler {
 
     if (I18n.exists(key)) {
       builder.append(I18n.get(key));
+
       return builder.toString();
     }
-    builder
-        .append(Character.toUpperCase(this.identifier.charAt(0)))
-        .append(this.identifier.substring(1).toLowerCase());
-    return builder.toString();
+    return builder.append(Character.toUpperCase(this.identifier.charAt(0)))
+        .append(this.identifier.substring(1).toLowerCase()).toString();
   }
 
   @Override

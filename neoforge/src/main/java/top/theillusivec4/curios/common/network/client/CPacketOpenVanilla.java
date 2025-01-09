@@ -31,7 +31,7 @@ import top.theillusivec4.curios.CuriosConstants;
 public record CPacketOpenVanilla(ItemStack carried) implements CustomPacketPayload {
 
   public static final Type<CPacketOpenVanilla> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "open_vanilla"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "open_vanilla"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, CPacketOpenVanilla> STREAM_CODEC =
       StreamCodec.composite(

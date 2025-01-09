@@ -33,7 +33,7 @@ import top.theillusivec4.curios.CuriosConstants;
 public class SPacketSetIcons implements CustomPacketPayload {
 
   public static final Type<SPacketSetIcons> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "set_icons"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "set_icons"));
   public static final StreamCodec<RegistryFriendlyByteBuf, SPacketSetIcons> STREAM_CODEC =
       new StreamCodec<>() {
         @Nonnull
@@ -66,7 +66,7 @@ public class SPacketSetIcons implements CustomPacketPayload {
     Map<String, ResourceLocation> map = new HashMap<>();
 
     for (int i = 0; i < entrySize; i++) {
-      map.put(buf.readUtf(), new ResourceLocation(buf.readUtf()));
+      map.put(buf.readUtf(), ResourceLocation.parse(buf.readUtf()));
     }
     this.entrySize = map.size();
     this.map = map;

@@ -30,7 +30,6 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -102,7 +101,8 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
     public boolean matches(SlotContext slotContext, ItemStack stack, LootContext lootContext) {
       Vec3 vec3 = lootContext.getParam(LootContextParams.ORIGIN);
 
-      if (slotContext != null && this.slot().map(slotPredicate -> !slotPredicate.matches(slotContext)).orElse(false)) {
+      if (slotContext != null &&
+          this.slot().map(slotPredicate -> !slotPredicate.matches(slotContext)).orElse(false)) {
         return false;
       }
 

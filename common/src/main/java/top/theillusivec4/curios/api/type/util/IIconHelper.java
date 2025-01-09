@@ -21,7 +21,6 @@
 package top.theillusivec4.curios.api.type.util;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 import top.theillusivec4.curios.api.type.ISlotType;
 

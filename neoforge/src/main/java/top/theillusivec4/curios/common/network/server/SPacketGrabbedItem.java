@@ -31,7 +31,7 @@ import top.theillusivec4.curios.CuriosConstants;
 public record SPacketGrabbedItem(ItemStack stack) implements CustomPacketPayload {
 
   public static final Type<SPacketGrabbedItem> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "grabbed_item"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "grabbed_item"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, SPacketGrabbedItem> STREAM_CODEC =
       StreamCodec.composite(ItemStack.STREAM_CODEC, SPacketGrabbedItem::stack,

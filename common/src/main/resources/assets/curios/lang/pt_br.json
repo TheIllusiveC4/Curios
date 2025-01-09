@@ -33,12 +33,6 @@
   "curios.modifiers.charm": "Quando como amuleto:",
   "curios.modifiers.hands": "Quando nas mãos:",
   "curios.modifiers.bracelet": "Quando usado como bracelete:",
-  "curios.modifiers.slots.plus.0": "+%s %s Slots",
-  "curios.modifiers.slots.plus.1": "+%s%% %s Slots",
-  "curios.modifiers.slots.plus.2": "+%s%% %s Slots",
-  "curios.modifiers.slots.take.0": "-%s %s Slots",
-  "curios.modifiers.slots.take.1": "-%s%% %s Slots",
-  "curios.modifiers.slots.take.2": "-%s%% %s Slots",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Abrir/Fechar Inventário do Curios",
   "gui.curios.toggle": "Alternar visibilidade"

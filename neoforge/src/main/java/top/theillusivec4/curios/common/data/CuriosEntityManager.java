@@ -39,7 +39,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
@@ -54,7 +53,6 @@ import net.minecraft.world.entity.EntityType;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.type.ISlotType;
-import top.theillusivec4.curios.common.slottype.LegacySlotManager;
 
 public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
 
@@ -65,15 +63,9 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
   public static CuriosEntityManager CLIENT = new CuriosEntityManager();
   private Map<EntityType<?>, Map<String, ISlotType>> entitySlots = ImmutableMap.of();
   private Map<String, Set<String>> idToMods = ImmutableMap.of();
-  private ICondition.IContext ctx = ICondition.IContext.EMPTY;
 
   public CuriosEntityManager() {
     super(GSON, "curios/entities");
-  }
-
-  public CuriosEntityManager(ICondition.IContext ctx) {
-    super(GSON, "curios/entities");
-    this.ctx = ctx;
   }
 
   protected void apply(Map<ResourceLocation, JsonElement> pObject,
@@ -89,7 +81,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
               "curios/entities",
               (resourceLocation, inputStreamIoSupplier) -> {
                 String path = resourceLocation.getPath();
-                ResourceLocation rl = new ResourceLocation(namespace,
+                ResourceLocation rl = ResourceLocation.fromNamespaceAndPath(namespace,
                     path.substring("curios/entities/".length(), path.length() - ".json".length()));
                 JsonElement el = pObject.get(rl);
                 if (el != null) {
@@ -97,14 +89,6 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
                 }
               }));
     });
-
-    // Legacy IMC slot registrations - players only
-    for (String s : LegacySlotManager.getImcBuilders().keySet()) {
-      ImmutableMap.Builder<String, ISlotType> builder =
-          map.computeIfAbsent(EntityType.PLAYER, (k) -> ImmutableMap.builder());
-      CuriosSlotManager.SERVER.getSlot(s).ifPresentOrElse(slot -> builder.put(s, slot),
-          () -> CuriosConstants.LOG.error("{} is not a registered slot type!", s));
-    }
 
     for (Map.Entry<ResourceLocation, JsonElement> entry : sorted.entrySet()) {
       ResourceLocation resourcelocation = entry.getKey();
@@ -117,7 +101,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
         JsonObject jsonObject = GsonHelper.convertToJsonObject(entry.getValue(), "top element");
 
         for (Map.Entry<EntityType<?>, Map<String, ISlotType>> entry1 : getSlotsForEntities(
-            jsonObject, resourcelocation, this.ctx).entrySet()) {
+            jsonObject, resourcelocation).entrySet()) {
 
           if (GsonHelper.getAsBoolean(jsonObject, "replace", false)) {
             ImmutableMap.Builder<String, ISlotType> builder = ImmutableMap.builder();
@@ -176,7 +160,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
 
       if (tag1 instanceof CompoundTag entity) {
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getOptional(
-            new ResourceLocation(entity.getString("Entity"))).orElse(null);
+            ResourceLocation.parse(entity.getString("Entity"))).orElse(null);
 
         if (type != null) {
           ListTag slots = entity.getList("Slots", Tag.TAG_STRING);
@@ -198,7 +182,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
   }
 
   private static Map<EntityType<?>, Map<String, ISlotType>> getSlotsForEntities(
-      JsonObject jsonObject, ResourceLocation resourceLocation, ICondition.IContext ctx) {
+      JsonObject jsonObject, ResourceLocation resourceLocation) {
     Map<EntityType<?>, Map<String, ISlotType>> map = new HashMap<>();
 
     if (!ICondition.conditionsMatched(JsonOps.INSTANCE, jsonObject)) {
@@ -214,7 +198,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
 
       if (entity.startsWith("#")) {
         BuiltInRegistries.ENTITY_TYPE.getTag(
-                TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(entity)))
+                TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse(entity)))
             .ifPresent(named -> {
               for (Holder<EntityType<?>> entityTypeHolder : named) {
                 toAdd.add(entityTypeHolder.value());
@@ -222,7 +206,7 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
             });
       } else {
         EntityType<?> type =
-            BuiltInRegistries.ENTITY_TYPE.getOptional(new ResourceLocation(entity)).orElse(null);
+            BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse(entity)).orElse(null);
 
         if (type != null) {
           toAdd.add(type);

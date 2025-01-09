@@ -22,16 +22,17 @@ package top.theillusivec4.curios.common.capability;
 
 import com.google.common.collect.Multimap;
 import java.util.List;
-import java.util.UUID;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import top.theillusivec4.curios.api.SlotContext;
@@ -68,6 +69,11 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
+  public List<Component> getSlotsTooltip(List<Component> tooltips, Item.TooltipContext context) {
+    return this.curioItem.getSlotsTooltip(tooltips, context, this.getStack());
+  }
+
+  @Override
   public List<Component> getSlotsTooltip(List<Component> tooltips) {
     return this.curioItem.getSlotsTooltip(tooltips, this.getStack());
   }
@@ -97,13 +103,20 @@ public class ItemizedCurioCapability implements ICurio {
   @Override
   public DropRule getDropRule(SlotContext slotContext, DamageSource source, int lootingLevel,
                               boolean recentlyHit) {
-    return this.curioItem
-        .getDropRule(slotContext, source, lootingLevel, recentlyHit, this.getStack());
+    return this.curioItem.getDropRule(slotContext, source, lootingLevel, recentlyHit,
+        this.getStack());
+  }
+
+  @Override
+  public List<Component> getAttributesTooltip(List<Component> tooltips,
+                                              Item.TooltipContext context) {
+    return this.curioItem.getAttributesTooltip(tooltips, context, this.getStack());
   }
 
   @Override
   public List<Component> getAttributesTooltip(List<Component> tooltips) {
-    return this.curioItem.getAttributesTooltip(tooltips, this.getStack());
+    return this.curioItem.getAttributesTooltip(tooltips, Item.TooltipContext.EMPTY,
+        this.getStack());
   }
 
   @Override
@@ -112,16 +125,14 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public int getLootingLevel(SlotContext slotContext, DamageSource source, LivingEntity target,
-                             int baseLooting) {
-    return this.curioItem
-        .getLootingLevel(slotContext, source, target, baseLooting, this.getStack());
+  public int getLootingLevel(SlotContext slotContext, @Nullable LootContext lootContext) {
+    return this.curioItem.getLootingLevel(slotContext, lootContext, this.getStack());
   }
 
   @Override
   public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-      SlotContext slotContext, UUID uuid) {
-    return this.curioItem.getAttributeModifiers(slotContext, uuid, this.getStack());
+      SlotContext slotContext, ResourceLocation id) {
+    return this.curioItem.getAttributeModifiers(slotContext, id, this.getStack());
   }
 
   @Override

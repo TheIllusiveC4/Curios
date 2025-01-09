@@ -1,4 +1,4 @@
-# Curios API [![](http://cf.way2muchnoise.eu/versions/curios.svg)](https://www.curseforge.com/minecraft/mc-mods/curios) [![](http://cf.way2muchnoise.eu/short_curios_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/curios/files) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg?&style=flat-square)](https://www.gnu.org/licenses/lgpl-3.0) [![](https://img.shields.io/discord/500852157503766538.svg?color=green&label=Discord&style=flat-square)](https://discord.gg/JWgrdwt)
+# Curios API
 
 ## Overview
 
@@ -23,41 +23,13 @@ Add the following to your build.gradle file:
 ```
 repositories {
     maven {
-        url = "https://maven.theillusivec4.top/"
+        name = "OctoStudios"
+        url = uri("https://maven.octo-studios.com/releases")
     }
 }
-```
 
-### Forge
-```
 dependencies {
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${version}")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${version}:api")
-}
-```
-
-Curios uses mixins and developers will need to make sure to tweak their run configurations in order to launch the game
-in their development environment with Curios as a dependency in Forge.
-
-#### 1. Add these lines to your run configurations
-
-Add both of these lines to both the `client {}` and `server {}` run configuration blocks in the `build.gradle`. These
-can be placed anywhere within each run configuration, the order does not matter.
-
-```
-property 'mixin.env.remapRefMap', 'true'
-property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
-```
-
-#### 2. Regenerate your run configurations
-
-Run the Gradle task `genIntellijRuns`, `genEclipseRuns`, or `genVSCodeRuns` depending on the chosen IDE.
-
-### NeoForge (1.20.2+)
-```
-dependencies {
-    runtimeOnly "top.theillusivec4.curios:curios-neoforge:${version}"
-    compileOnly "top.theillusivec4.curios:curios-neoforge:${version}:api"
+    implementation 'top.theillusivec4.curios:curios-neoforge:${version}'
 }
 ```
 

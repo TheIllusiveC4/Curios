@@ -30,7 +30,7 @@ import top.theillusivec4.curios.CuriosConstants;
 public record CPacketDestroy() implements CustomPacketPayload {
 
   public static final Type<CPacketDestroy> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "destroy"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "destroy"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, CPacketDestroy> STREAM_CODEC =
       new StreamCodec<>() {

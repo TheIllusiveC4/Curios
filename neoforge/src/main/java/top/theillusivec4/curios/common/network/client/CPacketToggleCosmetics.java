@@ -31,7 +31,7 @@ import top.theillusivec4.curios.CuriosConstants;
 public record CPacketToggleCosmetics(int windowId) implements CustomPacketPayload {
 
   public static final Type<CPacketToggleCosmetics> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "toggle_cosmetics"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "toggle_cosmetics"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, CPacketToggleCosmetics> STREAM_CODEC =
       StreamCodec.composite(ByteBufCodecs.INT, CPacketToggleCosmetics::windowId,

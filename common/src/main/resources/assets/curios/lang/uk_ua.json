@@ -36,12 +36,6 @@
   "curios.modifiers.charm": "Коли споряджено, як амулет:",
   "curios.modifiers.hands": "Коли на руках:",
   "curios.modifiers.bracelet": "Коли споряджено, як браслет:",
-  "curios.modifiers.slots.plus.0": "+%s до слотів %s",
-  "curios.modifiers.slots.plus.1": "+%s%% до слотів %s",
-  "curios.modifiers.slots.plus.2": "+%s%% до слотів %s",
-  "curios.modifiers.slots.take.0": "-%s до слотів %s",
-  "curios.modifiers.slots.take.1": "-%s%% до слотів %s",
-  "curios.modifiers.slots.take.2": "-%s%% до слотів %s",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Відкрити/закрити інвентар Curios",
   "gui.curios.toggle": "Перемкнути видимість"

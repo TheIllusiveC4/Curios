@@ -117,20 +117,24 @@ public class CuriosUtilMixinHooks {
     }).orElse(false);
   }
 
-  public static int getFortuneLevel(Player player) {
-    return CuriosApi.getCuriosInventory(player)
-        .map(handler -> handler.getFortuneLevel(null)).orElse(0);
-  }
-
   public static int getFortuneLevel(LootContext lootContext) {
     Entity entity = lootContext.getParamOrNull(LootContextParams.THIS_ENTITY);
 
     if (entity instanceof LivingEntity livingEntity) {
       return CuriosApi.getCuriosInventory(livingEntity)
           .map(handler -> handler.getFortuneLevel(lootContext)).orElse(0);
-    } else {
-      return 0;
     }
+    return 0;
+  }
+
+  public static int getLootingLevel(LootContext lootContext) {
+    Entity entity = lootContext.getParamOrNull(LootContextParams.ATTACKING_ENTITY);
+
+    if (entity instanceof LivingEntity livingEntity) {
+      return CuriosApi.getCuriosInventory(livingEntity)
+          .map(handler -> handler.getLootingLevel(lootContext)).orElse(0);
+    }
+    return 0;
   }
 
   public static boolean isFreezeImmune(LivingEntity livingEntity) {

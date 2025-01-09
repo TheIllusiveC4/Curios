@@ -24,7 +24,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -156,14 +155,14 @@ public class CuriosServerPayloadHandler {
             IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
             String id = stacksHandler.getIdentifier();
 
-            for (int i = 0; i < stackHandler.getSlots(); i++) {
+            for (int i = stackHandler.getSlots() - 1; i >= 0; i--) {
               NonNullList<Boolean> renderStates = stacksHandler.getRenders();
               SlotContext slotContext = new SlotContext(id, player, i, false,
                   renderStates.size() > i && renderStates.get(i));
-              UUID uuid = CuriosApi.getSlotUuid(slotContext);
               ItemStack stack = stackHandler.getStackInSlot(i);
               Multimap<Holder<Attribute>, AttributeModifier> map =
-                  CuriosApi.getAttributeModifiers(slotContext, uuid, stack);
+                  CuriosApi.getAttributeModifiers(slotContext, CuriosApi.getSlotId(slotContext),
+                      stack);
               Multimap<String, AttributeModifier> slots = HashMultimap.create();
               Set<Holder<Attribute>> toRemove = new HashSet<>();
               AttributeMap attributeMap = player.getAttributes();

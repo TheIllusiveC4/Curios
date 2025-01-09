@@ -109,9 +109,9 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
       ResourceLocation rl;
 
       if (attribute.value() instanceof SlotAttribute wrapper) {
-        rl = new ResourceLocation(CuriosConstants.MOD_ID, wrapper.getIdentifier());
+        rl = ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, wrapper.getIdentifier());
       } else {
-        rl = new ResourceLocation(attribute.getRegisteredName());
+        rl = ResourceLocation.parse(attribute.getRegisteredName());
       }
       this.entries.add(new Entry(rl, attributeModifier, slot));
       return this;

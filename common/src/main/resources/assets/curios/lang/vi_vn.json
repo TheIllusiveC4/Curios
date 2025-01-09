@@ -36,12 +36,6 @@
     "curios.modifiers.charm": "Khi trang bị làm bùa:",
     "curios.modifiers.hands": "Khi ở trên tay:",
     "curios.modifiers.bracelet": "Khi trang bị làm vòng tay:",
-    "curios.modifiers.slots.plus.0": "+%s %s Vị Trí",
-    "curios.modifiers.slots.plus.1": "+%s%% %s Vị Trí",
-    "curios.modifiers.slots.plus.2": "+%s%% %s Vị Trí",
-    "curios.modifiers.slots.take.0": "-%s %s Vị Trí",
-    "curios.modifiers.slots.take.1": "-%s%% %s Vị Trí",
-    "curios.modifiers.slots.take.2": "-%s%% %s Vị Trí",
     "key.curios.category": "Phụ Kiện",
     "key.curios.open.desc": "Mở/Đóng Kho Đồ Phụ Kiện",
     "gui.curios.toggle": "Thao Tác Hiển Thị"

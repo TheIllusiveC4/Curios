@@ -21,7 +21,6 @@
 package top.theillusivec4.curios.common.network.client;
 
 import javax.annotation.Nonnull;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -32,7 +31,7 @@ import top.theillusivec4.curios.CuriosConstants;
 public record CPacketOpenCurios(ItemStack carried) implements CustomPacketPayload {
 
   public static final Type<CPacketOpenCurios> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "open_curios"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "open_curios"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, CPacketOpenCurios> STREAM_CODEC =
       StreamCodec.composite(

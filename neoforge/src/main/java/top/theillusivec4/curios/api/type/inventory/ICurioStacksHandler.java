@@ -24,11 +24,10 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public interface ICurioStacksHandler {
@@ -91,7 +90,7 @@ public interface ICurioStacksHandler {
   int getSlots();
 
   /**
-   * Gets whether or not this stack handler should be visible. This does not lock the stack handler
+   * Gets whether this stack handler should be visible. This does not lock the stack handler
    * from being used regardless.
    *
    * @return True or false for visibility
@@ -99,7 +98,7 @@ public interface ICurioStacksHandler {
   boolean isVisible();
 
   /**
-   * Gets whether or not this stack handler has cosmetic handling. This does not lock the cosmetic
+   * Gets whether this stack handler has cosmetic handling. This does not lock the cosmetic
    * stack handler from being used regardless.
    *
    * @return True or false for cosmetic handling
@@ -130,9 +129,9 @@ public interface ICurioStacksHandler {
   /**
    * Retrieves all the slot modifiers on the handler.
    *
-   * @return A map of modifiers with the UUID as keys and {@link AttributeModifier} as values
+   * @return A map of modifiers with the ResourceLocation as keys and {@link AttributeModifier} as values
    */
-  Map<UUID, AttributeModifier> getModifiers();
+  Map<ResourceLocation, AttributeModifier> getModifiers();
 
   /**
    * Retrieves all the permanent slot modifiers on the handler.
@@ -179,9 +178,9 @@ public interface ICurioStacksHandler {
   /**
    * Removes a slot modifier from the handler.
    *
-   * @param uuid The UUID of the modifier to remove
+   * @param id id of the modifier to remove
    */
-  void removeModifier(UUID uuid);
+  void removeModifier(ResourceLocation id);
 
   /**
    * Removes all the slot modifiers on the handler.

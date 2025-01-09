@@ -34,12 +34,12 @@ import top.theillusivec4.curios.common.network.client.CPacketToggleCosmetics;
 public class CosmeticButton extends ImageButton {
 
   public static final WidgetSprites OFF =
-      new WidgetSprites(new ResourceLocation(CuriosApi.MODID, "cosmetic_off"),
-          new ResourceLocation(CuriosApi.MODID, "cosmetic_off_highlighted"));
-
+      new WidgetSprites(ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "cosmetic_off"),
+          ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "cosmetic_off_highlighted"));
   public static final WidgetSprites ON =
-      new WidgetSprites(new ResourceLocation(CuriosApi.MODID, "cosmetic_on"),
-          new ResourceLocation(CuriosApi.MODID, "cosmetic_on_highlighted"));
+      new WidgetSprites(ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "cosmetic_on"),
+          ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "cosmetic_on_highlighted"));
+
   private final CuriosScreen parentGui;
 
   CosmeticButton(CuriosScreen parentGui, int xIn, int yIn, int widthIn, int heightIn) {

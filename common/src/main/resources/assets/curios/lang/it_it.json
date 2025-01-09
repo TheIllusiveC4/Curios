@@ -36,12 +36,6 @@
   "curios.modifiers.charm": "Come amuleto:",
   "curios.modifiers.hands": "Sulle mani:",
   "curios.modifiers.bracelet": "Al polso:",
-  "curios.modifiers.slots.plus.0": "Slot di tipo %2$s: +%1$s",
-  "curios.modifiers.slots.plus.1": "Slot di tipo %2$s: +%1$s%%",
-  "curios.modifiers.slots.plus.2": "Slot di tipo %2$s: +%1$s%%",
-  "curios.modifiers.slots.take.0": "Slot di tipo %2$s: -%1$s",
-  "curios.modifiers.slots.take.1": "Slot di tipo %2$s: -%1$s%%",
-  "curios.modifiers.slots.take.2": "Slot di tipo %2$s: -%1$s%%",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Apri/Chiudi l'inventario di Curios",
   "gui.curios.toggle": "Mostra/Nascondi"

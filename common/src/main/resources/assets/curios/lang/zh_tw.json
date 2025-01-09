@@ -36,12 +36,6 @@
   "curios.modifiers.charm": "裝備護符後:",
   "curios.modifiers.hands": "裝備手上時:",
   "curios.modifiers.bracelet": "裝備手環後:",
-  "curios.modifiers.slots.plus.0": "+%s %s 插槽",
-  "curios.modifiers.slots.plus.1": "+%s%% %s 插槽",
-  "curios.modifiers.slots.plus.2": "+%s%% %s 插槽",
-  "curios.modifiers.slots.take.0": "-%s %s 插槽",
-  "curios.modifiers.slots.take.1": "-%s%% %s 插槽",
-  "curios.modifiers.slots.take.2": "-%s%% %s 插槽",
   "key.curios.category": "飾品",
   "key.curios.open.desc": "打開及關閉飾品欄",
   "gui.curios.toggle": "切換可飾性飾品欄"

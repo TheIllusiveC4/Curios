@@ -35,8 +35,7 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
  * This event is fired inside the {@link net.neoforged.neoforge.event.entity.living.LivingDropsEvent}.<br>
  * <br>
  * {@link #source} contains the DamageSource that caused the drop to occur.<br> {@link #drops}
- * contains the ArrayList of ItemEntity that will be dropped.<br> {@link #lootingLevel} contains the
- * amount of loot that will be dropped.<br> {@link #recentlyHit} determines whether the Entity doing
+ * contains the ArrayList of ItemEntity that will be dropped.<br> {@link #recentlyHit} determines whether the Entity doing
  * the drop has recently been damaged.<br>
  * <br>
  * This event is fired on the {@link net.neoforged.neoforge.common.NeoForge#EVENT_BUS}.

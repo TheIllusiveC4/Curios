@@ -28,14 +28,15 @@ public class CuriosGenerator implements AdvancementProvider.AdvancementGenerator
     Advancement.Builder.advancement()
         .addCriterion("test",
             CuriosTriggers.equip()
-                .withItem(ItemPredicate.Builder.item()
-                    .of(Items.DIAMOND))
+                .withItem(ItemPredicate.Builder.item().of(Items.DIAMOND))
                 .withLocation(LocationPredicate.Builder.location()
-                    .setBiomes(HolderSet.direct(registries.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.BADLANDS))))
+                    .setBiomes(HolderSet.direct(
+                        registries.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.BADLANDS))))
                 .withSlot(SlotPredicate.Builder.slot()
                     .of("ring", "necklace")
                     .withIndex(MinMaxBounds.Ints.between(0, 10)))
                 .build())
-        .save(saver, new ResourceLocation("curiostest", "test"), existingFileHelper);
+        .save(saver, ResourceLocation.fromNamespaceAndPath("curiostest", "test"),
+            existingFileHelper);
   }
 }

@@ -20,8 +20,9 @@ import top.theillusivec4.curiostest.client.model.KnucklesModel;
 
 public class KnucklesRenderer implements ICurioRenderer {
 
-  private static final ResourceLocation KNUCKLES_TEXTURE = new ResourceLocation(CuriosTest.MODID,
-      "textures/entity/knuckles.png");
+  private static final ResourceLocation KNUCKLES_TEXTURE =
+      ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID,
+          "textures/entity/knuckles.png");
 
   private final KnucklesModel model;
 
@@ -47,10 +48,9 @@ public class KnucklesRenderer implements ICurioRenderer {
     this.model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
     ICurioRenderer.followBodyRotations(entity, this.model);
     VertexConsumer vertexconsumer = ItemRenderer
-        .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(KNUCKLES_TEXTURE), false,
+        .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(KNUCKLES_TEXTURE),
             stack.hasFoil());
     this.model
-        .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F,
-            1.0F, 1.0F);
+        .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1);
   }
 }

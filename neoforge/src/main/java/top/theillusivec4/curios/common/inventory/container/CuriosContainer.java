@@ -34,7 +34,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
@@ -50,7 +49,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -66,7 +67,8 @@ import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.network.server.SPacketPage;
 import top.theillusivec4.curios.common.network.server.SPacketQuickMove;
 
-public class CuriosContainer extends RecipeBookMenu<CraftingContainer> implements ICuriosMenu {
+public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeInput>>
+    implements ICuriosMenu {
 
   private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[] {
       InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS, InventoryMenu.EMPTY_ARMOR_SLOT_LEGGINGS,
@@ -155,8 +157,8 @@ public class CuriosContainer extends RecipeBookMenu<CraftingContainer> implement
         @Override
         public boolean mayPickup(@Nonnull Player playerIn) {
           ItemStack itemstack = this.getItem();
-          return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper
-              .hasBindingCurse(itemstack)) && super.mayPickup(playerIn);
+          return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.has(itemstack,
+              EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE)) && super.mayPickup(playerIn);
         }
 
 
@@ -306,7 +308,8 @@ public class CuriosContainer extends RecipeBookMenu<CraftingContainer> implement
       ItemStack itemstack = ItemStack.EMPTY;
       Optional<RecipeHolder<CraftingRecipe>> optional =
           Objects.requireNonNull(this.player.level().getServer()).getRecipeManager()
-              .getRecipeFor(RecipeType.CRAFTING, this.craftMatrix, this.player.level());
+              .getRecipeFor(RecipeType.CRAFTING, this.craftMatrix.asCraftInput(),
+                  this.player.level());
 
       if (optional.isPresent()) {
         RecipeHolder<CraftingRecipe> recipeholder = optional.get();
@@ -314,7 +317,8 @@ public class CuriosContainer extends RecipeBookMenu<CraftingContainer> implement
 
         if (this.craftResult.setRecipeUsed(this.player.level(), serverplayer, recipeholder)) {
           ItemStack itemstack1 =
-              craftingrecipe.assemble(this.craftMatrix, this.player.level().registryAccess());
+              craftingrecipe.assemble(this.craftMatrix.asCraftInput(),
+                  this.player.level().registryAccess());
 
           if (itemstack1.isItemEnabled(this.player.level().enabledFeatures())) {
             itemstack = itemstack1;
@@ -361,7 +365,7 @@ public class CuriosContainer extends RecipeBookMenu<CraftingContainer> implement
     if (slot.hasItem()) {
       ItemStack itemstack1 = slot.getItem();
       itemstack = itemstack1.copy();
-      EquipmentSlot entityequipmentslot = Mob.getEquipmentSlotForItem(itemstack);
+      EquipmentSlot entityequipmentslot = playerIn.getEquipmentSlotForItem(itemstack);
       if (index == 0) {
 
         if (!this.moveItemStackTo(itemstack1, 9, 45, true)) {
@@ -378,7 +382,7 @@ public class CuriosContainer extends RecipeBookMenu<CraftingContainer> implement
         if (!this.moveItemStackTo(itemstack1, 9, 45, false)) {
           return ItemStack.EMPTY;
         }
-      } else if (entityequipmentslot.getType() == EquipmentSlot.Type.ARMOR
+      } else if (entityequipmentslot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR
           && !this.slots.get(8 - entityequipmentslot.getIndex()).hasItem()) {
         int i = 8 - entityequipmentslot.getIndex();
 
@@ -493,8 +497,8 @@ public class CuriosContainer extends RecipeBookMenu<CraftingContainer> implement
   }
 
   @Override
-  public boolean recipeMatches(RecipeHolder<? extends Recipe<CraftingContainer>> recipeHolder) {
-    return recipeHolder.value().matches(this.craftMatrix, this.player.level());
+  public boolean recipeMatches(RecipeHolder recipeHolder) {
+    return recipeHolder.value().matches(this.craftMatrix.asCraftInput(), this.player.level());
   }
 
   @Override
