@@ -31,24 +31,3 @@ artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
 }
-
-publishing {
-    repositories {
-        maven {
-            name = "octo"
-            url = "https://maven.octo-studios.com/releases"
-            credentials(PasswordCredentials)
-            authentication {
-                basic(BasicAuthentication)
-            }
-        }
-    }
-    publications {
-        maven(MavenPublication) {
-            groupId = group
-            artifactId = "curios-common"
-            version = version
-            from components.java
-        }
-    }
-}
