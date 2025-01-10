@@ -23,13 +23,14 @@ Add the following to your build.gradle file:
 ```
 repositories {
     maven {
-        name = "OctoStudios"
-        url = uri("https://maven.octo-studios.com/releases")
+        name = "Curios"
+        url = uri("https://maven.theillusivec4.top/")
     }
 }
 
 dependencies {
-    implementation 'top.theillusivec4.curios:curios-neoforge:${version}'
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:${version}"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:${version}:api"
 }
 ```
 

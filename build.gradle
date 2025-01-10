@@ -10,18 +10,10 @@ def publishDiscord() {
     try {
         def cfLinks = new StringJoiner('\\n')
 
-        if (project(':forge').hasProperty('curse_link')) {
-            cfLinks.add("[Forge](${project(':forge').findProperty('curse_link')})")
-        }
-
         if (project(':neoforge').hasProperty('curse_link')) {
             cfLinks.add("[NeoForge](${project(':neoforge').findProperty('curse_link')})")
         }
         def modrinthLinks = new StringJoiner('\\n')
-
-        if (project(':forge').hasProperty('modrinth_link')) {
-            modrinthLinks.add("[Forge](${project(':forge').findProperty('modrinth_link')})")
-        }
 
         if (project(':neoforge').hasProperty('curse_link')) {
             modrinthLinks.add("[NeoForge](${project(':neoforge').findProperty('modrinth_link')})")
@@ -104,24 +96,8 @@ def ordered(String... dependencyPaths) {
     return dependencies
 }
 
-tasks.register('publishForge') {
-    dependsOn ordered(':forge:modrinth', ':forge:publishCurseForge')
-
-    doLast {
-        publishDiscord()
-    }
-}
-
 tasks.register('publishNeoForge') {
     dependsOn ordered(':neoforge:modrinth', ':neoforge:publishCurseForge')
-
-    doLast {
-        publishDiscord()
-    }
-}
-
-tasks.register('publishForgeNeoForge') {
-    dependsOn ordered(':forge:modrinth', ':forge:publishCurseForge', ':neoforge:modrinth', ':neoforge:publishCurseForge')
 
     doLast {
         publishDiscord()
