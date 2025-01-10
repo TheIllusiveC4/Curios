@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 5.2.0, this projected used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [9.2.0+1.21.1] - 2025.01.10
+### Added
+- [API] Added the following methods:
+  - `ICurio#getAttributesTooltip(List<Component>, Item.TooltipContext)`
+  - `ICurio#getDropRule(SlotContext, DamageSource, boolean)`
+  - `ICurio#getAttributeModifiers(SlotContext, ResourceLocation)`
+  - `ICurio#getSlotsTooltip(List<Component>, Item.TooltipContext)`
+### Fixed
+- Addressed memory leaks due to unneeded capability invalidation
+### Changed
+- Updated to Minecraft 1.21.1
+- [API] Changed `ICurio#getLootingLevel(SlotContext, DamageSource, LivingEntity, int)` to `getLootingLevel(SlotContext, LootContext)`
+- [API] Replaced `UUID` for attribute modifiers with `ResourceLocation` in all instances of the API
+- Changed tooltip processing to use NeoForge's API
+- Added caching to Curios lookups for optimization
+### Deprecated
+- [API] Deprecated the following methods:
+  - `ICurio#getAttributesTooltip(List<Component>)`
+  - `ICurio#getDropRule(SlotContext, DamageSource, int, boolean)`
+  - `ICurio#getAttributeModifiers(SlotContext, UUID)`
+  - And their respective pairings in `ICurioItem`
+  - `CuriosApi#getSlotIcon(String)`
+  - `CurioCanEquipEvent#(ItemStack, SlotContext)`
+### Removed
+- [API] Removed previously deprecated methods from `ICurio`, `ICurioItem`, `SlotContext`
+
 ## [8.1.0+1.20.6] - 2024.10.23
 ### Added
 - Added `from` expansion additions to the `/curios replace` command [#450](https://github.com/TheIllusiveC4/Curios/issues/450)
