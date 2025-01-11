@@ -46,7 +46,7 @@ public class MixinApplyBonusCount {
           value = "INVOKE_ASSIGN",
           target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;getItemEnchantmentLevel(Lnet/minecraft/core/Holder;Lnet/minecraft/world/item/ItemStack;)I",
           ordinal = 0),
-      index = 5
+      index = 4
   )
   private int curios$applyEnchantBonus(int enchantmentLevel, ItemStack stack,
                                        LootContext lootContext) {
