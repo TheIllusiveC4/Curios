@@ -2,6 +2,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.21.1/CHANGELOG.md).
 
-## [9.2.1+1.21.1] - 2025.01.10
-### Fixed
-- Fixed invalid mixin target
+## [9.2.2+1.21.1] - 2025.01.11
+### Added
+- Added exclusion areas on the Curios screen for EMI and REI recipe viewers
