@@ -48,16 +48,20 @@ runs {
 
 repositories {
     maven {
-        url "https://www.cursemaven.com"
+        name = "CurseMaven"
+        url = uri("https://www.cursemaven.com")
     }
     maven {
-        // location of the maven that hosts JEI files since January 2023
-        name = "Jared's maven"
-        url = "https://maven.blamejared.com/"
+        name = "JEI"
+        url = uri("https://maven.blamejared.com/")
     }
     maven {
-        name = "TerraformersMC"
-        url = "https://maven.terraformersmc.com/"
+        name = "EMI"
+        url = uri("https://maven.terraformersmc.com/")
+    }
+    maven {
+        name = "REI"
+        url = uri("https://maven.shedaniel.me/")
     }
 }
 
@@ -66,10 +70,14 @@ dependencies {
 
     // compile against the JEI API but do not include it at runtime
     compileOnly "mezz.jei:jei-1.21-neoforge-api:${jei_version}"
-//    runtimeOnly "mezz.jei:jei-1.21-neoforge:${jei_version}"
+    runtimeOnly "mezz.jei:jei-1.21-neoforge:${jei_version}"
 
     compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
-    runtimeOnly "dev.emi:emi-neoforge:${emi_version}"
+//    runtimeOnly "dev.emi:emi-neoforge:${emi_version}"
+
+    compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${rei_version}"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:${rei_version}"
+//    runtimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
 }
 
 tasks.register('publishCurseForge', TaskPublishCurseForge) {
