@@ -245,15 +245,15 @@ public class CuriosTest {
 
   private void attributeModifier(final CurioAttributeModifierEvent evt) {
 
-    if (evt.getSlotContext().identifier().equals("curio")) {
-      evt.clearModifiers();
-      evt.addModifier(Attributes.MAX_HEALTH,
-          new AttributeModifier(ResourceLocation.withDefaultNamespace("test"), 10.0d,
-              AttributeModifier.Operation.ADD_VALUE));
-      evt.addModifier(SlotAttribute.getOrCreate("ring"),
-          new AttributeModifier(ResourceLocation.withDefaultNamespace("test"), 1.0d,
-              AttributeModifier.Operation.ADD_VALUE));
-    }
+//    if (evt.getSlotContext().identifier().equals("curio")) {
+//      evt.clearModifiers();
+//      evt.addModifier(Attributes.MAX_HEALTH,
+//          new AttributeModifier(ResourceLocation.withDefaultNamespace("test"), 10.0d,
+//              AttributeModifier.Operation.ADD_VALUE));
+//      evt.addModifier(SlotAttribute.getOrCreate("ring"),
+//          new AttributeModifier(ResourceLocation.withDefaultNamespace("test"), 1.0d,
+//              AttributeModifier.Operation.ADD_VALUE));
+//    }
   }
 
   private void creativeTab(final BuildCreativeModeTabContentsEvent evt) {
