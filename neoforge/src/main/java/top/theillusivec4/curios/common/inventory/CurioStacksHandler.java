@@ -63,8 +63,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   private final ICuriosItemHandler itemHandler;
   private final String identifier;
   private final Map<ResourceLocation, AttributeModifier> modifiers = new HashMap<>();
-  private final Set<AttributeModifier> persistentModifiers = new HashSet<>();
-  private final Set<AttributeModifier> cachedModifiers = new HashSet<>();
+  private final Map<ResourceLocation, AttributeModifier> persistentModifiers = new HashMap<>();
+  private final Map<ResourceLocation, AttributeModifier> cachedModifiers = new HashMap<>();
   private final Multimap<AttributeModifier.Operation, AttributeModifier> modifiersByOperation =
       HashMultimap.create();
 
@@ -178,10 +178,17 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     this.modifiers.put(newModifier.id(), newModifier);
     Collection<AttributeModifier> modifiers =
         this.getModifiersByOperation(newModifier.operation());
-    modifiers.remove(newModifier);
+    List<AttributeModifier> ops = new ArrayList<>(modifiers);
+
+    for (AttributeModifier op : ops) {
+
+      if (op.id().equals(newModifier.id())) {
+        modifiers.remove(op);
+      }
+    }
     modifiers.add(newModifier);
-    this.persistentModifiers.remove(newModifier);
-    this.persistentModifiers.add(newModifier);
+    this.persistentModifiers.remove(newModifier.id());
+    this.persistentModifiers.put(newModifier.id(), newModifier);
     this.flagUpdate();
   }
 
@@ -214,7 +221,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     if (!this.persistentModifiers.isEmpty()) {
       ListTag list = new ListTag();
 
-      for (AttributeModifier attributeModifier : this.persistentModifiers) {
+      for (AttributeModifier attributeModifier : this.persistentModifiers.values()) {
         list.add(attributeModifier.save());
       }
       compoundNBT.put("PersistentModifiers", list);
@@ -223,7 +230,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     if (!this.modifiers.isEmpty()) {
       ListTag list = new ListTag();
       this.modifiers.forEach((uuid, modifier) -> {
-        if (!this.persistentModifiers.contains(modifier)) {
+        if (!this.persistentModifiers.containsKey(modifier.id())) {
           list.add(modifier.save());
         }
       });
@@ -302,7 +309,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
         AttributeModifier attributeModifier = AttributeModifier.load(list.getCompound(i));
 
         if (attributeModifier != null) {
-          this.cachedModifiers.add(attributeModifier);
+          this.cachedModifiers.put(attributeModifier.id(), attributeModifier);
           this.addTransientModifier(attributeModifier);
         }
       }
@@ -426,7 +433,10 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     this.modifiersByOperation.clear();
     this.persistentModifiers.clear();
     other.getModifiers().forEach((uuid, modifier) -> this.addTransientModifier(modifier));
-    this.cachedModifiers.addAll(other.getCachedModifiers());
+
+    for (AttributeModifier cachedModifier : other.getCachedModifiers()) {
+      this.cachedModifiers.put(cachedModifier.id(), cachedModifier);
+    }
 
     for (AttributeModifier persistentModifier : other.getPermanentModifiers()) {
       this.addPermanentModifier(persistentModifier);
@@ -440,12 +450,12 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   @Override
   public Set<AttributeModifier> getPermanentModifiers() {
-    return this.persistentModifiers;
+    return new HashSet<>(this.persistentModifiers.values());
   }
 
   @Override
   public Set<AttributeModifier> getCachedModifiers() {
-    return this.cachedModifiers;
+    return new HashSet<>(this.cachedModifiers.values());
   }
 
   public Collection<AttributeModifier> getModifiersByOperation(
@@ -461,15 +471,23 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   public void addPermanentModifier(AttributeModifier modifier) {
     this.addTransientModifier(modifier);
-    this.persistentModifiers.add(modifier);
+    this.persistentModifiers.put(modifier.id(), modifier);
   }
 
   public void removeModifier(ResourceLocation id) {
     AttributeModifier modifier = this.modifiers.remove(id);
 
     if (modifier != null) {
-      this.persistentModifiers.remove(modifier);
-      this.getModifiersByOperation(modifier.operation()).remove(modifier);
+      this.persistentModifiers.remove(modifier.id(), modifier);
+      Collection<AttributeModifier> modifiers = this.getModifiersByOperation(modifier.operation());
+      List<AttributeModifier> ops = new ArrayList<>(modifiers);
+
+      for (AttributeModifier op : ops) {
+
+        if (op.id().equals(id)) {
+          modifiers.remove(op);
+        }
+      }
       this.flagUpdate();
     }
   }
@@ -493,7 +511,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   public void clearCachedModifiers() {
 
-    for (AttributeModifier cachedModifier : this.cachedModifiers) {
+    for (AttributeModifier cachedModifier : this.cachedModifiers.values()) {
       this.removeModifier(cachedModifier.id());
     }
     this.cachedModifiers.clear();
