@@ -119,8 +119,11 @@ public class ClientEventHandler {
 
               if (arg instanceof MutableComponent mutableComponent
                   && mutableComponent.getContents() instanceof TranslatableContents contents1) {
+                String key = contents1.getKey();
 
-                if (contents1.getKey().startsWith("curios.slot.")) {
+                // https://github.com/TheIllusiveC4/Curios/issues/483
+                // noinspection ConstantConditions
+                if (key != null && key.startsWith("curios.slot.")) {
                   String actualKey = contents1.getKey().replace(".slot.", ".identifier.");
                   contents.getArgs()[i1] = Component.translatable(actualKey, contents1.getArgs());
                   replace = true;
