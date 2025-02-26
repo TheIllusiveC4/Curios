@@ -17,7 +17,7 @@ public class SlotData implements ISlotData {
 
   private Integer order;
   private Integer size;
-  private AttributeModifier.Operation operation;
+  private String operation;
   private Boolean useNativeGui;
   private Boolean hasCosmetic;
   private ResourceLocation icon;
@@ -46,8 +46,14 @@ public class SlotData implements ISlotData {
   }
 
   @Override
-  public SlotData operation(AttributeModifier.Operation operation) {
+  public SlotData operation(String operation) {
     this.operation = operation;
+    return this;
+  }
+
+  @Override
+  public SlotData operation(AttributeModifier.Operation operation) {
+    this.operation = operation == AttributeModifier.Operation.ADDITION ? "ADD" : "SET";
     return this;
   }
 

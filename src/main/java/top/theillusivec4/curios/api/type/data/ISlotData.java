@@ -14,7 +14,9 @@ public interface ISlotData {
 
   ISlotData size(int size);
 
-  ISlotData operation(AttributeModifier.Operation operation);
+  default ISlotData operation(String operation) {
+    return this.operation(AttributeModifier.Operation.ADDITION);
+  }
 
   ISlotData useNativeGui(boolean useNativeGui);
 
@@ -31,4 +33,10 @@ public interface ISlotData {
   ISlotData addValidator(ResourceLocation resourceLocation);
 
   JsonObject serialize();
+
+  /**
+   * @see #operation(String)
+   */
+  @Deprecated(forRemoval = true)
+  ISlotData operation(AttributeModifier.Operation operation);
 }
