@@ -21,15 +21,10 @@ package top.theillusivec4.curios.client;
 
 import static net.minecraft.world.item.ItemStack.ATTRIBUTE_MODIFIER_FORMAT;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.platform.InputConstants;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -65,10 +60,10 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
 public class ClientEventHandler {
 
-  private static final UUID ATTACK_DAMAGE_MODIFIER = UUID
-      .fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
-  private static final UUID ATTACK_SPEED_MODIFIER = UUID
-      .fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
+  private static final UUID ATTACK_DAMAGE_MODIFIER =
+      UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
+  private static final UUID ATTACK_SPEED_MODIFIER =
+      UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
 
   @SubscribeEvent
   public void onClientTick(TickEvent.ClientTickEvent evt) {
@@ -79,8 +74,8 @@ public class ClientEventHandler {
     Minecraft mc = Minecraft.getInstance();
 
     if (KeyRegistry.openCurios.consumeClick() && mc.isWindowActive()) {
-      NetworkHandler.INSTANCE.send(PacketDistributor.SERVER.noArg(),
-          new CPacketOpenCurios(ItemStack.EMPTY));
+      NetworkHandler.INSTANCE.send(
+          PacketDistributor.SERVER.noArg(), new CPacketOpenCurios(ItemStack.EMPTY));
     }
   }
 
@@ -89,10 +84,11 @@ public class ClientEventHandler {
     Minecraft mc = Minecraft.getInstance();
     LocalPlayer localPlayer = mc.player;
 
-    if (localPlayer != null && localPlayer.hasContainerOpen() &&
-        !(localPlayer.containerMenu instanceof ICuriosMenu) &&
-        evt.getKey() == KeyRegistry.openCurios.getKey().getValue() &&
-        evt.getAction() == InputConstants.PRESS) {
+    if (localPlayer != null
+        && localPlayer.hasContainerOpen()
+        && !(localPlayer.containerMenu instanceof ICuriosMenu)
+        && evt.getKey() == KeyRegistry.openCurios.getKey().getValue()
+        && evt.getAction() == InputConstants.PRESS) {
       localPlayer.closeContainer();
     }
   }
@@ -121,8 +117,8 @@ public class ClientEventHandler {
             for (int i1 = 0; i1 < args.length; i1++) {
               Object arg = args[i1];
 
-              if (arg instanceof MutableComponent mutableComponent &&
-                  mutableComponent.getContents() instanceof TranslatableContents contents1) {
+              if (arg instanceof MutableComponent mutableComponent
+                  && mutableComponent.getContents() instanceof TranslatableContents contents1) {
 
                 if (contents1.getKey().startsWith("curios.slot.")) {
                   String actualKey = contents1.getKey().replace(".slot.", ".identifier.");
@@ -135,9 +131,12 @@ public class ClientEventHandler {
           }
 
           if (replace) {
-            tooltip.set(i, Component.translatable(
-                contents.getKey().replace("attribute.modifier.", "curios.modifiers.slots."),
-                contents.getArgs()).withStyle(component.getStyle()));
+            tooltip.set(
+                i,
+                Component.translatable(
+                        contents.getKey().replace("attribute.modifier.", "curios.modifiers.slots."),
+                        contents.getArgs())
+                    .withStyle(component.getStyle()));
           }
         }
       }
@@ -149,8 +148,10 @@ public class ClientEventHandler {
         i = tag.getInt("HideFlags");
       }
 
-      Map<String, ISlotType> map = player != null ? CuriosApi.getItemStackSlots(stack, player) :
-          CuriosApi.getItemStackSlots(stack, FMLLoader.getDist() == Dist.CLIENT);
+      Map<String, ISlotType> map =
+          player != null
+              ? CuriosApi.getItemStackSlots(stack, player)
+              : CuriosApi.getItemStackSlots(stack, FMLLoader.getDist() == Dist.CLIENT);
       // Remove slots that have curios:all validators to avoid tooltip bloat on every item
       map = new HashMap<>(map);
       Set<String> toRemove = new HashSet<>();
@@ -159,8 +160,8 @@ public class ClientEventHandler {
 
         for (ResourceLocation validator : value.getValidators()) {
 
-          if (validator.getNamespace().equals(CuriosApi.MODID) &&
-              validator.getPath().equals("all")) {
+          if (validator.getNamespace().equals(CuriosApi.MODID)
+              && validator.getPath().equals("all")) {
             toRemove.add(value.getIdentifier());
             break;
           }
@@ -180,7 +181,8 @@ public class ClientEventHandler {
       if (!slots.isEmpty()) {
         List<Component> tagTooltips = new ArrayList<>();
         MutableComponent slotsTooltip =
-            Component.translatable("curios.tooltip.slot").append(" ")
+            Component.translatable("curios.tooltip.slot")
+                .append(" ")
                 .withStyle(ChatFormatting.GOLD);
 
         for (int j = 0; j < slots.size(); j++) {
@@ -197,13 +199,14 @@ public class ClientEventHandler {
         tagTooltips.add(slotsTooltip);
 
         LazyOptional<ICurio> optionalCurio = CuriosApi.getCurio(stack);
-        optionalCurio.ifPresent(curio -> {
-          List<Component> actualSlotsTooltip = curio.getSlotsTooltip(tagTooltips);
+        optionalCurio.ifPresent(
+            curio -> {
+              List<Component> actualSlotsTooltip = curio.getSlotsTooltip(tagTooltips);
 
-          if (!actualSlotsTooltip.isEmpty()) {
-            tooltip.addAll(1, actualSlotsTooltip);
-          }
-        });
+              if (!actualSlotsTooltip.isEmpty()) {
+                tooltip.addAll(1, actualSlotsTooltip);
+              }
+            });
 
         if (!optionalCurio.isPresent()) {
           tooltip.addAll(1, tagTooltips);
@@ -211,12 +214,14 @@ public class ClientEventHandler {
         List<Component> attributeTooltip = new ArrayList<>();
 
         for (String identifier : slots) {
+          UUID uuid = UUID.nameUUIDFromBytes(identifier.getBytes());
           Multimap<Attribute, AttributeModifier> multimap =
-              CuriosApi.getAttributeModifiers(new SlotContext(identifier, player, 0, false, true),
-                  UUID.randomUUID(), stack);
+              CuriosApi.getAttributeModifiers(
+                  new SlotContext(identifier, player, 0, false, true), uuid, stack);
 
           if (!multimap.isEmpty() && (i & 2) == 0) {
-            boolean init = false;
+            Map<Attribute, Map<AttributeModifier.Operation, Double>> collapsed =
+                new LinkedHashMap<>();
 
             for (Map.Entry<Attribute, AttributeModifier> entry : multimap.entries()) {
 
@@ -224,15 +229,38 @@ public class ClientEventHandler {
               if (entry.getKey() == null) {
                 continue;
               }
+              Attribute attribute = entry.getKey();
+              AttributeModifier modifier = entry.getValue();
+              AttributeModifier.Operation operation = modifier.getOperation();
+              collapsed
+                  .computeIfAbsent(attribute, k -> new HashMap<>())
+                  .merge(operation, modifier.getAmount(), Double::sum);
+            }
+            boolean init = false;
+            Multimap<Attribute, AttributeModifier.Operation> processed = HashMultimap.create();
+
+            for (Map.Entry<Attribute, AttributeModifier> entry : multimap.entries()) {
+              Attribute attribute = entry.getKey();
+
+              if (attribute == null) {
+                continue;
+              }
+              AttributeModifier attributemodifier = entry.getValue();
+              AttributeModifier.Operation operation = attributemodifier.getOperation();
+
+              if (processed.get(attribute).contains(operation)) {
+                continue;
+              }
+              processed.put(attribute, operation);
 
               if (!init) {
                 attributeTooltip.add(Component.empty());
-                attributeTooltip.add(Component.translatable("curios.modifiers." + identifier)
-                    .withStyle(ChatFormatting.GOLD));
+                attributeTooltip.add(
+                    Component.translatable("curios.modifiers." + identifier)
+                        .withStyle(ChatFormatting.GOLD));
                 init = true;
               }
-              AttributeModifier attributemodifier = entry.getValue();
-              double amount = attributemodifier.getAmount();
+              double amount = collapsed.get(attribute).get(operation);
               boolean flag = false;
 
               if (player != null) {
@@ -243,8 +271,7 @@ public class ClientEventHandler {
                   if (att != null) {
                     amount = amount + att.getBaseValue();
                   }
-                  amount = amount + EnchantmentHelper
-                      .getDamageBonus(stack, MobType.UNDEFINED);
+                  amount = amount + EnchantmentHelper.getDamageBonus(stack, MobType.UNDEFINED);
                   flag = true;
                 } else if (attributemodifier.getId() == ATTACK_SPEED_MODIFIER) {
                   AttributeInstance att = player.getAttribute(Attributes.ATTACK_SPEED);
@@ -254,12 +281,11 @@ public class ClientEventHandler {
                   }
                   flag = true;
                 }
-
                 double d1;
 
                 if (attributemodifier.getOperation() != AttributeModifier.Operation.MULTIPLY_BASE
-                    && attributemodifier.getOperation() !=
-                    AttributeModifier.Operation.MULTIPLY_TOTAL) {
+                    && attributemodifier.getOperation()
+                        != AttributeModifier.Operation.MULTIPLY_TOTAL) {
 
                   if (entry.getKey().equals(Attributes.KNOCKBACK_RESISTANCE)) {
                     d1 = amount * 10.0D;
@@ -273,56 +299,66 @@ public class ClientEventHandler {
                 if (entry.getKey() instanceof SlotAttribute slotAttribute) {
 
                   if (amount > 0.0D) {
-                    attributeTooltip.add((Component.translatable(
-                        "curios.modifiers.slots.plus." +
-                            attributemodifier.getOperation().toValue(),
-                        ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                        Component.translatable(
-                            "curios.identifier." + slotAttribute.getIdentifier())))
-                        .withStyle(ChatFormatting.BLUE));
+                    attributeTooltip.add(
+                        (Component.translatable(
+                                "curios.modifiers.slots.plus."
+                                    + attributemodifier.getOperation().toValue(),
+                                ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                                Component.translatable(
+                                    "curios.identifier." + slotAttribute.getIdentifier())))
+                            .withStyle(ChatFormatting.BLUE));
                   } else {
                     d1 = d1 * -1.0D;
-                    attributeTooltip.add((Component.translatable(
-                        "curios.modifiers.slots.take." +
-                            attributemodifier.getOperation().toValue(),
-                        ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                        Component.translatable(
-                            "curios.identifier." + slotAttribute.getIdentifier())))
-                        .withStyle(ChatFormatting.RED));
+                    attributeTooltip.add(
+                        (Component.translatable(
+                                "curios.modifiers.slots.take."
+                                    + attributemodifier.getOperation().toValue(),
+                                ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                                Component.translatable(
+                                    "curios.identifier." + slotAttribute.getIdentifier())))
+                            .withStyle(ChatFormatting.RED));
                   }
                 } else if (flag) {
                   attributeTooltip.add(
-                      (Component.literal(" ")).append(Component.translatable(
-                              "attribute.modifier.equals." + attributemodifier.getOperation().toValue(),
-                              ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                              Component.translatable(entry.getKey().getDescriptionId())))
+                      (Component.literal(" "))
+                          .append(
+                              Component.translatable(
+                                  "attribute.modifier.equals."
+                                      + attributemodifier.getOperation().toValue(),
+                                  ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                                  Component.translatable(entry.getKey().getDescriptionId())))
                           .withStyle(ChatFormatting.DARK_GREEN));
                 } else if (amount > 0.0D) {
-                  attributeTooltip.add((Component.translatable(
-                      "attribute.modifier.plus." + attributemodifier.getOperation().toValue(),
-                      ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                      Component.translatable(entry.getKey().getDescriptionId())))
-                      .withStyle(ChatFormatting.BLUE));
+                  attributeTooltip.add(
+                      (Component.translatable(
+                              "attribute.modifier.plus."
+                                  + attributemodifier.getOperation().toValue(),
+                              ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                              Component.translatable(entry.getKey().getDescriptionId())))
+                          .withStyle(ChatFormatting.BLUE));
                 } else if (amount < 0.0D) {
                   d1 = d1 * -1.0D;
-                  attributeTooltip.add((Component.translatable(
-                      "attribute.modifier.take." + attributemodifier.getOperation().toValue(),
-                      ATTRIBUTE_MODIFIER_FORMAT.format(d1),
-                      Component.translatable(entry.getKey().getDescriptionId())))
-                      .withStyle(ChatFormatting.RED));
+                  attributeTooltip.add(
+                      (Component.translatable(
+                              "attribute.modifier.take."
+                                  + attributemodifier.getOperation().toValue(),
+                              ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                              Component.translatable(entry.getKey().getDescriptionId())))
+                          .withStyle(ChatFormatting.RED));
                 }
               }
             }
           }
         }
-        optionalCurio.ifPresent(curio -> {
-          List<Component> actualAttributeTooltips =
-              curio.getAttributesTooltip(attributeTooltip);
+        optionalCurio.ifPresent(
+            curio -> {
+              List<Component> actualAttributeTooltips =
+                  curio.getAttributesTooltip(attributeTooltip);
 
-          if (!actualAttributeTooltips.isEmpty()) {
-            tooltip.addAll(actualAttributeTooltips);
-          }
-        });
+              if (!actualAttributeTooltips.isEmpty()) {
+                tooltip.addAll(actualAttributeTooltips);
+              }
+            });
 
         if (!optionalCurio.isPresent()) {
           tooltip.addAll(attributeTooltip);
