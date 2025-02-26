@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 5.2.0, this projected used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [5.12.1+1.20.1] - 2025.02.26
+### Changed
+- Attribute tooltips will condense multiple values into a single sum when applicable
+### Fixed
+- Fixed tooltip visual bugs [#475](https://github.com/TheIllusiveC4/Curios/issues/475) [#483](https://github.com/TheIllusiveC4/Curios/issues/483)
+- Fixed `ISlotData#operation` to use the correct `String` argument instead of `AttributeModifier.Operation` [#484](https://github.com/TheIllusiveC4/Curios/issues/484)
+
 ## [5.12.0+1.20.1] - 2025.02.21
 ### Added
 - [API] Added `ModelRender` and `HumanoidRender` sub-interfaces to `ICurioRenderer`

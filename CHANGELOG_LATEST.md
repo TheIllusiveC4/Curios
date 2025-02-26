@@ -3,6 +3,9 @@ Prior to version 5.2.0, this project used [Forge Recommended Versioning](https:/
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.20.x/docs/CHANGELOG.md).
 
-## [5.12.0+1.20.1] - 2025.02.21
-### Added
-- [API] Added `ModelRender` and `HumanoidRender` sub-interfaces to `ICurioRenderer`
+## [5.12.1+1.20.1] - 2025.02.26
+### Changed
+- Attribute tooltips will condense multiple values into a single sum when applicable
+### Fixed
+- Fixed tooltip visual bugs [#475](https://github.com/TheIllusiveC4/Curios/issues/475) [#483](https://github.com/TheIllusiveC4/Curios/issues/483)
+- Fixed `ISlotData#operation` to use the correct `String` argument instead of `AttributeModifier.Operation` [#484](https://github.com/TheIllusiveC4/Curios/issues/484)
