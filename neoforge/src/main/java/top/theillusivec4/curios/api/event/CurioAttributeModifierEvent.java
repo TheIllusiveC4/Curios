@@ -20,7 +20,7 @@
 
 package top.theillusivec4.curios.api.event;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.util.Collection;
@@ -85,7 +85,7 @@ public class CurioAttributeModifierEvent extends Event {
   private Multimap<Holder<Attribute>, AttributeModifier> getModifiableMap() {
 
     if (this.modifiableModifiers == null) {
-      this.modifiableModifiers = HashMultimap.create(this.originalModifiers);
+      this.modifiableModifiers = LinkedHashMultimap.create(this.originalModifiers);
       this.unmodifiableModifiers = Multimaps.unmodifiableMultimap(this.modifiableModifiers);
     }
     return this.modifiableModifiers;
