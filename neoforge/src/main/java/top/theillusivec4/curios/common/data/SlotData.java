@@ -37,7 +37,7 @@ public class SlotData implements ISlotData {
 
   private Integer order;
   private Integer size;
-  private AttributeModifier.Operation operation;
+  private String operation;
   private Boolean useNativeGui;
   private Boolean hasCosmetic;
   private ResourceLocation icon;
@@ -66,8 +66,14 @@ public class SlotData implements ISlotData {
   }
 
   @Override
-  public SlotData operation(AttributeModifier.Operation operation) {
+  public SlotData operation(String operation) {
     this.operation = operation;
+    return this;
+  }
+
+  @Override
+  public SlotData operation(AttributeModifier.Operation operation) {
+    this.operation = operation == AttributeModifier.Operation.ADD_VALUE ? "ADD" : "SET";
     return this;
   }
 
@@ -138,7 +144,7 @@ public class SlotData implements ISlotData {
     }
 
     if (this.operation != null) {
-      jsonObject.addProperty("operation", this.operation.toString());
+      jsonObject.addProperty("operation", this.operation);
     }
 
     if (this.useNativeGui != null) {

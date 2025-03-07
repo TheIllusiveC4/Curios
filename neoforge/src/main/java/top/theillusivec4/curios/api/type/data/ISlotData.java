@@ -27,9 +27,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 
-/**
- * Used in data generation to represent the slot data
- */
+/** Used in data generation to represent the slot data */
 public interface ISlotData {
 
   ISlotData replace(boolean replace);
@@ -38,6 +36,14 @@ public interface ISlotData {
 
   ISlotData size(int size);
 
+  default ISlotData operation(String operation) {
+    return this.operation(AttributeModifier.Operation.ADD_VALUE);
+  }
+
+  /**
+   * @see #operation(String)
+   */
+  @Deprecated(forRemoval = true)
   ISlotData operation(AttributeModifier.Operation operation);
 
   ISlotData useNativeGui(boolean useNativeGui);

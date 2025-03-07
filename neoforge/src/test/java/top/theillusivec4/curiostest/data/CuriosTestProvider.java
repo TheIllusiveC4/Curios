@@ -12,9 +12,11 @@ import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public class CuriosTestProvider extends CuriosDataProvider {
 
-  public CuriosTestProvider(String modId, PackOutput output,
-                            ExistingFileHelper fileHelper,
-                            CompletableFuture<HolderLookup.Provider> registries) {
+  public CuriosTestProvider(
+      String modId,
+      PackOutput output,
+      ExistingFileHelper fileHelper,
+      CompletableFuture<HolderLookup.Provider> registries) {
     super(modId, output, fileHelper, registries);
   }
 
@@ -23,6 +25,7 @@ public class CuriosTestProvider extends CuriosDataProvider {
     createSlot("test_slot")
         .size(4)
         .dropRule(ICurio.DropRule.ALWAYS_KEEP)
+        .operation("ADD")
         .addCosmetic(true)
         .addCondition(FalseCondition.INSTANCE);
 
