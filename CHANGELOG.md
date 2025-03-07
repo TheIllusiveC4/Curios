@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 5.2.0, this projected used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [9.2.3+1.21.1] - 2025.03.07
+### Added
+- Added `lzh` localization [#488](https://github.com/TheIllusiveC4/Curios/issues/488)
+### Changed
+- Added `tr_tr` localization [#482](https://github.com/TheIllusiveC4/Curios/pull/482)
+### Fixed
+- Fixed slot modifier collisions causing desyncs when using the Curios inventory [#479](https://github.com/TheIllusiveC4/Curios/issues/479)
+- Fixed `ISlotData#operation` to use the correct `String` argument instead of `AttributeModifier.Operation` [#484](https://github.com/TheIllusiveC4/Curios/issues/484)
+- Fixed tooltip ordering when using `CurioAttributeModifierEvent`
+
 ## [9.2.2+1.21.1] - 2025.01.11
 ### Added
 - Added exclusion areas on the Curios screen for EMI and REI recipe viewers
