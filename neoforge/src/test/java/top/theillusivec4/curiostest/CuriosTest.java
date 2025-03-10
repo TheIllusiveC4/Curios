@@ -38,9 +38,11 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.neoforged.bus.api.IEventBus;
@@ -65,6 +67,8 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
+import top.theillusivec4.curios.api.extensions.ICurioSlotExtension;
+import top.theillusivec4.curios.api.extensions.RegisterCuriosExtensionsEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curiostest.client.CuriosLayerDefinitions;
 import top.theillusivec4.curiostest.client.model.AmuletModel;
@@ -91,9 +95,19 @@ public class CuriosTest {
     eventBus.addListener(this::creativeTab);
     eventBus.addListener(this::registerCaps);
     eventBus.addListener(this::gatherData);
+    eventBus.addListener(this::registerSlotExtensions);
     NeoForge.EVENT_BUS.addListener(this::attributeModifier);
     CuriosApi.registerCurioPredicate(ResourceLocation.fromNamespaceAndPath(MODID, "test"),
         slotResult -> slotResult.stack().getItem() == Items.OAK_BOAT);
+  }
+
+  private void registerSlotExtensions(final RegisterCuriosExtensionsEvent evt) {
+    evt.registerSlotExtension(new ICurioSlotExtension() {
+      @Override
+      public ItemStack getDisplayStack(SlotContext slotContext, ItemStack defaultStack) {
+        return Items.DIAMOND_AXE.getDefaultInstance();
+      }
+    }, "test");
   }
 
   private void gatherData(final GatherDataEvent evt) {
