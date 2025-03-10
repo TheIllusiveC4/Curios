@@ -20,10 +20,6 @@
 
 package top.theillusivec4.curios;
 
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,27 +29,4 @@ public class CuriosConstants {
   public static final String MOD_NAME = "Curios API";
   public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
 
-  public static class Tags {
-
-    public static final TagKey<Item> BACK =
-        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "back"));
-    public static final TagKey<Item> BELT =
-        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "belt"));
-    public static final TagKey<Item> BODY =
-        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "body"));
-    public static final TagKey<Item> BRACELET =
-        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "bracelet"));
-    public static final TagKey<Item> CHARM =
-        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "charm"));
-    public static final TagKey<Item> CURIO =
-        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "curio"));
-    public static final TagKey<Item> HANDS =
-        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "hands"));
-    public static final TagKey<Item> HEAD =
-        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "head"));
-    public static final TagKey<Item> NECKLACE =
-        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "necklace"));
-    public static final TagKey<Item> RING =
-        TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "ring"));
-  }
 }
