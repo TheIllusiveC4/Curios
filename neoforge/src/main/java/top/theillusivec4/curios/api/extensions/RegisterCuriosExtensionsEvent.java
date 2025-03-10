@@ -6,7 +6,7 @@ import net.neoforged.fml.event.IModBusEvent;
 
 /**
  * Allows registration of new behavior to various game objects used by Curios. Fired during {@link
- * net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent}.
+ * net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent} on the mod-specific event bus.
  */
 public class RegisterCuriosExtensionsEvent extends Event implements IModBusEvent {
 
