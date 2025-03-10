@@ -24,28 +24,50 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import top.theillusivec4.curios.CuriosConstants;
 
-public class CuriosTags {
+/** Collection of tags used by Curios. */
+public final class CuriosTags {
 
-    public static final TagKey<Item> BACK =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "back"));
-    public static final TagKey<Item> BELT =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "belt"));
-    public static final TagKey<Item> BODY =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "body"));
-    public static final TagKey<Item> BRACELET =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "bracelet"));
-    public static final TagKey<Item> CHARM =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "charm"));
-    public static final TagKey<Item> CURIO =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "curio"));
-    public static final TagKey<Item> HANDS =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "hands"));
-    public static final TagKey<Item> HEAD =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "head"));
-    public static final TagKey<Item> NECKLACE =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "necklace"));
-    public static final TagKey<Item> RING =
-            TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "ring"));
+  /** Items worn on the back, such as capes or backpacks. */
+  public static final TagKey<Item> BACK = createItemTag("back");
+
+  /** Items worn around the waist, such as belts or pouches. */
+  public static final TagKey<Item> BELT = createItemTag("belt");
+
+  /** Items worn on the torso/chest, such as cloaks or shirts. */
+  public static final TagKey<Item> BODY = createItemTag("body");
+
+  /** Items worn around the wrist, such as bands or bracelets. */
+  public static final TagKey<Item> BRACELET = createItemTag("bracelet");
+
+  /**
+   * Miscellaneous items that are not strongly associated with a specific body part or usage type.
+   */
+  public static final TagKey<Item> CHARM = createItemTag("charm");
+
+  /** Universal items that are able to equip or be equipped into any slot type. */
+  public static final TagKey<Item> CURIO = createItemTag("curio");
+
+  /** Items worn on the hands, such as gloves or gauntlets. */
+  public static final TagKey<Item> HANDS = createItemTag("hands");
+
+  /** Items worn on top of the head, such as crowns or hats. */
+  public static final TagKey<Item> HEAD = createItemTag("head");
+
+  /** Items worn around the neck, such as amulets or necklaces. */
+  public static final TagKey<Item> NECKLACE = createItemTag("necklace");
+
+  /** Items worn on the fingers, such as rings. */
+  public static final TagKey<Item> RING = createItemTag("ring");
+
+  /**
+   * Creates an item tag key using the Curios namespace that is associated with the slot for the
+   * given identifier.
+   *
+   * @param id The slot identifier
+   * @return An item tag key
+   */
+  public static TagKey<Item> createItemTag(String id) {
+    return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("curios", id));
+  }
 }
