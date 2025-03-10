@@ -5,4 +5,4 @@ This is a copy of the changelog for the most recent version. For the full versio
 ## [9.3.0+1.21.1] - 2025.03.10
 ### Added
 - Added `ICurioSlotExtension` for defining additional slot behavior
-- Added `CuriosTags` for more convenient access to commonly used Curios tags
+- Added `CuriosTags` for more convenient access to commonly used Curios tags [#495](https://github.com/TheIllusiveC4/Curios/pull/495)
