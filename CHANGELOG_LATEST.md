@@ -2,7 +2,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.21.1/CHANGELOG.md).
 
-## [9.3.0+1.21.1] - 2025.03.10
-### Added
-- Added `ICurioSlotExtension` for defining additional slot behavior
-- Added `CuriosTags` for more convenient access to commonly used Curios tags [#495](https://github.com/TheIllusiveC4/Curios/pull/495)
+## [9.3.1+1.21.1] - 2025.03.12
+### Fixed
+- Fixed slot tooltip rendering
