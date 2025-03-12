@@ -264,22 +264,29 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
           && this.getSlotUnderMouse() != null) {
         Slot slot = this.getSlotUnderMouse();
 
-        if (slot instanceof CurioSlot slotCurio && !slot.hasItem() && this.minecraft != null) {
-          List<Component> slotTooltips =
+        if (slot instanceof CurioSlot slotCurio && this.minecraft != null) {
+          ItemStack stack =
               slotCurio
                   .getSlotExtension()
-                  .getSlotTooltip(
-                      slotCurio.getSlotContext(),
-                      ClientTooltipFlag.of(
-                          this.minecraft.options.advancedItemTooltips
-                              ? TooltipFlag.Default.ADVANCED
-                              : TooltipFlag.Default.NORMAL));
+                  .getDisplayStack(slotCurio.getSlotContext(), slot.getItem());
 
-          if (!slotTooltips.isEmpty()) {
-            guiGraphics.renderComponentTooltip(this.font, slotTooltips, mouseX, mouseY);
-          } else {
-            guiGraphics.renderTooltip(
-                this.font, Component.literal(slotCurio.getSlotName()), mouseX, mouseY);
+          if (stack.isEmpty()) {
+            List<Component> slotTooltips =
+                slotCurio
+                    .getSlotExtension()
+                    .getSlotTooltip(
+                        slotCurio.getSlotContext(),
+                        ClientTooltipFlag.of(
+                            this.minecraft.options.advancedItemTooltips
+                                ? TooltipFlag.Default.ADVANCED
+                                : TooltipFlag.Default.NORMAL));
+
+            if (!slotTooltips.isEmpty()) {
+              guiGraphics.renderComponentTooltip(this.font, slotTooltips, mouseX, mouseY);
+            } else {
+              guiGraphics.renderTooltip(
+                  this.font, Component.literal(slotCurio.getSlotName()), mouseX, mouseY);
+            }
           }
         }
       }
@@ -299,8 +306,16 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
         if (this.isRenderButtonHovered) {
           guiGraphics.renderTooltip(
               this.font, Component.translatable("gui.curios.toggle"), mouseX, mouseY);
-        } else if (this.hoveredSlot != null && this.hoveredSlot.hasItem()) {
-          guiGraphics.renderTooltip(this.font, this.hoveredSlot.getItem(), mouseX, mouseY);
+        } else if (this.hoveredSlot != null) {
+          ItemStack stack = this.hoveredSlot.getItem();
+
+          if (this.hoveredSlot instanceof CurioSlot curioSlot) {
+            stack = curioSlot.getSlotExtension().getDisplayStack(curioSlot.getSlotContext(), stack);
+          }
+
+          if (!stack.isEmpty()) {
+            guiGraphics.renderTooltip(this.font, stack, mouseX, mouseY);
+          }
         }
       }
     }
@@ -450,7 +465,8 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
     ItemStack itemstack = slot.getItem();
 
     if (slot instanceof CurioSlot curioSlot) {
-      itemstack = curioSlot.getSlotExtension().getDisplayStack(curioSlot.getSlotContext(), itemstack);
+      itemstack =
+          curioSlot.getSlotExtension().getDisplayStack(curioSlot.getSlotContext(), itemstack);
     }
     boolean flag = false;
     boolean flag1 =
