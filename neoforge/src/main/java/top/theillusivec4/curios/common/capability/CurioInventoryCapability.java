@@ -20,6 +20,7 @@
 
 package top.theillusivec4.curios.common.capability;
 
+import com.google.common.cache.Cache;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -27,7 +28,6 @@ import com.mojang.datafixers.util.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -152,23 +152,18 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
     return findFirstCurio(filter, "");
   }
 
-  static Map<String, Pair<Long, Optional<SlotResult>>> firstCurioCache = new HashMap<>();
-
   public Optional<SlotResult> findFirstCurio(Predicate<ItemStack> filter, String cacheKey) {
     // Check cached value first
     long gameTime = this.livingEntity.level().getGameTime();
+    Cache<String, Pair<Long, Optional<SlotResult>>> cache = this.curioInventory.firstCurioCache;
+
     if (!cacheKey.isEmpty()) {
-      if (firstCurioCache.size() > 500) {
-        firstCurioCache.clear();
-      }
-      if (firstCurioCache.containsKey(cacheKey)) {
-        var pair = firstCurioCache.get(cacheKey);
-        if (pair.getFirst() == gameTime) {
-          return pair.getSecond();
-        }
+      Pair<Long, Optional<SlotResult>> cached = cache.getIfPresent(cacheKey);
+
+      if (cached != null && cached.getFirst() == gameTime) {
+        return cached.getSecond();
       }
     }
-
     Map<String, ICurioStacksHandler> curios = this.getCurios();
 
     for (String id : curios.keySet()) {
@@ -190,12 +185,12 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
                           false,
                           renderStates.size() > i && renderStates.get(i)),
                       stack));
-          firstCurioCache.put(cacheKey, Pair.of(gameTime, ret));
+          cache.put(cacheKey, Pair.of(gameTime, ret));
           return ret;
         }
       }
     }
-    firstCurioCache.put(cacheKey, Pair.of(gameTime, Optional.empty()));
+    cache.put(cacheKey, Pair.of(gameTime, Optional.empty()));
     return Optional.empty();
   }
 
@@ -210,23 +205,18 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
     return findCurios(filter, "");
   }
 
-  static Map<String, Pair<Long, List<SlotResult>>> findCuriosCache = new HashMap<>();
-
   public List<SlotResult> findCurios(Predicate<ItemStack> filter, String cacheKey) {
     // Check cached value first
     long gameTime = this.livingEntity.level().getGameTime();
+    Cache<String, Pair<Long, List<SlotResult>>> cache = this.curioInventory.findCuriosCache;
+
     if (!cacheKey.isEmpty()) {
-      if (findCuriosCache.size() > 500) {
-        findCuriosCache.clear();
-      }
-      if (findCuriosCache.containsKey(cacheKey)) {
-        var pair = findCuriosCache.get(cacheKey);
-        if (pair.getFirst() == gameTime) {
-          return pair.getSecond();
-        }
+      Pair<Long, List<SlotResult>> cached = cache.getIfPresent(cacheKey);
+
+      if (cached != null && cached.getFirst() == gameTime) {
+        return cached.getSecond();
       }
     }
-
     List<SlotResult> result = new ArrayList<>();
     Map<String, ICurioStacksHandler> curios = this.getCurios();
 
@@ -251,7 +241,7 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
         }
       }
     }
-    findCuriosCache.put(cacheKey, Pair.of(gameTime, result));
+    cache.put(cacheKey, Pair.of(gameTime, result));
     return result;
   }
 
