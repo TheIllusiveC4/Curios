@@ -143,8 +143,8 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
   @Override
   public Optional<SlotResult> findFirstCurio(Item item) {
-    return findFirstCurio(stack -> stack.getItem() == item,
-        Curios.itemCacheKey(item.getDefaultInstance()));
+    return findFirstCurio(
+        stack -> stack.getItem() == item, Curios.itemCacheKey(item.getDefaultInstance()));
   }
 
   @Override
@@ -180,8 +180,16 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
         if (!stack.isEmpty() && filter.test(stack)) {
           NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-          var ret = Optional.of(new SlotResult(new SlotContext(id, this.livingEntity, i, false,
-              renderStates.size() > i && renderStates.get(i)), stack));
+          var ret =
+              Optional.of(
+                  new SlotResult(
+                      new SlotContext(
+                          id,
+                          this.livingEntity,
+                          i,
+                          false,
+                          renderStates.size() > i && renderStates.get(i)),
+                      stack));
           firstCurioCache.put(cacheKey, Pair.of(gameTime, ret));
           return ret;
         }
@@ -193,8 +201,8 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
   @Override
   public List<SlotResult> findCurios(Item item) {
-    return findCurios(stack -> stack.getItem() == item,
-        Curios.itemCacheKey(item.getDefaultInstance()));
+    return findCurios(
+        stack -> stack.getItem() == item, Curios.itemCacheKey(item.getDefaultInstance()));
   }
 
   @Override
@@ -231,8 +239,15 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
         if (!stack.isEmpty() && filter.test(stack)) {
           NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-          result.add(new SlotResult(new SlotContext(id, this.livingEntity, i, false,
-              renderStates.size() > i && renderStates.get(i)), stack));
+          result.add(
+              new SlotResult(
+                  new SlotContext(
+                      id,
+                      this.livingEntity,
+                      i,
+                      false,
+                      renderStates.size() > i && renderStates.get(i)),
+                  stack));
         }
       }
     }
@@ -257,8 +272,15 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
           if (!stack.isEmpty()) {
             NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-            result.add(new SlotResult(new SlotContext(id, this.livingEntity, i, false,
-                renderStates.size() > i && renderStates.get(i)), stack));
+            result.add(
+                new SlotResult(
+                    new SlotContext(
+                        id,
+                        this.livingEntity,
+                        i,
+                        false,
+                        renderStates.size() > i && renderStates.get(i)),
+                    stack));
           }
         }
       }
@@ -279,9 +301,15 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
         if (!stack.isEmpty()) {
           NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-          return Optional.of(new SlotResult(
-              new SlotContext(identifier, this.livingEntity, index, false,
-                  renderStates.size() > index && renderStates.get(index)), stack));
+          return Optional.of(
+              new SlotResult(
+                  new SlotContext(
+                      identifier,
+                      this.livingEntity,
+                      index,
+                      false,
+                      renderStates.size() > index && renderStates.get(index)),
+                  stack));
         }
       }
     }
@@ -334,16 +362,20 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
         this.curioInventory.invalidStacks.forEach(
             drop -> ItemHandlerHelper.giveItemToPlayer(player, drop));
       } else {
-        this.curioInventory.invalidStacks.forEach(drop -> {
-          ItemEntity ent = this.livingEntity.spawnAtLocation(drop, 1.0F);
-          RandomSource rand = this.livingEntity.getRandom();
+        this.curioInventory.invalidStacks.forEach(
+            drop -> {
+              ItemEntity ent = this.livingEntity.spawnAtLocation(drop, 1.0F);
+              RandomSource rand = this.livingEntity.getRandom();
 
-          if (ent != null) {
-            ent.setDeltaMovement(ent.getDeltaMovement()
-                .add((rand.nextFloat() - rand.nextFloat()) * 0.1F, rand.nextFloat() * 0.05F,
-                    (rand.nextFloat() - rand.nextFloat()) * 0.1F));
-          }
-        });
+              if (ent != null) {
+                ent.setDeltaMovement(
+                    ent.getDeltaMovement()
+                        .add(
+                            (rand.nextFloat() - rand.nextFloat()) * 0.1F,
+                            rand.nextFloat() * 0.05F,
+                            (rand.nextFloat() - rand.nextFloat()) * 0.1F));
+              }
+            });
       }
       this.curioInventory.invalidStacks = NonNullList.create();
     }
@@ -357,13 +389,21 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
       for (int i = 0; i < stacks.getSlots(); i++) {
         final int index = i;
-        fortuneLevel += CuriosApi.getCurio(stacks.getStackInSlot(i)).map(
-            curio -> {
-              NonNullList<Boolean> renderStates = entry.getValue().getRenders();
-              return curio.getFortuneLevel(
-                  new SlotContext(entry.getKey(), this.livingEntity, index, false,
-                      renderStates.size() > index && renderStates.get(index)), lootContext);
-            }).orElse(0);
+        fortuneLevel +=
+            CuriosApi.getCurio(stacks.getStackInSlot(i))
+                .map(
+                    curio -> {
+                      NonNullList<Boolean> renderStates = entry.getValue().getRenders();
+                      return curio.getFortuneLevel(
+                          new SlotContext(
+                              entry.getKey(),
+                              this.livingEntity,
+                              index,
+                              false,
+                              renderStates.size() > index && renderStates.get(index)),
+                          lootContext);
+                    })
+                .orElse(0);
       }
     }
     return fortuneLevel;
@@ -377,13 +417,21 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
       for (int i = 0; i < stacks.getSlots(); i++) {
         final int index = i;
-        lootingLevel += CuriosApi.getCurio(stacks.getStackInSlot(i)).map(
-            curio -> {
-              NonNullList<Boolean> renderStates = entry.getValue().getRenders();
-              return curio.getLootingLevel(
-                  new SlotContext(entry.getKey(), this.livingEntity, index, false,
-                      renderStates.size() > index && renderStates.get(index)), lootContext);
-            }).orElse(0);
+        lootingLevel +=
+            CuriosApi.getCurio(stacks.getStackInSlot(i))
+                .map(
+                    curio -> {
+                      NonNullList<Boolean> renderStates = entry.getValue().getRenders();
+                      return curio.getLootingLevel(
+                          new SlotContext(
+                              entry.getKey(),
+                              this.livingEntity,
+                              index,
+                              false,
+                              renderStates.size() > index && renderStates.get(index)),
+                          lootContext);
+                    })
+                .orElse(0);
       }
     }
     return lootingLevel;
@@ -454,8 +502,8 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
   }
 
   @Override
-  public void addTransientSlotModifier(String slot, ResourceLocation id, double amount,
-                                       AttributeModifier.Operation operation) {
+  public void addTransientSlotModifier(
+      String slot, ResourceLocation id, double amount, AttributeModifier.Operation operation) {
     Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
     map.put(slot, new AttributeModifier(id, amount, operation));
     this.addTransientSlotModifiers(map);
@@ -478,8 +526,8 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
   }
 
   @Override
-  public void addPermanentSlotModifier(String slot, ResourceLocation id, double amount,
-                                       AttributeModifier.Operation operation) {
+  public void addPermanentSlotModifier(
+      String slot, ResourceLocation id, double amount, AttributeModifier.Operation operation) {
     Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
     map.put(slot, new AttributeModifier(id, amount, operation));
     this.addPermanentSlotModifiers(map);
@@ -535,12 +583,23 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
   @Override
   public void clearCachedSlotModifiers() {
     Multimap<String, AttributeModifier> slots = HashMultimap.create();
+    boolean flag = false;
+    Map<String, ICurioStacksHandler> inv = this.curioInventory.asMap();
 
-    for (Map.Entry<String, ICurioStacksHandler> entry : this.curioInventory.asMap().entrySet()) {
+    for (Map.Entry<String, ICurioStacksHandler> entry : inv.entrySet()) {
       ICurioStacksHandler stacksHandler = entry.getValue();
       Set<AttributeModifier> modifiers = stacksHandler.getCachedModifiers();
 
       if (!modifiers.isEmpty()) {
+        flag = true;
+        break;
+      }
+    }
+
+    if (flag) {
+
+      for (Map.Entry<String, ICurioStacksHandler> entry : inv.entrySet()) {
+        ICurioStacksHandler stacksHandler = entry.getValue();
         IDynamicStackHandler stacks = stacksHandler.getStacks();
         NonNullList<Boolean> renderStates = stacksHandler.getRenders();
         String id = entry.getKey();
@@ -549,11 +608,12 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
           ItemStack stack = stacks.getStackInSlot(i);
 
           if (!stack.isEmpty()) {
-            SlotContext slotContext = new SlotContext(id, this.getWearer(), i, false,
-                renderStates.size() > i && renderStates.get(i));
+            SlotContext slotContext =
+                new SlotContext(
+                    id, this.getWearer(), i, false, renderStates.size() > i && renderStates.get(i));
             Multimap<Holder<Attribute>, AttributeModifier> map =
-                CuriosApi.getAttributeModifiers(slotContext, CuriosApi.getSlotId(slotContext),
-                    stack);
+                CuriosApi.getAttributeModifiers(
+                    slotContext, CuriosApi.getSlotId(slotContext), stack);
 
             for (Holder<Attribute> attribute : map.keySet()) {
 
@@ -590,8 +650,8 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
     return result;
   }
 
-  private void loadStacks(ICurioStacksHandler stacksHandler, ItemStackHandler loaded,
-                          IDynamicStackHandler stacks) {
+  private void loadStacks(
+      ICurioStacksHandler stacksHandler, ItemStackHandler loaded, IDynamicStackHandler stacks) {
 
     for (int j = 0; j < stacksHandler.getSlots() && j < loaded.getSlots(); j++) {
       ItemStack stack = stacks.getStackInSlot(j);
