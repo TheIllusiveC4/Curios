@@ -127,7 +127,7 @@ public class CuriosEventHandler {
         }
         DropRule dropRule = dropRuleOverride != null ? dropRuleOverride :
             CuriosApi.getCurio(stack).map(curio -> curio
-                .getDropRule(slotContext, evt.getSource(), 0,
+                .getDropRule(slotContext, evt.getSource(),
                     // todo: Fix looting levels when NeoForge has a new API or figure a workaround
                     evt.isRecentlyHit())).orElse(DropRule.DEFAULT);
 
