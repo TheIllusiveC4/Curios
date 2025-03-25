@@ -53,6 +53,7 @@ import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
+import top.theillusivec4.curios.common.CuriosRegistry;
 
 public class SetCurioAttributesFunction extends LootItemConditionalFunction {
 
@@ -69,7 +70,6 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
           )
           .apply(instance, SetCurioAttributesFunction::new)
   );
-  public static LootItemFunctionType<SetCurioAttributesFunction> TYPE = null;
 
   final List<Modifier> modifiers;
   final boolean replace;
@@ -81,15 +81,9 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
     this.replace = replace;
   }
 
-  public static void register() {
-    TYPE = Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE,
-        ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "set_curio_attributes"),
-        new LootItemFunctionType<>(CODEC));
-  }
-
   @Nonnull
   public LootItemFunctionType<SetCurioAttributesFunction> getType() {
-    return TYPE;
+    return CuriosRegistry.CURIO_ATTRIBUTES.get();
   }
 
   @Nonnull
@@ -117,7 +111,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
     return stack;
   }
 
-  record Modifier(String name, Holder<Attribute> attribute, AttributeModifier.Operation operation,
+  record Modifier(Holder<Attribute> attribute, AttributeModifier.Operation operation,
                   NumberProvider amount, ResourceLocation id, List<String> slots) {
 
     private static final Codec<List<String>> SLOTS_CODEC = ExtraCodecs.nonEmptyList(
@@ -164,8 +158,6 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
     };
     public static final Codec<Modifier> MODIFIER_CODEC =
         RecordCodecBuilder.create((instance) -> instance.group(
-                Codec.STRING.fieldOf("name")
-                    .forGetter(Modifier::name),
                 ATTRIBUTE_CODEC.fieldOf("attribute")
                     .forGetter(Modifier::attribute),
                 AttributeModifier.Operation.CODEC.fieldOf("operation")

@@ -66,7 +66,7 @@ public class CuriosRegistry {
   public static final Supplier<MenuType<CuriosContainer>> CURIO_MENU =
       MENU_TYPES.register("curios_container",
           () -> IMenuTypeExtension.create(CuriosContainer::new));
-  public static final Supplier<LootItemFunctionType<?>> CURIO_ATTRIBUTES =
+  public static final Supplier<LootItemFunctionType<SetCurioAttributesFunction>> CURIO_ATTRIBUTES =
       LOOT_FUNCTIONS.register("set_curio_attributes",
           () -> new LootItemFunctionType<>(SetCurioAttributesFunction.CODEC));
   public static final Supplier<EquipCurioTrigger> EQUIP_TRIGGER =

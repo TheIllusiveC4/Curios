@@ -22,12 +22,12 @@
               "modifiers": [
                 {
                   "attribute": "minecraft:generic.max_health",
+                  "id": "curiostest:test_attribute_drop",
                   "operation": "add_value",
                   "amount": {
                     "min": 0,
                     "max": 4
                   },
-                  "name": "test",
                   "slot": ["ring", "necklace", "head", "hands"]
                 }
               ]
