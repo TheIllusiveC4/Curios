@@ -22,12 +22,9 @@ package top.theillusivec4.curios.common.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+
+import java.util.*;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -36,8 +33,8 @@ import top.theillusivec4.curios.api.type.data.IEntitiesData;
 
 public class EntitiesData implements IEntitiesData {
 
-  private final Set<EntityType<?>> entities = new HashSet<>();
-  private final Set<String> slots = new HashSet<>();
+  private final Set<EntityType<?>> entities = new LinkedHashSet<>();
+  private final Set<String> slots = new LinkedHashSet<>();
   private Boolean replace;
   private List<ICondition> conditions;
 

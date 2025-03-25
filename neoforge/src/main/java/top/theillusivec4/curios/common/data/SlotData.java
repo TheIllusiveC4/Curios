@@ -22,10 +22,9 @@ package top.theillusivec4.curios.common.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -121,7 +120,7 @@ public class SlotData implements ISlotData {
   public ISlotData addValidator(ResourceLocation resourceLocation) {
 
     if (this.validators == null) {
-      this.validators = new HashSet<>();
+      this.validators = new LinkedHashSet<>();
     }
     this.validators.add(resourceLocation);
     return this;
