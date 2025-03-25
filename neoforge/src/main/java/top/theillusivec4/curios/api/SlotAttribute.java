@@ -22,8 +22,16 @@ package top.theillusivec4.curios.api;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.TooltipFlag;
+
+import javax.annotation.Nonnull;
 
 /**
  * A wrapper class for representing slot types as attributes for use in attribute modifiers
@@ -47,5 +55,21 @@ public class SlotAttribute extends Attribute {
 
   public String getIdentifier() {
     return this.identifier;
+  }
+
+  @Nonnull
+  @Override
+  public MutableComponent toComponent(@Nonnull AttributeModifier modif, @Nonnull TooltipFlag flag) {
+    double value = modif.amount();
+    String key = value > 0 ? "curios.modifiers.slots.plus" : "curios.modifiers.slots.take";
+
+    if (value > 1) {
+      key = key + ".multiple";
+    }
+    ChatFormatting color = this.getStyle(value > 0);
+    Component attrDesc = Component.translatable(this.getDescriptionId());
+    Component valueComp = this.toValueComponent(modif.operation(), value, flag);
+    MutableComponent comp = Component.translatable(key, valueComp, attrDesc).withStyle(color);
+    return comp.append(this.getDebugInfo(modif, flag));
   }
 }
