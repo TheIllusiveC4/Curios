@@ -118,8 +118,11 @@ public class ClientEventHandler {
         Component.translatable("curios.tooltip.slot").append(" ").withStyle(ChatFormatting.GOLD);
 
     for (int j = 0; j < slots.size(); j++) {
-      String key = "curios.identifier." + slots.get(j);
-      MutableComponent type = Component.translatable(key);
+      String id = slots.get(j);
+      String key = "curios.identifier." + id;
+      MutableComponent type =
+          Component.translatableWithFallback(
+              key, Character.toUpperCase(id.charAt(0)) + id.substring(1).toLowerCase());
 
       if (j < slots.size() - 1) {
         type = type.append(", ");
