@@ -81,7 +81,7 @@ dependencies {
 }
 
 tasks.register('publishCurseForge', TaskPublishCurseForge) {
-    apiToken = findProperty('curseKey')
+    apiToken = "${providers.environmentVariable('CURSEFORGE_KEY')}"
     //debugMode = true
     def projectId = "${cf_id}".toString()
     def mainFile = upload(projectId, file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
@@ -103,7 +103,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 }
 
 modrinth {
-    token = findProperty('modrinthKey') ?: ""
+    token = "${providers.environmentVariable('MODRINTH_KEY')}" ?: ""
     //debugMode = true
     projectId = "${modrinth_id}"
     versionName = getArchivesBaseName() + "-" + getVersion()
