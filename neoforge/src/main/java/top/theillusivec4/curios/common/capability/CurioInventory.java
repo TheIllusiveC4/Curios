@@ -203,6 +203,10 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
 
   @Override
   public CompoundTag serializeNBT(@Nonnull HolderLookup.Provider provider) {
+
+    if (!this.deserialized.isEmpty()) {
+      return this.deserialized;
+    }
     CompoundTag compound = new CompoundTag();
 
     ListTag taglist = new ListTag();
