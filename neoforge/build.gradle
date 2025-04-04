@@ -72,7 +72,7 @@ dependencies {
     compileOnly "mezz.jei:jei-1.21-neoforge-api:${jei_version}"
     runtimeOnly "mezz.jei:jei-1.21-neoforge:${jei_version}"
 
-    compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
+    compileOnly "dev.emi:emi-neoforge:${emi_version}"
 //    runtimeOnly "dev.emi:emi-neoforge:${emi_version}"
 
     compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${rei_version}"

@@ -16,7 +16,7 @@ public class CuriosEmiPlugin implements EmiPlugin {
     registry.addExclusionArea(CuriosScreen.class, (screen, consumer) -> {
       for (Rect2i rect2i : CuriosExclusionAreas.create(screen)) {
         consumer.accept(new Bounds(rect2i.getX(), rect2i.getY(), rect2i.getWidth(),
-            rect2i.getHeight()));
+                                   rect2i.getHeight()));
       }
     });
   }

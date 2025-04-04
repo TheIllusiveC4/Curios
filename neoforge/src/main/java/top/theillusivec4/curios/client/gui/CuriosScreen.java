@@ -350,7 +350,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
 
   /** Draws the background layer of this container (behind the item). */
   @Override
-  protected void renderBg(
+  public void renderBg(
       @Nonnull GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
 
     if (this.minecraft != null && this.minecraft.player != null) {

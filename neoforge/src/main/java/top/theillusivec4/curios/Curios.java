@@ -80,6 +80,7 @@ import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
 import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
+import top.theillusivec4.curios.common.integration.CuriosIntegrations;
 import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.common.slottype.LegacySlotManager;
 import top.theillusivec4.curios.mixin.CuriosImplMixinHooks;
@@ -93,6 +94,7 @@ public class Curios {
 
   public Curios(IEventBus eventBus, ModContainer modContainer) {
     CuriosRegistry.init(eventBus);
+    CuriosIntegrations.setup(eventBus);
     eventBus.addListener(this::setup);
     eventBus.addListener(this::process);
     eventBus.addListener(this::registerCaps);
