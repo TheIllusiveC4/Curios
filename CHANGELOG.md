@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 5.2.0, this projected used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [9.4.1+1.21.1] - 2025.04.04
+### Fixed
+- Fixed missing inventory when a player fails to join a server [#481](https://github.com/TheIllusiveC4/Curios/issues/481)
+- Fixed Curios panel rendering beneath EMI themed panels [#503](https://github.com/TheIllusiveC4/Curios/issues/503)
+
 ## [9.4.0+1.21.1] - 2025.03.24
 ### Changed
 - Updated tooltip logic to follow NeoForge conventions, including the use of `AddAttributeTooltipsEvent` and `GatherSkippedAttributeTooltipsEvent` [#496](https://github.com/TheIllusiveC4/Curios/issues/496)
