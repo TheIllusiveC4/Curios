@@ -1,6 +1,9 @@
 package top.theillusivec4.curios.mixin.core;
 
+import java.util.function.Predicate;
+import javax.annotation.Nonnull;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -13,8 +16,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 
-@Mixin(Inventory.class)
-public class MixinInventory {
+@Mixin(value = Inventory.class, priority = 4)
+public abstract class MixinInventory implements Container {
 
   @Shadow
   @Final
@@ -40,6 +43,24 @@ public class MixinInventory {
   private void curios$containsTag(TagKey<Item> tagKey, CallbackInfoReturnable<Boolean> cir) {
 
     if (CuriosUtilMixinHooks.containsTag(this.player, tagKey)) {
+      cir.setReturnValue(true);
+    }
+  }
+
+  @Override
+  public boolean hasAnyMatching(@Nonnull Predicate<ItemStack> predicate) {
+    return Container.super.hasAnyMatching(predicate);
+  }
+
+  @Inject(
+      at = @At("TAIL"),
+      method = "hasAnyMatching(Ljava/util/function/Predicate;)Z",
+      cancellable = true
+  )
+  private void curios$hasAnyMatching(Predicate<ItemStack> predicate,
+                                     CallbackInfoReturnable<Boolean> cir) {
+
+    if (!cir.getReturnValue() && CuriosUtilMixinHooks.hasAnyMatching(this.player, predicate)) {
       cir.setReturnValue(true);
     }
   }

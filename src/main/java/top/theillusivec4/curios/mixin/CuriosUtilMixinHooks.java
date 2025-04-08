@@ -1,6 +1,7 @@
 package top.theillusivec4.curios.mixin;
 
 import java.util.Map;
+import java.util.function.Predicate;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -39,7 +40,8 @@ public class CuriosUtilMixinHooks {
           boolean canNeutralize =
               CuriosApi.getCurio(stacks.getStackInSlot(i)).map(curio -> curio
                       .makesPiglinsNeutral(new SlotContext(entry.getKey(), livingEntity, index, false,
-                          renderStates.size() > index && renderStates.get(index))))
+                                                           renderStates.size() > index
+                                                               && renderStates.get(index))))
                   .orElse(false);
 
           if (canNeutralize) {
@@ -63,7 +65,8 @@ public class CuriosUtilMixinHooks {
           boolean canWalk =
               CuriosApi.getCurio(stacks.getStackInSlot(i)).map(curio -> curio
                       .canWalkOnPowderedSnow(new SlotContext(entry.getKey(), livingEntity, index, false,
-                          renderStates.size() > index && renderStates.get(index))))
+                                                             renderStates.size() > index
+                                                                 && renderStates.get(index))))
                   .orElse(false);
 
           if (canWalk) {
@@ -140,5 +143,10 @@ public class CuriosUtilMixinHooks {
     return CuriosApi.getCuriosInventory(player).map(
             inv -> inv.findFirstCurio(stack2 -> !stack2.isEmpty() && stack2.is(tagKey)).isPresent())
         .orElse(false);
+  }
+
+  public static boolean hasAnyMatching(Player player, Predicate<ItemStack> predicate) {
+    return CuriosApi.getCuriosInventory(player)
+        .map(inv -> inv.findFirstCurio(predicate).isPresent()).orElse(false);
   }
 }
