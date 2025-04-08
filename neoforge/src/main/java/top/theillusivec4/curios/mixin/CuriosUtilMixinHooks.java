@@ -176,19 +176,18 @@ public class CuriosUtilMixinHooks {
   }
 
   public static boolean containsStack(Player player, ItemStack stack) {
-    return CuriosApi.getCuriosInventory(player).map(inv -> inv.findFirstCurio(
-            stack2 -> !stack2.isEmpty() && ItemStack.isSameItemSameComponents(stack, stack2))
-        .isPresent()).orElse(false);
+    return CuriosApi.getCuriosInventory(player).flatMap(inv -> inv.findFirstCurio(
+            stack2 -> !stack2.isEmpty() && ItemStack.isSameItemSameComponents(stack, stack2)))
+        .isPresent();
   }
 
   public static boolean containsTag(Player player, TagKey<Item> tagKey) {
-    return CuriosApi.getCuriosInventory(player).map(
-            inv -> inv.findFirstCurio(stack2 -> !stack2.isEmpty() && stack2.is(tagKey)).isPresent())
-        .orElse(false);
+    return CuriosApi.getCuriosInventory(player).flatMap(
+            inv -> inv.findFirstCurio(stack2 -> !stack2.isEmpty() && stack2.is(tagKey)))
+        .isPresent();
   }
 
-  public static boolean containsPredicate(Player player, Predicate<ItemStack> predicate) {
-    return CuriosApi.getCuriosInventory(player).map(inv -> inv.findFirstCurio(predicate).isPresent())
-        .orElse(false);
+  public static boolean contains(Player player, Predicate<ItemStack> predicate) {
+    return CuriosApi.getCuriosInventory(player).flatMap(inv -> inv.findFirstCurio(predicate)).isPresent();
   }
 }

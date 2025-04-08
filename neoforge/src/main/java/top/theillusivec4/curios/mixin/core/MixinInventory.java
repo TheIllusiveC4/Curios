@@ -69,9 +69,9 @@ public class MixinInventory {
           method = "contains(Ljava/util/function/Predicate;)Z",
           cancellable = true
   )
-  private void curios$containsPredicate(Predicate<ItemStack> predicate, CallbackInfoReturnable<Boolean> cir) {
+  private void curios$contains(Predicate<ItemStack> predicate, CallbackInfoReturnable<Boolean> cir) {
 
-    if (CuriosUtilMixinHooks.containsPredicate(this.player, predicate)) {
+    if (CuriosUtilMixinHooks.contains(this.player, predicate)) {
       cir.setReturnValue(true);
     }
   }
