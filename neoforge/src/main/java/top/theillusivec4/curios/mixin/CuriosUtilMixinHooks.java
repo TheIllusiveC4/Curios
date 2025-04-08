@@ -25,6 +25,7 @@ import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.mojang.datafixers.util.Pair;
 import java.util.Map;
+import java.util.function.Predicate;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -183,6 +184,11 @@ public class CuriosUtilMixinHooks {
   public static boolean containsTag(Player player, TagKey<Item> tagKey) {
     return CuriosApi.getCuriosInventory(player).map(
             inv -> inv.findFirstCurio(stack2 -> !stack2.isEmpty() && stack2.is(tagKey)).isPresent())
+        .orElse(false);
+  }
+
+  public static boolean containsPredicate(Player player, Predicate<ItemStack> predicate) {
+    return CuriosApi.getCuriosInventory(player).map(inv -> inv.findFirstCurio(predicate).isPresent())
         .orElse(false);
   }
 }

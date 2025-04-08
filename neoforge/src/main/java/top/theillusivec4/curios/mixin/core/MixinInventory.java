@@ -20,6 +20,7 @@
 
 package top.theillusivec4.curios.mixin.core;
 
+import java.util.function.Predicate;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -59,6 +60,18 @@ public class MixinInventory {
   private void curios$containsTag(TagKey<Item> tagKey, CallbackInfoReturnable<Boolean> cir) {
 
     if (CuriosUtilMixinHooks.containsTag(this.player, tagKey)) {
+      cir.setReturnValue(true);
+    }
+  }
+
+  @Inject(
+          at = @At("TAIL"),
+          method = "contains(Ljava/util/function/Predicate;)Z",
+          cancellable = true
+  )
+  private void curios$containsPredicate(Predicate<ItemStack> predicate, CallbackInfoReturnable<Boolean> cir) {
+
+    if (CuriosUtilMixinHooks.containsPredicate(this.player, predicate)) {
       cir.setReturnValue(true);
     }
   }
