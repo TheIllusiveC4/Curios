@@ -220,6 +220,18 @@ public interface ICuriosItemHandler {
   ListTag saveInventory(boolean clear);
 
   /**
+   * Saves the curios inventory stacks that pass a filter to NBT. Only stacks that pass the filter
+   * will be cleared if clear is true.
+   *
+   * @param clear True to clear the inventory while saving, false to just save the data
+   * @param filter The filter that will test for each stack found in the curios inventory to save
+   * @return {@link ListTag} with the curios inventory stacks data
+   */
+  default ListTag saveInventory(boolean clear, Predicate<ItemStack> filter) {
+    return this.saveInventory(clear);
+  }
+
+  /**
    * Loads the curios inventory stacks from NBT.
    *
    * @param data {@link ListTag} data from {@link ICuriosItemHandler#saveInventory(boolean)}

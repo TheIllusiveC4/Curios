@@ -71,7 +71,6 @@ import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
-import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 
 public class CurioInventoryCapability {
@@ -81,6 +80,7 @@ public class CurioInventoryCapability {
   }
 
   public static class CurioInventoryWrapper implements ICuriosItemHandler {
+
     Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
     NonNullList<ItemStack> invalidStacks = NonNullList.create();
     LivingEntity wearer;
@@ -102,9 +102,10 @@ public class CurioInventoryCapability {
 
         for (ISlotType slotType : sorted) {
           this.curios.put(slotType.getIdentifier(),
-              new CurioStacksHandler(this, slotType.getIdentifier(), slotType.getSize(),
-                  slotType.useNativeGui(), slotType.hasCosmetic(), slotType.canToggleRendering(),
-                  slotType.getDropRule()));
+                          new CurioStacksHandler(this, slotType.getIdentifier(), slotType.getSize(),
+                                                 slotType.useNativeGui(), slotType.hasCosmetic(),
+                                                 slotType.canToggleRendering(),
+                                                 slotType.getDropRule()));
         }
       }
     }
@@ -186,7 +187,8 @@ public class CurioInventoryCapability {
           if (!stack.isEmpty() && filter.test(stack)) {
             NonNullList<Boolean> renderStates = stacksHandler.getRenders();
             return Optional.of(new SlotResult(new SlotContext(id, this.wearer, i, false,
-                renderStates.size() > i && renderStates.get(i)), stack));
+                                                              renderStates.size() > i
+                                                                  && renderStates.get(i)), stack));
           }
         }
       }
@@ -213,7 +215,8 @@ public class CurioInventoryCapability {
           if (!stack.isEmpty() && filter.test(stack)) {
             NonNullList<Boolean> renderStates = stacksHandler.getRenders();
             result.add(new SlotResult(new SlotContext(id, this.wearer, i, false,
-                renderStates.size() > i && renderStates.get(i)), stack));
+                                                      renderStates.size() > i && renderStates.get(
+                                                          i)), stack));
           }
         }
       }
@@ -238,7 +241,8 @@ public class CurioInventoryCapability {
             if (!stack.isEmpty()) {
               NonNullList<Boolean> renderStates = stacksHandler.getRenders();
               result.add(new SlotResult(new SlotContext(id, this.wearer, i, false,
-                  renderStates.size() > i && renderStates.get(i)), stack));
+                                                        renderStates.size() > i && renderStates.get(
+                                                            i)), stack));
             }
           }
         }
@@ -260,7 +264,9 @@ public class CurioInventoryCapability {
           if (!stack.isEmpty()) {
             NonNullList<Boolean> renderStates = stacksHandler.getRenders();
             return Optional.of(new SlotResult(new SlotContext(identifier, this.wearer, index, false,
-                renderStates.size() > index && renderStates.get(index)), stack));
+                                                              renderStates.size() > index
+                                                                  && renderStates.get(index)),
+                                              stack));
           }
         }
       }
@@ -318,8 +324,9 @@ public class CurioInventoryCapability {
 
             if (ent != null) {
               ent.setDeltaMovement(ent.getDeltaMovement()
-                  .add((rand.nextFloat() - rand.nextFloat()) * 0.1F, rand.nextFloat() * 0.05F,
-                      (rand.nextFloat() - rand.nextFloat()) * 0.1F));
+                                       .add((rand.nextFloat() - rand.nextFloat()) * 0.1F,
+                                            rand.nextFloat() * 0.05F,
+                                            (rand.nextFloat() - rand.nextFloat()) * 0.1F));
             }
           });
         }
@@ -340,7 +347,8 @@ public class CurioInventoryCapability {
                 NonNullList<Boolean> renderStates = entry.getValue().getRenders();
                 return curio.getFortuneLevel(
                     new SlotContext(entry.getKey(), this.wearer, index, false,
-                        renderStates.size() > index && renderStates.get(index)), lootContext);
+                                    renderStates.size() > index && renderStates.get(index)),
+                    lootContext);
               }).orElse(0);
         }
       }
@@ -360,7 +368,8 @@ public class CurioInventoryCapability {
                     NonNullList<Boolean> renderStates = entry.getValue().getRenders();
                     return curio.getLootingLevel(
                         new SlotContext(entry.getKey(), this.wearer, index, false,
-                            renderStates.size() > index && renderStates.get(index)), source, target,
+                                        renderStates.size() > index && renderStates.get(index)), source,
+                        target,
                         baseLooting);
                   })
               .orElse(0);
@@ -371,6 +380,11 @@ public class CurioInventoryCapability {
 
     @Override
     public ListTag saveInventory(boolean clear) {
+      return this.saveInventory(clear, stack -> true);
+    }
+
+    @Override
+    public ListTag saveInventory(boolean clear, Predicate<ItemStack> filter) {
       ListTag taglist = new ListTag();
 
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
@@ -378,23 +392,36 @@ public class CurioInventoryCapability {
         ICurioStacksHandler stacksHandler = entry.getValue();
         IDynamicStackHandler stacks = stacksHandler.getStacks();
         IDynamicStackHandler cosmetics = stacksHandler.getCosmeticStacks();
-        tag.put("Stacks", stacks.serializeNBT());
-        tag.put("Cosmetics", cosmetics.serializeNBT());
+        tag.put("Stacks", getFilteredStacksTag(stacks, filter, clear));
+        tag.put("Cosmetics", getFilteredStacksTag(cosmetics, filter, clear));
         tag.putString("Identifier", entry.getKey());
         taglist.add(tag);
+      }
+      return taglist;
+    }
 
-        if (clear) {
+    protected CompoundTag getFilteredStacksTag(IDynamicStackHandler stacks,
+                                               Predicate<ItemStack> filter, boolean clear) {
+      ListTag nbtTagList = new ListTag();
 
-          for (int i = 0; i < stacks.getSlots(); i++) {
+      for (int i = 0; i < stacks.getSlots(); ++i) {
+        ItemStack stack = stacks.getStackInSlot(i);
+
+        if (!stack.isEmpty() && filter.test(stack)) {
+          CompoundTag itemTag = new CompoundTag();
+          itemTag.putInt("Slot", i);
+          stack.save(itemTag);
+          nbtTagList.add(itemTag);
+
+          if (clear) {
             stacks.setStackInSlot(i, ItemStack.EMPTY);
-          }
-
-          for (int i = 0; i < cosmetics.getSlots(); i++) {
-            cosmetics.setStackInSlot(i, ItemStack.EMPTY);
           }
         }
       }
-      return taglist;
+      CompoundTag nbt = new CompoundTag();
+      nbt.put("Items", nbtTagList);
+      nbt.putInt("Size", stacks.getSlots());
+      return nbt;
     }
 
     @Override
@@ -530,7 +557,8 @@ public class CurioInventoryCapability {
 
             if (!stack.isEmpty()) {
               SlotContext slotContext = new SlotContext(id, this.getWearer(), i, false,
-                  renderStates.size() > i && renderStates.get(i));
+                                                        renderStates.size() > i && renderStates.get(
+                                                            i));
               UUID uuid = CuriosApi.getSlotUuid(slotContext);
               Multimap<Attribute, AttributeModifier> map =
                   CuriosApi.getAttributeModifiers(slotContext, uuid, stack);
@@ -580,7 +608,7 @@ public class CurioInventoryCapability {
         if (stack.isEmpty()) {
           stacks.setStackInSlot(j, loadedStack);
         } else {
-          this.loseInvalidStack(stack);
+          this.loseInvalidStack(loadedStack);
         }
       }
     }
@@ -613,9 +641,11 @@ public class CurioInventoryCapability {
 
         for (ISlotType slotType : sorted) {
           sortedCurios.put(slotType,
-              new CurioStacksHandler(this, slotType.getIdentifier(), slotType.getSize(),
-                  slotType.useNativeGui(), slotType.hasCosmetic(), slotType.canToggleRendering(),
-                  slotType.getDropRule()));
+                           new CurioStacksHandler(this, slotType.getIdentifier(),
+                                                  slotType.getSize(),
+                                                  slotType.useNativeGui(), slotType.hasCosmetic(),
+                                                  slotType.canToggleRendering(),
+                                                  slotType.getDropRule()));
         }
 
         for (int i = 0; i < tagList.size(); i++) {
@@ -629,8 +659,9 @@ public class CurioInventoryCapability {
           optionalType.ifPresent(type -> {
             CurioStacksHandler newStacksHandler =
                 new CurioStacksHandler(this, type.getIdentifier(), type.getSize(),
-                    type.useNativeGui(), type.hasCosmetic(), type.canToggleRendering(),
-                    type.getDropRule());
+                                       type.useNativeGui(), type.hasCosmetic(),
+                                       type.canToggleRendering(),
+                                       type.getDropRule());
             newStacksHandler.copyModifiers(prevStacksHandler);
             int index = 0;
 
@@ -653,7 +684,8 @@ public class CurioInventoryCapability {
 
                 if (newStacksHandler.getStacks().isItemValid(index, prevCosmetic)) {
                   newStacksHandler.getCosmeticStacks().setStackInSlot(index,
-                      prevStacksHandler.getCosmeticStacks().getStackInSlot(index));
+                                                                      prevStacksHandler.getCosmeticStacks()
+                                                                          .getStackInSlot(index));
                 } else {
                   this.loseInvalidStack(prevCosmetic);
                 }
