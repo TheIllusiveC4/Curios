@@ -36,6 +36,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -385,6 +386,11 @@ public class CurioInventoryCapability {
 
     @Override
     public ListTag saveInventory(boolean clear, Predicate<ItemStack> filter) {
+      return this.saveInventory(clear, (stack, slotContext) -> filter.test(stack));
+    }
+
+    @Override
+    public ListTag saveInventory(boolean clear, BiPredicate<ItemStack, SlotContext> filter) {
       ListTag taglist = new ListTag();
 
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
@@ -392,22 +398,29 @@ public class CurioInventoryCapability {
         ICurioStacksHandler stacksHandler = entry.getValue();
         IDynamicStackHandler stacks = stacksHandler.getStacks();
         IDynamicStackHandler cosmetics = stacksHandler.getCosmeticStacks();
-        tag.put("Stacks", getFilteredStacksTag(stacks, filter, clear));
-        tag.put("Cosmetics", getFilteredStacksTag(cosmetics, filter, clear));
+        String id = entry.getKey();
+        NonNullList<Boolean> renders = stacksHandler.getRenders();
+        tag.put("Stacks", getFilteredStacksTag(id, false, renders, stacks, filter, clear));
+        tag.put("Cosmetics", getFilteredStacksTag(id, true, renders, cosmetics, filter, clear));
         tag.putString("Identifier", entry.getKey());
         taglist.add(tag);
       }
       return taglist;
     }
 
-    protected CompoundTag getFilteredStacksTag(IDynamicStackHandler stacks,
-                                               Predicate<ItemStack> filter, boolean clear) {
+    protected CompoundTag getFilteredStacksTag(String id, boolean cosmetic,
+                                               NonNullList<Boolean> renders,
+                                               IDynamicStackHandler stacks,
+                                               BiPredicate<ItemStack, SlotContext> filter,
+                                               boolean clear) {
       ListTag nbtTagList = new ListTag();
 
       for (int i = 0; i < stacks.getSlots(); ++i) {
         ItemStack stack = stacks.getStackInSlot(i);
+        SlotContext slotContext =
+            new SlotContext(id, this.wearer, i, cosmetic, renders.size() < i && renders.get(i));
 
-        if (!stack.isEmpty() && filter.test(stack)) {
+        if (!stack.isEmpty() && filter.test(stack, slotContext)) {
           CompoundTag itemTag = new CompoundTag();
           itemTag.putInt("Slot", i);
           stack.save(itemTag);

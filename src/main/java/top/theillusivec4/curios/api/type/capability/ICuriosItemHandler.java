@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.ListTag;
@@ -42,6 +43,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -228,6 +230,18 @@ public interface ICuriosItemHandler {
    * @return {@link ListTag} with the curios inventory stacks data
    */
   default ListTag saveInventory(boolean clear, Predicate<ItemStack> filter) {
+    return this.saveInventory(clear);
+  }
+
+  /**
+   * Saves the curios inventory stacks that pass a filter to NBT. Only stacks that pass the filter
+   * will be cleared if clear is true.
+   *
+   * @param clear True to clear the inventory while saving, false to just save the data
+   * @param filter The filter that will test for each stack found in the curios inventory to save
+   * @return {@link ListTag} with the curios inventory stacks data
+   */
+  default ListTag saveInventory(boolean clear, BiPredicate<ItemStack, SlotContext> filter) {
     return this.saveInventory(clear);
   }
 
