@@ -403,6 +403,17 @@ public class CurioInventoryCapability {
         tag.put("Stacks", getFilteredStacksTag(id, false, renders, stacks, filter, clear));
         tag.put("Cosmetics", getFilteredStacksTag(id, true, renders, cosmetics, filter, clear));
         tag.putString("Identifier", entry.getKey());
+        Map<UUID, AttributeModifier> modifiers = stacksHandler.getModifiers();
+
+        if (!modifiers.isEmpty()) {
+          ListTag list = new ListTag();
+          modifiers.forEach((uuid, modifier) -> {
+            if (!stacksHandler.getPermanentModifiers().contains(modifier)) {
+              list.add(modifier.save());
+            }
+          });
+          tag.put("Modifiers", list);
+        }
         taglist.add(tag);
       }
       return taglist;
@@ -446,22 +457,51 @@ public class CurioInventoryCapability {
           CompoundTag tag = data.getCompound(i);
           String identifier = tag.getString("Identifier");
           ICurioStacksHandler stacksHandler = curios.get(identifier);
+          ItemStackHandler loaded = new ItemStackHandler();
 
           if (stacksHandler != null) {
-            CompoundTag stacksData = tag.getCompound("Stacks");
-            ItemStackHandler loaded = new ItemStackHandler();
-            IDynamicStackHandler stacks = stacksHandler.getStacks();
 
-            if (!stacksData.isEmpty()) {
-              loaded.deserializeNBT(stacksData);
-              loadStacks(stacksHandler, loaded, stacks);
+            if (tag.contains("Modifiers", Tag.TAG_LIST)) {
+              ListTag list = tag.getList("Modifiers", 10);
+
+              for (int j = 0; j < list.size(); ++j) {
+                AttributeModifier attributeModifier = AttributeModifier.load(list.getCompound(j));
+
+                if (attributeModifier != null) {
+                  stacksHandler.getCachedModifiers().add(attributeModifier);
+                  stacksHandler.addTransientModifier(attributeModifier);
+                }
+              }
             }
-            stacksData = tag.getCompound("Cosmetics");
+          }
+          CompoundTag stacksData = tag.getCompound("Stacks");
 
-            if (!stacksData.isEmpty()) {
-              loaded.deserializeNBT(stacksData);
-              stacks = stacksHandler.getCosmeticStacks();
+          if (!stacksData.isEmpty()) {
+            loaded.deserializeNBT(stacksData);
+
+            if (stacksHandler != null) {
+              IDynamicStackHandler stacks = stacksHandler.getStacks();
               loadStacks(stacksHandler, loaded, stacks);
+            } else {
+
+              for (int i1 = 0; i1 < loaded.getSlots(); i1++) {
+                this.loseInvalidStack(loaded.getStackInSlot(i1));
+              }
+            }
+          }
+          stacksData = tag.getCompound("Cosmetics");
+
+          if (!stacksData.isEmpty()) {
+            loaded.deserializeNBT(stacksData);
+
+            if (stacksHandler != null) {
+              IDynamicStackHandler stacks = stacksHandler.getCosmeticStacks();
+              loadStacks(stacksHandler, loaded, stacks);
+            } else {
+
+              for (int i1 = 0; i1 < loaded.getSlots(); i1++) {
+                this.loseInvalidStack(loaded.getStackInSlot(i1));
+              }
             }
           }
         }
@@ -613,16 +653,23 @@ public class CurioInventoryCapability {
 
     private void loadStacks(ICurioStacksHandler stacksHandler, ItemStackHandler loaded,
                             IDynamicStackHandler stacks) {
+      int index = 0;
 
-      for (int j = 0; j < stacksHandler.getSlots() && j < loaded.getSlots(); j++) {
-        ItemStack stack = stacks.getStackInSlot(j);
-        ItemStack loadedStack = loaded.getStackInSlot(j);
+      while (index < stacksHandler.getSlots() && index < loaded.getSlots()) {
+        ItemStack stack = stacks.getStackInSlot(index);
+        ItemStack loadedStack = loaded.getStackInSlot(index);
 
         if (stack.isEmpty()) {
-          stacks.setStackInSlot(j, loadedStack);
+          stacks.setStackInSlot(index, loadedStack);
         } else {
           this.loseInvalidStack(loadedStack);
         }
+        index++;
+      }
+
+      while (index < loaded.getSlots()) {
+        this.loseInvalidStack(loaded.getStackInSlot(index));
+        index++;
       }
     }
 
