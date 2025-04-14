@@ -58,6 +58,14 @@ public interface ICurioStacksHandler {
    */
   NonNullList<Boolean> getRenders();
 
+  default NonNullList<Boolean> getActiveStates() {
+    return NonNullList.create();
+  }
+
+  default void updateActiveState(int index) {
+
+  }
+
   /**
    * Gets whether this stack handler can toggle rendering its contents on an entity, which is stored in {@link ICurioStacksHandler#getRenders()}.
    *

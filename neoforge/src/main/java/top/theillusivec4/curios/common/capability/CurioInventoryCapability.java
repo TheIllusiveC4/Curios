@@ -152,7 +152,14 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
     return findFirstCurio(filter, "");
   }
 
+  @Override
   public Optional<SlotResult> findFirstCurio(Predicate<ItemStack> filter, String cacheKey) {
+    return findFirstCurio(filter, false, cacheKey);
+  }
+
+  @Override
+  public Optional<SlotResult> findFirstCurio(Predicate<ItemStack> filter, boolean includeInactive,
+                                             String cacheKey) {
     // Check cached value first
     long gameTime = this.livingEntity.level().getGameTime();
     Cache<String, Pair<Long, Optional<SlotResult>>> cache = this.curioInventory.firstCurioCache;
@@ -171,6 +178,10 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
       IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
       for (int i = 0; i < stackHandler.getSlots(); i++) {
+
+        if (!includeInactive && !stacksHandler.getActiveStates().get(i)) {
+          continue;
+        }
         ItemStack stack = stackHandler.getStackInSlot(i);
 
         if (!stack.isEmpty() && filter.test(stack)) {
@@ -196,16 +207,18 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
   @Override
   public List<SlotResult> findCurios(Item item) {
-    return findCurios(
-        stack -> stack.getItem() == item, Curios.itemCacheKey(item.getDefaultInstance()));
+    return findCurios(stack -> stack.getItem() == item, false,
+                      Curios.itemCacheKey(item.getDefaultInstance()));
   }
 
   @Override
   public List<SlotResult> findCurios(Predicate<ItemStack> filter) {
-    return findCurios(filter, "");
+    return findCurios(filter, false, "");
   }
 
-  public List<SlotResult> findCurios(Predicate<ItemStack> filter, String cacheKey) {
+  @Override
+  public List<SlotResult> findCurios(Predicate<ItemStack> filter, boolean includeInactive,
+                                     String cacheKey) {
     // Check cached value first
     long gameTime = this.livingEntity.level().getGameTime();
     Cache<String, Pair<Long, List<SlotResult>>> cache = this.curioInventory.findCuriosCache;
@@ -225,6 +238,10 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
       IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
       for (int i = 0; i < stackHandler.getSlots(); i++) {
+
+        if (!includeInactive && !stacksHandler.getActiveStates().get(i)) {
+          continue;
+        }
         ItemStack stack = stackHandler.getStackInSlot(i);
 
         if (!stack.isEmpty() && filter.test(stack)) {
@@ -247,6 +264,11 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
   @Override
   public List<SlotResult> findCurios(String... identifiers) {
+    return this.findCurios(false, identifiers);
+  }
+
+  @Override
+  public List<SlotResult> findCurios(boolean includeInactive, String... identifiers) {
     List<SlotResult> result = new ArrayList<>();
     Set<String> ids = new HashSet<>(List.of(identifiers));
     Map<String, ICurioStacksHandler> curios = this.getCurios();
@@ -258,6 +280,10 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
         IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
+
+          if (!includeInactive && !stacksHandler.getActiveStates().get(i)) {
+            continue;
+          }
           ItemStack stack = stackHandler.getStackInSlot(i);
 
           if (!stack.isEmpty()) {
@@ -280,6 +306,11 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
   @Override
   public Optional<SlotResult> findCurio(String identifier, int index) {
+    return this.findCurio(identifier, index, false);
+  }
+
+  @Override
+  public Optional<SlotResult> findCurio(String identifier, int index, boolean includeInactive) {
     Map<String, ICurioStacksHandler> curios = this.getCurios();
     ICurioStacksHandler stacksHandler = curios.get(identifier);
 
@@ -287,6 +318,10 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
       IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
       if (index < stackHandler.getSlots()) {
+
+        if (!includeInactive && !stacksHandler.getActiveStates().get(index)) {
+          return Optional.empty();
+        }
         ItemStack stack = stackHandler.getStackInSlot(index);
 
         if (!stack.isEmpty()) {

@@ -54,6 +54,7 @@ import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
 import top.theillusivec4.curios.common.network.server.SPacketPage;
 import top.theillusivec4.curios.common.network.server.SPacketQuickMove;
 import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
+import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActiveState;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncData;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
@@ -85,8 +86,7 @@ public class CuriosClientPackets {
     Minecraft mc = Minecraft.getInstance();
     LocalPlayer clientPlayer = mc.player;
 
-    if (clientPlayer != null &&
-        clientPlayer.containerMenu instanceof CuriosContainer container) {
+    if (clientPlayer != null && clientPlayer.containerMenu instanceof CuriosContainer container) {
       container.quickMoveStack(clientPlayer, data.moveIndex());
     }
   }
@@ -117,18 +117,27 @@ public class CuriosClientPackets {
 
       if (entity instanceof LivingEntity livingEntity) {
         CuriosApi.getCuriosInventory(livingEntity)
-            .flatMap(handler -> handler.getStacksHandler(data.curioId())).ifPresent(stacks -> {
-              ItemStack stack = stacks.getStacks().getStackInSlot(data.slotId());
-              Optional<ICurio> possibleCurio = CuriosApi.getCurio(stack);
-              NonNullList<Boolean> renderStates = stacks.getRenders();
-              possibleCurio.ifPresent(curio -> curio.curioBreak(
-                  new SlotContext(data.curioId(), livingEntity, data.slotId(), false,
-                      renderStates.size() > data.slotId() && renderStates.get(data.slotId()))));
+            .flatMap(handler -> handler.getStacksHandler(data.curioId()))
+            .ifPresent(
+                stacks -> {
+                  ItemStack stack = stacks.getStacks().getStackInSlot(data.slotId());
+                  Optional<ICurio> possibleCurio = CuriosApi.getCurio(stack);
+                  NonNullList<Boolean> renderStates = stacks.getRenders();
+                  possibleCurio.ifPresent(
+                      curio ->
+                          curio.curioBreak(
+                              new SlotContext(
+                                  data.curioId(),
+                                  livingEntity,
+                                  data.slotId(),
+                                  false,
+                                  renderStates.size() > data.slotId()
+                                      && renderStates.get(data.slotId()))));
 
-              if (possibleCurio.isEmpty()) {
-                ICurio.playBreakAnimation(stack, livingEntity);
-              }
-            });
+                  if (possibleCurio.isEmpty()) {
+                    ICurio.playBreakAnimation(stack, livingEntity);
+                  }
+                });
       }
     }
   }
@@ -142,14 +151,15 @@ public class CuriosClientPackets {
       if (entity instanceof LivingEntity) {
         CuriosApi.getCuriosInventory((LivingEntity) entity)
             .flatMap(handler -> handler.getStacksHandler(data.curioId()))
-            .ifPresent(stacksHandler -> {
-              int index = data.slotId();
-              NonNullList<Boolean> renderStatuses = stacksHandler.getRenders();
+            .ifPresent(
+                stacksHandler -> {
+                  int index = data.slotId();
+                  NonNullList<Boolean> renderStatuses = stacksHandler.getRenders();
 
-              if (renderStatuses.size() > index) {
-                renderStatuses.set(index, data.value());
-              }
-            });
+                  if (renderStatuses.size() > index) {
+                    renderStatuses.set(index, data.value());
+                  }
+                });
       }
     }
   }
@@ -163,34 +173,35 @@ public class CuriosClientPackets {
 
       if (entity instanceof LivingEntity livingEntity) {
         CuriosApi.getCuriosInventory(livingEntity)
-            .ifPresent(handler -> {
-              Map<String, ICurioStacksHandler> curios = handler.getCurios();
+            .ifPresent(
+                handler -> {
+                  Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
-              for (Map.Entry<String, CompoundTag> entry : data.updates.entrySet()) {
-                String id = entry.getKey();
-                ICurioStacksHandler stacksHandler = curios.get(id);
+                  for (Map.Entry<String, CompoundTag> entry : data.updates.entrySet()) {
+                    String id = entry.getKey();
+                    ICurioStacksHandler stacksHandler = curios.get(id);
 
-                if (stacksHandler != null) {
-                  stacksHandler.applySyncTag(entry.getValue());
-                }
-              }
+                    if (stacksHandler != null) {
+                      stacksHandler.applySyncTag(entry.getValue());
+                    }
+                  }
 
-              if (!data.updates.isEmpty()) {
-                NeoForge.EVENT_BUS.post(
-                    new SlotModifiersUpdatedEvent(livingEntity, data.updates.keySet()));
-              }
+                  if (!data.updates.isEmpty()) {
+                    NeoForge.EVENT_BUS.post(
+                        new SlotModifiersUpdatedEvent(livingEntity, data.updates.keySet()));
+                  }
 
-              if (entity instanceof LocalPlayer localPlayer) {
+                  if (entity instanceof LocalPlayer localPlayer) {
 
-                if (localPlayer.containerMenu instanceof ICuriosMenu curiosMenu) {
-                  curiosMenu.resetSlots();
-                }
+                    if (localPlayer.containerMenu instanceof ICuriosMenu curiosMenu) {
+                      curiosMenu.resetSlots();
+                    }
 
-                if (mc.screen instanceof CuriosScreen screen) {
-                  screen.updateRenderButtons();
-                }
-              }
-            });
+                    if (mc.screen instanceof CuriosScreen screen) {
+                      screen.updateRenderButtons();
+                    }
+                  }
+                });
       }
     }
   }
@@ -208,22 +219,23 @@ public class CuriosClientPackets {
 
       if (entity instanceof LivingEntity) {
         CuriosApi.getCuriosInventory((LivingEntity) entity)
-            .ifPresent(handler -> {
-              Map<String, ICurioStacksHandler> stacks = new LinkedHashMap<>();
+            .ifPresent(
+                handler -> {
+                  Map<String, ICurioStacksHandler> stacks = new LinkedHashMap<>();
 
-              for (Map.Entry<String, CompoundTag> entry : data.map.entrySet()) {
-                ICurioStacksHandler stacksHandler =
-                    new CurioStacksHandler(handler, entry.getKey());
-                stacksHandler.applySyncTag(entry.getValue());
-                stacks.put(entry.getKey(), stacksHandler);
-              }
-              handler.setCurios(stacks);
+                  for (Map.Entry<String, CompoundTag> entry : data.map.entrySet()) {
+                    ICurioStacksHandler stacksHandler =
+                        new CurioStacksHandler(handler, entry.getKey());
+                    stacksHandler.applySyncTag(entry.getValue());
+                    stacks.put(entry.getKey(), stacksHandler);
+                  }
+                  handler.setCurios(stacks);
 
-              if (entity instanceof LocalPlayer localPlayer &&
-                  localPlayer.containerMenu instanceof ICuriosMenu curiosContainer) {
-                curiosContainer.resetSlots();
-              }
-            });
+                  if (entity instanceof LocalPlayer localPlayer
+                      && localPlayer.containerMenu instanceof ICuriosMenu curiosContainer) {
+                    curiosContainer.resetSlots();
+                  }
+                });
       }
     }
   }
@@ -245,26 +257,58 @@ public class CuriosClientPackets {
       if (entity instanceof LivingEntity livingEntity) {
         CuriosApi.getCuriosInventory(livingEntity)
             .flatMap(handler -> handler.getStacksHandler(data.curioId()))
-            .ifPresent(stacksHandler -> {
-              ItemStack stack = data.stack().copy();
-              CompoundTag compoundNBT = data.compoundTag();
-              int slot = data.slotId();
-              boolean cosmetic = SPacketSyncStack.HandlerType.fromValue(data.handlerType()) ==
-                  SPacketSyncStack.HandlerType.COSMETIC;
+            .ifPresent(
+                stacksHandler -> {
+                  ItemStack stack = data.stack().copy();
+                  CompoundTag compoundNBT = data.compoundTag();
+                  int slot = data.slotId();
+                  boolean cosmetic =
+                      SPacketSyncStack.HandlerType.fromValue(data.handlerType())
+                          == SPacketSyncStack.HandlerType.COSMETIC;
 
-              if (!compoundNBT.isEmpty()) {
-                NonNullList<Boolean> renderStates = stacksHandler.getRenders();
-                CuriosApi.getCurio(stack).ifPresent(curio -> curio.readSyncData(
-                    new SlotContext(data.curioId(), livingEntity, slot, cosmetic,
-                        renderStates.size() > slot && renderStates.get(slot)), compoundNBT));
-              }
+                  if (!compoundNBT.isEmpty()) {
+                    NonNullList<Boolean> renderStates = stacksHandler.getRenders();
+                    CuriosApi.getCurio(stack)
+                        .ifPresent(
+                            curio ->
+                                curio.readSyncData(
+                                    new SlotContext(
+                                        data.curioId(),
+                                        livingEntity,
+                                        slot,
+                                        cosmetic,
+                                        renderStates.size() > slot && renderStates.get(slot)),
+                                    compoundNBT));
+                  }
 
-              if (cosmetic) {
-                stacksHandler.getCosmeticStacks().setStackInSlot(slot, stack);
-              } else {
-                stacksHandler.getStacks().setStackInSlot(slot, stack);
-              }
-            });
+                  if (cosmetic) {
+                    stacksHandler.getCosmeticStacks().setStackInSlot(slot, stack);
+                  } else {
+                    stacksHandler.getStacks().setStackInSlot(slot, stack);
+                  }
+                });
+      }
+    }
+  }
+
+  public static void handle(SPacketSyncActiveState data) {
+    ClientLevel world = Minecraft.getInstance().level;
+
+    if (world != null) {
+      Entity entity = world.getEntity(data.entityId());
+
+      if (entity instanceof LivingEntity) {
+        CuriosApi.getCuriosInventory((LivingEntity) entity)
+            .flatMap(handler -> handler.getStacksHandler(data.curioId()))
+            .ifPresent(
+                stacksHandler -> {
+                  int index = data.slotId();
+                  NonNullList<Boolean> functionStatuses = stacksHandler.getActiveStates();
+
+                  if (functionStatuses.size() > index) {
+                    functionStatuses.set(index, data.value());
+                  }
+                });
       }
     }
   }

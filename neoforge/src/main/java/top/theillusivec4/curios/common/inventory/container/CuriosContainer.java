@@ -158,7 +158,8 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
         public boolean mayPickup(@Nonnull Player playerIn) {
           ItemStack itemstack = this.getItem();
           return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.has(itemstack,
-              EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE)) && super.mayPickup(playerIn);
+                                                                                         EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE))
+              && super.mayPickup(playerIn);
         }
 
 
@@ -166,7 +167,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
         @Override
         public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
           return Pair.of(InventoryMenu.BLOCK_ATLAS,
-              ARMOR_SLOT_TEXTURES[equipmentslottype.getIndex()]);
+                         ARMOR_SLOT_TEXTURES[equipmentslottype.getIndex()]);
         }
       });
     }
@@ -176,7 +177,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
       for (int j1 = 0; j1 < 9; ++j1) {
         this.addSlot(
             new Slot(player.getInventory(), j1 + (l + 1) * 9, 8 + j1 * 18,
-                84 + l * 18));
+                     84 + l * 18));
       }
     }
 
@@ -233,15 +234,17 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
               if (isCosmetic) {
                 this.addSlot(
                     new CurioSlot(this.player, stackHandler, i, identifier,
-                        (currentColumn - 1) * 18 + 7 - panelWidth,
-                        yOffset + (currentRow - 1) * 18, stacksHandler.getRenders(),
-                        stacksHandler.canToggleRendering(), true, true));
+                                  (currentColumn - 1) * 18 + 7 - panelWidth,
+                                  yOffset + (currentRow - 1) * 18, stacksHandler.getRenders(),
+                                  stacksHandler.getActiveStates(),
+                                  stacksHandler.canToggleRendering(), true, true));
               } else {
                 this.addSlot(
                     new CurioSlot(this.player, stackHandler, i, identifier,
-                        (currentColumn - 1) * 18 + 7 - panelWidth,
-                        yOffset + (currentRow - 1) * 18, stacksHandler.getRenders(),
-                        stacksHandler.canToggleRendering(), false, false));
+                                  (currentColumn - 1) * 18 + 7 - panelWidth,
+                                  yOffset + (currentRow - 1) * 18, stacksHandler.getRenders(),
+                                  stacksHandler.getActiveStates(),
+                                  stacksHandler.canToggleRendering(), false, false));
               }
 
               if (this.grid.size() < currentColumn) {
@@ -260,16 +263,28 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
 
               if (isCosmetic) {
                 this.proxySlots.add(new ProxySlot(currentPage,
-                    new CurioSlot(this.player, stackHandler, i, identifier,
-                        (currentColumn - 1) * 18 + 7 - panelWidth, yOffset + (currentRow - 1) * 18,
-                        stacksHandler.getRenders(), stacksHandler.canToggleRendering(), true,
-                        true)));
+                                                  new CurioSlot(this.player, stackHandler, i,
+                                                                identifier,
+                                                                (currentColumn - 1) * 18 + 7
+                                                                    - panelWidth,
+                                                                yOffset + (currentRow - 1) * 18,
+                                                                stacksHandler.getRenders(),
+                                                                stacksHandler.getActiveStates(),
+                                                                stacksHandler.canToggleRendering(),
+                                                                true,
+                                                                true)));
               } else {
                 this.proxySlots.add(new ProxySlot(currentPage,
-                    new CurioSlot(this.player, stackHandler, i, identifier,
-                        (currentColumn - 1) * 18 + 7 - panelWidth, yOffset + (currentRow - 1) * 18,
-                        stacksHandler.getRenders(), stacksHandler.canToggleRendering(), false,
-                        false)));
+                                                  new CurioSlot(this.player, stackHandler, i,
+                                                                identifier,
+                                                                (currentColumn - 1) * 18 + 7
+                                                                    - panelWidth,
+                                                                yOffset + (currentRow - 1) * 18,
+                                                                stacksHandler.getRenders(),
+                                                                stacksHandler.getActiveStates(),
+                                                                stacksHandler.canToggleRendering(),
+                                                                false,
+                                                                false)));
               }
             }
             slots++;
@@ -285,7 +300,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
 
       if (!this.isLocalWorld) {
         PacketDistributor.sendToPlayer((ServerPlayer) this.player,
-            new SPacketPage(this.containerId, page));
+                                       new SPacketPage(this.containerId, page));
       }
     }
     this.currentPage = page;
@@ -309,7 +324,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
       Optional<RecipeHolder<CraftingRecipe>> optional =
           Objects.requireNonNull(this.player.level().getServer()).getRecipeManager()
               .getRecipeFor(RecipeType.CRAFTING, this.craftMatrix.asCraftInput(),
-                  this.player.level());
+                            this.player.level());
 
       if (optional.isPresent()) {
         RecipeHolder<CraftingRecipe> recipeholder = optional.get();
@@ -318,7 +333,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
         if (this.craftResult.setRecipeUsed(this.player.level(), serverplayer, recipeholder)) {
           ItemStack itemstack1 =
               craftingrecipe.assemble(this.craftMatrix.asCraftInput(),
-                  this.player.level().registryAccess());
+                                      this.player.level().registryAccess());
 
           if (itemstack1.isItemEnabled(this.player.level().enabledFeatures())) {
             itemstack = itemstack1;
@@ -329,7 +344,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
       this.setRemoteSlot(0, itemstack);
       serverplayer.connection.send(
           new ClientboundContainerSetSlotPacket(this.containerId, this.incrementStateId(), 0,
-              itemstack));
+                                                itemstack));
     }
   }
 
@@ -538,7 +553,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
 
       if (!this.isLocalWorld) {
         PacketDistributor.sendToPlayer((ServerPlayer) this.player,
-            new SPacketQuickMove(this.containerId, this.moveFromIndex));
+                                       new SPacketQuickMove(this.containerId, this.moveFromIndex));
       }
     }
   }

@@ -20,13 +20,21 @@
 
 package top.theillusivec4.curios.common.capability;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import javax.annotation.Nonnull;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mojang.datafixers.util.Pair;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
+import javax.annotation.Nonnull;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -159,10 +167,12 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
               sortedCurios.put(slotType, newStacksHandler);
 
               for (int j = 0;
-                  j < newStacksHandler.getRenders().size()
-                      && j < prevStacksHandler.getRenders().size();
-                  j++) {
+                   j < newStacksHandler.getRenders().size()
+                       && j < prevStacksHandler.getRenders().size();
+                   j++) {
                 newStacksHandler.getRenders().set(j, prevStacksHandler.getRenders().get(j));
+                newStacksHandler.getActiveStates()
+                    .set(j, prevStacksHandler.getActiveStates().get(j));
               }
             });
 

@@ -20,6 +20,7 @@
 
 package top.theillusivec4.curios.common.inventory;
 
+import java.util.List;
 import javax.annotation.Nonnull;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.NonNullList;
@@ -44,20 +45,22 @@ public class CurioSlot extends SlotItemHandler {
 
   private final NonNullList<Boolean> renderStatuses;
   private final boolean canToggleRender;
+  private List<Boolean> activeStatuses;
   private boolean showCosmeticToggle;
   private boolean isCosmetic;
 
-  public CurioSlot(
-      Player player,
-      IDynamicStackHandler handler,
-      int index,
-      String identifier,
-      int xPosition,
-      int yPosition,
-      NonNullList<Boolean> renders,
-      boolean canToggleRender,
-      boolean showCosmeticToggle,
-      boolean isCosmetic) {
+  public CurioSlot(Player player, IDynamicStackHandler handler, int index, String identifier,
+                   int xPosition, int yPosition, NonNullList<Boolean> renders,
+                   List<Boolean> actives,
+                   boolean canToggleRender, boolean showCosmeticToggle, boolean isCosmetic) {
+    this(player, handler, index, identifier, xPosition, yPosition, renders, canToggleRender,
+         showCosmeticToggle, isCosmetic);
+    this.activeStatuses = actives;
+  }
+
+  public CurioSlot(Player player, IDynamicStackHandler handler, int index, String identifier,
+                   int xPosition, int yPosition, NonNullList<Boolean> renders,
+                   boolean canToggleRender, boolean showCosmeticToggle, boolean isCosmetic) {
     this(player, handler, index, identifier, xPosition, yPosition, renders, canToggleRender);
     this.showCosmeticToggle = showCosmeticToggle;
     this.isCosmetic = isCosmetic;
@@ -95,6 +98,11 @@ public class CurioSlot extends SlotItemHandler {
 
   public boolean canToggleRender() {
     return this.canToggleRender;
+  }
+
+  public boolean isActiveState() {
+    return this.activeStatuses.size() > this.getSlotIndex() && this.activeStatuses.get(
+        this.getSlotIndex());
   }
 
   public boolean isCosmetic() {
@@ -150,7 +158,8 @@ public class CurioSlot extends SlotItemHandler {
 
     if (!flag
         && !ItemStack.matches(current, stack)
-        && !((AccessorEntity) this.player).getFirstTick()) {
+        && !((AccessorEntity) this.player).getFirstTick()
+        && this.isActiveState()) {
       CuriosApi.getCurio(stack).ifPresent(curio -> curio.onEquipFromUse(this.slotContext));
     }
   }

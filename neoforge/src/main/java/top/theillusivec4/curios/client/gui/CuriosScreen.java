@@ -23,6 +23,7 @@ package top.theillusivec4.curios.client.gui;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
@@ -271,22 +273,24 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
                   .getDisplayStack(slotCurio.getSlotContext(), slot.getItem());
 
           if (stack.isEmpty()) {
-            List<Component> slotTooltips =
+            List<Component> slotTooltips = new ArrayList<>(
                 slotCurio
                     .getSlotExtension()
                     .getSlotTooltip(
                         slotCurio.getSlotContext(),
-                        ClientTooltipFlag.of(
-                            this.minecraft.options.advancedItemTooltips
-                                ? TooltipFlag.Default.ADVANCED
-                                : TooltipFlag.Default.NORMAL));
+                        ClientTooltipFlag.of(this.minecraft.options.advancedItemTooltips ?
+                                                 TooltipFlag.Default.ADVANCED :
+                                                 TooltipFlag.Default.NORMAL)));
 
-            if (!slotTooltips.isEmpty()) {
-              guiGraphics.renderComponentTooltip(this.font, slotTooltips, mouseX, mouseY);
-            } else {
-              guiGraphics.renderTooltip(
-                  this.font, Component.literal(slotCurio.getSlotName()), mouseX, mouseY);
+            if (slotTooltips.isEmpty()) {
+              slotTooltips.add(Component.literal(slotCurio.getSlotName()));
             }
+
+            if (!slotCurio.isActiveState()) {
+              slotTooltips.add(Component.translatable("curios.tooltip.inactive")
+                                   .withStyle(ChatFormatting.RED));
+            }
+            guiGraphics.renderComponentTooltip(this.font, slotTooltips, mouseX, mouseY);
           }
         }
       }
@@ -314,7 +318,15 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
           }
 
           if (!stack.isEmpty()) {
-            guiGraphics.renderTooltip(this.font, stack, mouseX, mouseY);
+            List<Component> components = Screen.getTooltipFromItem(this.minecraft, stack);
+
+            if (this.hoveredSlot instanceof CurioSlot curioSlot && !curioSlot.isActiveState()) {
+              components.add(Component.empty());
+              components.add(
+                  Component.translatable("curios.tooltip.inactive").withStyle(ChatFormatting.RED));
+            }
+            guiGraphics.renderTooltip(this.font, components, stack.getTooltipImage(), mouseX,
+                                      mouseY);
           }
         }
       }
@@ -348,7 +360,9 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
     }
   }
 
-  /** Draws the background layer of this container (behind the item). */
+  /**
+   * Draws the background layer of this container (behind the item).
+   */
   @Override
   public void renderBg(
       @Nonnull GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
@@ -494,7 +508,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
         int l = slot.getItem().isEmpty() ? 0 : slot.getItem().getCount();
         int i1 =
             AbstractContainerMenu.getQuickCraftPlaceCount(
-                    this.quickCraftSlots, this.quickCraftingType, itemstack1)
+                this.quickCraftSlots, this.quickCraftingType, itemstack1)
                 + l;
 
         if (i1 > k) {
@@ -546,7 +560,9 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
         && super.isHovering(rectX, rectY, rectWidth, rectHeight, pointX, pointY);
   }
 
-  /** Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton */
+  /**
+   * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
+   */
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
 
@@ -595,13 +611,13 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
             || mouseX >= guiLeftIn + this.imageWidth
             || mouseY >= guiTopIn + this.imageHeight;
     return this.recipeBookGui.hasClickedOutside(
-            mouseX,
-            mouseY,
-            this.leftPos,
-            this.topPos,
-            this.imageWidth,
-            this.imageHeight,
-            mouseButton)
+        mouseX,
+        mouseY,
+        this.leftPos,
+        this.topPos,
+        this.imageWidth,
+        this.imageHeight,
+        mouseButton)
         && flag;
   }
 

@@ -34,11 +34,7 @@ import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
 import top.theillusivec4.curios.common.network.server.SPacketPage;
 import top.theillusivec4.curios.common.network.server.SPacketQuickMove;
 import top.theillusivec4.curios.common.network.server.SPacketSetIcons;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncData;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncRender;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
+import top.theillusivec4.curios.common.network.server.sync.*;
 
 public class NetworkHandler {
 
@@ -70,6 +66,8 @@ public class NetworkHandler {
         CuriosClientPayloadHandler.getInstance()::handle);
     registrar.playToClient(SPacketSyncRender.TYPE, SPacketSyncRender.STREAM_CODEC,
         CuriosClientPayloadHandler.getInstance()::handle);
+    registrar.playToClient(SPacketSyncActiveState.TYPE, SPacketSyncActiveState.STREAM_CODEC,
+            CuriosClientPayloadHandler.getInstance()::handle);
     registrar.playToClient(SPacketBreak.TYPE, SPacketBreak.STREAM_CODEC,
         CuriosClientPayloadHandler.getInstance()::handle);
     registrar.playToClient(SPacketPage.TYPE, SPacketPage.STREAM_CODEC,
