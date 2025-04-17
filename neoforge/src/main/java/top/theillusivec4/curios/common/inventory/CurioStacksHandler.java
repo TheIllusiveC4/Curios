@@ -830,10 +830,14 @@ public class CurioStacksHandler implements ICurioStacksHandler {
         newList = NonNullList.withSize(Math.max(0, newSize), true);
 
         for (int i = 0; i < newList.size() && i < this.activeStates.size(); i++) {
-          newList.set(i, activeStates.get(i));
+          newList.set(i, this.activeStates.get(i));
         }
         this.activeStates = newList;
-        this.previousActiveStates = NonNullList.copyOf(newList);
+        this.previousActiveStates = NonNullList.create();
+
+        for (int i = 0; i < this.activeStates.size(); i++) {
+          this.previousActiveStates.add(i, this.activeStates.get(i));
+        }
       } else {
         this.stackHandler.grow(change);
         this.cosmeticStackHandler.grow(change);
@@ -846,10 +850,14 @@ public class CurioStacksHandler implements ICurioStacksHandler {
         newList = NonNullList.withSize(Math.max(0, newSize), true);
 
         for (int i = 0; i < newList.size() && i < this.activeStates.size(); i++) {
-          newList.set(i, activeStates.get(i));
+          newList.set(i, this.activeStates.get(i));
         }
         this.activeStates = newList;
-        this.previousActiveStates = NonNullList.copyOf(newList);
+        this.previousActiveStates = NonNullList.create();
+
+        for (int i = 0; i < this.activeStates.size(); i++) {
+          this.previousActiveStates.add(i, this.activeStates.get(i));
+        }
       }
     }
   }
