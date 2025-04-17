@@ -176,10 +176,11 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
     for (String id : curios.keySet()) {
       ICurioStacksHandler stacksHandler = curios.get(id);
       IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+      NonNullList<Boolean> activeStates = stacksHandler.getActiveStates();
 
       for (int i = 0; i < stackHandler.getSlots(); i++) {
 
-        if (!includeInactive && !stacksHandler.getActiveStates().get(i)) {
+        if (!includeInactive && activeStates.size() > i && !activeStates.get(i)) {
           continue;
         }
         ItemStack stack = stackHandler.getStackInSlot(i);
@@ -236,10 +237,11 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
     for (String id : curios.keySet()) {
       ICurioStacksHandler stacksHandler = curios.get(id);
       IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+      NonNullList<Boolean> activeStates = stacksHandler.getActiveStates();
 
       for (int i = 0; i < stackHandler.getSlots(); i++) {
 
-        if (!includeInactive && !stacksHandler.getActiveStates().get(i)) {
+        if (!includeInactive && activeStates.size() > i && !activeStates.get(i)) {
           continue;
         }
         ItemStack stack = stackHandler.getStackInSlot(i);
@@ -278,10 +280,11 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
       if (ids.contains(id)) {
         ICurioStacksHandler stacksHandler = curios.get(id);
         IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+        NonNullList<Boolean> activeStates = stacksHandler.getActiveStates();
 
         for (int i = 0; i < stackHandler.getSlots(); i++) {
 
-          if (!includeInactive && !stacksHandler.getActiveStates().get(i)) {
+          if (!includeInactive && activeStates.size() > i && !activeStates.get(i)) {
             continue;
           }
           ItemStack stack = stackHandler.getStackInSlot(i);
@@ -316,10 +319,11 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
     if (stacksHandler != null) {
       IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+      NonNullList<Boolean> activeStates = stacksHandler.getActiveStates();
 
       if (index < stackHandler.getSlots()) {
 
-        if (!includeInactive && !stacksHandler.getActiveStates().get(index)) {
+        if (!includeInactive && activeStates.size() > index && !activeStates.get(index)) {
           return Optional.empty();
         }
         ItemStack stack = stackHandler.getStackInSlot(index);
