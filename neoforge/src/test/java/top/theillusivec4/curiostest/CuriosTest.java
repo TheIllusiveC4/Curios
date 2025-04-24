@@ -107,6 +107,11 @@ public class CuriosTest {
       public ItemStack getDisplayStack(SlotContext slotContext, ItemStack defaultStack) {
         return Items.DIAMOND_AXE.getDefaultInstance();
       }
+
+      @Override
+      public ItemStack getCloneStack(SlotContext slotContext, ItemStack defaultStack) {
+        return Items.EMERALD.getDefaultInstance();
+      }
     }, "test");
   }
 

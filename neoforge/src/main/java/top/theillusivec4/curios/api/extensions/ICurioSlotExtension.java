@@ -12,7 +12,8 @@ import top.theillusivec4.curios.api.SlotContext;
  */
 public interface ICurioSlotExtension {
 
-  ICurioSlotExtension DEFAULT = new ICurioSlotExtension() {};
+  ICurioSlotExtension DEFAULT = new ICurioSlotExtension() {
+  };
 
   /**
    * Gets the current {@link ICurioSlotExtension} instance associated with a given slot identifier,
@@ -32,11 +33,23 @@ public interface ICurioSlotExtension {
    * is normally found in the inventory. This has no effect on the functionality of those stacks,
    * only the rendering of the stack in the slot on the screen.
    *
-   * @param slotContext The slot context for the slot being rendered
+   * @param slotContext  The slot context for the slot being rendered
    * @param defaultStack The default stack that is to be rendered from the slot's container
    * @return The stack to be rendered in the slot
    */
   default ItemStack getDisplayStack(SlotContext slotContext, ItemStack defaultStack) {
+    return defaultStack;
+  }
+
+  /**
+   * Gets the stack to clone into the inventory when a user uses the Creative pick item button on a
+   * curio slot.
+   *
+   * @param slotContext  The slot context for the slot the item is in
+   * @param defaultStack The stack that is currently in the slot
+   * @return A ItemStack to add to the player's inventory, empty stack if nothing should be added.
+   */
+  default ItemStack getCloneStack(SlotContext slotContext, ItemStack defaultStack) {
     return defaultStack;
   }
 
