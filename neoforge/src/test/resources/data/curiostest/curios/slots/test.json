@@ -1,5 +1,0 @@
-{
-  "icon": "curios:slot/empty_curio_slot",
-  "validators": ["curiostest:test"],
-  "add_cosmetic": true
-}

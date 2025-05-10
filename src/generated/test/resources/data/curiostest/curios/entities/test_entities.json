@@ -1,0 +1,31 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:always"
+    }
+  ],
+  "entities": [
+    "#curios:player_like",
+    "minecraft:wither_skeleton"
+  ],
+  "slots": [
+    "back",
+    "belt",
+    "body",
+    "bracelet",
+    "charm",
+    "curio",
+    "feet",
+    "hands",
+    "head",
+    "necklace",
+    "ring",
+    "inline_from_entities",
+    {
+      "slot": {
+        "id": "slot_from_entities",
+        "size": 3
+      }
+    }
+  ]
+}

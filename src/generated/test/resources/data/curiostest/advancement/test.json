@@ -1,0 +1,31 @@
+{
+  "criteria": {
+    "test": {
+      "conditions": {
+        "curios:slot": {
+          "index": {
+            "max": 10,
+            "min": 0
+          },
+          "slots": [
+            "ring",
+            "necklace"
+          ]
+        },
+        "item": {
+          "items": "minecraft:diamond"
+        },
+        "location": {
+          "biomes": "minecraft:badlands"
+        }
+      },
+      "trigger": "curios:equip_curio"
+    }
+  },
+  "requirements": [
+    [
+      "test"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

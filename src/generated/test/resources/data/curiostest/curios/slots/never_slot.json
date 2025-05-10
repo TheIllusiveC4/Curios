@@ -1,0 +1,11 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:never"
+    }
+  ],
+  "add_cosmetic": true,
+  "drop_rule": "always_keep",
+  "operation": "add",
+  "size": 4
+}

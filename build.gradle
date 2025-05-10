@@ -2,9 +2,134 @@ import javax.net.ssl.HttpsURLConnection
 import java.nio.charset.StandardCharsets
 
 plugins {
-    // Required for NeoGradle
-    id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.7"
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.78'
+    id 'idea'
 }
+
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        name = "CurseMaven"
+        url = uri("https://www.cursemaven.com")
+    }
+    maven {
+        name = "JEI"
+        url = uri("https://maven.blamejared.com/")
+    }
+    maven {
+        name = "EMI"
+        url = uri("https://maven.terraformersmc.com/")
+    }
+    maven {
+        name = "REI"
+        url = uri("https://maven.shedaniel.me/")
+    }
+}
+
+base {
+    archivesName = "${mod_id}-neoforge"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neoforge_version
+    addModdingDependenciesTo sourceSets.test
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+    accessTransformers.from "src/main/resources/META-INF/accesstransformer.cfg"
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        gameTestServer {
+            type = "gameTestServer"
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        clientData {
+            clientData()
+            programArguments.addAll '--mod', "curiostest", '--all', '--output', file('src/generated/test/resources/').getAbsolutePath(), '--existing', file('src/test/resources/').getAbsolutePath()
+        }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+
+        "curiostest" {
+            sourceSet sourceSets.test
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/main/resources' }
+sourceSets.test.resources { srcDir 'src/generated/test/resources' }
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    compileOnly "mezz.jei:jei-1.21-neoforge-api:${jei_version}"
+//    localRuntime "mezz.jei:jei-1.21-neoforge:${jei_version}"
+
+    compileOnly "dev.emi:emi-neoforge:${emi_version}"
+//    localRuntime "dev.emi:emi-neoforge:${emi_version}"
+
+    compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${rei_version}"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:${rei_version}"
+//    localRuntime "me.shedaniel:RoughlyEnoughItems-neoforge:${rei_version}"
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neoforge_version       : neoforge_version,
+            neoforge_version_range : neoforge_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            license                : license,
+            issues_url             : issues_url,
+            version                : version,
+            mod_author             : mod_author,
+            mod_description        : mod_description,
+            sources_url            : sources_url
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
 
 def publishDiscord() {
     try {
@@ -70,7 +195,7 @@ def publishDiscord() {
             }
             """
         println(message)
-        final URL url = URI.create(System.getenv('DISCORD_WEBHOOK')).toURL()
+        final URL url = new URL("${discordWebhook}")
         final HttpsURLConnection connection = (HttpsURLConnection) url.openConnection()
         connection.addRequestProperty("Content-Type", "application/json; charset=UTF-8")
         connection.addRequestProperty("User-Agent", "${mod_name} Gradle Upload")
@@ -101,5 +226,16 @@ tasks.register('publishNeoForge') {
 
     doLast {
         publishDiscord()
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
     }
 }

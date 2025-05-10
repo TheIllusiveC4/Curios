@@ -1,0 +1,14 @@
+{
+  "sources": [
+    {
+      "type": "directory",
+      "source": "gui/curios",
+      "prefix": ""
+    },
+    {
+      "type": "directory",
+      "source": "slot",
+      "prefix": "slot/"
+    }
+  ]
+}
