@@ -171,6 +171,12 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
                        && j < prevStacksHandler.getRenders().size();
                    j++) {
                 newStacksHandler.getRenders().set(j, prevStacksHandler.getRenders().get(j));
+              }
+
+              for (int j = 0;
+                   j < newStacksHandler.getActiveStates().size()
+                       && j < prevStacksHandler.getActiveStates().size();
+                   j++) {
                 newStacksHandler.getActiveStates()
                     .set(j, prevStacksHandler.getActiveStates().get(j));
               }
