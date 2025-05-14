@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -128,6 +129,34 @@ public interface ICuriosItemHandler {
     return this.findFirstCurio(filter).isPresent();
   }
 
+  default boolean isSlotActive(String identifier, int index) {
+    return this.getStacksHandler(identifier).map(stackHandler -> {
+      NonNullList<Boolean> activeStates = stackHandler.getActiveStates();
+
+      if (index < activeStates.size()) {
+        return activeStates.get(index);
+      }
+      return true;
+    }).orElse(true);
+  }
+
+  default void setSlotActive(String identifier, int index, boolean active) {
+    this.getStacksHandler(identifier).ifPresent(stackHandler -> {
+      NonNullList<Boolean> activeStates = stackHandler.getActiveStates();
+
+      if (index < activeStates.size()) {
+        activeStates.set(index, active);
+      }
+    });
+  }
+
+  default void setSlotsActive(String identifier, boolean active) {
+    this.getStacksHandler(identifier).ifPresent(stackHandler -> {
+      NonNullList<Boolean> activeStates = stackHandler.getActiveStates();
+      activeStates.replaceAll(ignored -> active);
+    });
+  }
+
   /**
    * Gets the first matching item equipped in a curio slot.
    *
@@ -154,6 +183,11 @@ public interface ICuriosItemHandler {
    */
   Optional<SlotResult> findFirstCurio(Predicate<ItemStack> filter, String cacheKey);
 
+  default Optional<SlotResult> findFirstCurio(Predicate<ItemStack> filter, boolean includeInactive,
+                                              String cacheKey) {
+    return this.findFirstCurio(filter, cacheKey);
+  }
+
   /**
    * Gets all matching items equipped in a curio slot.
    *
@@ -170,6 +204,11 @@ public interface ICuriosItemHandler {
    */
   List<SlotResult> findCurios(Predicate<ItemStack> filter);
 
+  default List<SlotResult> findCurios(Predicate<ItemStack> filter, boolean includeInactive,
+                                      String cacheKey) {
+    return this.findCurios(filter);
+  }
+
   /**
    * Gets all items equipped in all curio slots with specific identifiers.
    *
@@ -177,6 +216,10 @@ public interface ICuriosItemHandler {
    * @return A list of matching results
    */
   List<SlotResult> findCurios(String... identifiers);
+
+  default List<SlotResult> findCurios(boolean includeInactive, String... identifiers) {
+    return this.findCurios(identifiers);
+  }
 
   /**
    * Gets the currently equipped item in a specified curio slot, if it exists.
@@ -186,6 +229,10 @@ public interface ICuriosItemHandler {
    * @return The equipped curio stack, or empty if there is none
    */
   Optional<SlotResult> findCurio(String identifier, int index);
+
+  default Optional<SlotResult> findCurio(String identifier, int index, boolean includeInactive) {
+    return this.findCurio(identifier, index);
+  }
 
   /**
    * Gets the wearer/owner of this handler instance.

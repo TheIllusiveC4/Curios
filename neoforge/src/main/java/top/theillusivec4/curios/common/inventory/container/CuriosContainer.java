@@ -237,12 +237,14 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
                     new CurioSlot(this.player, stackHandler, i, identifier,
                                   (currentColumn - 1) * 18 + 7 - panelWidth,
                                   yOffset + (currentRow - 1) * 18, stacksHandler.getRenders(),
+                                  stacksHandler.getActiveStates(),
                                   stacksHandler.canToggleRendering(), true, true));
               } else {
                 this.addSlot(
                     new CurioSlot(this.player, stackHandler, i, identifier,
                                   (currentColumn - 1) * 18 + 7 - panelWidth,
                                   yOffset + (currentRow - 1) * 18, stacksHandler.getRenders(),
+                                  stacksHandler.getActiveStates(),
                                   stacksHandler.canToggleRendering(), false, false));
               }
 
@@ -268,6 +270,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
                                                                     - panelWidth,
                                                                 yOffset + (currentRow - 1) * 18,
                                                                 stacksHandler.getRenders(),
+                                                                stacksHandler.getActiveStates(),
                                                                 stacksHandler.canToggleRendering(),
                                                                 true,
                                                                 true)));
@@ -279,6 +282,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
                                                                     - panelWidth,
                                                                 yOffset + (currentRow - 1) * 18,
                                                                 stacksHandler.getRenders(),
+                                                                stacksHandler.getActiveStates(),
                                                                 stacksHandler.canToggleRendering(),
                                                                 false,
                                                                 false)));
