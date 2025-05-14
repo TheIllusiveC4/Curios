@@ -555,7 +555,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     nbt = new CompoundTag();
     nbt.put("ActiveStates", nbtTagList);
     nbt.putInt("Size", this.activeStates.size());
-    compoundNBT.put("Functions", nbt);
+    compoundNBT.put("ActiveStates", nbt);
     compoundNBT.putBoolean("HasCosmetic", this.cosmetic);
     compoundNBT.putBoolean("Visible", this.visible);
     compoundNBT.putBoolean("RenderToggle", this.canToggleRender);
@@ -614,7 +614,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       this.activeStates = NonNullList.withSize(
           compoundNBT.contains("Size", Tag.TAG_INT) ? compoundNBT.getInt("Size") :
               this.stackHandler.getSlots(), true);
-      this.activeStates = NonNullList.withSize(
+      this.previousActiveStates = NonNullList.withSize(
           compoundNBT.contains("Size", Tag.TAG_INT) ? compoundNBT.getInt("Size") :
               this.stackHandler.getSlots(), true);
       ListTag tagList = compoundNBT.getList("ActiveStates", Tag.TAG_COMPOUND);
