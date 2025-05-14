@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -135,8 +136,13 @@ public class CuriosHelper implements ICuriosHelper {
           for (String id : curios.keySet()) {
             ICurioStacksHandler stacksHandler = curios.get(id);
             IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+            NonNullList<Boolean> activeStates = stacksHandler.getActiveStates();
 
             for (int i = 0; i < stackHandler.getSlots(); i++) {
+
+              if (activeStates.size() > i && !activeStates.get(i)) {
+                continue;
+              }
               ItemStack stack = stackHandler.getStackInSlot(i);
 
               if (!stack.isEmpty() && filter.test(stack)) {

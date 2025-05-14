@@ -39,7 +39,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
+import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.CuriosTags;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
@@ -56,7 +58,13 @@ public class CuriosCommand {
 //    curiosCommand.then(Commands.literal("debug1").executes(context -> {
 //      ServerPlayer serverPlayer = context.getSource().getPlayer();
 //      CuriosApi.getCuriosInventory(serverPlayer).ifPresent(inventory -> {
-//        inventory.setSlotActive("necklace", 0, false);
+//        inventory.setSlotActive("necklace", 0, !inventory.isSlotActive("necklace", 0));
+//        CuriosConstants.LOG.info(String.valueOf(
+//            inventory.findFirstCurio(stack -> stack.is(CuriosTags.NECKLACE)).isPresent()));
+//        CuriosConstants.LOG.info(String.valueOf(
+//            CuriosApi.getCuriosHelper().findFirstCurio(serverPlayer, stack -> stack.is(CuriosTags.NECKLACE)).isPresent()));
+//        CuriosConstants.LOG.info(String.valueOf(
+//            CuriosApi.getCuriosHelper().findEquippedCurio(stack -> stack.is(CuriosTags.NECKLACE), serverPlayer).isPresent()));
 //      });
 //      return Command.SINGLE_SUCCESS;
 //    }));
