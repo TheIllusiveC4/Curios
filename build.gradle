@@ -1,3 +1,5 @@
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
 import javax.net.ssl.HttpsURLConnection
 import java.nio.charset.StandardCharsets
 
@@ -6,6 +8,8 @@ plugins {
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.78'
     id 'idea'
+    id 'com.modrinth.minotaur' version '2.+'
+    id 'net.darkhax.curseforgegradle' version '1.+'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -36,7 +40,10 @@ base {
     archivesName = "${mod_id}-neoforge"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
 
 neoForge {
     version = project.neoforge_version
@@ -94,6 +101,33 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+task apiJar(type: Jar) {
+    archiveClassifier.set('api')
+    include 'top/theillusivec4/curios/api/**/*'
+    from sourceSets.main.allSource
+    from sourceSets.main.output
+}
+
+sourcesJar {
+    from(rootProject.file("LICENSE"))
+    from(rootProject.file("COPYING"))
+    from(rootProject.file("COPYING.LESSER"))
+    from(rootProject.file("README.md"))
+    from(rootProject.file("CHANGELOG.md"))
+}
+
+jar {
+    from(rootProject.file("LICENSE"))
+    from(rootProject.file("COPYING"))
+    from(rootProject.file("COPYING.LESSER"))
+    from(rootProject.file("README.md"))
+    from(rootProject.file("CHANGELOG.md"))
+}
+
+artifacts {
+    archives apiJar
+}
+
 dependencies {
     compileOnly "mezz.jei:jei-1.21-neoforge-api:${jei_version}"
 //    localRuntime "mezz.jei:jei-1.21-neoforge:${jei_version}"
@@ -135,13 +169,13 @@ def publishDiscord() {
     try {
         def cfLinks = new StringJoiner('\\n')
 
-        if (project(':neoforge').hasProperty('curse_link')) {
-            cfLinks.add("[NeoForge](${project(':neoforge').findProperty('curse_link')})")
+        if (project.hasProperty('curse_link')) {
+            cfLinks.add("[Download](${project.findProperty('curse_link')})")
         }
         def modrinthLinks = new StringJoiner('\\n')
 
-        if (project(':neoforge').hasProperty('curse_link')) {
-            modrinthLinks.add("[NeoForge](${project(':neoforge').findProperty('modrinth_link')})")
+        if (project.hasProperty('modrinth_link')) {
+            modrinthLinks.add("[Download](${project.findProperty('modrinth_link')})")
         }
         println(cfLinks)
         println(modrinthLinks)
@@ -195,7 +229,7 @@ def publishDiscord() {
             }
             """
         println(message)
-        final URL url = new URL("${discordWebhook}")
+        final URL url = URI.create(System.getenv('DISCORD_WEBHOOK') as String).toURL()
         final HttpsURLConnection connection = (HttpsURLConnection) url.openConnection()
         connection.addRequestProperty("Content-Type", "application/json; charset=UTF-8")
         connection.addRequestProperty("User-Agent", "${mod_name} Gradle Upload")
@@ -221,8 +255,49 @@ def ordered(String... dependencyPaths) {
     return dependencies
 }
 
-tasks.register('publishNeoForge') {
-    dependsOn ordered(':neoforge:modrinth', ':neoforge:publishCurseForge')
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+    apiToken = "${System.getenv('CURSEFORGE_KEY')}"
+    //debugMode = true
+    def projectId = "${cf_id}".toString()
+    def mainFile = upload(projectId, file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+    mainFile.changelogType = 'markdown'
+    mainFile.changelog = file('CHANGELOG_LATEST.md')
+    mainFile.releaseType = "${release_type}"
+    "${release_versions}".split(',').each {
+        mainFile.addGameVersion("${it}")
+    }
+    mainFile.withAdditionalFile(sourcesJar)
+    mainFile.withAdditionalFile(apiJar)
+
+    doLast {
+
+        if (project.hasProperty('cf_page') && mainFile.curseFileId != null) {
+            project.ext.curse_link = "${cf_page}/files/${mainFile.curseFileId}"
+        }
+    }
+}
+
+modrinth {
+    token = "${System.getenv('MODRINTH_KEY')}" ?: ""
+    //debugMode = true
+    projectId = "${modrinth_id}"
+    versionName = getArchivesBaseName() + "-" + getVersion()
+    versionType = "${release_type}"
+    changelog = file('CHANGELOG_LATEST.md').text
+    uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    additionalFiles = [sourcesJar, apiJar]
+    gameVersions = "${release_versions}".split(",") as List<String>
+}
+
+tasks.modrinth.doLast {
+
+    if (project.hasProperty('modrinth_page') && tasks.modrinth.newVersion != null) {
+        project.ext.modrinth_link = "${modrinth_page}/version/${tasks.modrinth.newVersion.id}"
+    }
+}
+
+tasks.register('publishMod') {
+    dependsOn ordered('publish', 'modrinth', 'publishCurseForge')
 
     doLast {
         publishDiscord()
@@ -237,5 +312,26 @@ idea {
     module {
         downloadSources = true
         downloadJavadoc = true
+    }
+}
+
+publishing {
+
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId base.archivesName.get()
+            artifact jar
+            artifact apiJar
+        }
+    }
+
+    repositories {
+        maven {
+            url = "${System.getenv('MAVEN_URL')}"
+            credentials {
+                username = "${System.getenv('MAVEN_USER')}"
+                password = "${System.getenv('MAVEN_PASSWORD')}"
+            }
+        }
     }
 }
