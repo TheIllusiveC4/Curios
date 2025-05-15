@@ -33,7 +33,6 @@ import java.util.Set;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -354,12 +353,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     compoundNBT.putString("DropRule", this.dropRule.toString());
 
     if (!this.persistentModifiers.isEmpty()) {
-      ListTag list = new ListTag();
-
-      for (AttributeModifier attributeModifier : this.persistentModifiers.values()) {
-        list.add(attributeModifier.save());
-      }
-      compoundNBT.put("PersistentModifiers", list);
+      compoundNBT.store("PersistentModifiers", AttributeModifier.CODEC.listOf(),
+                        List.copyOf(this.persistentModifiers.values()));
     }
 
     if (!this.modifiers.isEmpty()) {
@@ -367,7 +362,9 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       this.modifiers.forEach(
           (uuid, modifier) -> {
             if (!this.persistentModifiers.containsKey(modifier.id())) {
-              list.add(modifier.save());
+              CompoundTag tag = new CompoundTag();
+              tag.store(AttributeModifier.MAP_CODEC, modifier);
+              list.add(tag);
             }
           });
       compoundNBT.put("CachedModifiers", list);
@@ -379,92 +376,96 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   public void deserializeNBT(CompoundTag nbt) {
 
     if (nbt.contains("SavedBaseSize")) {
-      this.baseSize = nbt.getInt("SavedBaseSize");
+      this.baseSize = nbt.getInt("SavedBaseSize").orElse(0);
     }
 
     if (nbt.contains("Stacks")) {
       this.stackHandler.deserializeNBT(
-          this.itemHandler.getWearer().registryAccess(), nbt.getCompound("Stacks"));
+          this.itemHandler.getWearer().registryAccess(),
+          nbt.getCompound("Stacks").orElse(new CompoundTag()));
     }
 
     if (nbt.contains("Cosmetics")) {
       this.cosmeticStackHandler.deserializeNBT(
-          this.itemHandler.getWearer().registryAccess(), nbt.getCompound("Cosmetics"));
+          this.itemHandler.getWearer().registryAccess(),
+          nbt.getCompound("Cosmetics").orElse(new CompoundTag()));
     }
 
     if (nbt.contains("Renders")) {
-      CompoundTag tag = nbt.getCompound("Renders");
+      CompoundTag tag = nbt.getCompound("Renders").orElse(new CompoundTag());
       this.renderHandler =
           NonNullList.withSize(
-              nbt.contains("Size", Tag.TAG_INT) ? nbt.getInt("Size") : this.stackHandler.getSlots(),
+              nbt.contains("Size") ? nbt.getInt("Size").orElse(0) : this.stackHandler.getSlots(),
               true);
-      ListTag tagList = tag.getList("Renders", Tag.TAG_COMPOUND);
+      ListTag tagList = tag.getList("Renders").orElse(new ListTag());
 
       for (int i = 0; i < tagList.size(); i++) {
-        CompoundTag tags = tagList.getCompound(i);
-        int slot = tags.getInt("Slot");
+        CompoundTag tags = tagList.getCompound(i).orElse(new CompoundTag());
+        int slot = tags.getInt("Slot").orElse(0);
 
         if (slot >= 0 && slot < this.renderHandler.size()) {
-          this.renderHandler.set(slot, tags.getBoolean("Render"));
+          this.renderHandler.set(slot, tags.getBoolean("Render").orElse(true));
         }
       }
     }
 
     if (nbt.contains("ActiveStates")) {
-      CompoundTag tag = nbt.getCompound("ActiveStates");
+      CompoundTag tag = nbt.getCompound("ActiveStates").orElse(new CompoundTag());
       this.activeStates = NonNullList.withSize(
-          nbt.contains("Size", Tag.TAG_INT) ? nbt.getInt("Size") : this.stackHandler.getSlots(),
+          nbt.contains("Size") ? nbt.getInt("Size").orElse(0) : this.stackHandler.getSlots(),
           true);
       this.previousActiveStates = NonNullList.withSize(
-          nbt.contains("Size", Tag.TAG_INT) ? nbt.getInt("Size") : this.stackHandler.getSlots(),
+          nbt.contains("Size") ? nbt.getInt("Size").orElse(0) : this.stackHandler.getSlots(),
           true);
-      ListTag tagList = tag.getList("ActiveStates", Tag.TAG_COMPOUND);
+      ListTag tagList = tag.getList("ActiveStates").orElse(new ListTag());
 
       for (int i = 0; i < tagList.size(); i++) {
-        CompoundTag tags = tagList.getCompound(i);
-        int slot = tags.getInt("Slot");
+        CompoundTag tags = tagList.getCompound(i).orElse(new CompoundTag());
+        int slot = tags.getInt("Slot").orElse(0);
 
         if (slot >= 0 && slot < this.activeStates.size()) {
-          this.activeStates.set(slot, tags.getBoolean("ActiveState"));
-          this.previousActiveStates.set(slot, tags.getBoolean("ActiveState"));
+          this.activeStates.set(slot, tags.getBoolean("ActiveState").orElse(true));
+          this.previousActiveStates.set(slot, tags.getBoolean("ActiveState").orElse(true));
         }
       }
     }
 
     if (nbt.contains("SizeShift")) {
-      int sizeShift = nbt.getInt("SizeShift");
+      int sizeShift = nbt.getInt("SizeShift").orElse(0);
 
       if (sizeShift != 0) {
         this.addLegacyChange(sizeShift);
       }
     }
-    this.cosmetic = nbt.contains("HasCosmetic") ? nbt.getBoolean("HasCosmetic") : this.cosmetic;
-    this.visible = nbt.contains("Visible") ? nbt.getBoolean("Visible") : this.visible;
+    this.cosmetic =
+        nbt.contains("HasCosmetic") ? nbt.getBoolean("HasCosmetic").orElse(false) : this.cosmetic;
+    this.visible = nbt.contains("Visible") ? nbt.getBoolean("Visible").orElse(true) : this.visible;
     this.canToggleRender =
-        nbt.contains("RenderToggle") ? nbt.getBoolean("RenderToggle") : this.canToggleRender;
+        nbt.contains("RenderToggle") ? nbt.getBoolean("RenderToggle").orElse(true)
+                                     : this.canToggleRender;
 
     if (nbt.contains("DropRule")) {
       this.dropRule =
-          EnumUtils.getEnum(DropRule.class, nbt.getString("DropRule"), this.dropRule);
+          EnumUtils.getEnum(DropRule.class,
+                            nbt.getString("DropRule").orElse(DropRule.DEFAULT.getSerializedName()),
+                            this.dropRule);
     }
 
-    if (nbt.contains("PersistentModifiers", 9)) {
-      ListTag list = nbt.getList("PersistentModifiers", 10);
+    if (nbt.contains("PersistentModifiers")) {
 
-      for (int i = 0; i < list.size(); ++i) {
-        AttributeModifier attributeModifier = AttributeModifier.load(list.getCompound(i));
-
-        if (attributeModifier != null) {
-          this.addPermanentModifier(attributeModifier);
-        }
+      for (AttributeModifier modifier : nbt.read("PersistentModifiers",
+                                                 AttributeModifier.CODEC.listOf())
+          .orElse(List.of())) {
+        this.addPermanentModifier(modifier);
       }
     }
 
-    if (nbt.contains("CachedModifiers", 9)) {
-      ListTag list = nbt.getList("CachedModifiers", 10);
+    if (nbt.contains("CachedModifiers")) {
+      ListTag list = nbt.getList("CachedModifiers").orElse(new ListTag());
 
       for (int i = 0; i < list.size(); ++i) {
-        AttributeModifier attributeModifier = AttributeModifier.load(list.getCompound(i));
+        CompoundTag tag = list.getCompound(i).orElse(new CompoundTag());
+        AttributeModifier attributeModifier = tag.read(AttributeModifier.MAP_CODEC).orElse(null);
 
         if (attributeModifier != null) {
           this.cachedModifiers.put(attributeModifier.id(), attributeModifier);
@@ -519,12 +520,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     compoundNBT.putInt("BaseSize", this.baseSize);
 
     if (!this.modifiers.isEmpty()) {
-      ListTag list = new ListTag();
-
-      for (Map.Entry<ResourceLocation, AttributeModifier> modifier : this.modifiers.entrySet()) {
-        list.add(modifier.getValue().save());
-      }
-      compoundNBT.put("Modifiers", list);
+      compoundNBT.store("Modifiers", AttributeModifier.CODEC.listOf(),
+                        List.copyOf(this.modifiers.values()));
     }
     return compoundNBT;
   }
@@ -532,89 +529,93 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   public void applySyncTag(CompoundTag tag) {
 
     if (tag.contains("BaseSize")) {
-      this.baseSize = tag.getInt("BaseSize");
+      this.baseSize = tag.getInt("BaseSize").orElse(0);
     }
 
     if (tag.contains("Stacks")) {
       this.stackHandler.deserializeNBT(
-          this.itemHandler.getWearer().registryAccess(), tag.getCompound("Stacks"));
+          this.itemHandler.getWearer().registryAccess(), tag.getCompound("Stacks")
+              .orElse(new CompoundTag()));
     }
 
     if (tag.contains("Cosmetics")) {
       this.cosmeticStackHandler.deserializeNBT(
-          this.itemHandler.getWearer().registryAccess(), tag.getCompound("Cosmetics"));
+          this.itemHandler.getWearer().registryAccess(), tag.getCompound("Cosmetics")
+              .orElse(new CompoundTag()));
     }
 
     if (tag.contains("Renders")) {
-      CompoundTag compoundNBT = tag.getCompound("Renders");
+      CompoundTag compoundNBT = tag.getCompound("Renders").orElse(new CompoundTag());
       this.renderHandler =
           NonNullList.withSize(
-              compoundNBT.contains("Size", Tag.TAG_INT)
-              ? compoundNBT.getInt("Size")
+              compoundNBT.contains("Size")
+              ? compoundNBT.getInt("Size").orElse(0)
               : this.stackHandler.getSlots(),
               true);
-      ListTag tagList = compoundNBT.getList("Renders", Tag.TAG_COMPOUND);
+      ListTag tagList = compoundNBT.getList("Renders").orElse(new ListTag());
 
       for (int i = 0; i < tagList.size(); i++) {
-        CompoundTag tags = tagList.getCompound(i);
-        int slot = tags.getInt("Slot");
+        CompoundTag tags = tagList.getCompound(i).orElse(new CompoundTag());
+        int slot = tags.getInt("Slot").orElse(0);
 
         if (slot >= 0 && slot < this.renderHandler.size()) {
-          this.renderHandler.set(slot, tags.getBoolean("Render"));
+          this.renderHandler.set(slot, tags.getBoolean("Render").orElse(true));
         }
       }
     }
 
     if (tag.contains("ActiveStates")) {
-      CompoundTag compoundNBT = tag.getCompound("ActiveStates");
+      CompoundTag compoundNBT = tag.getCompound("ActiveStates").orElse(new CompoundTag());
       this.activeStates = NonNullList.withSize(
-          compoundNBT.contains("Size", Tag.TAG_INT) ? compoundNBT.getInt("Size") :
+          compoundNBT.contains("Size") ? compoundNBT.getInt("Size").orElse(0) :
           this.stackHandler.getSlots(), true);
       this.previousActiveStates = NonNullList.withSize(
-          compoundNBT.contains("Size", Tag.TAG_INT) ? compoundNBT.getInt("Size") : this.stackHandler.getSlots(),
+          compoundNBT.contains("Size") ? compoundNBT.getInt("Size").orElse(0)
+                                       : this.stackHandler.getSlots(),
           true);
-      ListTag tagList = compoundNBT.getList("ActiveStates", Tag.TAG_COMPOUND);
+      ListTag tagList = compoundNBT.getList("ActiveStates").orElse(new ListTag());
 
       for (int i = 0; i < tagList.size(); i++) {
-        CompoundTag tags = tagList.getCompound(i);
-        int slot = tags.getInt("Slot");
+        CompoundTag tags = tagList.getCompound(i).orElse(new CompoundTag());
+        int slot = tags.getInt("Slot").orElse(0);
 
         if (slot >= 0 && slot < this.activeStates.size()) {
-          this.activeStates.set(slot, tags.getBoolean("ActiveState"));
-          this.previousActiveStates.set(slot, tags.getBoolean("ActiveState"));
+          this.activeStates.set(slot, tags.getBoolean("ActiveState").orElse(true));
+          this.previousActiveStates.set(slot, tags.getBoolean("ActiveState").orElse(true));
         }
       }
     }
 
     if (tag.contains("SizeShift")) {
-      int sizeShift = tag.getInt("SizeShift");
+      int sizeShift = tag.getInt("SizeShift").orElse(0);
 
       if (sizeShift != 0) {
         this.addLegacyChange(sizeShift);
       }
     }
-    this.cosmetic = tag.contains("HasCosmetic") ? tag.getBoolean("HasCosmetic") : this.cosmetic;
-    this.visible = tag.contains("Visible") ? tag.getBoolean("Visible") : this.visible;
+    this.cosmetic =
+        tag.contains("HasCosmetic") ? tag.getBoolean("HasCosmetic").orElse(false) : this.cosmetic;
+    this.visible = tag.contains("Visible") ? tag.getBoolean("Visible").orElse(true) : this.visible;
     this.canToggleRender =
-        tag.contains("RenderToggle") ? tag.getBoolean("RenderToggle") : this.canToggleRender;
+        tag.contains("RenderToggle") ? tag.getBoolean("RenderToggle").orElse(true)
+                                     : this.canToggleRender;
 
     if (tag.contains("DropRule")) {
       this.dropRule =
-          EnumUtils.getEnum(DropRule.class, tag.getString("DropRule"), this.dropRule);
+          EnumUtils.getEnum(DropRule.class,
+                            tag.getString("DropRule").orElse(DropRule.DEFAULT.getSerializedName()),
+                            this.dropRule);
     }
     this.modifiers.clear();
     this.persistentModifiers.clear();
     this.modifiersByOperation.clear();
 
-    if (tag.contains("Modifiers", 9)) {
-      ListTag list = tag.getList("Modifiers", 10);
+    if (tag.contains("Modifiers")) {
 
-      for (int i = 0; i < list.size(); ++i) {
-        AttributeModifier attributeModifier = AttributeModifier.load(list.getCompound(i));
-
-        if (attributeModifier != null) {
-          this.addTransientModifier(attributeModifier);
-        }
+      for (AttributeModifier modifier : tag.read("Modifiers",
+                                                 AttributeModifier.CODEC.listOf())
+          .orElse(List.of())) {
+        this.addTransientModifier(modifier);
       }
     }
     this.flagUpdate();

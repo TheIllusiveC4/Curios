@@ -29,6 +29,7 @@ import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import net.minecraft.commands.arguments.selector.options.EntitySelectorOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
@@ -42,31 +43,37 @@ public class CuriosSelectorOptions {
 
   public static void register() {
     EntitySelectorOptions.register("curios", CuriosSelectorOptions::curioArgument,
-        entitySelectorParser -> true,
-        Component.translatable("argument.entity.options.curios.description"));
+                                   entitySelectorParser -> true,
+                                   Component.translatable(
+                                       "argument.entity.options.curios.description"));
   }
 
   private static void curioArgument(EntitySelectorParser parser) throws CommandSyntaxException {
     StringReader reader = parser.getReader();
     boolean invert = parser.shouldInvertValue();
-    CompoundTag compoundtag = (new TagParser(reader)).readStruct();
-    ListTag listTag = compoundtag.getList("slot", Tag.TAG_STRING);
+    Tag tag = TagParser.create(NbtOps.INSTANCE).parseFully(reader);
+
+    if (!(tag instanceof CompoundTag compoundtag)) {
+      return;
+    }
+    ListTag listTag = compoundtag.getList("slot").orElse(new ListTag());
     Set<String> slots = new HashSet<>();
 
     for (int i = 0; i < listTag.size(); i++) {
-      slots.add(listTag.getString(i));
+      slots.add(listTag.getString(i).orElse(""));
     }
-    listTag = compoundtag.getList("index", Tag.TAG_INT);
+    listTag = compoundtag.getList("index").orElse(new ListTag());
     int min = 0;
     int max = -1;
 
     if (listTag.size() == 2) {
-      min = Math.max(0, listTag.getInt(0));
-      max = Math.max(min + 1, listTag.getInt(1));
+      min = Math.max(0, listTag.getInt(0).orElse(min));
+      max = Math.max(min + 1, listTag.getInt(1).orElse(max));
     }
     CompoundTag stack =
-        compoundtag.contains("item") ? compoundtag.getCompound("item") : new CompoundTag();
-    boolean exclusive = compoundtag.getBoolean("exclusive");
+        compoundtag.contains("item") ? compoundtag.getCompound("item").orElse(new CompoundTag())
+                                     : new CompoundTag();
+    boolean exclusive = compoundtag.getBoolean("exclusive").orElse(false);
     int finalMin = min;
     int finalMax = max;
     parser.addPredicate(
@@ -76,7 +83,8 @@ public class CuriosSelectorOptions {
   private static boolean matches(Entity entity, Set<String> slots, int min, int max,
                                  CompoundTag inputStack, boolean invert, boolean exclusive) {
     if (entity instanceof LivingEntity livingEntity) {
-      ItemStack stack = ItemStack.parseOptional(livingEntity.registryAccess(), inputStack);
+      ItemStack stack =
+          ItemStack.parse(livingEntity.registryAccess(), inputStack).orElse(ItemStack.EMPTY);
 
       if (!stack.isEmpty()) {
         stack.setCount(Math.max(1, stack.getCount()));

@@ -89,7 +89,7 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
     } else {
       this.markDeserialized = false;
 
-      ListTag tagList = this.deserialized.getList("Curios", Tag.TAG_COMPOUND);
+      ListTag tagList = this.deserialized.getList("Curios").orElse(new ListTag());
       Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
       SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = new TreeMap<>();
       SortedSet<ISlotType> sorted = new TreeSet<>(
@@ -109,11 +109,12 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
       }
 
       for (int i = 0; i < tagList.size(); i++) {
-        CompoundTag tag = tagList.getCompound(i);
-        String identifier = tag.getString("Identifier");
+        CompoundTag tag = tagList.getCompound(i).orElse(new CompoundTag());
+        String identifier = tag.getString("Identifier").orElse("");
         CurioStacksHandler prevStacksHandler =
             new CurioStacksHandler(curiosItemHandler, identifier);
-        prevStacksHandler.deserializeNBT(tag.getCompound("StacksHandler"));
+        prevStacksHandler.deserializeNBT(
+            tag.getCompound("StacksHandler").orElse(new CompoundTag()));
 
         Optional<ISlotType> optionalType =
             Optional.ofNullable(

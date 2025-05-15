@@ -142,7 +142,7 @@ public class CuriosTest {
         LivingEntity livingEntity = slotContext.entity();
 
         if (!livingEntity.level().isClientSide() && livingEntity.tickCount % 19 == 0) {
-          livingEntity.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 20, 0, true, true));
+          livingEntity.addEffect(new MobEffectInstance(MobEffects.HASTE, 20, 0, true, true));
         }
       }
 

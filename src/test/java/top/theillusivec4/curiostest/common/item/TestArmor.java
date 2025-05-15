@@ -5,21 +5,21 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorMaterials;
 import net.minecraft.world.item.equipment.ArmorType;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
 
-public class TestArmor extends ArmorItem {
+public class TestArmor extends Item {
 
   private static final ResourceLocation ARMOR_ID =
       ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "armor");
 
-  public TestArmor(ArmorMaterial pMaterial, ArmorType pType, Properties pProperties) {
-    super(pMaterial, pType, pProperties);
+  public TestArmor(Properties pProperties) {
+    super(pProperties.humanoidArmor(ArmorMaterials.GOLD, ArmorType.CHESTPLATE));
   }
 
   @Nonnull

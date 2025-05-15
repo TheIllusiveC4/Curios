@@ -487,12 +487,12 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
     if (data != null) {
 
       for (int i = 0; i < data.size(); i++) {
-        CompoundTag tag = data.getCompound(i);
-        String identifier = tag.getString("Identifier");
+        CompoundTag tag = data.getCompound(i).orElse(new CompoundTag());
+        String identifier = tag.getString("Identifier").orElse("");
         ICurioStacksHandler stacksHandler = this.curioInventory.asMap().get(identifier);
 
         if (stacksHandler != null) {
-          CompoundTag stacksData = tag.getCompound("Stacks");
+          CompoundTag stacksData = tag.getCompound("Stacks").orElse(new CompoundTag());
           ItemStackHandler loaded = new ItemStackHandler();
           IDynamicStackHandler stacks = stacksHandler.getStacks();
 
@@ -500,7 +500,7 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
             loaded.deserializeNBT(this.livingEntity.level().registryAccess(), stacksData);
             loadStacks(stacksHandler, loaded, stacks);
           }
-          stacksData = tag.getCompound("Cosmetics");
+          stacksData = tag.getCompound("Cosmetics").orElse(new CompoundTag());
 
           if (!stacksData.isEmpty()) {
             loaded.deserializeNBT(this.livingEntity.level().registryAccess(), stacksData);

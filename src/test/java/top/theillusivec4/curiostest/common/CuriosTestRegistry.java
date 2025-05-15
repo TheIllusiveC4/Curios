@@ -20,8 +20,6 @@
 package top.theillusivec4.curiostest.common;
 
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.equipment.ArmorMaterials;
-import net.minecraft.world.item.equipment.ArmorType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -48,11 +46,8 @@ public class CuriosTestRegistry {
   public static final DeferredItem<Item> KNUCKLES =
       ITEMS.registerItem("knuckles", KnucklesItem::new, new Item.Properties().stacksTo(1));
 
-  public static final DeferredItem<Item> TEST_ARMOR = ITEMS.registerItem("test_armor",
-                                                                         (properties) -> new TestArmor(
-                                                                             ArmorMaterials.GOLD,
-                                                                             ArmorType.CHESTPLATE,
-                                                                             properties));
+  public static final DeferredItem<Item> TEST_ARMOR =
+      ITEMS.registerItem("test_armor", TestArmor::new);
 
   public static void init(IEventBus eventBus) {
     ITEMS.register(eventBus);

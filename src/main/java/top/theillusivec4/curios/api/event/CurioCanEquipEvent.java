@@ -20,8 +20,8 @@
 
 package top.theillusivec4.curios.api.event;
 
+import net.minecraft.util.TriState;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import top.theillusivec4.curios.api.SlotContext;
 

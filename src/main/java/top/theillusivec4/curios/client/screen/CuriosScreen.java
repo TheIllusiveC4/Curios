@@ -37,6 +37,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.CraftingRecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -379,7 +380,6 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
                                    yOffset + 7, 7, 7, 18, upperHeight, 256, 256);
                   xOffset += 18;
                 }
-                RenderSystem.enableBlend();
 
                 for (Slot slot : this.menu.slots) {
 
@@ -389,7 +389,6 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
                                      32, 50, 18, 18, 256, 256);
                   }
                 }
-                RenderSystem.disableBlend();
               });
     }
   }

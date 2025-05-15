@@ -170,12 +170,13 @@ public class CuriosCommonEvents {
         ExperienceOrb orb = evt.getOrb();
         player.takeXpDelay = 2;
         player.take(orb, 1);
-        int toRepair = Math.min(orb.value * 2, stack.getDamageValue());
-        orb.value -= toRepair / 2;
+        int value = orb.getValue();
+        int toRepair = Math.min(value * 2, stack.getDamageValue());
+        value -= toRepair / 2;
         stack.setDamageValue(stack.getDamageValue() - toRepair);
 
-        if (orb.value > 0) {
-          player.giveExperiencePoints(orb.value);
+        if (value > 0) {
+          player.giveExperiencePoints(value);
         }
         orb.remove(Entity.RemovalReason.KILLED);
         return true;
@@ -538,7 +539,7 @@ public class CuriosCommonEvents {
             Optional<ICurio> currentCurio = CuriosApi.getCurio(stack);
 
             if (functional && !stack.isEmpty()) {
-              stack.inventoryTick(livingEntity.level(), livingEntity, -1, false);
+              stack.inventoryTick(livingEntity.level(), livingEntity, null);
               currentCurio.ifPresent(curio -> curio.curioTick(slotContext));
             }
 

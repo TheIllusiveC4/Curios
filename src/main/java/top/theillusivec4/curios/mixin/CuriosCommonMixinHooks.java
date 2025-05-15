@@ -156,7 +156,7 @@ public class CuriosCommonMixinHooks {
   public static CompoundTag mergeCuriosInventory(CompoundTag compoundTag, Entity entity) {
 
     if (entity instanceof LivingEntity livingEntity) {
-      ListTag list = compoundTag.getList("Inventory", Tag.TAG_COMPOUND);
+      ListTag list = compoundTag.getList("Inventory").orElse(new ListTag());
       return CuriosApi.getCuriosInventory(livingEntity).map(inv -> {
         IItemHandler handler = inv.getEquippedCurios();
 

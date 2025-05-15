@@ -368,7 +368,7 @@ public interface ICurio {
       if (!livingEntity.isSilent()) {
         livingEntity.level()
             .playLocalSound(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(),
-                            SoundEvents.ITEM_BREAK, livingEntity.getSoundSource(), 0.8F,
+                            SoundEvents.ITEM_BREAK.value(), livingEntity.getSoundSource(), 0.8F,
                             0.8F + livingEntity.level().random.nextFloat() * 0.4F, false);
       }
 

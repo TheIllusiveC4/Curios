@@ -20,7 +20,6 @@
 
 package top.theillusivec4.curios.client.screen.button;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import javax.annotation.Nonnull;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
@@ -58,7 +57,6 @@ public class RenderButton extends ImageButton implements ICuriosWidget {
 
   public void renderButtonOverlay(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
                                   float partialTicks) {
-    RenderSystem.disableDepthTest();
     int j = this.xTexStart;
 
     if (!slot.getRenderStatus()) {
@@ -66,6 +64,5 @@ public class RenderButton extends ImageButton implements ICuriosWidget {
     }
     guiGraphics.blit(RenderType::guiTextured, this.resourceLocation, this.getX(), this.getY(),
                      (float) j, (float) this.yTexStart, this.width, this.height, 256, 256);
-    RenderSystem.enableDepthTest();
   }
 }
