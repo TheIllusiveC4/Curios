@@ -266,6 +266,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     "${release_versions}".split(',').each {
         mainFile.addGameVersion("${it}")
     }
+    mainFile.addModLoader("NeoForge")
     mainFile.withAdditionalFile(sourcesJar)
     mainFile.withAdditionalFile(apiJar)
 
@@ -286,6 +287,7 @@ modrinth {
     changelog = file('CHANGELOG_LATEST.md').text
     uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
     additionalFiles = [sourcesJar, apiJar]
+    loaders = ["neoforge"]
     gameVersions = "${release_versions}".split(",") as List<String>
 }
 
