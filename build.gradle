@@ -229,7 +229,7 @@ def publishDiscord() {
             }
             """
         println(message)
-        final URL url = URI.create(System.getenv('DISCORD_WEBHOOK') as String).toURL()
+        final URL url = URI.create("${System.getenv('DISCORD_WEBHOOK')}").toURL()
         final HttpsURLConnection connection = (HttpsURLConnection) url.openConnection()
         connection.addRequestProperty("Content-Type", "application/json; charset=UTF-8")
         connection.addRequestProperty("User-Agent", "${mod_name} Gradle Upload")

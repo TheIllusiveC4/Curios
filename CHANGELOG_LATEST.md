@@ -2,6 +2,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/TheIllusiveC4/Curios/blob/1.21.4/CHANGELOG.md).
 
+## [10.0.1+1.21.4] - 2025.05.17
+
+### Fixed
+
+- Fixed loot context crash
+
 ## [10.0.0+1.21.4] - 2025.05.15
 
 For an in-depth overview of API changes, refer to [this](https://docs.illusivesoulworks.com/curios/porting/1211to1214)
