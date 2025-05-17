@@ -4,8 +4,8 @@ to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This is a copy of the changelog for the most recent version. For the full version history,
 go [here](https://github.com/TheIllusiveC4/Curios/blob/1.21.x/CHANGELOG.md).
 
-## [11.0.0+1.21.5] - 2025.05.15
+## [11.0.1+1.21.5] - 2025.05.17
 
-### Changed
+### Fixed
 
-- Updated to Minecraft 1.21.5
+- Fixed loot context crash
