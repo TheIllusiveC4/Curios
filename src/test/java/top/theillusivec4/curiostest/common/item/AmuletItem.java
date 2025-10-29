@@ -21,7 +21,6 @@ package top.theillusivec4.curiostest.common.item;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -47,6 +46,8 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curiostest.CuriosTest;
 import top.theillusivec4.curiostest.client.CuriosLayerDefinitions;
 import top.theillusivec4.curiostest.client.model.AmuletModel;
+
+import javax.annotation.Nonnull;
 
 public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
 

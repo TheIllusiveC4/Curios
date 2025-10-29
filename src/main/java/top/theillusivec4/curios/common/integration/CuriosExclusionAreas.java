@@ -1,11 +1,12 @@
 package top.theillusivec4.curios.common.integration;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.Rect2i;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class CuriosExclusionAreas {
 

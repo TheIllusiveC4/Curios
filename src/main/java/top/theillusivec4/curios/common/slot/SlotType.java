@@ -2,10 +2,6 @@ package top.theillusivec4.curios.common.slot;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Either;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,6 +15,11 @@ import top.theillusivec4.curios.api.CuriosTags;
 import top.theillusivec4.curios.api.common.DropRule;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.data.ISlotData;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public final class SlotType implements ISlotType {
 

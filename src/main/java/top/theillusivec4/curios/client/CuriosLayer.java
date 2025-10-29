@@ -21,8 +21,6 @@
 package top.theillusivec4.curios.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import java.util.List;
-import javax.annotation.Nonnull;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -31,6 +29,9 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class CuriosLayer<S extends LivingEntityRenderState, M extends EntityModel<? super S>>
     extends RenderLayer<S, M> {

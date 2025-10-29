@@ -22,14 +22,6 @@ package top.theillusivec4.curios.common.inventory;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -57,8 +49,10 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActiveState;
-import top.theillusivec4.curios.impl.CuriosRegistry;
 import top.theillusivec4.curios.common.util.CuriosNbtIO;
+import top.theillusivec4.curios.impl.CuriosRegistry;
+
+import java.util.*;
 
 public class CurioStacksHandler implements ICurioStacksHandler {
 

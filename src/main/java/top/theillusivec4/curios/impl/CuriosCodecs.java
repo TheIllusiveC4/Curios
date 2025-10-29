@@ -3,12 +3,6 @@ package top.theillusivec4.curios.impl;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import javax.annotation.Nonnull;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -35,6 +29,9 @@ import top.theillusivec4.curios.api.type.data.ISlotData;
 import top.theillusivec4.curios.common.data.EntitiesData;
 import top.theillusivec4.curios.common.data.SlotData;
 import top.theillusivec4.curios.common.slot.SlotType;
+
+import javax.annotation.Nonnull;
+import java.util.*;
 
 public class CuriosCodecs implements ICuriosCodecs {
 

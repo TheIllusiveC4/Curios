@@ -21,9 +21,6 @@
 package top.theillusivec4.curios.api.type;
 
 import com.mojang.serialization.Codec;
-import java.util.Set;
-import java.util.function.BiPredicate;
-import javax.annotation.Nullable;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -35,6 +32,10 @@ import top.theillusivec4.curios.api.CuriosSlotTypes;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.common.DropRule;
 import top.theillusivec4.curios.api.internal.CuriosServices;
+
+import javax.annotation.Nullable;
+import java.util.Set;
+import java.util.function.BiPredicate;
 
 /**
  * This interface provides read-only data for slot types used throughout Curios. Modders are not

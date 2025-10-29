@@ -3,8 +3,6 @@ package top.theillusivec4.curios.mixin.core;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.mojang.datafixers.util.Pair;
-import java.util.Map;
-import java.util.function.Supplier;
 import net.minecraft.util.datafix.schemas.V1460;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -13,6 +11,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import top.theillusivec4.curios.mixin.CuriosCommonMixinHooks;
+
+import java.util.Map;
+import java.util.function.Supplier;
 
 @Mixin(V1460.class)
 public class MixinV1460 {

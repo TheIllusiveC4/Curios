@@ -1,19 +1,13 @@
 package top.theillusivec4.curios.api;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.type.ISlotType;
-import top.theillusivec4.curios.api.internal.CuriosServices;
+
+import java.util.*;
 
 /**
  * Helper class for building tooltips in a unified style with Curios

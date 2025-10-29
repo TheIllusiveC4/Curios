@@ -21,9 +21,6 @@ package top.theillusivec4.curiostest;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import java.util.Collection;
-import java.util.List;
-import javax.annotation.Nonnull;
 import net.minecraft.core.Holder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.advancements.AdvancementProvider;
@@ -54,11 +51,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import top.theillusivec4.curios.api.CurioAttributeModifiers;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.CuriosSlotTypes;
-import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.*;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 import top.theillusivec4.curios.api.common.DropRule;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
@@ -75,6 +68,10 @@ import top.theillusivec4.curiostest.common.CuriosTestRegistry;
 import top.theillusivec4.curiostest.common.item.AmuletItem;
 import top.theillusivec4.curiostest.data.CuriosGenerator;
 import top.theillusivec4.curiostest.data.CuriosTestProvider;
+
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.List;
 
 @Mod(CuriosTest.MODID)
 public class CuriosTest {

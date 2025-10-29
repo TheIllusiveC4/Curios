@@ -20,11 +20,11 @@
 
 package top.theillusivec4.curios.config;
 
-import java.util.List;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
-import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosResources;
+
+import java.util.List;
 
 public class CuriosConfig {
 

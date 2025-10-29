@@ -20,13 +20,14 @@
 
 package top.theillusivec4.curios.api.event;
 
-import java.util.Collection;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+
+import java.util.Collection;
 
 /**
  * This event is fired when an entity's death causes dropped curios to appear.

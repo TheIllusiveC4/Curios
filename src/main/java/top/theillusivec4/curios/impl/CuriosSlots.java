@@ -3,9 +3,6 @@ package top.theillusivec4.curios.impl;
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.function.BiPredicate;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -24,6 +21,10 @@ import top.theillusivec4.curios.api.type.data.ISlotData;
 import top.theillusivec4.curios.common.data.CuriosSlotResources;
 import top.theillusivec4.curios.common.data.EntitiesData;
 import top.theillusivec4.curios.common.data.SlotData;
+
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.function.BiPredicate;
 
 public class CuriosSlots implements ICuriosSlots {
 

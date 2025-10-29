@@ -1,11 +1,12 @@
 package top.theillusivec4.curios.api.common;
 
 import io.netty.buffer.ByteBuf;
-import javax.annotation.Nonnull;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
+
+import javax.annotation.Nonnull;
 
 /**
  * Determines the behavior when dropping items from curio slots as loot.

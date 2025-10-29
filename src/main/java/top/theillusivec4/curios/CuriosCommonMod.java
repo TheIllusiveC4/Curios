@@ -20,8 +20,6 @@
 
 package top.theillusivec4.curios;
 
-import java.util.HashSet;
-import java.util.Set;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -60,6 +58,9 @@ import top.theillusivec4.curios.impl.CuriosRegistry;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
 import top.theillusivec4.curios.server.command.CuriosSelectorOptions;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Mod(CuriosConstants.MOD_ID)
 public class CuriosCommonMod {

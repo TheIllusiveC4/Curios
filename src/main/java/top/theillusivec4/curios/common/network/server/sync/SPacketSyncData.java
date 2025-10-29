@@ -20,7 +20,6 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
-import javax.annotation.Nonnull;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -28,6 +27,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.common.data.CuriosSlotResources;
+
+import javax.annotation.Nonnull;
 
 public record SPacketSyncData(CuriosSlotResources slotResources)
     implements CustomPacketPayload {

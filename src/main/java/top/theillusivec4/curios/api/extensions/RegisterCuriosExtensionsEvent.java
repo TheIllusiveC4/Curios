@@ -1,9 +1,10 @@
 package top.theillusivec4.curios.api.extensions;
 
-import javax.annotation.Nonnull;
 import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 import top.theillusivec4.curios.api.internal.CuriosServices;
+
+import javax.annotation.Nonnull;
 
 /**
  * Allows registration of new behavior to various game objects used by Curios. Fired during {@link

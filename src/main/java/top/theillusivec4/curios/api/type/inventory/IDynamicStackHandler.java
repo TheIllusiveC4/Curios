@@ -20,11 +20,12 @@
 
 package top.theillusivec4.curios.api.type.inventory;
 
-import javax.annotation.Nonnull;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
+
+import javax.annotation.Nonnull;
 
 public interface IDynamicStackHandler extends IItemHandlerModifiable {
 

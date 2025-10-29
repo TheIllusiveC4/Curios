@@ -20,9 +20,6 @@
 
 package top.theillusivec4.curios.common.inventory;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
@@ -38,6 +35,10 @@ import top.theillusivec4.curios.api.extensions.ICurioSlotExtension;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.mixin.core.AccessorEntity;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CurioSlot extends SlotItemHandler {
 

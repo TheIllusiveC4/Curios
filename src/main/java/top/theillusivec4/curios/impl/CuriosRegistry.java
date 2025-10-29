@@ -20,7 +20,6 @@
 
 package top.theillusivec4.curios.impl;
 
-import java.util.function.Supplier;
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
@@ -42,6 +41,8 @@ import top.theillusivec4.curios.common.capability.CurioInventory;
 import top.theillusivec4.curios.common.inventory.container.CuriosMenu;
 import top.theillusivec4.curios.common.util.EquipCurioTrigger;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
+
+import java.util.function.Supplier;
 
 public class CuriosRegistry implements ICuriosRegistry {
 

@@ -20,7 +20,6 @@
 
 package top.theillusivec4.curios.common.capability;
 
-import java.util.Map;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -29,6 +28,8 @@ import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.impl.CuriosRegistry;
+
+import java.util.Map;
 
 public class CurioItemHandler implements IItemHandler {
 

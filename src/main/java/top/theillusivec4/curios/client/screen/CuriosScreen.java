@@ -21,10 +21,6 @@
 package top.theillusivec4.curios.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
-import java.util.List;
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -35,14 +31,14 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.gui.screens.recipebook.CraftingRecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.client.player.LocalPlayer;
-import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
@@ -50,16 +46,12 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.client.ICuriosScreen;
 import top.theillusivec4.curios.client.CuriosKeyMappings;
-import top.theillusivec4.curios.client.screen.button.CosmeticButton;
-import top.theillusivec4.curios.client.screen.button.CuriosButton;
-import top.theillusivec4.curios.client.screen.button.ICuriosWidget;
-import top.theillusivec4.curios.client.screen.button.PageButton;
-import top.theillusivec4.curios.client.screen.button.RenderButton;
+import top.theillusivec4.curios.client.screen.button.*;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 import top.theillusivec4.curios.common.inventory.container.CuriosMenu;
 import top.theillusivec4.curios.common.network.client.CPacketPage;
@@ -67,8 +59,10 @@ import top.theillusivec4.curios.common.network.client.CPacketToggleRender;
 import top.theillusivec4.curios.config.CuriosClientConfig;
 import top.theillusivec4.curios.config.CuriosClientConfig.Client;
 import top.theillusivec4.curios.config.CuriosClientConfig.Client.ButtonCorner;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.function.Predicate;
 
 
 public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
@@ -112,7 +106,32 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
     return new Tuple<>(x, y);
   }
 
-  @Override
+	// Call this instead of guiGraphics.renderTooltip(...)
+	private void renderTooltipFixed(GuiGraphics g, Font font, List<ClientTooltipComponent> comps, int mouseX, int mouseY) {
+		int width = 0;
+		int height = 0;
+		for (ClientTooltipComponent c : comps) {
+			width = Math.max(width, c.getWidth(font));
+			height += c.getHeight(font);
+		}
+
+		ClientTooltipPositioner pos = DefaultTooltipPositioner.INSTANCE;
+		var pt = pos.positionTooltip(width, height, mouseX, mouseY, this.width, this.height);
+		int x = pt.x();
+		int y = pt.y();
+
+		TooltipRenderUtil.renderTooltipBackground(g, x, y, width, height, /*bg*/ null);
+
+		int cy = y;
+		for (ClientTooltipComponent c : comps) {
+			c.renderText(g, font, x, cy);
+			c.renderImage(font, x, cy, 400, 0, g);
+			cy += c.getHeight(font);
+		}
+	}
+
+
+	@Override
   public void init() {
     super.init();
     this.panelWidth = this.menu.panelWidth;
@@ -225,17 +244,12 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
         if (stack.isEmpty()) {
 			var lines = slotCurio.getSlotTooltip();
 	        var tooltips = lines.stream().map(line -> ClientTooltipComponent.create(line.getVisualOrderText())).toList();
-
-			ClientTooltipPositioner pos = DefaultTooltipPositioner.INSTANCE;
-			ResourceLocation bg = ResourceLocation.withDefaultNamespace("tooltip/background");
-
-	        guiGraphics.renderTooltip(this.font, tooltips, mouseX, mouseY, pos, bg);
+	        renderTooltipFixed(guiGraphics, this.font, tooltips, mouseX, mouseY);
         }
       }
     }
     this.renderTooltip(guiGraphics, mouseX, mouseY);
-    //this.effects.render(guiGraphics, mouseX, mouseY, partialTicks);
-	this.effects.renderTooltip(guiGraphics, mouseX, mouseY); // New way?
+	this.effects.renderTooltip(guiGraphics, mouseX, mouseY);
     this.oldMouseX = mouseX;
     this.oldMouseY = mouseY;
   }
@@ -251,10 +265,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
 
         if (this.isRenderButtonHovered) {
 	        List<ClientTooltipComponent> tooltips = List.of(ClientTooltipComponent.create(Component.translatable("gui.curios.toggle").getVisualOrderText()));
-	        ClientTooltipPositioner pos = DefaultTooltipPositioner.INSTANCE;
-	        ResourceLocation bg = ResourceLocation.withDefaultNamespace("tooltip/background");
-
-	        guiGraphics.renderTooltip(this.font, tooltips, mouseX, mouseY, pos, bg);
+	        renderTooltipFixed(guiGraphics, this.font, tooltips, mouseX, mouseY);
         } else if (this.hoveredSlot != null) {
           ItemStack stack = this.hoveredSlot.getItem();
 
@@ -274,10 +285,8 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
 	          List<ClientTooltipComponent> tooltips = components.stream().map(c -> ClientTooltipComponent.create(c.getVisualOrderText())).toList();
 
 	          ClientTooltipPositioner pos = DefaultTooltipPositioner.INSTANCE;
-	          ResourceLocation bg = ResourceLocation.withDefaultNamespace("tooltip/background");
 
-
-	          guiGraphics.renderTooltip(this.font, tooltips, mouseX, mouseY, pos, bg, stack);
+	          guiGraphics.renderTooltip(this.font, tooltips, mouseX, mouseY, pos, null, stack);
 
           }
         }

@@ -20,8 +20,6 @@
 
 package top.theillusivec4.curios.common.inventory;
 
-import java.util.function.Function;
-import javax.annotation.Nonnull;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -41,6 +39,9 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.event.CurioCanEquipEvent;
 import top.theillusivec4.curios.api.event.CurioCanUnequipEvent;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+
+import javax.annotation.Nonnull;
+import java.util.function.Function;
 
 public class DynamicStackHandler extends ItemStackHandler implements IDynamicStackHandler {
 

@@ -20,13 +20,14 @@
 
 package top.theillusivec4.curios.common.integration.jei;
 
-import javax.annotation.Nonnull;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
+
+import javax.annotation.Nonnull;
 
 @JeiPlugin
 public class CuriosJeiPlugin implements IModPlugin {

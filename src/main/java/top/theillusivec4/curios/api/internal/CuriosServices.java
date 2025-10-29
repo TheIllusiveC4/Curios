@@ -20,13 +20,10 @@
 
 package top.theillusivec4.curios.api.internal;
 
-import java.util.ServiceLoader;
 import org.jetbrains.annotations.ApiStatus;
-import top.theillusivec4.curios.api.internal.services.ICuriosCodecs;
-import top.theillusivec4.curios.api.internal.services.ICuriosExtensions;
-import top.theillusivec4.curios.api.internal.services.ICuriosNetwork;
-import top.theillusivec4.curios.api.internal.services.ICuriosRegistry;
-import top.theillusivec4.curios.api.internal.services.ICuriosSlots;
+import top.theillusivec4.curios.api.internal.services.*;
+
+import java.util.ServiceLoader;
 
 @ApiStatus.Internal
 public class CuriosServices {

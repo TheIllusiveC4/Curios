@@ -22,8 +22,6 @@ package top.theillusivec4.curios.api;
 
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
-import java.util.Map;
-import javax.annotation.Nonnull;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -35,6 +33,9 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.TooltipFlag;
 import top.theillusivec4.curios.api.internal.CuriosServices;
+
+import javax.annotation.Nonnull;
+import java.util.Map;
 
 /**
  * A wrapper class for representing slot types as attributes for use in attribute modifiers

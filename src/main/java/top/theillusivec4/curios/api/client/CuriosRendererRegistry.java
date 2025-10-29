@@ -20,9 +20,10 @@
 
 package top.theillusivec4.curios.api.client;
 
+import net.minecraft.world.item.Item;
+
 import java.util.Optional;
 import java.util.function.Supplier;
-import net.minecraft.world.item.Item;
 
 /**
  * Registry class for registering and obtaining curio rendering logic.

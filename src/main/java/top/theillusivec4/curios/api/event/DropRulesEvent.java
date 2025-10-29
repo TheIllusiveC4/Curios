@@ -21,9 +21,6 @@
 package top.theillusivec4.curios.api.event;
 
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,6 +28,10 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import top.theillusivec4.curios.api.common.DropRule;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * This event is fired when an entity's death causes dropped curios to appear.

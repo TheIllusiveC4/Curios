@@ -1,8 +1,6 @@
 package top.theillusivec4.curios.client;
 
 import com.google.common.reflect.TypeToken;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -32,8 +30,11 @@ import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 import top.theillusivec4.curios.client.screen.CuriosScreenEvents;
-import top.theillusivec4.curios.impl.CuriosRegistry;
 import top.theillusivec4.curios.impl.CuriosClientExtensions;
+import top.theillusivec4.curios.impl.CuriosRegistry;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mod(value = CuriosConstants.MOD_ID, dist = Dist.CLIENT)
 public class CuriosClientMod {

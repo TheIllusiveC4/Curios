@@ -1,6 +1,5 @@
 package top.theillusivec4.curiostest.data;
 
-import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.entity.EntityType;
@@ -11,6 +10,8 @@ import top.theillusivec4.curios.api.CuriosTags;
 import top.theillusivec4.curios.api.common.DropRule;
 import top.theillusivec4.curios.api.type.data.ISlotData;
 import top.theillusivec4.curiostest.common.CuriosTestRegistry;
+
+import java.util.concurrent.CompletableFuture;
 
 public class CuriosTestProvider extends CuriosDataProvider {
 
