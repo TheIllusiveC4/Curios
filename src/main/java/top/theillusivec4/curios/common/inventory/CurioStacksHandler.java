@@ -58,6 +58,7 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActiveState;
 import top.theillusivec4.curios.impl.CuriosRegistry;
+import top.theillusivec4.curios.common.util.CuriosNbtIO;
 
 public class CurioStacksHandler implements ICurioStacksHandler {
 
@@ -313,15 +314,14 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     this.flagUpdate();
   }
 
-  @Override
-  public CompoundTag serializeNBT() {
-    CompoundTag compoundNBT = new CompoundTag();
-    compoundNBT.putInt("SavedBaseSize", this.baseSize);
-    compoundNBT.put(
-        "Stacks", this.stackHandler.serializeNBT(this.itemHandler.getWearer().registryAccess()));
-    compoundNBT.put(
-        "Cosmetics",
-        this.cosmeticStackHandler.serializeNBT(this.itemHandler.getWearer().registryAccess()));
+	@Override
+	public CompoundTag serializeNBT() {
+		CompoundTag compoundNBT = new CompoundTag();
+		compoundNBT.putInt("SavedBaseSize", this.baseSize);
+
+		var provider = this.itemHandler.getWearer().registryAccess();
+		compoundNBT.put("Stacks",    CuriosNbtIO.writeHandler(provider, this.stackHandler));
+		compoundNBT.put("Cosmetics", CuriosNbtIO.writeHandler(provider, this.cosmeticStackHandler));
 
     ListTag nbtTagList = new ListTag();
 
@@ -379,17 +379,15 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       this.baseSize = nbt.getInt("SavedBaseSize").orElse(0);
     }
 
-    if (nbt.contains("Stacks")) {
-      this.stackHandler.deserializeNBT(
-          this.itemHandler.getWearer().registryAccess(),
-          nbt.getCompound("Stacks").orElse(new CompoundTag()));
-    }
+	  var provider = this.itemHandler.getWearer().registryAccess();
 
-    if (nbt.contains("Cosmetics")) {
-      this.cosmeticStackHandler.deserializeNBT(
-          this.itemHandler.getWearer().registryAccess(),
-          nbt.getCompound("Cosmetics").orElse(new CompoundTag()));
-    }
+	  if (nbt.contains("Stacks")) {
+		  CuriosNbtIO.readHandler(provider, this.stackHandler, nbt.getCompound("Stacks").orElse(new CompoundTag()));
+	  }
+
+	  if (nbt.contains("Cosmetics")) {
+		  CuriosNbtIO.readHandler(provider, this.cosmeticStackHandler, nbt.getCompound("Cosmetics").orElse(new CompoundTag()));
+	  }
 
     if (nbt.contains("Renders")) {
       CompoundTag tag = nbt.getCompound("Renders").orElse(new CompoundTag());
@@ -483,11 +481,10 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   public CompoundTag getSyncTag() {
     CompoundTag compoundNBT = new CompoundTag();
-    compoundNBT.put(
-        "Stacks", this.stackHandler.serializeNBT(this.itemHandler.getWearer().registryAccess()));
-    compoundNBT.put(
-        "Cosmetics",
-        this.cosmeticStackHandler.serializeNBT(this.itemHandler.getWearer().registryAccess()));
+	var provider = this.itemHandler.getWearer().registryAccess();
+
+	compoundNBT.put("Stacks",    CuriosNbtIO.writeHandler(provider, this.stackHandler));
+	compoundNBT.put("Cosmetics", CuriosNbtIO.writeHandler(provider, this.cosmeticStackHandler));
 
     ListTag nbtTagList = new ListTag();
 
@@ -529,18 +526,19 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   public void applySyncTag(CompoundTag tag) {
 
     if (tag.contains("BaseSize")) {
-      this.baseSize = tag.getInt("BaseSize").orElse(0);
+      this.baseSize = tag.getInt("BaseSize")
+		      .orElse(0);
     }
 
+	var provider = this.itemHandler.getWearer().registryAccess();
+
     if (tag.contains("Stacks")) {
-      this.stackHandler.deserializeNBT(
-          this.itemHandler.getWearer().registryAccess(), tag.getCompound("Stacks")
+	    CuriosNbtIO.readHandler(provider, this.stackHandler, tag.getCompound("Stacks")
               .orElse(new CompoundTag()));
     }
 
     if (tag.contains("Cosmetics")) {
-      this.cosmeticStackHandler.deserializeNBT(
-          this.itemHandler.getWearer().registryAccess(), tag.getCompound("Cosmetics")
+	    CuriosNbtIO.readHandler(provider, this.cosmeticStackHandler, tag.getCompound("Cosmetics")
               .orElse(new CompoundTag()));
     }
 

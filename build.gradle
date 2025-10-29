@@ -49,10 +49,11 @@ neoForge {
     version = project.neoforge_version
     addModdingDependenciesTo sourceSets.test
 
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
+    //parchment {
+    //    mappingsVersion = project.parchment_mappings_version
+    //    minecraftVersion = project.parchment_minecraft_version
+    //}
+
     accessTransformers.from "src/main/resources/META-INF/accesstransformer.cfg"
 
     runs {

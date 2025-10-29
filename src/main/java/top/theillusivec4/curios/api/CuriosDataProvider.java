@@ -36,9 +36,10 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
-import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.data.tags.TagAppender;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
@@ -70,8 +71,7 @@ public abstract class CuriosDataProvider implements DataProvider {
     this.registries = registries;
     this.blockTagsProvider = new CuriosBlockTagsProvider(output, registries, modId);
     this.itemTagsProvider =
-        new CuriosItemTagsProvider(output, registries, this.blockTagsProvider.contentsGetter(),
-                                   modId);
+        new CuriosItemTagsProvider(output, registries, modId);
   }
 
   public abstract void generate(HolderLookup.Provider registries);
@@ -136,21 +136,21 @@ public abstract class CuriosDataProvider implements DataProvider {
                          (k) -> this.entitiesBuilders.getOrDefault(copyId, createEntitiesData()));
   }
 
-  public final IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item> tag(TagKey<Item> tagKey) {
-    return this.itemTagsProvider.tag(tagKey);
-  }
+	public final TagAppender<Item, Item> tag(TagKey<Item> tagKey) {
+		return this.itemTagsProvider.tagPublic(tagKey);
+	}
 
-  public final IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item> tag(String slotId) {
-    return this.itemTagsProvider.tag(
-        TagKey.create(Registries.ITEM, CuriosResources.resource(slotId)));
-  }
+	public final TagAppender<Item, Item> tag(String slotId) {
+		return this.itemTagsProvider.tagPublic(
+				TagKey.create(Registries.ITEM, CuriosResources.resource(slotId)));
+	}
 
-  public final IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item> tag(ISlotData slot) {
-    return this.itemTagsProvider.tag(
-        TagKey.create(Registries.ITEM, CuriosResources.resource(slot.getId())));
-  }
+	public final TagAppender<Item, Item> tag(ISlotData slot) {
+		return this.itemTagsProvider.tagPublic(
+				TagKey.create(Registries.ITEM, CuriosResources.resource(slot.getId())));
+	}
 
-  @Nonnull
+	@Nonnull
   public final String getName() {
     return "Curios for " + this.modId;
   }
@@ -177,32 +177,37 @@ public abstract class CuriosDataProvider implements DataProvider {
     }
   }
 
-  private static class CuriosItemTagsProvider extends ItemTagsProvider {
+	private static class CuriosItemTagsProvider extends IntrinsicHolderTagsProvider<Item> {
 
-    CompletableFuture<HolderLookup.Provider> lookupProvider;
+		private final CompletableFuture<HolderLookup.Provider> lookupProvider;
 
-    public CuriosItemTagsProvider(PackOutput output,
-                                  CompletableFuture<HolderLookup.Provider> lookupProvider,
-                                  CompletableFuture<TagLookup<Block>> blockTags, String modid) {
-      super(output, lookupProvider, blockTags, modid);
-      this.lookupProvider = lookupProvider;
-    }
+		public CuriosItemTagsProvider(PackOutput output,
+		                              CompletableFuture<HolderLookup.Provider> lookupProvider,
+		                              String modid) {
+			super(
+					output,
+					Registries.ITEM,
+					lookupProvider,
+					item -> BuiltInRegistries.ITEM.getResourceKey(item)
+							.orElseThrow(() -> new IllegalStateException("Unregistered item: " + item)),
+					modid
+			);
+			this.lookupProvider = lookupProvider;
+		}
 
-    @Nonnull
-    @Override
-    protected IntrinsicTagAppender<Item> tag(@Nonnull TagKey<Item> tag) {
-      return super.tag(tag);
-    }
+		public TagAppender<Item, Item> tagPublic(TagKey<Item> tag) {
+			return super.tag(tag);
+		}
 
-    @Nonnull
-    @Override
-    protected CompletableFuture<HolderLookup.Provider> createContentsProvider() {
-      return this.lookupProvider;
-    }
+		@Nonnull
+		@Override
+		protected CompletableFuture<HolderLookup.Provider> createContentsProvider() {
+			return this.lookupProvider;
+		}
 
-    @Override
-    protected void addTags(@Nonnull HolderLookup.Provider provider) {
-
-    }
-  }
+		@Override
+		protected void addTags(@Nonnull HolderLookup.Provider provider) {
+			// no-op for Curios; add item tag entries here if needed
+		}
+	}
 }

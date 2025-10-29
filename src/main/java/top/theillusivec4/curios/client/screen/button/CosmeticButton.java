@@ -21,6 +21,7 @@
 package top.theillusivec4.curios.client.screen.button;
 
 import javax.annotation.Nonnull;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -33,6 +34,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 import top.theillusivec4.curios.common.network.client.CPacketToggleCosmetics;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 public class CosmeticButton extends ImageButton implements ICuriosWidget {
 
@@ -49,7 +51,7 @@ public class CosmeticButton extends ImageButton implements ICuriosWidget {
     super(xIn, yIn, widthIn, heightIn, OFF,
           (button) -> {
             parentGui.getMenu().toggleCosmetics();
-            PacketDistributor.sendToServer(
+	          ClientPacketDistributor.sendToServer(
                 new CPacketToggleCosmetics(parentGui.getMenu().containerId));
           });
     this.parentGui = parentGui;
@@ -67,8 +69,8 @@ public class CosmeticButton extends ImageButton implements ICuriosWidget {
     }
     this.setX(this.parentGui.getGuiLeft() - 27);
     this.setY(this.parentGui.getGuiTop() - 18);
-    ResourceLocation resourcelocation = sprites1.get(this.isActive(), this.isHoveredOrFocused());
-    guiGraphics.blitSprite(RenderType::guiTextured, resourcelocation, this.getX(), this.getY(),
-                           this.width, this.height);
+	ResourceLocation sprite = sprites1.get(this.isActive(), this.isHoveredOrFocused());
+	guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, this.getX(), this.getY(), this.width, this.height);
+
   }
 }

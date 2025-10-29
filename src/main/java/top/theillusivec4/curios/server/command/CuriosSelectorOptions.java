@@ -83,8 +83,9 @@ public class CuriosSelectorOptions {
   private static boolean matches(Entity entity, Set<String> slots, int min, int max,
                                  CompoundTag inputStack, boolean invert, boolean exclusive) {
     if (entity instanceof LivingEntity livingEntity) {
-      ItemStack stack =
-          ItemStack.parse(livingEntity.registryAccess(), inputStack).orElse(ItemStack.EMPTY);
+		var ops   = livingEntity.registryAccess().createSerializationContext(NbtOps.INSTANCE);
+	    ItemStack stack = ItemStack.CODEC.parse(ops, inputStack).result().orElse(ItemStack.EMPTY);
+
 
       if (!stack.isEmpty()) {
         stack.setCount(Math.max(1, stack.getCount()));

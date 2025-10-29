@@ -54,6 +54,7 @@ import net.neoforged.neoforge.event.AddAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.GatherSkippedAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.api.CuriosSlotTypes;
@@ -122,7 +123,7 @@ public class CuriosClientEvents {
 
     if (CuriosKeyMappings.OPEN_CURIOS_INVENTORY.consumeClick() && Minecraft.getInstance()
         .isWindowActive()) {
-      PacketDistributor.sendToServer(new CPacketOpenCurios(ItemStack.EMPTY));
+	    ClientPacketDistributor.sendToServer(new CPacketOpenCurios(ItemStack.EMPTY));
     }
   }
 

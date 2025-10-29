@@ -22,12 +22,18 @@ package top.theillusivec4.curios.common.inventory;
 
 import java.util.function.Function;
 import javax.annotation.Nonnull;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.TriState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -95,24 +101,49 @@ public class DynamicStackHandler extends ItemStackHandler implements IDynamicSta
     return ItemStack.EMPTY;
   }
 
-  @Override
-  public void grow(int amount) {
-    this.stacks = getResizedList(this.stacks.size() + amount, this.stacks);
-    this.previousStacks = getResizedList(this.previousStacks.size() + amount, this.previousStacks);
-  }
+	/* ---------- Resizing ---------- */
 
-  @Override
-  public void shrink(int amount) {
-    this.stacks = getResizedList(this.stacks.size() - amount, this.stacks);
-    this.previousStacks = getResizedList(this.previousStacks.size() - amount, this.previousStacks);
-  }
+	// Keep previousStacks in sync whenever the base list size changes
+	@Override
+	public void setSize(int size) {
+		super.setSize(size);
+		this.previousStacks = resizeList(size, this.previousStacks);
+	}
 
-  private static NonNullList<ItemStack> getResizedList(int size, NonNullList<ItemStack> stacks) {
-    NonNullList<ItemStack> newList = NonNullList.withSize(Math.max(0, size), ItemStack.EMPTY);
+	@Override
+	public void grow(int amount) {
+		setSize(this.getSlots() + amount);
+	}
 
-    for (int i = 0; i < newList.size() && i < stacks.size(); i++) {
-      newList.set(i, stacks.get(i));
-    }
-    return newList;
-  }
+	@Override
+	public void shrink(int amount) {
+		setSize(Math.max(0, this.getSlots() - amount));
+	}
+
+	private static NonNullList<ItemStack> resizeList(int size, NonNullList<ItemStack> source) {
+		NonNullList<ItemStack> dst = NonNullList.withSize(Math.max(0, size), ItemStack.EMPTY);
+		for (int i = 0; i < dst.size() && i < source.size(); i++) {
+			dst.set(i, source.get(i));
+		}
+		return dst;
+	}
+
+	/* ---------- Legacy NBT bridge (kept for API compatibility) ---------- */
+
+	@Override
+	public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+		TagValueOutput out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, provider);
+		this.serialize(out);                 // ValueIOSerializable from ItemStackHandler
+		return out.buildResult();
+	}
+
+	@Override
+	public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+		ValueInput in = TagValueInput.create(
+				ProblemReporter.DISCARDING,
+				provider,
+				nbt == null ? new CompoundTag() : nbt
+		);
+		this.deserialize(in);                // ValueIOSerializable from ItemStackHandler
+	}
 }

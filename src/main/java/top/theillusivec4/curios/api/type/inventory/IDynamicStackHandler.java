@@ -85,13 +85,19 @@ public interface IDynamicStackHandler extends IItemHandlerModifiable {
    * Writes the data for this handler.
    *
    * @return A {@link CompoundTag} representing the serialized data
+   *
+   * NOTE: serializeNBT deprecated, bridged used to Value I/O in 1.21.6+
    */
+  @Deprecated
   CompoundTag serializeNBT(HolderLookup.Provider provider);
 
   /**
    * Reads the data into this handler.
    *
    * @param nbt A {@link CompoundTag} representing the serialized data
+   *
+   * NOTE: deserializeNBT deprecated, bridged used to Value I/O in 1.21.6+
    */
+  @Deprecated
   void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt);
 }

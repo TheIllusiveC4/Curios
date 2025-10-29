@@ -58,7 +58,7 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
   }
 
   public void trigger(ServerPlayer serverPlayer, ItemStack stack) {
-    LootParams lootparams = new LootParams.Builder(serverPlayer.serverLevel())
+    LootParams lootparams = new LootParams.Builder(serverPlayer.level())
         .withParameter(LootContextParams.ORIGIN, serverPlayer.blockPosition().getCenter())
         .withParameter(LootContextParams.THIS_ENTITY, serverPlayer)
         .withParameter(LootContextParams.BLOCK_STATE, serverPlayer.getBlockStateOn())
@@ -69,7 +69,7 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
   }
 
   public void trigger(SlotContext slotContext, ServerPlayer serverPlayer, ItemStack stack) {
-    LootParams lootparams = new LootParams.Builder(serverPlayer.serverLevel())
+    LootParams lootparams = new LootParams.Builder(serverPlayer.level())
         .withParameter(LootContextParams.ORIGIN, serverPlayer.blockPosition().getCenter())
         .withParameter(LootContextParams.THIS_ENTITY, serverPlayer)
         .withParameter(LootContextParams.BLOCK_STATE, serverPlayer.getBlockStateOn())
