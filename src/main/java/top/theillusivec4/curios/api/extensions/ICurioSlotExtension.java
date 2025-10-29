@@ -1,11 +1,12 @@
 package top.theillusivec4.curios.api.extensions;
 
-import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.internal.CuriosServices;
+
+import java.util.List;
 
 /**
  * Additional behavior for curio slots. Registration occurs in

@@ -22,10 +22,6 @@ package top.theillusivec4.curios.api.type.capability;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -52,6 +48,11 @@ import top.theillusivec4.curios.api.CuriosSlotTypes;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.common.DropRule;
 import top.theillusivec4.curios.api.type.ISlotType;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
 
 public interface ICurio {
 

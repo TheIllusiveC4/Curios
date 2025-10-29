@@ -21,9 +21,10 @@
 package top.theillusivec4.curios.api.event;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.Set;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
+
+import java.util.Set;
 
 /**
  * This event is fired when the slot size is dynamically changed during gameplay through slot

@@ -4,14 +4,15 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceMaps;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import javax.annotation.Nullable;
 import net.minecraft.world.item.Item;
 import top.theillusivec4.curios.api.extensions.ICurioSlotExtension;
 import top.theillusivec4.curios.api.internal.services.ICuriosExtensions;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
+
+import javax.annotation.Nullable;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 public final class CuriosExtensions implements ICuriosExtensions {
 

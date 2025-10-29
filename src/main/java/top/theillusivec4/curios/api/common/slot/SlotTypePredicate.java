@@ -2,16 +2,17 @@ package top.theillusivec4.curios.api.common.slot;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import top.theillusivec4.curios.api.common.DropRule;
 import top.theillusivec4.curios.api.type.ISlotType;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Record containing data for filtering slot types.

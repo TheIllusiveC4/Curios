@@ -24,11 +24,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import top.theillusivec4.curiostest.CuriosTest;
-import top.theillusivec4.curiostest.common.item.AmuletItem;
-import top.theillusivec4.curiostest.common.item.CrownItem;
-import top.theillusivec4.curiostest.common.item.KnucklesItem;
-import top.theillusivec4.curiostest.common.item.RingItem;
-import top.theillusivec4.curiostest.common.item.TestArmor;
+import top.theillusivec4.curiostest.common.item.*;
 
 public class CuriosTestRegistry {
 

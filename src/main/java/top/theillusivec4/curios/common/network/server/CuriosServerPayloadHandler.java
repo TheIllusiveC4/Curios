@@ -36,12 +36,7 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.inventory.container.CuriosMenu;
 import top.theillusivec4.curios.common.inventory.container.CuriosMenuProvider;
-import top.theillusivec4.curios.common.network.client.CPacketDestroy;
-import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
-import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
-import top.theillusivec4.curios.common.network.client.CPacketPage;
-import top.theillusivec4.curios.common.network.client.CPacketToggleCosmetics;
-import top.theillusivec4.curios.common.network.client.CPacketToggleRender;
+import top.theillusivec4.curios.common.network.client.*;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncRender;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 

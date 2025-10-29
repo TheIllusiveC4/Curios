@@ -25,22 +25,13 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Pair;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -48,6 +39,8 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
@@ -62,7 +55,12 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+import top.theillusivec4.curios.common.util.CuriosNbtIO;
 import top.theillusivec4.curios.impl.CuriosRegistry;
+
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Predicate;
 
 public class CurioInventoryCapability implements ICuriosItemHandler {
 
@@ -462,8 +460,9 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
       ICurioStacksHandler stacksHandler = entry.getValue();
       IDynamicStackHandler stacks = stacksHandler.getStacks();
       IDynamicStackHandler cosmetics = stacksHandler.getCosmeticStacks();
-      tag.put("Stacks", stacks.serializeNBT(this.livingEntity.level().registryAccess()));
-      tag.put("Cosmetics", cosmetics.serializeNBT(this.livingEntity.level().registryAccess()));
+	  var provider = this.livingEntity.level().registryAccess();
+	  tag.put("Stacks", CuriosNbtIO.writeHandler(provider, stacks));
+	  tag.put("Cosmetics", CuriosNbtIO.writeHandler(provider, cosmetics));
       tag.putString("Identifier", entry.getKey());
       taglist.add(tag);
 
@@ -497,13 +496,17 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
           IDynamicStackHandler stacks = stacksHandler.getStacks();
 
           if (!stacksData.isEmpty()) {
-            loaded.deserializeNBT(this.livingEntity.level().registryAccess(), stacksData);
+			var provider = this.livingEntity.level().registryAccess();
+			ValueInput vin = TagValueInput.create(ProblemReporter.DISCARDING, provider, stacksData);
+			loaded.deserialize(vin);
             loadStacks(stacksHandler, loaded, stacks);
           }
           stacksData = tag.getCompound("Cosmetics").orElse(new CompoundTag());
 
           if (!stacksData.isEmpty()) {
-            loaded.deserializeNBT(this.livingEntity.level().registryAccess(), stacksData);
+			var provider = this.livingEntity.level().registryAccess();
+			ValueInput vin = TagValueInput.create(ProblemReporter.DISCARDING, provider, stacksData);
+			loaded.deserialize(vin);
             stacks = stacksHandler.getCosmeticStacks();
             loadStacks(stacksHandler, loaded, stacks);
           }
@@ -676,16 +679,17 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
     }
   }
 
+
   @Override
   public Tag writeTag() {
-    return this.curioInventory.serializeNBT(this.livingEntity.level().registryAccess());
+	  return this.curioInventory.toTag(this.livingEntity.level().registryAccess());
   }
 
   @Override
   public void readTag(Tag nbt) {
 
     if (nbt instanceof CompoundTag tag) {
-      this.curioInventory.deserializeNBT(this.livingEntity.level().registryAccess(), tag);
+	    this.curioInventory.fromTag(this.livingEntity.level().registryAccess(), tag);
     }
   }
 }

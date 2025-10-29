@@ -24,12 +24,11 @@ import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.mojang.datafixers.util.Pair;
-import java.util.Map;
-import java.util.function.Predicate;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.datafix.fixes.References;
@@ -47,6 +46,9 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+
+import java.util.Map;
+import java.util.function.Predicate;
 
 public class CuriosCommonMixinHooks {
 
@@ -164,9 +166,9 @@ public class CuriosCommonMixinHooks {
           ItemStack stack = handler.getStackInSlot(i);
 
           if (!stack.isEmpty()) {
-            CompoundTag tag = new CompoundTag();
-            tag.putByte("Slot", (byte) (4444 + i));
-            list.add(stack.save(livingEntity.registryAccess(), tag));
+			CompoundTag tag = encodeStack(livingEntity.level().registryAccess(), stack);
+			tag.putByte("Slot", (byte) (4444 + i));
+			list.add(tag);
           }
         }
         return compoundTag;
@@ -174,6 +176,13 @@ public class CuriosCommonMixinHooks {
     }
     return compoundTag;
   }
+
+	private static CompoundTag encodeStack(HolderLookup.Provider provider, ItemStack stack) {
+		var ops = provider.createSerializationContext(NbtOps.INSTANCE);
+		var encoded = ItemStack.CODEC.encodeStart(ops, stack)
+				.getOrThrow(err -> new IllegalStateException("Failed to encode ItemStack: " + err));
+		return encoded instanceof CompoundTag c ? c : new CompoundTag();
+	}
 
   public static boolean containsStack(Player player, ItemStack stack) {
     return CuriosApi.getCuriosInventory(player).flatMap(inv -> inv.findFirstCurio(

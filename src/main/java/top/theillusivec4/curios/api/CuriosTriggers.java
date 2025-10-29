@@ -20,11 +20,12 @@
 
 package top.theillusivec4.curios.api;
 
-import javax.annotation.Nonnull;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
+
+import javax.annotation.Nonnull;
 
 public class CuriosTriggers {
 

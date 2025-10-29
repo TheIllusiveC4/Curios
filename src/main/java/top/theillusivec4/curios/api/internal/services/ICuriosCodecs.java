@@ -6,7 +6,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import org.jetbrains.annotations.ApiStatus;
-import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.data.IEntitiesData;
 import top.theillusivec4.curios.api.type.data.ISlotData;

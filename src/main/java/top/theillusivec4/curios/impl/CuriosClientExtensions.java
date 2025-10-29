@@ -1,12 +1,13 @@
 package top.theillusivec4.curios.impl;
 
+import net.minecraft.world.item.Item;
+import top.theillusivec4.curios.api.client.ICurioRenderer;
+import top.theillusivec4.curios.api.internal.services.client.ICuriosClientExtensions;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import net.minecraft.world.item.Item;
-import top.theillusivec4.curios.api.client.ICurioRenderer;
-import top.theillusivec4.curios.api.internal.services.client.ICuriosClientExtensions;
 
 public class CuriosClientExtensions implements ICuriosClientExtensions {
 

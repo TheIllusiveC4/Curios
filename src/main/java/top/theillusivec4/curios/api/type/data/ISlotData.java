@@ -23,8 +23,6 @@ package top.theillusivec4.curios.api.type.data;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -34,6 +32,9 @@ import net.neoforged.neoforge.common.conditions.ICondition;
 import org.jetbrains.annotations.ApiStatus;
 import top.theillusivec4.curios.api.common.DropRule;
 import top.theillusivec4.curios.api.internal.CuriosServices;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Used in data generation to represent the slot data

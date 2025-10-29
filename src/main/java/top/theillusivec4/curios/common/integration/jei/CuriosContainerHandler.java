@@ -20,12 +20,13 @@
 
 package top.theillusivec4.curios.common.integration.jei;
 
-import java.util.List;
-import javax.annotation.Nonnull;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.client.renderer.Rect2i;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 import top.theillusivec4.curios.common.integration.CuriosExclusionAreas;
+
+import javax.annotation.Nonnull;
+import java.util.List;
 
 public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen> {
 

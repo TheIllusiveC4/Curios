@@ -20,9 +20,6 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import javax.annotation.Nonnull;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -31,6 +28,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+
+import javax.annotation.Nonnull;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class SPacketSyncCurios implements CustomPacketPayload {
 

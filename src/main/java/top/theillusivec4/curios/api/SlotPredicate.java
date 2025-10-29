@@ -23,11 +23,12 @@ package top.theillusivec4.curios.api;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.advancements.critereon.MinMaxBounds;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-import net.minecraft.advancements.critereon.MinMaxBounds;
 
 /**
  * Predicate for matching a filter of slots and indices to a particular {@link SlotContext}.

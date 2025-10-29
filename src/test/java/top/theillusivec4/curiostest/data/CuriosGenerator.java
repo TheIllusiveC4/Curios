@@ -1,7 +1,5 @@
 package top.theillusivec4.curiostest.data;
 
-import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.critereon.ItemPredicate;
@@ -17,6 +15,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biomes;
 import top.theillusivec4.curios.api.CuriosTriggers;
 import top.theillusivec4.curios.api.SlotPredicate;
+
+import javax.annotation.Nonnull;
+import java.util.function.Consumer;
 
 public class CuriosGenerator implements AdvancementSubProvider {
 

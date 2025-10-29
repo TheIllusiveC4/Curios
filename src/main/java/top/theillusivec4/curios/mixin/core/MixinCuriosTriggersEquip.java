@@ -20,7 +20,6 @@
 
 package top.theillusivec4.curios.mixin.core;
 
-import java.util.Optional;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.critereon.ItemPredicate;
@@ -33,6 +32,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import top.theillusivec4.curios.api.CuriosTriggers;
 import top.theillusivec4.curios.api.SlotPredicate;
 import top.theillusivec4.curios.common.util.EquipCurioTrigger;
+
+import java.util.Optional;
 
 @Mixin(value = CuriosTriggers.EquipBuilder.class, remap = false)
 public class MixinCuriosTriggersEquip {

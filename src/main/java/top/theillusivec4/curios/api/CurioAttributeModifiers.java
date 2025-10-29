@@ -23,8 +23,6 @@ package top.theillusivec4.curios.api;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.List;
-import java.util.function.BiConsumer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -37,6 +35,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.common.extensions.IHolderExtension;
 import top.theillusivec4.curios.api.common.slot.SlotTypePredicate;
 import top.theillusivec4.curios.api.type.ISlotType;
+
+import java.util.List;
+import java.util.function.BiConsumer;
 
 /**
  * A record used for data component representation of curio attribute modifiers.

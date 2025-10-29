@@ -25,20 +25,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.JsonOps;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.function.Function;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
@@ -64,6 +50,11 @@ import top.theillusivec4.curios.api.type.data.IEntitiesData;
 import top.theillusivec4.curios.api.type.data.ISlotData;
 import top.theillusivec4.curios.common.slot.SlotType;
 import top.theillusivec4.curios.config.CuriosConfig;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.function.Function;
 
 public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonElement> {
 

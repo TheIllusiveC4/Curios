@@ -26,12 +26,7 @@ import top.theillusivec4.curios.common.network.server.SPacketBreak;
 import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
 import top.theillusivec4.curios.common.network.server.SPacketPage;
 import top.theillusivec4.curios.common.network.server.SPacketQuickMove;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActiveState;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncData;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncRender;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
+import top.theillusivec4.curios.common.network.server.sync.*;
 
 public class CuriosClientPayloadHandler {
 

@@ -23,11 +23,6 @@ package top.theillusivec4.curios.client;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.vertex.PoseStack;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -47,23 +42,21 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderArmEvent;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.AttributeTooltipContext;
 import net.neoforged.neoforge.common.util.AttributeUtil;
 import net.neoforged.neoforge.event.AddAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.GatherSkippedAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosResources;
-import top.theillusivec4.curios.api.CuriosSlotTypes;
-import top.theillusivec4.curios.api.CuriosTags;
-import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.*;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
+
+import java.util.*;
 
 public class CuriosClientEvents {
 
@@ -122,7 +115,7 @@ public class CuriosClientEvents {
 
     if (CuriosKeyMappings.OPEN_CURIOS_INVENTORY.consumeClick() && Minecraft.getInstance()
         .isWindowActive()) {
-      PacketDistributor.sendToServer(new CPacketOpenCurios(ItemStack.EMPTY));
+	    ClientPacketDistributor.sendToServer(new CPacketOpenCurios(ItemStack.EMPTY));
     }
   }
 

@@ -24,15 +24,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -43,9 +34,11 @@ import net.neoforged.bus.api.Event;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CurioAttributeModifiers;
-import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.common.slot.SlotTypePredicate;
 import top.theillusivec4.curios.api.type.ISlotType;
+
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * This event is fired when the attributes for curio are queried (for any reason) through

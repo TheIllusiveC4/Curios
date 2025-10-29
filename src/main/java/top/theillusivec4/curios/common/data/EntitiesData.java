@@ -25,10 +25,6 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -39,6 +35,11 @@ import top.theillusivec4.curios.api.CuriosSlotTypes;
 import top.theillusivec4.curios.api.CuriosTags;
 import top.theillusivec4.curios.api.type.data.IEntitiesData;
 import top.theillusivec4.curios.api.type.data.ISlotData;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public class EntitiesData implements IEntitiesData {
 

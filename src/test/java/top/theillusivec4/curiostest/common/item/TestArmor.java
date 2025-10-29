@@ -1,6 +1,5 @@
 package top.theillusivec4.curiostest.common.item;
 
-import javax.annotation.Nonnull;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -12,6 +11,8 @@ import net.minecraft.world.item.equipment.ArmorMaterials;
 import net.minecraft.world.item.equipment.ArmorType;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
+
+import javax.annotation.Nonnull;
 
 public class TestArmor extends Item {
 

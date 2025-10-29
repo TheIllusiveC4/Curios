@@ -1,7 +1,5 @@
 package top.theillusivec4.curios.api.internal.services;
 
-import java.util.Map;
-import java.util.function.BiPredicate;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,6 +9,9 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.data.IEntitiesData;
 import top.theillusivec4.curios.api.type.data.ISlotData;
+
+import java.util.Map;
+import java.util.function.BiPredicate;
 
 @ApiStatus.Internal
 public interface ICuriosSlots {

@@ -30,11 +30,11 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.inventory.Slot;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.lwjgl.glfw.GLFW;
-import top.theillusivec4.curios.config.CuriosClientConfig;
 import top.theillusivec4.curios.client.screen.button.CuriosButton;
 import top.theillusivec4.curios.common.network.client.CPacketDestroy;
+import top.theillusivec4.curios.config.CuriosClientConfig;
 
 public class CuriosScreenEvents {
 
@@ -75,7 +75,7 @@ public class CuriosScreenEvents {
     Slot slot = gui.getSlotUnderMouse();
 
     if (destroyItemSlot != null && slot == destroyItemSlot) {
-      PacketDistributor.sendToServer(new CPacketDestroy());
+	    ClientPacketDistributor.sendToServer(new CPacketDestroy());
     }
   }
 }

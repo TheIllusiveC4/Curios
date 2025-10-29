@@ -21,24 +21,9 @@
 package top.theillusivec4.curios.common.network;
 
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import top.theillusivec4.curios.common.network.client.CPacketDestroy;
-import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
-import top.theillusivec4.curios.common.network.client.CPacketOpenVanilla;
-import top.theillusivec4.curios.common.network.client.CPacketPage;
-import top.theillusivec4.curios.common.network.client.CPacketToggleCosmetics;
-import top.theillusivec4.curios.common.network.client.CPacketToggleRender;
-import top.theillusivec4.curios.common.network.client.CuriosClientPayloadHandler;
-import top.theillusivec4.curios.common.network.server.CuriosServerPayloadHandler;
-import top.theillusivec4.curios.common.network.server.SPacketBreak;
-import top.theillusivec4.curios.common.network.server.SPacketGrabbedItem;
-import top.theillusivec4.curios.common.network.server.SPacketPage;
-import top.theillusivec4.curios.common.network.server.SPacketQuickMove;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncActiveState;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncCurios;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncData;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncRender;
-import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
+import top.theillusivec4.curios.common.network.client.*;
+import top.theillusivec4.curios.common.network.server.*;
+import top.theillusivec4.curios.common.network.server.sync.*;
 
 public class NetworkHandler {
 

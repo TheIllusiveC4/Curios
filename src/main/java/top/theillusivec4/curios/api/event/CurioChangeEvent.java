@@ -20,10 +20,11 @@
 
 package top.theillusivec4.curios.api.event;
 
-import javax.annotation.Nonnull;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
+
+import javax.annotation.Nonnull;
 
 /**
  * {@link CurioChangeEvent} is fired when the curio item of a LivingEntity changes.

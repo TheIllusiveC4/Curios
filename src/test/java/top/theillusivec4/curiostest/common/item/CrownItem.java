@@ -19,9 +19,10 @@
 
 package top.theillusivec4.curiostest.common.item;
 
-import javax.annotation.Nonnull;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+
+import javax.annotation.Nonnull;
 
 public class CrownItem extends Item {
 

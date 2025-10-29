@@ -20,7 +20,6 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
-import javax.annotation.Nonnull;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -29,6 +28,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.CuriosConstants;
+
+import javax.annotation.Nonnull;
 
 public record SPacketSyncStack(int entityId, String curioId, int slotId, ItemStack stack,
                                int handlerType, CompoundTag compoundTag) implements

@@ -1,8 +1,5 @@
 package top.theillusivec4.curios.api;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiPredicate;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -10,6 +7,10 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.loading.FMLLoader;
 import top.theillusivec4.curios.api.internal.CuriosServices;
 import top.theillusivec4.curios.api.type.ISlotType;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiPredicate;
 
 public final class CuriosSlotTypes {
 

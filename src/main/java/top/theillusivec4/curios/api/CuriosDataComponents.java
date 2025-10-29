@@ -1,7 +1,5 @@
 package top.theillusivec4.curios.api;
 
-import java.util.function.UnaryOperator;
-import javax.annotation.Nonnull;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -9,6 +7,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.common.slot.SlotTypePredicate;
 import top.theillusivec4.curios.api.internal.CuriosServices;
+
+import javax.annotation.Nonnull;
+import java.util.function.UnaryOperator;
 
 /**
  * Data components for Curios items and objects.

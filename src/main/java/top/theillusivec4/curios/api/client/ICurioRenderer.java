@@ -24,9 +24,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import com.mojang.math.Axis;
-import java.util.function.Supplier;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -51,6 +48,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.internal.CuriosClientServices;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 /**
  * Logic and data for rendering ItemStack objects found in curio slots on entities.

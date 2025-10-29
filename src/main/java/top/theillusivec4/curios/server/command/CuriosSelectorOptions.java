@@ -22,22 +22,19 @@ package top.theillusivec4.curios.server.command;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import net.minecraft.commands.arguments.selector.options.EntitySelectorOptions;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.TagParser;
+import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class CuriosSelectorOptions {
 
@@ -83,8 +80,9 @@ public class CuriosSelectorOptions {
   private static boolean matches(Entity entity, Set<String> slots, int min, int max,
                                  CompoundTag inputStack, boolean invert, boolean exclusive) {
     if (entity instanceof LivingEntity livingEntity) {
-      ItemStack stack =
-          ItemStack.parse(livingEntity.registryAccess(), inputStack).orElse(ItemStack.EMPTY);
+		var ops   = livingEntity.registryAccess().createSerializationContext(NbtOps.INSTANCE);
+	    ItemStack stack = ItemStack.CODEC.parse(ops, inputStack).result().orElse(ItemStack.EMPTY);
+
 
       if (!stack.isEmpty()) {
         stack.setCount(Math.max(1, stack.getCount()));

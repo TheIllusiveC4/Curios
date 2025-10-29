@@ -22,12 +22,6 @@ package top.theillusivec4.curios.api.type.capability;
 
 import com.google.common.collect.Multimap;
 import com.mojang.logging.LogUtils;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -42,6 +36,13 @@ import org.slf4j.Logger;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public interface ICuriosItemHandler {
 

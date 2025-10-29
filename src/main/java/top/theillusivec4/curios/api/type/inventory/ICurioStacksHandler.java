@@ -20,15 +20,15 @@
 
 package top.theillusivec4.curios.api.type.inventory;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import top.theillusivec4.curios.api.common.DropRule;
-import top.theillusivec4.curios.api.type.capability.ICurio;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 public interface ICurioStacksHandler {
 

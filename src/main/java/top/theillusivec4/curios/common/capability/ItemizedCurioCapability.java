@@ -21,9 +21,6 @@
 package top.theillusivec4.curios.common.capability;
 
 import com.google.common.collect.Multimap;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -40,6 +37,10 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.common.DropRule;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class ItemizedCurioCapability implements ICurio {
 

@@ -23,26 +23,19 @@ package top.theillusivec4.curios.common.capability;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mojang.datafixers.util.Pair;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
-import javax.annotation.Nonnull;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
+import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.CuriosSlotTypes;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.ISlotType;
@@ -51,7 +44,11 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 
-public class CurioInventory implements INBTSerializable<CompoundTag> {
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+public class CurioInventory implements ValueIOSerializable {
+
 
   final Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
   ICuriosItemHandler curiosItemHandler;
@@ -206,7 +203,8 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
         }
       }
       sortedCurios.forEach(
-          (slotType, stacksHandler) -> curios.put(slotType.getId(), stacksHandler));
+          (slotType,
+           stacksHandler) -> curios.put(slotType.getId(), stacksHandler));
       this.curios.putAll(curios);
       this.deserialized = new CompoundTag();
     }
@@ -221,29 +219,39 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
     this.curios.putAll(curios);
   }
 
-  @Override
-  public CompoundTag serializeNBT(@Nonnull HolderLookup.Provider provider) {
-
-    if (!this.deserialized.isEmpty()) {
-      return this.deserialized;
-    }
-    CompoundTag compound = new CompoundTag();
-
-    ListTag taglist = new ListTag();
-    this.curios.forEach(
-        (key, stacksHandler) -> {
-          CompoundTag tag = new CompoundTag();
-          tag.put("StacksHandler", stacksHandler.serializeNBT());
-          tag.putString("Identifier", key);
-          taglist.add(tag);
-        });
-    compound.put("Curios", taglist);
-    return compound;
+  public CompoundTag toTag(HolderLookup.Provider provider) {
+	  TagValueOutput out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, provider);
+	  this.serialize(out);
+	  return out.buildResult();
   }
 
-  @Override
-  public void deserializeNBT(@Nonnull HolderLookup.Provider provider, @Nonnull CompoundTag nbt) {
-    this.deserialized = nbt;
-    this.markDeserialized = true;
+  public void fromTag(HolderLookup.Provider provider, CompoundTag tag) {
+	  this.deserialized = (tag == null) ? new CompoundTag() : tag.copy();
+
+	  ValueInput in = TagValueInput.create(ProblemReporter.DISCARDING, provider, this.deserialized);
+	  this.deserialize(in);
   }
+
+	@Override
+	public void serialize(ValueOutput output) {
+
+		var list = output.childrenList("Curios");
+
+		this.curios.forEach((String key, ICurioStacksHandler stacksHandler) -> {
+			ValueOutput child = list.addChild();
+
+			child.putString("Identifier", key);
+
+			CompoundTag old = stacksHandler.serializeNBT();
+			if (old != null && !old.isEmpty()) {
+
+				child.child("StacksHandler").store(old);
+			}
+		});
+	}
+
+	@Override
+	public void deserialize(@NotNull ValueInput input) {
+		this.markDeserialized = true;
+	}
 }

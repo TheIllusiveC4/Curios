@@ -20,8 +20,6 @@
 
 package top.theillusivec4.curios.mixin.core;
 
-import java.util.function.Predicate;
-import javax.annotation.Nonnull;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -35,6 +33,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import top.theillusivec4.curios.mixin.CuriosCommonMixinHooks;
+
+import javax.annotation.Nonnull;
+import java.util.function.Predicate;
 
 @Mixin(value = Inventory.class, priority = 4)
 public abstract class MixinInventory implements Container {
