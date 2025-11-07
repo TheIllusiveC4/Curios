@@ -60,7 +60,7 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
   public static final CurioAttributeModifiers EMPTY = new CurioAttributeModifiers(List.of(), true);
   public static final Codec<CurioAttributeModifiers> CODEC =
       Codec.withAlternative(FULL_CODEC, Entry.CODEC.listOf(),
-                            list -> new CurioAttributeModifiers(list, true));
+          list -> new CurioAttributeModifiers(list, true));
   public static final StreamCodec<RegistryFriendlyByteBuf, CurioAttributeModifiers>
       STREAM_CODEC = StreamCodec.composite(
       Entry.STREAM_CODEC.apply(ByteBufCodecs.list()),
@@ -88,7 +88,7 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
                                                    AttributeModifier attributeModifier,
                                                    String slotId) {
     return this.withModifierAdded(attribute, attributeModifier,
-                                  SlotTypePredicate.builder().withId(slotId).build());
+        SlotTypePredicate.builder().withId(slotId).build());
   }
 
   public CurioAttributeModifiers withModifierAdded(Holder<Attribute> attribute,
@@ -115,10 +115,11 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
       if (entry.slotType().matches(slotContext.identifier())) {
         AttributeModifier modifier = entry.modifier();
         consumer.accept(entry.attributeHolder(),
-                        new AttributeModifier(
-                            modifier.id().withSuffix("/" + slotContext.identifier()),
-                            modifier.amount(),
-                            modifier.operation()));
+            new AttributeModifier(
+                modifier.id()
+                    .withSuffix("/" + slotContext.identifier() + "/" + slotContext.index()),
+                modifier.amount(),
+                modifier.operation()));
       }
     }
   }
@@ -131,10 +132,10 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
       if (entry.slotType().matches(slotType)) {
         AttributeModifier modifier = entry.modifier();
         consumer.accept(entry.attributeHolder(),
-                        new AttributeModifier(
-                            modifier.id().withSuffix("/" + slotType.getId()),
-                            modifier.amount(),
-                            modifier.operation()));
+            new AttributeModifier(
+                modifier.id().withSuffix("/" + slotType.getId()),
+                modifier.amount(),
+                modifier.operation()));
       }
     }
   }
@@ -165,10 +166,10 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
       if (entry.slotType().matches(slot)) {
         AttributeModifier modifier = entry.modifier();
         consumer.accept(entry.attribute(),
-                        new AttributeModifier(
-                            modifier.id().withSuffix("/" + slot),
-                            modifier.amount(),
-                            modifier.operation()));
+            new AttributeModifier(
+                modifier.id().withSuffix("/" + slot),
+                modifier.amount(),
+                modifier.operation()));
       }
     }
   }
@@ -189,7 +190,7 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
     public Builder addSlotModifier(String slotId, AttributeModifier attributeModifier,
                                    String... slot) {
       this.entries.add(new Entry(SlotAttribute.getOrCreate(slotId), attributeModifier,
-                                 SlotTypePredicate.builder().withId(slot).build()));
+          SlotTypePredicate.builder().withId(slot).build()));
       return this;
     }
 
@@ -208,7 +209,7 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
     public Builder addModifier(Holder<Attribute> attribute, AttributeModifier attributeModifier,
                                String... slot) {
       this.entries.add(new Entry(attribute, attributeModifier,
-                                 SlotTypePredicate.builder().withId(slot).build()));
+          SlotTypePredicate.builder().withId(slot).build()));
       return this;
     }
 

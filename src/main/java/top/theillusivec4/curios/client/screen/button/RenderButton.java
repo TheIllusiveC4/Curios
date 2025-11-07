@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 
@@ -62,7 +62,7 @@ public class RenderButton extends ImageButton implements ICuriosWidget {
     if (!slot.getRenderStatus()) {
       j += 8;
     }
-    guiGraphics.blit(RenderType::guiTextured, this.resourceLocation, this.getX(), this.getY(),
+    guiGraphics.blit(RenderPipelines.GUI_TEXTURED, this.resourceLocation, this.getX(), this.getY(),
                      (float) j, (float) this.yTexStart, this.width, this.height, 256, 256);
   }
 }

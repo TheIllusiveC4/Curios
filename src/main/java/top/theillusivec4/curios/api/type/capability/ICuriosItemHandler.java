@@ -21,7 +21,6 @@
 package top.theillusivec4.curios.api.type.capability;
 
 import com.google.common.collect.Multimap;
-import com.mojang.logging.LogUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,16 +35,16 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import org.slf4j.Logger;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
-public interface ICuriosItemHandler {
-
-  Logger LOGGER = LogUtils.getLogger();
+public interface ICuriosItemHandler extends ValueIOSerializable {
 
   /**
    * A map of the current curios, keyed by the {@link ISlotType} identifier.
@@ -298,7 +297,7 @@ public interface ICuriosItemHandler {
    */
   default void addTransientSlotModifier(String slot, ResourceLocation id, double amount,
                                         AttributeModifier.Operation operation) {
-    LOGGER.error("Missing method implementation!");
+
   }
 
   /**
@@ -322,7 +321,7 @@ public interface ICuriosItemHandler {
    */
   default void addPermanentSlotModifier(String slot, ResourceLocation id, double amount,
                                         AttributeModifier.Operation operation) {
-    LOGGER.error("Missing method implementation!");
+
   }
 
   /**
@@ -339,7 +338,7 @@ public interface ICuriosItemHandler {
    * @param id   id of the {@link AttributeModifier} to remove
    */
   default void removeSlotModifier(String slot, ResourceLocation id) {
-    LOGGER.error("Missing method implementation!");
+
   }
 
   /**
@@ -362,13 +361,24 @@ public interface ICuriosItemHandler {
   Multimap<String, AttributeModifier> getModifiers();
 
   /**
-   * Serializes the curios inventory data
+   * Loads the slot configuration from datapacks and applies it to the curios inventory.
    */
+  void loadDatapacks();
+
+  /**
+   * Serializes the curios inventory data.
+   *
+   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#serialize(ValueOutput)}.
+   */
+  @Deprecated(forRemoval = true, since = "12.0.0")
   Tag writeTag();
 
   /**
-   * Deserializes the curios inventory data
+   * Deserializes the curios inventory data.
+   *
+   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#deserialize(ValueInput)}.
    */
+  @Deprecated(forRemoval = true, since = "12.0.0")
   void readTag(Tag tag);
 
   /**

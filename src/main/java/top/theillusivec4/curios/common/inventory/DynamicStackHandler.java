@@ -22,7 +22,12 @@ package top.theillusivec4.curios.common.inventory;
 
 import java.util.function.Function;
 import javax.annotation.Nonnull;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.util.TriState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -63,33 +68,30 @@ public class DynamicStackHandler extends ItemStackHandler implements IDynamicSta
 
   @Override
   public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-    SlotContext ctx = ctxBuilder.apply(slot);
-    boolean canEquip = (CuriosApi.isStackValid(ctx, stack) &&
-        CuriosApi.getCurio(stack).map(curio -> curio.canEquip(ctx)).orElse(true) &&
-        super.isItemValid(slot, stack));
-    CurioCanEquipEvent event =
-        new CurioCanEquipEvent(stack, ctx, canEquip ? TriState.TRUE : TriState.FALSE);
-    NeoForge.EVENT_BUS.post(event);
-    return event.getEquipResult() != TriState.FALSE;
+    SlotContext ctx = this.ctxBuilder.apply(slot);
+    boolean originalResult = (CuriosApi.isStackValid(ctx, stack)
+        && CuriosApi.getCurio(stack).map(curio -> curio.canEquip(ctx)).orElse(true)
+        && super.isItemValid(slot, stack));
+    CurioCanEquipEvent equipEvent = new CurioCanEquipEvent(stack, ctx, originalResult);
+    NeoForge.EVENT_BUS.post(equipEvent);
+    TriState result = equipEvent.getEquipResult();
+    return (result == TriState.DEFAULT && originalResult) || result == TriState.TRUE;
   }
 
   @Override
   public @Nonnull ItemStack extractItem(int slot, int amount, boolean simulate) {
     ItemStack existing = this.stacks.get(slot);
-    SlotContext ctx = ctxBuilder.apply(slot);
-    CurioCanUnequipEvent unequipEvent = new CurioCanUnequipEvent(existing, ctx);
+    SlotContext ctx = this.ctxBuilder.apply(slot);
+    boolean isCreative = ctx.entity() instanceof Player player && player.isCreative();
+    boolean originalResult = (existing.isEmpty()
+        || isCreative
+        || !EnchantmentHelper.has(existing, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE))
+        && CuriosApi.getCurio(existing).map(curio -> curio.canUnequip(ctx)).orElse(true);
+    CurioCanUnequipEvent unequipEvent = new CurioCanUnequipEvent(existing, ctx, originalResult);
     NeoForge.EVENT_BUS.post(unequipEvent);
     TriState result = unequipEvent.getUnequipResult();
 
-    if (result == TriState.FALSE) {
-      return ItemStack.EMPTY;
-    }
-    boolean isCreative = ctx.entity() instanceof Player player && player.isCreative();
-
-    if (result == TriState.TRUE ||
-        ((existing.isEmpty() || isCreative ||
-            !EnchantmentHelper.has(existing, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE)) &&
-            CuriosApi.getCurio(existing).map(curio -> curio.canUnequip(ctx)).orElse(true))) {
+    if ((result == TriState.DEFAULT && originalResult) || result == TriState.TRUE) {
       return super.extractItem(slot, amount, simulate);
     }
     return ItemStack.EMPTY;
@@ -105,6 +107,45 @@ public class DynamicStackHandler extends ItemStackHandler implements IDynamicSta
   public void shrink(int amount) {
     this.stacks = getResizedList(this.stacks.size() - amount, this.stacks);
     this.previousStacks = getResizedList(this.previousStacks.size() - amount, this.previousStacks);
+  }
+
+  @Override
+  public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+    ListTag nbtTagList = new ListTag();
+
+    for (int i = 0; i < this.stacks.size(); i++) {
+
+      if (!this.stacks.get(i).isEmpty()) {
+        CompoundTag itemTag = new CompoundTag();
+        itemTag.putInt("Slot", i);
+        ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, this.stacks.get(i))
+            .ifSuccess(tag -> itemTag.put("Stack", tag));
+        nbtTagList.add(itemTag);
+      }
+    }
+    CompoundTag nbt = new CompoundTag();
+    nbt.put("Items", nbtTagList);
+    nbt.putInt("Size", this.stacks.size());
+    return nbt;
+  }
+
+  @Override
+  public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+    this.setSize(nbt.getIntOr("Size", this.stacks.size()));
+    nbt.getListOrEmpty("Items").compoundStream().forEach(itemTags -> {
+      int slot = itemTags.getIntOr("Slot", -1);
+
+      if (slot >= 0 && slot < this.stacks.size()) {
+        ItemStack[] stack = {ItemStack.EMPTY};
+        Tag tag = itemTags.get("Stack");
+
+        if (tag != null) {
+          ItemStack.CODEC.decode(NbtOps.INSTANCE, tag).ifSuccess(s -> stack[0] = s.getFirst());
+        }
+        this.stacks.set(slot, stack[0]);
+      }
+    });
+    this.onLoad();
   }
 
   private static NonNullList<ItemStack> getResizedList(int size, NonNullList<ItemStack> stacks) {

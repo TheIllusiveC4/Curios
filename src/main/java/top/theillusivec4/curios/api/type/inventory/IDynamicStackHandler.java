@@ -24,9 +24,12 @@ import javax.annotation.Nonnull;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
-public interface IDynamicStackHandler extends IItemHandlerModifiable {
+public interface IDynamicStackHandler extends IItemHandlerModifiable, ValueIOSerializable {
 
   /**
    * Sets a {@link ItemStack} to the given slot index as the current stack.
@@ -37,7 +40,7 @@ public interface IDynamicStackHandler extends IItemHandlerModifiable {
   void setStackInSlot(int slot, @Nonnull ItemStack stack);
 
   /**
-   * Gets the {@link ItemStack} assigned as the current stack in the given slot index
+   * Gets the {@link ItemStack} assigned as the current stack in the given slot index.
    *
    * @param slot The slot index
    * @return The {@link ItemStack} assigned as the current stack
@@ -55,7 +58,7 @@ public interface IDynamicStackHandler extends IItemHandlerModifiable {
   void setPreviousStackInSlot(int slot, @Nonnull ItemStack stack);
 
   /**
-   * Gets the {@link ItemStack} assigned as the previous stack in the given slot index
+   * Gets the {@link ItemStack} assigned as the previous stack in the given slot index.
    *
    * @param slot The slot index
    * @return The {@link ItemStack} assigned as the previous stack
@@ -63,14 +66,14 @@ public interface IDynamicStackHandler extends IItemHandlerModifiable {
   ItemStack getPreviousStackInSlot(int slot);
 
   /**
-   * @return The total number of slots
+   * @return The total number of slots.
    */
   int getSlots();
 
   /**
    * Increases the number of slots by the given amount.
    *
-   * @param amount The number of slots to add
+   * @param amount The number of slots to add.
    */
   void grow(int amount);
 
@@ -84,14 +87,22 @@ public interface IDynamicStackHandler extends IItemHandlerModifiable {
   /**
    * Writes the data for this handler.
    *
-   * @return A {@link CompoundTag} representing the serialized data
+   * @return A {@link CompoundTag} representing the serialized data.
+   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#serialize(ValueOutput)}.
    */
-  CompoundTag serializeNBT(HolderLookup.Provider provider);
+  @Deprecated(forRemoval = true, since = "12.0.0")
+  default CompoundTag serializeNBT(HolderLookup.Provider provider) {
+    return new CompoundTag();
+  }
 
   /**
    * Reads the data into this handler.
    *
-   * @param nbt A {@link CompoundTag} representing the serialized data
+   * @param nbt A {@link CompoundTag} representing the serialized data.
+   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#deserialize(ValueInput)}.
    */
-  void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt);
+  @Deprecated(forRemoval = true, since = "12.0.0")
+  default void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+
+  }
 }

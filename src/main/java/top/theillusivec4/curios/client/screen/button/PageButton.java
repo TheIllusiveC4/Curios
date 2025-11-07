@@ -20,15 +20,19 @@
 
 package top.theillusivec4.curios.client.screen.button;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 import top.theillusivec4.curios.common.network.client.CPacketPage;
@@ -44,7 +48,7 @@ public class PageButton extends Button implements ICuriosWidget {
   public PageButton(CuriosScreen parentGui, int xIn, int yIn, int widthIn, int heightIn,
                     Type type) {
     super(xIn, yIn, widthIn, heightIn, CommonComponents.EMPTY,
-          (button) -> PacketDistributor.sendToServer(
+          (button) -> ClientPacketDistributor.sendToServer(
               new CPacketPage(parentGui.getMenu().containerId, type == Type.NEXT)),
           DEFAULT_NARRATION);
     this.parentGui = parentGui;
@@ -71,12 +75,17 @@ public class PageButton extends Button implements ICuriosWidget {
     }
 
     if (this.isHovered()) {
-      guiGraphics.renderTooltip(Minecraft.getInstance().font,
-                                Component.translatable("gui.curios.page",
-                                                       this.parentGui.getMenu().currentPage + 1,
-                                                       this.parentGui.getMenu().totalPages), x, y);
+      List<ClientTooltipComponent> tooltip = new ArrayList<>();
+      int currentPage = this.parentGui.getMenu().currentPage + 1;
+      int totalPages = this.parentGui.getMenu().totalPages;
+      tooltip.add(
+          ClientTooltipComponent.create(
+              Component.translatable("gui.curios.page", currentPage, totalPages)
+                  .getVisualOrderText()));
+      guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltip, x, y,
+                                DefaultTooltipPositioner.INSTANCE, null);
     }
-    guiGraphics.blit(RenderType::guiTextured, CURIO_INVENTORY, this.getX(), this.getY(), xText,
+    guiGraphics.blit(RenderPipelines.GUI_TEXTURED, CURIO_INVENTORY, this.getX(), this.getY(), xText,
                      yText, this.width, this.height, 256, 256);
   }
 

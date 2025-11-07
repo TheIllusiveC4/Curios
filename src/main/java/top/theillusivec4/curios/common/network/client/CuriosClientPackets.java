@@ -41,6 +41,7 @@ import top.theillusivec4.curios.api.type.ICuriosMenu;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
+import top.theillusivec4.curios.common.capability.CurioInventory;
 import top.theillusivec4.curios.common.data.CuriosSlotResources;
 import top.theillusivec4.curios.common.inventory.CurioStacksHandler;
 import top.theillusivec4.curios.common.inventory.container.CuriosMenu;
@@ -54,6 +55,7 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncData;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncRender;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
+import top.theillusivec4.curios.impl.CuriosRegistry;
 
 public class CuriosClientPackets {
 
@@ -183,21 +185,22 @@ public class CuriosClientPackets {
     if (world != null) {
       Entity entity = world.getEntity(data.entityId);
 
-      if (entity instanceof LivingEntity) {
-        CuriosApi.getCuriosInventory((LivingEntity) entity)
+      if (entity instanceof LivingEntity livingEntity) {
+        CuriosApi.getCuriosInventory(livingEntity)
             .ifPresent(handler -> {
               Map<String, ICurioStacksHandler> stacks = new LinkedHashMap<>();
+              CurioInventory inventory = livingEntity.getData(CuriosRegistry.INVENTORY.get());
 
               for (Map.Entry<String, CompoundTag> entry : data.map.entrySet()) {
                 ICurioStacksHandler stacksHandler =
-                    new CurioStacksHandler(handler, entry.getKey());
+                    new CurioStacksHandler(inventory, entry.getKey());
                 stacksHandler.applySyncTag(entry.getValue());
                 stacks.put(entry.getKey(), stacksHandler);
               }
               handler.setCurios(stacks);
 
-              if (entity instanceof LocalPlayer localPlayer &&
-                  localPlayer.containerMenu instanceof ICuriosMenu curiosContainer) {
+              if (entity instanceof LocalPlayer localPlayer
+                  && localPlayer.containerMenu instanceof ICuriosMenu curiosContainer) {
                 curiosContainer.resetSlots();
               }
             });

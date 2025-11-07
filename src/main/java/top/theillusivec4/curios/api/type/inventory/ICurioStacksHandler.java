@@ -27,10 +27,12 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import top.theillusivec4.curios.api.common.DropRule;
-import top.theillusivec4.curios.api.type.capability.ICurio;
 
-public interface ICurioStacksHandler {
+public interface ICurioStacksHandler extends ValueIOSerializable {
 
   /**
    * Gets the {@link IDynamicStackHandler} for the equipped curio stacks.
@@ -98,6 +100,13 @@ public interface ICurioStacksHandler {
   int getSlots();
 
   /**
+   * Gets the base number of slots for equipped curio stacks, before slot modifiers are applied.
+   *
+   * @return The base number of slots for equipped curio stacks.
+   */
+  int getBaseSize();
+
+  /**
    * Gets whether this stack handler should be visible. This does not lock the stack handler
    * from being used regardless.
    *
@@ -116,16 +125,24 @@ public interface ICurioStacksHandler {
   /**
    * Writes the data for this handler.
    *
-   * @return A {@link CompoundTag} representing the serialized data
+   * @return A {@link CompoundTag} representing the serialized data.
+   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#serialize(ValueOutput)}.
    */
-  CompoundTag serializeNBT();
+  @Deprecated(forRemoval = true, since = "12.0.0")
+  default CompoundTag serializeNBT() {
+    return new CompoundTag();
+  }
 
   /**
    * Reads the data into this handler.
    *
-   * @param nbt A {@link CompoundTag} representing the serialized data
+   * @param nbt A {@link CompoundTag} representing the serialized data.
+   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#deserialize(ValueInput)}.
    */
-  void deserializeNBT(CompoundTag nbt);
+  @Deprecated(forRemoval = true, since = "12.0.0")
+  default void deserializeNBT(CompoundTag nbt) {
+
+  }
 
   /**
    * Retrieves the slot identifier associated with the handler.
@@ -155,6 +172,7 @@ public interface ICurioStacksHandler {
    *
    * @return A set of {@link AttributeModifier}
    */
+  @Deprecated(forRemoval = true, since = "12.0.0")
   Set<AttributeModifier> getCachedModifiers();
 
   /**
@@ -201,6 +219,7 @@ public interface ICurioStacksHandler {
    * Primarily for internal use, used as a workaround to avoid calculating slot stacks before slot
    * modifiers are initially applied.
    */
+  @Deprecated(forRemoval = true, since = "12.0.0")
   void clearCachedModifiers();
 
   /**
@@ -220,7 +239,9 @@ public interface ICurioStacksHandler {
    *
    * @return The data represented as a {@link CompoundTag}
    */
-  CompoundTag getSyncTag();
+  default CompoundTag getSyncTag() {
+    return new CompoundTag();
+  }
 
   /**
    * Applies the NBT data synced to clients.
@@ -229,5 +250,7 @@ public interface ICurioStacksHandler {
    *
    * @param tag The data represented as a {@link CompoundTag}
    */
-  void applySyncTag(CompoundTag tag);
+  default void applySyncTag(CompoundTag tag) {
+
+  }
 }

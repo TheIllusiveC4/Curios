@@ -29,7 +29,6 @@ import java.util.function.Predicate;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.datafix.fixes.References;
@@ -165,8 +164,9 @@ public class CuriosCommonMixinHooks {
 
           if (!stack.isEmpty()) {
             CompoundTag tag = new CompoundTag();
+            tag.store(ItemStack.MAP_CODEC, stack);
             tag.putByte("Slot", (byte) (4444 + i));
-            list.add(stack.save(livingEntity.registryAccess(), tag));
+            list.add(tag);
           }
         }
         return compoundTag;
@@ -188,6 +188,7 @@ public class CuriosCommonMixinHooks {
   }
 
   public static boolean contains(Player player, Predicate<ItemStack> predicate) {
-    return CuriosApi.getCuriosInventory(player).flatMap(inv -> inv.findFirstCurio(predicate)).isPresent();
+    return CuriosApi.getCuriosInventory(player).flatMap(inv -> inv.findFirstCurio(predicate))
+        .isPresent();
   }
 }

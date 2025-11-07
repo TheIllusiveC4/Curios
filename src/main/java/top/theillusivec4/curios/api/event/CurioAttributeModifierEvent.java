@@ -43,7 +43,6 @@ import net.neoforged.bus.api.Event;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CurioAttributeModifiers;
-import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.common.slot.SlotTypePredicate;
 import top.theillusivec4.curios.api.type.ISlotType;
 
@@ -205,6 +204,20 @@ public class CurioAttributeModifierEvent extends Event {
   }
 
   /**
+   * Removes a single modifier for the given attribute.
+   *
+   * @param attribute Attribute.
+   * @param modifier  Modifier instance.
+   * @return True if an attribute was removed, false if no change.
+   * @deprecated Use {@link #removeModifier(Holder, ResourceLocation)} instead to avoid needing
+   *     a specific modifier instance.
+   */
+  @Deprecated(forRemoval = true)
+  public boolean removeModifier(Holder<Attribute> attribute, AttributeModifier modifier) {
+    return this.removeModifier(attribute, modifier.id());
+  }
+
+  /**
    * Adds a new attribute modifier to the given stack, optionally replacing any existing modifiers
    * with the same id.
    *
@@ -343,20 +356,6 @@ public class CurioAttributeModifierEvent extends Event {
   }
 
   /**
-   * Removes a single modifier for the given attribute.
-   *
-   * @param attribute Attribute.
-   * @param modifier  Modifier instance.
-   * @return True if an attribute was removed, false if no change.
-   * @deprecated Use {@link #removeModifier(Holder, ResourceLocation)} instead to avoid needing
-   *     a specific modifier instance.
-   */
-  @Deprecated(forRemoval = true)
-  public boolean removeModifier(Holder<Attribute> attribute, AttributeModifier modifier) {
-    return this.removeModifier(attribute, modifier.id());
-  }
-
-  /**
    * Removes all modifiers for the given attribute.
    *
    * @param attribute Attribute.
@@ -451,6 +450,7 @@ public class CurioAttributeModifierEvent extends Event {
      *
      * @return The previous modifier, or null if there was no previous modifier with the same id.
      */
+    @SuppressWarnings("UnusedReturnValue")
     @Nullable
     CurioAttributeModifiers.Entry replaceModifier(Holder<Attribute> attribute,
                                                   AttributeModifier modifier,

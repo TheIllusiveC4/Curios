@@ -6,7 +6,6 @@
   "mixins": [
     "AccessorEntity",
     "MixinApplyBonusCount",
-    "MixinCuriosTriggers",
     "MixinCuriosTriggersEquip",
     "MixinEnchantedCountIncreaseFunction",
     "MixinInventory",

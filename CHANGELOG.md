@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 to [Semantic Versioning](http://semver.org/spec/v2.0.0.html). Prior to version 5.2.0, this projected
 used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [12.0.0+1.21.8] - 2026.02.16
+
+### Added
+- Added new constructors for `CurioCanEquipEvent`, `CurioCanUnequipEvent`, and `CurioChangeEvent`
+- Added `ICuriosItemHandler#loadDatapacks`
+
+### Changed
+- `ICuriosItemHandler`, `ICurioStacksHandler`, and `IDynamicStackHandler` now extend `ValueIOSerializable`
+
+### Deprecated
+
+- Deprecated old constructors for `CurioCanEquipEvent`, `CurioCanUnequipEvent`, and `CurioChangeEvent`
+- Deprecated tag-based serialization and deserialization methods:
+  - `serializeNBT` and `deserializeNBT` in `IDynamicStackHandler`
+  - `serializeNBT` and `deserializeNBT` in `ICurioStacksHandler`
+  - `writeTag` and `readTag` in `IDynamicStackHandler`
+
 ## [11.0.1+1.21.5] - 2025.05.17
 
 ### Fixed
@@ -15,7 +32,7 @@ used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/con
 ## [11.0.0+1.21.5] - 2025.05.15
 
 ### Changed
-- 
+
 - Updated to Minecraft 1.21.5
 
 ## [10.0.0+1.21.4] - 2025.05.15
@@ -25,19 +42,20 @@ guide.
 
 ### Added
 
-- Added ways for developers to listen to state changes (when an item is the same) and differentiate them from item changes:
-  - `CurioChangeEvent` is now abstract, with added `CurioChangeEvent.Item` and `CurioChangeEvent.State` subclasses
-  - `onStateChange` method added to `ICurio` and `ICurioItem`
+- Added ways for developers to listen to state changes (when an item is the same) and differentiate them from item
+  changes:
+    - `CurioChangeEvent` is now abstract, with added `CurioChangeEvent.Item` and `CurioChangeEvent.State` subclasses
+    - `onStateChange` method added to `ICurio` and `ICurioItem`
 - A new preset slot type, `feet`, has been added with an included default icon
 - Added slot type predicates for more advanced checking in `CurioAttributeModifier`
 - Added new data generation options, including the ability to generate tags within the same provider as the Curios data
 - Added `curios:player_like` entity type tag, with entries for players and armor stands
 - Added `entities` field to slot type data files for marking default entity types to add the slot type to automatically,
-without needing a corresponding `curios/entities` file
+  without needing a corresponding `curios/entities` file
 - Added the ability to create slots directly inside `curios/entities` data files, without needing a corresponding
-`curios/slots` file
+  `curios/slots` file
 - Added `curios:generic_exclusions` item tag for declaring curio items that should not be equipable into the generic
-`curio` slot by default
+  `curio` slot by default
 - Added preset slot type constants and tags to `CuriosSlotTypes` and `CuriosTags` respectively
 
 ### Changed

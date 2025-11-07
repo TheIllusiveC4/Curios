@@ -35,19 +35,19 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
-import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.common.data.BlockTagCopyingItemTagProvider;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import top.theillusivec4.curios.api.internal.CuriosServices;
 import top.theillusivec4.curios.api.type.data.IEntitiesData;
 import top.theillusivec4.curios.api.type.data.ISlotData;
 
 /**
- * Basic data generator for curios slots and entities
+ * Basic data generator for curios slots and entities.
  */
 public abstract class CuriosDataProvider implements DataProvider {
 
@@ -57,7 +57,6 @@ public abstract class CuriosDataProvider implements DataProvider {
   private final String modId;
   private final Map<String, ISlotData> slotBuilders = new ConcurrentHashMap<>();
   private final Map<String, IEntitiesData> entitiesBuilders = new ConcurrentHashMap<>();
-  private final CuriosBlockTagsProvider blockTagsProvider;
   private final CuriosItemTagsProvider itemTagsProvider;
 
   public CuriosDataProvider(String modId, PackOutput output,
@@ -68,9 +67,10 @@ public abstract class CuriosDataProvider implements DataProvider {
     this.slotsPathProvider =
         output.createPathProvider(PackOutput.Target.DATA_PACK, "curios/slots");
     this.registries = registries;
-    this.blockTagsProvider = new CuriosBlockTagsProvider(output, registries, modId);
+    CuriosBlockTagsProvider blockTagsProvider =
+        new CuriosBlockTagsProvider(output, registries, modId);
     this.itemTagsProvider =
-        new CuriosItemTagsProvider(output, registries, this.blockTagsProvider.contentsGetter(),
+        new CuriosItemTagsProvider(output, registries, blockTagsProvider.contentsGetter(),
                                    modId);
   }
 
@@ -136,16 +136,16 @@ public abstract class CuriosDataProvider implements DataProvider {
                          (k) -> this.entitiesBuilders.getOrDefault(copyId, createEntitiesData()));
   }
 
-  public final IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item> tag(TagKey<Item> tagKey) {
+  public final TagAppender<Item, Item> tag(TagKey<Item> tagKey) {
     return this.itemTagsProvider.tag(tagKey);
   }
 
-  public final IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item> tag(String slotId) {
+  public final TagAppender<Item, Item> tag(String slotId) {
     return this.itemTagsProvider.tag(
         TagKey.create(Registries.ITEM, CuriosResources.resource(slotId)));
   }
 
-  public final IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item> tag(ISlotData slot) {
+  public final TagAppender<Item, Item> tag(ISlotData slot) {
     return this.itemTagsProvider.tag(
         TagKey.create(Registries.ITEM, CuriosResources.resource(slot.getId())));
   }
@@ -177,7 +177,7 @@ public abstract class CuriosDataProvider implements DataProvider {
     }
   }
 
-  private static class CuriosItemTagsProvider extends ItemTagsProvider {
+  private static class CuriosItemTagsProvider extends BlockTagCopyingItemTagProvider {
 
     CompletableFuture<HolderLookup.Provider> lookupProvider;
 
@@ -190,7 +190,7 @@ public abstract class CuriosDataProvider implements DataProvider {
 
     @Nonnull
     @Override
-    protected IntrinsicTagAppender<Item> tag(@Nonnull TagKey<Item> tag) {
+    protected TagAppender<Item, Item> tag(@Nonnull TagKey<Item> tag) {
       return super.tag(tag);
     }
 

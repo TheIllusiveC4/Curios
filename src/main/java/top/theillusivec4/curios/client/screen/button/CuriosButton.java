@@ -20,7 +20,6 @@
 
 package top.theillusivec4.curios.client.screen.button;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -30,11 +29,9 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
-import top.theillusivec4.curios.api.CuriosApi;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
@@ -70,7 +67,7 @@ public class CuriosButton extends ImageButton {
                 inventoryScreen.xMouse = curiosScreen.oldMouseX;
                 inventoryScreen.yMouse = curiosScreen.oldMouseY;
                 mc.player.inventoryMenu.setCarried(stack);
-                PacketDistributor.sendToServer(new CPacketOpenVanilla(stack));
+                ClientPacketDistributor.sendToServer(new CPacketOpenVanilla(stack));
               } else {
 
                 if (parentGui instanceof InventoryScreen inventory) {
@@ -80,7 +77,7 @@ public class CuriosButton extends ImageButton {
                     recipeBookGui.toggleVisibility();
                   }
                 }
-                PacketDistributor.sendToServer(new CPacketOpenCurios(stack));
+                ClientPacketDistributor.sendToServer(new CPacketOpenCurios(stack));
               }
             }
           });

@@ -250,7 +250,8 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
                   if (create && slotType == null) {
                     SlotType.Builder slotBuilder = new SlotType.Builder(key);
                     slotBuilder.apply(slotEntry.slot(), this.registryAccess);
-                    slotType = slotMap.put(key, slotBuilder);
+                    slotType = slotBuilder;
+                    slotMap.put(key, slotBuilder);
                   }
 
                   if (slotType != null) {

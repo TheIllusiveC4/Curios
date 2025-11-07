@@ -58,7 +58,7 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
   }
 
   public void trigger(ServerPlayer serverPlayer, ItemStack stack) {
-    LootParams lootparams = new LootParams.Builder(serverPlayer.serverLevel())
+    LootParams lootparams = new LootParams.Builder(serverPlayer.level())
         .withParameter(LootContextParams.ORIGIN, serverPlayer.blockPosition().getCenter())
         .withParameter(LootContextParams.THIS_ENTITY, serverPlayer)
         .withParameter(LootContextParams.BLOCK_STATE, serverPlayer.getBlockStateOn())
@@ -69,7 +69,7 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
   }
 
   public void trigger(SlotContext slotContext, ServerPlayer serverPlayer, ItemStack stack) {
-    LootParams lootparams = new LootParams.Builder(serverPlayer.serverLevel())
+    LootParams lootparams = new LootParams.Builder(serverPlayer.level())
         .withParameter(LootContextParams.ORIGIN, serverPlayer.blockPosition().getCenter())
         .withParameter(LootContextParams.THIS_ENTITY, serverPlayer)
         .withParameter(LootContextParams.BLOCK_STATE, serverPlayer.getBlockStateOn())
@@ -101,13 +101,13 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
     public boolean matches(SlotContext slotContext, ItemStack stack, LootContext lootContext) {
       Vec3 vec3 = lootContext.getParameter(LootContextParams.ORIGIN);
 
-      if (slotContext != null &&
-          this.slot().map(slotPredicate -> !slotPredicate.matches(slotContext)).orElse(false)) {
+      if (slotContext != null
+          && this.slot().map(slotPredicate -> !slotPredicate.matches(slotContext)).orElse(false)) {
         return false;
       }
 
-      if (this.location.isEmpty() ||
-          this.location.get().matches(lootContext.getLevel(), vec3.x, vec3.y, vec3.z)) {
+      if (this.location.isEmpty()
+          || this.location.get().matches(lootContext.getLevel(), vec3.x, vec3.y, vec3.z)) {
         return this.item.isEmpty() || this.item.get().test(stack);
       }
       return false;
