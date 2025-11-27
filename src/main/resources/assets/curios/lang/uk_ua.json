@@ -14,7 +14,7 @@
   "commands.curios.dropAll.success": "Викинуто предмети зі всіх слотів для %s",
   "commands.curios.reset.success": "Слоти для %s скинуто",
   "commands.curios.replace.success": "Слот %s замінено для %s %s",
-  "argument.entity.options.curios.description": "Інвентар Curios сутності",
+  "argument.entity.options.curios.description": "Інвентар Curios сутности",
   "argument.curios.type.unknown": "Невідомий сувенірний слот, типу %s",
   "curios.identifier.curio": "Сувенір",
   "curios.identifier.necklace": "Намисто",
