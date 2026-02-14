@@ -87,7 +87,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
   public CuriosMenu(int windowId, Inventory playerInventory) {
     super(CuriosRegistry.CURIO_MENU.get(), windowId, 2, 2);
     this.player = playerInventory.player;
-    this.isLocalWorld = this.player.level().isClientSide;
+    this.isLocalWorld = this.player.level().isClientSide();
     this.curiosHandler = CuriosApi.getCuriosInventory(this.player).orElse(null);
     this.resetSlots();
   }
@@ -292,7 +292,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
     super.removed(playerIn);
     this.craftResult.clearContent();
 
-    if (!playerIn.level().isClientSide) {
+    if (!playerIn.level().isClientSide()) {
       this.clearContainer(playerIn, this.craftMatrix);
     }
   }

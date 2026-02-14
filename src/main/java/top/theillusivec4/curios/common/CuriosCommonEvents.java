@@ -308,7 +308,7 @@ public class CuriosCommonEvents {
   public void playerXPPickUp(PlayerXpEvent.PickupXp evt) {
     Player player = evt.getEntity();
 
-    if (!player.level().isClientSide) {
+    if (!player.level().isClientSide()) {
       CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
         Map<String, ICurioStacksHandler> curios = handler.getCurios();
         for (ICurioStacksHandler stacksHandler : curios.values()) {
@@ -501,7 +501,7 @@ public class CuriosCommonEvents {
               currentCurio.ifPresent(curio -> curio.curioTick(slotContext));
             }
 
-            if (!livingEntity.level().isClientSide) {
+            if (!livingEntity.level().isClientSide()) {
               ItemStack prevStack = stackHandler.getPreviousStackInSlot(i);
 
               if (!ItemStack.matches(stack, prevStack)) {

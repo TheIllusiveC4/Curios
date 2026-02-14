@@ -106,9 +106,9 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
       if (renderState instanceof HumanoidRenderState humanoidRenderState) {
         amuletModel.setupAnim(humanoidRenderState);
       }
-      VertexConsumer vertexconsumer = ItemRenderer
-          .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(AMULET_TEXTURE),
-                              stack.hasFoil());
+      VertexConsumer vertexconsumer =
+          ItemRenderer.getFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(AMULET_TEXTURE),
+                                     false, stack.hasFoil());
       (amuletModel)
           .renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
     }

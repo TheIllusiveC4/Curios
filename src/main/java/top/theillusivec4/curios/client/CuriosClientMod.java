@@ -6,13 +6,15 @@ import java.util.List;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelType;
+import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -47,6 +49,7 @@ public class CuriosClientMod {
   }
 
   private void registerKeys(final RegisterKeyMappingsEvent evt) {
+    evt.registerCategory(CuriosKeyMappings.CURIOS_KEY_CATEGORY);
     evt.register(CuriosKeyMappings.OPEN_CURIOS_INVENTORY);
   }
 
@@ -74,11 +77,11 @@ public class CuriosClientMod {
       }
     }
 
-    for (PlayerSkin.Model skin : evt.getSkins()) {
-      EntityRenderer<? extends Player, ?> renderer = evt.getSkin(skin);
+    for (PlayerModelType skin : evt.getSkins()) {
+      AvatarRenderer<?> avatarRenderer = evt.getPlayerRenderer(skin);
 
-      if (renderer instanceof LivingEntityRenderer livingRenderer) {
-        livingRenderer.addLayer(new CuriosLayer<>(livingRenderer, context));
+      if (avatarRenderer != null) {
+        avatarRenderer.addLayer(new CuriosLayer<>(avatarRenderer, context));
       }
     }
     CuriosClientExtensions.loadRenderers();

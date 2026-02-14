@@ -24,7 +24,7 @@ public class CrownRenderer implements ICurioRenderer.HumanoidRender {
   }
 
   @Override
-  public HumanoidModel<? extends HumanoidRenderState> getModel(ItemStack stack,
+  public HumanoidModel<HumanoidRenderState> getModel(ItemStack stack,
                                                                SlotContext slotContext) {
     return this.model;
   }

@@ -57,7 +57,6 @@ public class CurioInventory implements ValueIOSerializable {
   Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
   NonNullList<ItemStack> invalidStacks = NonNullList.create();
   Set<ICurioStacksHandler> updates = new HashSet<>();
-  boolean dataLoaded = false;
 
   final Cache<String, Pair<Long, Optional<SlotResult>>> firstCurioCache =
       CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.SECONDS).build();

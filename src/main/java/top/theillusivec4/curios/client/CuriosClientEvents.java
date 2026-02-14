@@ -32,8 +32,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -79,7 +79,7 @@ public class CuriosClientEvents {
           entityRenderer = mc.getEntityRenderDispatcher().getRenderer(clientPlayer);
       EntityRenderState renderState = entityRenderer.createRenderState();
 
-      if (renderState instanceof PlayerRenderState playerRenderState) {
+      if (renderState instanceof AvatarRenderState avatarRenderState) {
         CuriosApi.getCuriosInventory(clientPlayer)
             .ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {
               IDynamicStackHandler stackHandler = stacksHandler.getStacks();
@@ -104,8 +104,8 @@ public class CuriosClientEvents {
                       slotContext,
                       evt.getArm(),
                       poseStack,
-                      evt.getMultiBufferSource(),
-                      playerRenderState,
+                      evt.getSubmitNodeCollector(),
+                      avatarRenderState,
                       evt.getPlayer(),
                       evt.getPackedLight()
                   );
@@ -213,7 +213,7 @@ public class CuriosClientEvents {
     Map<String, ISlotType> map =
         player != null
         ? CuriosSlotTypes.getItemSlotTypes(stack, player)
-        : CuriosSlotTypes.getItemSlotTypes(stack, FMLLoader.getDist().isClient());
+        : CuriosSlotTypes.getItemSlotTypes(stack, FMLLoader.getCurrent().getDist().isClient());
 
     for (Map.Entry<String, ISlotType> entry : map.entrySet()) {
       ISlotType slotType = entry.getValue();

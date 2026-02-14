@@ -14,7 +14,7 @@ import top.theillusivec4.curios.api.type.ISlotType;
 public final class CuriosSlotTypes {
 
   public static ISlotType getSlotType(String id) {
-    return getSlotType(id, FMLLoader.getDist().isClient());
+    return getSlotType(id, FMLLoader.getCurrent().getDist().isClient());
   }
 
   public static ISlotType getSlotType(String id, boolean isClient) {
@@ -22,7 +22,7 @@ public final class CuriosSlotTypes {
   }
 
   public static Map<String, ISlotType> getSlotTypes() {
-    return getSlotTypes(FMLLoader.getDist().isClient());
+    return getSlotTypes(FMLLoader.getCurrent().getDist().isClient());
   }
 
   public static Map<String, ISlotType> getSlotTypes(boolean isClient) {

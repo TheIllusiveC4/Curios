@@ -22,9 +22,13 @@ package top.theillusivec4.curios.client;
 
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
+import top.theillusivec4.curios.api.CuriosResources;
 
 public class CuriosKeyMappings {
 
+  public static final KeyMapping.Category CURIOS_KEY_CATEGORY = new KeyMapping.Category(
+      CuriosResources.resource("key.curios.category"));
+
   public static final KeyMapping OPEN_CURIOS_INVENTORY =
-      new KeyMapping("key.curios.open.desc", GLFW.GLFW_KEY_G, "key.curios.category");
+      new KeyMapping("key.curios.open.desc", GLFW.GLFW_KEY_G, CURIOS_KEY_CATEGORY);
 }

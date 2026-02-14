@@ -25,6 +25,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
@@ -46,13 +47,12 @@ public class CuriosLayer<S extends LivingEntityRenderState, M extends EntityMode
   }
 
   @Override
-  public void render(
-      PoseStack poseStack,
-      @Nonnull MultiBufferSource bufferSource,
-      int packedLight,
-      S renderState,
-      float vertRot,
-      float horizRot) {
+  public void submit(@Nonnull PoseStack poseStack,
+                     @Nonnull SubmitNodeCollector nodeCollector,
+                     int packedLight,
+                     @Nonnull S renderState,
+                     float vertRot,
+                     float horizRot) {
     poseStack.pushPose();
     List<SlotResult> slots =
         renderState.getRenderDataOrDefault(CuriosClientMod.CUSTOM_RENDER, List.of());
@@ -62,7 +62,7 @@ public class CuriosLayer<S extends LivingEntityRenderState, M extends EntityMode
           slot.stack(),
           slot.slotContext(),
           poseStack,
-          bufferSource,
+          nodeCollector,
           packedLight,
           renderState,
           this.renderLayerParent,

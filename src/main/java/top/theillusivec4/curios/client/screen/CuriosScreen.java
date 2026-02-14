@@ -37,6 +37,8 @@ import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.CraftingRecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -288,12 +290,12 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
+  public boolean keyPressed(@Nonnull KeyEvent event) {
 
-    if (super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_)) {
+    if (super.keyPressed(event)) {
       return true;
     } else if (CuriosKeyMappings.OPEN_CURIOS_INVENTORY.isActiveAndMatches(
-        InputConstants.getKey(p_keyPressed_1_, p_keyPressed_2_))) {
+        InputConstants.getKey(event))) {
       LocalPlayer playerEntity = this.getMinecraft().player;
 
       if (playerEntity != null) {
@@ -493,13 +495,13 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  public boolean mouseReleased(double mouseReleased1, double mouseReleased3, int mouseReleased5) {
+  public boolean mouseReleased(@Nonnull MouseButtonEvent event) {
 
     if (this.buttonClicked) {
       this.buttonClicked = false;
       return true;
     } else {
-      return super.mouseReleased(mouseReleased1, mouseReleased3, mouseReleased5);
+      return super.mouseReleased(event);
     }
   }
 

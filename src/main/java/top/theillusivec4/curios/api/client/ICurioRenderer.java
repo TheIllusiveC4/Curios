@@ -31,19 +31,21 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
-import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -137,12 +139,14 @@ public interface ICurioRenderer {
    * @param xRotation         The x-rotation of the render state.
    * @param <S>               The class for the entity's render state.
    * @param <M>               The class for the entity's model.
+   * @deprecated As of 13.0.0, use {@link ICurioRenderer#render(ItemStack, SlotContext, PoseStack, SubmitNodeCollector, int, LivingEntityRenderState, RenderLayerParent, EntityRendererProvider.Context, float, float)}
    */
+  @Deprecated
   default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void render(
       ItemStack stack,
       SlotContext slotContext,
       PoseStack poseStack,
-      @Nonnull MultiBufferSource renderTypeBuffer,
+      MultiBufferSource renderTypeBuffer,
       int packedLight,
       S renderState,
       RenderLayerParent<S, M> renderLayerParent,
@@ -150,6 +154,38 @@ public interface ICurioRenderer {
       float yRotation,
       float xRotation) {
     // NO-OP
+  }
+
+  /**
+   * Renders an ItemStack in a given SlotContext on an entity.
+   *
+   * @param stack               The ItemStack being rendered.
+   * @param slotContext         The SlotContext for the slot that the item is found in.
+   * @param poseStack           The PoseStack containing the current transformations.
+   * @param submitNodeCollector The node collector for submitting.
+   * @param packedLight         The packed light for rendering.
+   * @param renderState         The render state of the entity used for this rendering instance.
+   * @param renderLayerParent   The parent rendering layer and model from the entity.
+   * @param context             The rendering context provided by the entity render layer.
+   * @param yRotation           The y-rotation of the render state.
+   * @param xRotation           The x-rotation of the render state.
+   * @param <S>                 The class for the entity's render state.
+   * @param <M>                 The class for the entity's model.
+   */
+  default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void render(
+      ItemStack stack,
+      SlotContext slotContext,
+      PoseStack poseStack,
+      SubmitNodeCollector submitNodeCollector,
+      int packedLight,
+      S renderState,
+      RenderLayerParent<S, M> renderLayerParent,
+      EntityRendererProvider.Context context,
+      float yRotation,
+      float xRotation) {
+    this.render(stack, slotContext, poseStack,
+                Minecraft.getInstance().renderBuffers().bufferSource(), packedLight, renderState,
+                renderLayerParent, context, yRotation, xRotation);
   }
 
   /**
@@ -164,22 +200,22 @@ public interface ICurioRenderer {
    * current transformations applied to the arm are already applied in the PoseStack before this
    * method is called.
    *
-   * @param stack             The ItemStack being rendered.
-   * @param arm               The player's arm being rendered.
-   * @param slotContext       The SlotContext for the slot that the item is found in.
-   * @param poseStack         The PoseStack containing the current transformations.
-   * @param renderTypeBuffer  The buffer for rendering.
-   * @param playerRenderState The render state of the player being rendered.
-   * @param clientPlayer      The player being rendered.
-   * @param packedLight       The packed light for rendering.
+   * @param stack               The ItemStack being rendered.
+   * @param arm                 The player's arm being rendered.
+   * @param slotContext         The SlotContext for the slot that the item is found in.
+   * @param poseStack           The PoseStack containing the current transformations.
+   * @param submitNodeCollector The submit node collector.
+   * @param avatarRenderState   The render state of the player being rendered.
+   * @param clientPlayer        The player being rendered.
+   * @param packedLight         The packed light for rendering.
    */
   default void renderFirstPersonHand(
       ItemStack stack,
       SlotContext slotContext,
       HumanoidArm arm,
       PoseStack poseStack,
-      MultiBufferSource renderTypeBuffer,
-      PlayerRenderState playerRenderState,
+      SubmitNodeCollector submitNodeCollector,
+      AvatarRenderState avatarRenderState,
       AbstractClientPlayer clientPlayer,
       int packedLight) {
     // NO-OP
@@ -194,9 +230,11 @@ public interface ICurioRenderer {
    * @param renderTypeBuffer The buffer for rendering.
    * @param packedLight      The packed light for rendering.
    * @param glintRender      The render type of the enchantment glint overlay, or null to disable.
+   * @deprecated model As of 13.0.0, use {@link net.minecraft.client.renderer.OrderedSubmitNodeCollector#submitModel(Model, Object, PoseStack, RenderType, int, int, int, TextureAtlasSprite, int, ModelFeatureRenderer.CrumblingOverlay)}
    */
+  @Deprecated(forRemoval = true, since = "13.0.0")
   static void renderModel(
-      Model model,
+      Model<?> model,
       ResourceLocation textureLocation,
       PoseStack poseStack,
       MultiBufferSource renderTypeBuffer,
@@ -237,29 +275,10 @@ public interface ICurioRenderer {
   }
 
   /**
-   * Applies {@link HumanoidModel#copyPropertiesTo(HumanoidModel)} from the second model to the
-   * first model. This is useful for copying the xyz-coordinates, scaling, and rotations from
-   * all the parts of a humanoid model to another.
-   *
-   * <p>Although the parameter is a {@link EntityModel}, this is primarily to avoid casting issues
-   * when used by implementations of this interface. The model must be a child of
-   * {@link HumanoidModel} or else the method will do nothing.
-   *
-   * @param model       The original model.
-   * @param modelToCopy The model to copy the properties onto the original model.
-   */
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  static void copyHumanoidProperties(HumanoidModel<?> model, EntityModel<?> modelToCopy) {
-
-    if (modelToCopy instanceof HumanoidModel humanoidModel) {
-      humanoidModel.copyPropertiesTo(model);
-    }
-  }
-
-  /**
    * Renderer that uses a {@link Model} for rendering.
    */
-  interface ModelRender<L extends Model> extends ICurioRenderer {
+  interface ModelRender<S extends LivingEntityRenderState, M extends EntityModel<? super S>>
+      extends ICurioRenderer {
 
     /**
      * Returns the model used for rendering from an item in a slot.
@@ -267,7 +286,7 @@ public interface ICurioRenderer {
      * @param stack       The item used for rendering.
      * @param slotContext The context of the slot used for rendering.
      */
-    L getModel(ItemStack stack, SlotContext slotContext);
+    M getModel(ItemStack stack, SlotContext slotContext);
 
     /**
      * Returns the texture location used for rendering on the model from an item in a slot.
@@ -279,40 +298,63 @@ public interface ICurioRenderer {
 
     /**
      * Renders the model after all adjustments have been made in
-     * {@link ModelRender#prepareModel(ItemStack, SlotContext, PoseStack, MultiBufferSource, int,
+     * {@link ModelRender#prepareModel(ItemStack, SlotContext, PoseStack, SubmitNodeCollector, int,
      * LivingEntityRenderState, RenderLayerParent, EntityRendererProvider.Context, float, float)}.
      *
      * <p>Enchantment glints will be rendered if {@link ItemStack#hasFoil()} returns true.
      */
-    default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void renderModel(
+    default void renderModel(
         ItemStack stack,
         SlotContext slotContext,
         PoseStack poseStack,
-        MultiBufferSource renderTypeBuffer,
+        SubmitNodeCollector submitNodeCollector,
         int packedLight,
         S renderState,
         RenderLayerParent<S, M> renderLayerParent,
         EntityRendererProvider.Context context,
         float yRotation,
         float xRotation) {
-      ICurioRenderer.renderModel(
-          this.getModel(stack, slotContext),
-          this.getModelTexture(stack, slotContext),
-          poseStack,
-          renderTypeBuffer,
-          packedLight,
-          stack.hasFoil() ? RenderType.entityGlint() : null);
+      M model = this.getModel(stack, slotContext);
+      submitNodeCollector
+          .order(1)
+          .submitModel(
+              model,
+              renderState,
+              poseStack,
+              RenderType.armorCutoutNoCull(this.getModelTexture(stack, slotContext)),
+              packedLight,
+              OverlayTexture.NO_OVERLAY,
+              0,
+              null,
+              renderState.outlineColor,
+              null);
+
+      if (stack.hasFoil()) {
+        submitNodeCollector
+            .order(2)
+            .submitModel(
+                model,
+                renderState,
+                poseStack,
+                RenderType.armorEntityGlint(),
+                packedLight,
+                OverlayTexture.NO_OVERLAY,
+                0,
+                null,
+                renderState.outlineColor,
+                null);
+      }
     }
 
     /**
      * Prepares the model for rendering, including adjusting model properties and
      * translations/rotations.
      */
-    default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void prepareModel(
+    default void prepareModel(
         ItemStack stack,
         SlotContext slotContext,
         PoseStack poseStack,
-        MultiBufferSource renderTypeBuffer,
+        SubmitNodeCollector submitNodeCollector,
         int packedLight,
         S renderState,
         RenderLayerParent<S, M> renderLayerParent,
@@ -321,96 +363,38 @@ public interface ICurioRenderer {
         float xRotation) {
       // NO-OP
     }
-
-    @Override
-    default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void render(
-        ItemStack stack,
-        SlotContext slotContext,
-        PoseStack poseStack,
-        @Nonnull MultiBufferSource renderTypeBuffer,
-        int packedLight,
-        S renderState,
-        RenderLayerParent<S, M> renderLayerParent,
-        EntityRendererProvider.Context context,
-        float yRotation,
-        float xRotation) {
-      this.prepareModel(
-          stack,
-          slotContext,
-          poseStack,
-          renderTypeBuffer,
-          packedLight,
-          renderState,
-          renderLayerParent,
-          context,
-          yRotation,
-          xRotation);
-      this.renderModel(
-          stack,
-          slotContext,
-          poseStack,
-          renderTypeBuffer,
-          packedLight,
-          renderState,
-          renderLayerParent,
-          context,
-          yRotation,
-          xRotation);
-    }
   }
 
-  /**
-   * Renderer that uses a {@link HumanoidModel} for rendering.
-   *
-   * <p>The default methods will call {@link #copyHumanoidProperties(HumanoidModel, EntityModel)}
-   * and {@link #setupHumanoidAnimations(EntityModel, LivingEntityRenderState)} on the model
-   * before rendering.
-   *
-   * <p>This also implements
-   * {@link #renderFirstPersonHand(ItemStack, SlotContext, HumanoidArm, PoseStack,
-   * MultiBufferSource, PlayerRenderState, AbstractClientPlayer, int)} with the same rendering that
-   * is performed in {@link #render(ItemStack, SlotContext, PoseStack, MultiBufferSource, int,
-   * LivingEntityRenderState, RenderLayerParent, EntityRendererProvider.Context, float, float)}.
-   */
-  interface HumanoidRender extends ModelRender<HumanoidModel<? extends HumanoidRenderState>> {
+  //  /**
+//   * Renderer that uses a {@link HumanoidModel} for rendering.
+//   *
+//   * <p>The default methods will call {@link #copyHumanoidProperties(HumanoidModel, EntityModel)}
+//   * and {@link #setupHumanoidAnimations(EntityModel, LivingEntityRenderState)} on the model
+//   * before rendering.
+//   *
+//   * <p>This also implements
+//   * {@link #renderFirstPersonHand(ItemStack, SlotContext, HumanoidArm, PoseStack,
+//   * MultiBufferSource, AvatarRenderState, AbstractClientPlayer, int)} with the same rendering that
+//   * is performed in {@link #render(ItemStack, SlotContext, PoseStack, MultiBufferSource, int,
+//   * LivingEntityRenderState, RenderLayerParent, EntityRendererProvider.Context, float, float)}.
+//   */
+  interface HumanoidRender
+      extends ModelRender<HumanoidRenderState, EntityModel<HumanoidRenderState>> {
 
     @Override
-    default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void prepareModel(
+    default void prepareModel(
         ItemStack stack,
         SlotContext slotContext,
         PoseStack poseStack,
-        MultiBufferSource renderTypeBuffer,
+        SubmitNodeCollector submitNodeCollector,
         int packedLight,
-        S renderState,
-        RenderLayerParent<S, M> renderLayerParent,
+        HumanoidRenderState renderState,
+        RenderLayerParent<HumanoidRenderState, EntityModel<HumanoidRenderState>> renderLayerParent,
         EntityRendererProvider.Context context,
         float yRotation,
         float xRotation) {
-      HumanoidModel<? extends HumanoidRenderState> model = this.getModel(stack, slotContext);
-      M parentModel = renderLayerParent.getModel();
-      ICurioRenderer.copyHumanoidProperties(model, parentModel);
+      EntityModel<HumanoidRenderState> model = this.getModel(stack, slotContext);
       ICurioRenderer.setupHumanoidAnimations(model, renderState);
-    }
-
-    @Override
-    default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void renderModel(
-        ItemStack stack,
-        SlotContext slotContext,
-        PoseStack poseStack,
-        MultiBufferSource renderTypeBuffer,
-        int packedLight,
-        S renderState,
-        RenderLayerParent<S, M> renderLayerParent,
-        EntityRendererProvider.Context context,
-        float yRotation,
-        float xRotation) {
-      ICurioRenderer.renderModel(
-          this.getModel(stack, slotContext),
-          this.getModelTexture(stack, slotContext),
-          poseStack,
-          renderTypeBuffer,
-          packedLight,
-          stack.hasFoil() ? RenderType.armorEntityGlint() : null);
     }
 
     @Override
@@ -418,20 +402,42 @@ public interface ICurioRenderer {
                                        SlotContext slotContext,
                                        HumanoidArm arm,
                                        PoseStack poseStack,
-                                       MultiBufferSource renderTypeBuffer,
-                                       PlayerRenderState playerRenderState,
+                                       SubmitNodeCollector submitNodeCollector,
+                                       AvatarRenderState avatarRenderState,
                                        AbstractClientPlayer clientPlayer,
                                        int packedLight) {
-      HumanoidModel<? extends HumanoidRenderState> model = this.getModel(stack, slotContext);
-      ICurioRenderer.setupHumanoidAnimations(model, playerRenderState);
+      EntityModel<HumanoidRenderState> model = this.getModel(stack, slotContext);
+      ICurioRenderer.setupHumanoidAnimations(model, avatarRenderState);
       model.resetPose();
-      ICurioRenderer.renderModel(
-          this.getModel(stack, slotContext),
-          this.getModelTexture(stack, slotContext),
-          poseStack,
-          renderTypeBuffer,
-          packedLight,
-          stack.hasFoil() ? RenderType.armorEntityGlint() : null);
+      submitNodeCollector
+          .order(1)
+          .submitModel(
+              model,
+              avatarRenderState,
+              poseStack,
+              RenderType.armorCutoutNoCull(this.getModelTexture(stack, slotContext)),
+              packedLight,
+              OverlayTexture.NO_OVERLAY,
+              0,
+              null,
+              avatarRenderState.outlineColor,
+              null);
+
+      if (stack.hasFoil()) {
+        submitNodeCollector
+            .order(2)
+            .submitModel(
+                model,
+                avatarRenderState,
+                poseStack,
+                RenderType.armorEntityGlint(),
+                packedLight,
+                OverlayTexture.NO_OVERLAY,
+                0,
+                null,
+                avatarRenderState.outlineColor,
+                null);
+      }
     }
   }
 
@@ -467,57 +473,6 @@ public interface ICurioRenderer {
 
       if (entityModel instanceof HumanoidModel<?> humanoidModel) {
         matrixStack.mulPose(Axis.XP.rotation(humanoidModel.body.xRot));
-      }
-    }
-  }
-
-  /**
-   * Rotates the rendering for the model renderers based on the entity's head movement. This will
-   * align the model renderers with the movements and rotations of the head. This will do nothing
-   * if the entity render object does not implement {@link LivingEntityRenderer} or if the model
-   * does not have a head (does not implement {@link HumanoidModel}).
-   *
-   * @param livingEntity The wearer of the curio
-   * @param renderers    The list of model renderers to align to the head movement
-   * @deprecated Use {@link #setupHumanoidAnimations(EntityModel, LivingEntityRenderState)} instead
-   *     for a more robust and complete method to apply all transformations from an entity.
-   */
-  @Deprecated(forRemoval = true)
-  static void followHeadRotations(final LivingEntity livingEntity,
-                                  final ModelPart... renderers) {
-    EntityModel<LivingEntityRenderState> entityModel = getModelFromEntity(livingEntity);
-
-    if (entityModel instanceof HumanoidModel<?> humanoidModel) {
-
-      for (ModelPart renderer : renderers) {
-        renderer.copyFrom(humanoidModel.head);
-      }
-    }
-  }
-
-  /**
-   * Rotates the rendering for the models based on the entity's poses and movements. This will do
-   * nothing if the entity render object does not implement {@link LivingEntityRenderer} or if the
-   * model does not implement {@link HumanoidModel}).
-   *
-   * @param livingEntity The wearer of the curio
-   * @param models       The list of models to align to the body movement
-   * @deprecated Use {@link #setupHumanoidAnimations(EntityModel, LivingEntityRenderState)} instead
-   *     for a more robust and complete method to apply all transformations from an entity.
-   */
-  @Deprecated(forRemoval = true)
-  @SafeVarargs
-  @SuppressWarnings("unchecked")
-  static void followBodyRotations(final LivingEntity livingEntity,
-                                  final HumanoidModel<HumanoidRenderState>... models) {
-    EntityModel<LivingEntityRenderState> entityModel = getModelFromEntity(livingEntity);
-
-    if (entityModel instanceof HumanoidModel<?> humanoidModel) {
-
-      for (HumanoidModel<HumanoidRenderState> model : models) {
-        HumanoidModel<HumanoidRenderState> bipedModel =
-            (HumanoidModel<HumanoidRenderState>) humanoidModel;
-        bipedModel.copyPropertiesTo(model);
       }
     }
   }

@@ -132,7 +132,8 @@ public final class CuriosApi {
     if (livingEntity != null) {
       results.putAll(CuriosSlotTypes.getItemSlotTypes(stack, livingEntity));
     } else {
-      results.putAll(CuriosSlotTypes.getItemSlotTypes(stack, FMLLoader.getDist().isClient()));
+      results.putAll(CuriosSlotTypes.getItemSlotTypes(
+          stack, FMLLoader.getCurrent().getDist().isClient()));
     }
     return results.containsKey(id);
   }

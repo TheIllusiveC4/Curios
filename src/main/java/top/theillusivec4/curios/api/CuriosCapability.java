@@ -24,6 +24,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.capabilities.EntityCapability;
 import net.neoforged.neoforge.capabilities.ItemCapability;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
@@ -37,11 +39,14 @@ public class CuriosCapability {
       EntityCapability.createVoid(ID_INVENTORY, ICuriosItemHandler.class);
 
   /**
-   * An {@link IItemHandler} capability that can be accessed by external mods without requiring
-   * a dependency on Curios or this class.
+   * An {@link ResourceHandler} capability using {@link ItemResource} that can be accessed by
+   * external mods without requiring a dependency on Curios or this class.
+   * <br>
+   * For legacy code that expects an {@link IItemHandler} instance, use
+   * {@link IItemHandler#of(ResourceHandler)} as a wrapper for this capability.
    */
-  public static final EntityCapability<IItemHandler, Void> ITEM_HANDLER =
-      EntityCapability.createVoid(ID_ITEM_HANDLER, IItemHandler.class);
+  public static final EntityCapability<ResourceHandler<ItemResource>, Void> ITEM_HANDLER =
+      EntityCapability.createVoid(ID_ITEM_HANDLER, ResourceHandler.asClass());
 
   public static final ItemCapability<ICurio, Void> ITEM =
       ItemCapability.createVoid(ID_ITEM, ICurio.class);

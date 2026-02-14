@@ -21,6 +21,7 @@
 package top.theillusivec4.curios.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -62,9 +63,9 @@ public class CuriosScreenEvents {
 
   @SubscribeEvent
   public void preMouseClick(final ScreenEvent.MouseButtonPressed.Pre evt) {
-    long handle = Minecraft.getInstance().getWindow().getWindow();
-    boolean isLeftShiftDown = InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT);
-    boolean isRightShiftDown = InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);
+    Window window = Minecraft.getInstance().getWindow();
+    boolean isLeftShiftDown = InputConstants.isKeyDown(window, GLFW.GLFW_KEY_LEFT_SHIFT);
+    boolean isRightShiftDown = InputConstants.isKeyDown(window, GLFW.GLFW_KEY_RIGHT_SHIFT);
     boolean isShiftDown = isLeftShiftDown || isRightShiftDown;
 
     if (!(evt.getScreen() instanceof CreativeModeInventoryScreen gui) || !isShiftDown

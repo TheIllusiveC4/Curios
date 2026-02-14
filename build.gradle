@@ -108,6 +108,10 @@ task apiJar(type: Jar) {
     from sourceSets.main.output
 }
 
+test {
+    failOnNoDiscoveredTests = false
+}
+
 sourcesJar {
     from(rootProject.file("LICENSE"))
     from(rootProject.file("COPYING"))
@@ -129,10 +133,10 @@ artifacts {
 }
 
 dependencies {
-    compileOnly "mezz.jei:jei-1.21-neoforge-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
 //    localRuntime "mezz.jei:jei-1.21-neoforge:${jei_version}"
 
-    compileOnly "dev.emi:emi-neoforge:${emi_version}"
+//    compileOnly "dev.emi:emi-neoforge:${emi_version}"
 //    localRuntime "dev.emi:emi-neoforge:${emi_version}"
 
     compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${rei_version}"
@@ -258,7 +262,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     apiToken = "${System.getenv('CURSEFORGE_KEY')}"
     //debugMode = true
     def projectId = "${cf_id}".toString()
-    def mainFile = upload(projectId, file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+    def mainFile = upload(projectId, file("${project.layout.buildDirectory.get()}/libs/${base.archivesName.get()}-${version}.jar"))
     mainFile.changelogType = 'markdown'
     mainFile.changelog = file('CHANGELOG_LATEST.md')
     mainFile.releaseType = "${release_type}"
@@ -281,10 +285,10 @@ modrinth {
     token = "${System.getenv('MODRINTH_KEY')}" ?: ""
     //debugMode = true
     projectId = "${modrinth_id}"
-    versionName = getArchivesBaseName() + "-" + getVersion()
+    versionName = "${base.archivesName.get()}-${version}"
     versionType = "${release_type}"
     changelog = file('CHANGELOG_LATEST.md').text
-    uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    uploadFile = file("${project.layout.buildDirectory.get()}/libs/${base.archivesName.get()}-${version}.jar")
     additionalFiles = [sourcesJar, apiJar]
     loaders = ["neoforge"]
     gameVersions = "${release_versions}".split(",") as List<String>
