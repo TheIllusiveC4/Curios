@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
@@ -298,7 +298,7 @@ public interface ICuriosItemHandler extends ValueIOSerializable {
    * @param amount    Amount for the attribute modifier
    * @param operation Operation for the attribute modifier
    */
-  default void addTransientSlotModifier(String slot, ResourceLocation id, double amount,
+  default void addTransientSlotModifier(String slot, Identifier id, double amount,
                                         AttributeModifier.Operation operation) {
 
   }
@@ -322,7 +322,7 @@ public interface ICuriosItemHandler extends ValueIOSerializable {
    * @param amount    Amount for the attribute modifier
    * @param operation Operation for the attribute modifier
    */
-  default void addPermanentSlotModifier(String slot, ResourceLocation id, double amount,
+  default void addPermanentSlotModifier(String slot, Identifier id, double amount,
                                         AttributeModifier.Operation operation) {
 
   }
@@ -340,7 +340,7 @@ public interface ICuriosItemHandler extends ValueIOSerializable {
    * @param slot Identifier of the {@link ISlotType} to remove the modifier from
    * @param id   id of the {@link AttributeModifier} to remove
    */
-  default void removeSlotModifier(String slot, ResourceLocation id) {
+  default void removeSlotModifier(String slot, Identifier id) {
 
   }
 

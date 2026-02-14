@@ -30,7 +30,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -141,7 +141,7 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
   }
 
   @Deprecated(forRemoval = true)
-  public CurioAttributeModifiers withModifierAdded(ResourceLocation attribute,
+  public CurioAttributeModifiers withModifierAdded(Identifier attribute,
                                                    AttributeModifier attributeModifier,
                                                    String slot) {
     ImmutableList.Builder<Entry> builder =
@@ -159,7 +159,7 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
   }
 
   @Deprecated(forRemoval = true)
-  public void forEach(String slot, BiConsumer<ResourceLocation, AttributeModifier> consumer) {
+  public void forEach(String slot, BiConsumer<Identifier, AttributeModifier> consumer) {
 
     for (Entry entry : this.modifiers) {
 
@@ -260,7 +260,7 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
     }
 
     @Deprecated(forRemoval = true)
-    public Entry(ResourceLocation attribute, AttributeModifier modifier, String slot) {
+    public Entry(Identifier attribute, AttributeModifier modifier, String slot) {
       this.attributeHolder = BuiltInRegistries.ATTRIBUTE.get(attribute)
           .map(IHolderExtension::getDelegate).orElse(Attributes.ARMOR);
       this.modifier = modifier;
@@ -280,7 +280,7 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
     }
 
     @Deprecated(forRemoval = true)
-    public ResourceLocation attribute() {
+    public Identifier attribute() {
       return BuiltInRegistries.ATTRIBUTE.getKey(this.attributeHolder.value());
     }
 

@@ -40,7 +40,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.RandomSource;
@@ -547,7 +547,7 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
   @Override
   public void addTransientSlotModifier(
-      String slot, ResourceLocation id, double amount, AttributeModifier.Operation operation) {
+      String slot, Identifier id, double amount, AttributeModifier.Operation operation) {
     Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
     map.put(slot, new AttributeModifier(id, amount, operation));
     this.addTransientSlotModifiers(map);
@@ -571,7 +571,7 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
   @Override
   public void addPermanentSlotModifier(
-      String slot, ResourceLocation id, double amount, AttributeModifier.Operation operation) {
+      String slot, Identifier id, double amount, AttributeModifier.Operation operation) {
     Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
     map.put(slot, new AttributeModifier(id, amount, operation));
     this.addPermanentSlotModifiers(map);
@@ -594,7 +594,7 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
   }
 
   @Override
-  public void removeSlotModifier(String slot, ResourceLocation id) {
+  public void removeSlotModifier(String slot, Identifier id) {
     Multimap<String, AttributeModifier> map = LinkedHashMultimap.create();
     map.put(slot, new AttributeModifier(id, 0, AttributeModifier.Operation.ADD_VALUE));
     this.removeSlotModifiers(map);
@@ -624,7 +624,7 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
     }
   }
 
-  private static final ResourceLocation SIZE_SHIFT = CuriosResources.resource("size_shift");
+  private static final Identifier SIZE_SHIFT = CuriosResources.resource("size_shift");
 
   @Override
   public void clearCachedSlotModifiers() {

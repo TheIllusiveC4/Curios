@@ -85,7 +85,7 @@ public class CuriosButton extends ImageButton {
   }
 
   @Override
-  public void renderWidget(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
+  public void renderContents(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
                            float partialTicks) {
     Tuple<Integer, Integer> offsets =
         CuriosScreen.getButtonOffset(parentGui instanceof CreativeModeInventoryScreen);
@@ -101,6 +101,6 @@ public class CuriosButton extends ImageButton {
         return;
       }
     }
-    super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+    super.renderContents(guiGraphics, mouseX, mouseY, partialTicks);
   }
 }

@@ -31,7 +31,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPosition
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
@@ -41,8 +41,8 @@ public class PageButton extends Button implements ICuriosWidget {
 
   private final CuriosScreen parentGui;
   private final Type type;
-  private static final ResourceLocation CURIO_INVENTORY =
-      ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID,
+  private static final Identifier CURIO_INVENTORY =
+      Identifier.fromNamespaceAndPath(CuriosConstants.MOD_ID,
                                             "textures/gui/curios/inventory.png");
 
   public PageButton(CuriosScreen parentGui, int xIn, int yIn, int widthIn, int heightIn,
@@ -56,7 +56,7 @@ public class PageButton extends Button implements ICuriosWidget {
   }
 
   @Override
-  public void renderWidget(@Nonnull GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+  public void renderContents(@Nonnull GuiGraphics guiGraphics, int x, int y, float partialTicks) {
     int xText = type == Type.NEXT ? 43 : 32;
     int yText = 25;
 

@@ -1,7 +1,7 @@
 package top.theillusivec4.curiostest.common.item;
 
 import javax.annotation.Nonnull;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -15,8 +15,8 @@ import top.theillusivec4.curios.api.CuriosApi;
 
 public class TestArmor extends Item {
 
-  private static final ResourceLocation ARMOR_ID =
-      ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "armor");
+  private static final Identifier ARMOR_ID =
+      Identifier.fromNamespaceAndPath(CuriosConstants.MOD_ID, "armor");
 
   public TestArmor(Properties pProperties) {
     super(pProperties.humanoidArmor(ArmorMaterials.GOLD, ArmorType.CHESTPLATE));

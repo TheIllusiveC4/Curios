@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 
@@ -33,8 +33,8 @@ public class CuriosJeiPlugin implements IModPlugin {
 
   @Override
   @Nonnull
-  public ResourceLocation getPluginUid() {
-    return ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, CuriosConstants.MOD_ID);
+  public Identifier getPluginUid() {
+    return Identifier.fromNamespaceAndPath(CuriosConstants.MOD_ID, CuriosConstants.MOD_ID);
   }
 
   @Override

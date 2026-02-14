@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -193,7 +193,7 @@ public interface ICurioItem {
    * @return A map of attribute modifiers to apply
    */
   default Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-      SlotContext slotContext, ResourceLocation id, ItemStack stack) {
+      SlotContext slotContext, Identifier id, ItemStack stack) {
     return defaultInstance.getAttributeModifiers(slotContext, id);
   }
 

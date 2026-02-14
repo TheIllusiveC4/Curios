@@ -31,9 +31,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.context.ContextKey;
@@ -136,7 +136,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
    * Creates and returns a new {@link ModifierBuilder} for building modifiers on this loot function,
    * using the parameters provided for initial values.
    *
-   * <p>The {@link ResourceLocation} used for the location of the attribute modifier will have
+   * <p>The {@link Identifier} used for the location of the attribute modifier will have
    * a suffix appended when applied on an entity during gameplay to avoid conflicts when multiple
    * are present at once.
    *
@@ -148,7 +148,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
    * @return A new builder instance.
    */
   public static SetCurioAttributesFunction.ModifierBuilder modifier(
-      ResourceLocation id, Holder<Attribute> attribute, AttributeModifier.Operation operation,
+      Identifier id, Holder<Attribute> attribute, AttributeModifier.Operation operation,
       NumberProvider amount) {
     return new SetCurioAttributesFunction.ModifierBuilder(id, attribute, operation, amount);
   }
@@ -228,14 +228,14 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
    *                          the attribute modifier.
    * @see CurioAttributeModifiers
    */
-  public record Modifier(ResourceLocation id, Holder<Attribute> attribute,
+  public record Modifier(Identifier id, Holder<Attribute> attribute,
                          AttributeModifier.Operation operation, NumberProvider amount,
                          List<SlotTypePredicate> slotTypePredicate) {
 
     public static final Codec<SetCurioAttributesFunction.Modifier> CODEC =
         RecordCodecBuilder.create(
             modifier -> modifier.group(
-                    ResourceLocation.CODEC
+                    Identifier.CODEC
                         .fieldOf("id")
                         .forGetter(SetCurioAttributesFunction.Modifier::id),
                     Codec.withAlternative(Attribute.CODEC, SlotAttribute.CODEC)
@@ -261,7 +261,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
    */
   public static class ModifierBuilder {
 
-    private final ResourceLocation id;
+    private final Identifier id;
     private final Holder<Attribute> attribute;
     private final AttributeModifier.Operation operation;
     private final NumberProvider amount;
@@ -270,7 +270,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
     /**
      * Constructs a new builder instance with the provided values used for the attribute modifier.
      *
-     * <p>The {@link ResourceLocation} used for the location of the attribute modifier will have
+     * <p>The {@link Identifier} used for the location of the attribute modifier will have
      * a suffix appended when applied on an entity during gameplay to avoid conflicts when multiple
      * are present at once.
      *
@@ -280,7 +280,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
      * @param amount    The amount to use for the attribute modifier, represented as a
      *                  {@link NumberProvider}.
      */
-    public ModifierBuilder(ResourceLocation id, Holder<Attribute> attribute,
+    public ModifierBuilder(Identifier id, Holder<Attribute> attribute,
                            AttributeModifier.Operation operation, NumberProvider amount) {
       this.id = id;
       this.attribute = attribute;

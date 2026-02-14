@@ -24,13 +24,13 @@ import javax.annotation.Nonnull;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import top.theillusivec4.curios.CuriosConstants;
 
 public record CPacketDestroy() implements CustomPacketPayload {
 
   public static final Type<CPacketDestroy> TYPE =
-      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "destroy"));
+      new Type<>(Identifier.fromNamespaceAndPath(CuriosConstants.MOD_ID, "destroy"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, CPacketDestroy> STREAM_CODEC =
       new StreamCodec<>() {

@@ -20,7 +20,7 @@
 
 package top.theillusivec4.curios.mixin.core;
 
-import net.minecraft.advancements.critereon.NbtPredicate;
+import net.minecraft.advancements.criterion.NbtPredicate;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;

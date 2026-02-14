@@ -58,7 +58,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -280,7 +280,7 @@ public class CuriosCommonEvents {
         if (livingEntity instanceof Player
             && livingEntity.level() instanceof ServerLevel serverLevel) {
           keepInventory =
-              serverLevel.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
+              serverLevel.getGameRules().get(GameRules.KEEP_INVENTORY);
 
           if (CuriosConfig.SERVER.keepCurios.get() != CuriosConfig.KeepCurios.DEFAULT) {
             keepInventory = CuriosConfig.SERVER.keepCurios.get() == CuriosConfig.KeepCurios.ON;

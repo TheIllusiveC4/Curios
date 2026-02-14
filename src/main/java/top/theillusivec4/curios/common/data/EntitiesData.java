@@ -169,7 +169,7 @@ public class EntitiesData implements IEntitiesData {
           arr.add("#" + entity.location());
         });
         entityType.ifRight(entity -> {
-          arr.add(entity.location().toString());
+          arr.add(entity.identifier().toString());
         });
       });
       jsonObject.add("entities", arr);

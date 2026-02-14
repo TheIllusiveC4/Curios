@@ -16,7 +16,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.entity.EntityType;
@@ -57,7 +57,7 @@ public class CuriosCodecs implements ICuriosCodecs {
                 Codec.BOOL
                     .optionalFieldOf("add_cosmetic", false)
                     .forGetter(ISlotType::hasCosmetic),
-                ResourceLocation.CODEC
+                Identifier.CODEC
                     .optionalFieldOf("icon", ISlotType.GENERIC_ICON)
                     .forGetter(ISlotType::getIcon),
                 DropRule.CODEC
@@ -66,9 +66,9 @@ public class CuriosCodecs implements ICuriosCodecs {
                 Codec.BOOL
                     .optionalFieldOf("render_toggle", true)
                     .forGetter(ISlotType::canToggleRendering),
-                ResourceLocation.CODEC.listOf()
+                Identifier.CODEC.listOf()
                     .fieldOf("validators")
-                    .xmap(list -> (Set<ResourceLocation>) new HashSet<>(list), ArrayList::new)
+                    .xmap(list -> (Set<Identifier>) new HashSet<>(list), ArrayList::new)
                     .forGetter(ISlotType::getValidators),
                 Codec.STRING.listOf()
                     .xmap(list -> {
@@ -76,13 +76,13 @@ public class CuriosCodecs implements ICuriosCodecs {
                       list.forEach(entityType -> {
                         if (entityType.startsWith("#")) {
                           TagKey<EntityType<?>> key = TagKey.create(Registries.ENTITY_TYPE,
-                                                                    ResourceLocation.parse(
+                                                                    Identifier.parse(
                                                                         entityType.substring(1)));
                           BuiltInRegistries.ENTITY_TYPE.get(key).ifPresent(holders -> {
                             holders.forEach(holder -> entityTypes.add(holder.value()));
                           });
                         } else {
-                          BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(entityType))
+                          BuiltInRegistries.ENTITY_TYPE.get(Identifier.parse(entityType))
                               .ifPresent(holder -> {
                                 entityTypes.add(holder.value());
                               });
@@ -108,7 +108,7 @@ public class CuriosCodecs implements ICuriosCodecs {
             l -> l.tag() ? Either.left(TagKey.create(Registries.ENTITY_TYPE, l.id()))
                          : Either.right(ResourceKey.create(Registries.ENTITY_TYPE, l.id())),
             e -> e.map(t -> new ExtraCodecs.TagOrElementLocation(t.location(), true),
-                       r -> new ExtraCodecs.TagOrElementLocation(r.location(), false)));
+                       r -> new ExtraCodecs.TagOrElementLocation(r.identifier(), false)));
     return RecordCodecBuilder.create(
         slot -> slot.group(
                 Codec.BOOL
@@ -132,7 +132,7 @@ public class CuriosCodecs implements ICuriosCodecs {
                 Codec.BOOL
                     .optionalFieldOf("add_cosmetic")
                     .forGetter(ISlotData.Entry::hasCosmetic),
-                ResourceLocation.CODEC
+                Identifier.CODEC
                     .optionalFieldOf("icon")
                     .forGetter(ISlotData.Entry::icon),
                 DropRule.CODEC
@@ -144,7 +144,7 @@ public class CuriosCodecs implements ICuriosCodecs {
                 ICondition.CODEC.listOf()
                     .optionalFieldOf(ConditionalOps.DEFAULT_CONDITIONS_KEY, List.of())
                     .forGetter(ISlotData.Entry::conditions),
-                ResourceLocation.CODEC.listOf()
+                Identifier.CODEC.listOf()
                     .optionalFieldOf("validators")
                     .forGetter(ISlotData.Entry::validators),
                 tagOrValue.listOf()
@@ -161,7 +161,7 @@ public class CuriosCodecs implements ICuriosCodecs {
             l -> l.tag() ? Either.left(TagKey.create(Registries.ENTITY_TYPE, l.id()))
                          : Either.right(ResourceKey.create(Registries.ENTITY_TYPE, l.id())),
             e -> e.map(t -> new ExtraCodecs.TagOrElementLocation(t.location(), true),
-                       r -> new ExtraCodecs.TagOrElementLocation(r.location(), false)));
+                       r -> new ExtraCodecs.TagOrElementLocation(r.identifier(), false)));
     return RecordCodecBuilder.create(
         slot -> slot.group(
                 Codec.BOOL
@@ -183,7 +183,7 @@ public class CuriosCodecs implements ICuriosCodecs {
 
   @Override
   public Codec<Holder<Attribute>> slotAttributeCodec() {
-    return ResourceLocation.CODEC.xmap(
+    return Identifier.CODEC.xmap(
         resourceLocation -> {
           if (resourceLocation.getNamespace().startsWith(CuriosResources.MOD_ID)) {
             String key = resourceLocation.getPath();
@@ -211,7 +211,7 @@ public class CuriosCodecs implements ICuriosCodecs {
       @Nonnull
       @Override
       public Holder<Attribute> decode(@Nonnull RegistryFriendlyByteBuf buffer) {
-        ResourceLocation resourceLocation = ResourceLocation.STREAM_CODEC.decode(buffer);
+        Identifier resourceLocation = Identifier.STREAM_CODEC.decode(buffer);
 
         if (resourceLocation.getNamespace().equals(CuriosConstants.MOD_ID)) {
           return SlotAttribute.getOrCreate(resourceLocation.getPath());
@@ -223,14 +223,14 @@ public class CuriosCodecs implements ICuriosCodecs {
       @Override
       public void encode(@Nonnull RegistryFriendlyByteBuf buffer,
                          @Nonnull Holder<Attribute> value) {
-        ResourceLocation resourceLocation;
+        Identifier resourceLocation;
 
         if (value.value() instanceof SlotAttribute slotAttribute) {
           resourceLocation = slotAttribute.resourceLocation();
         } else {
           resourceLocation = BuiltInRegistries.ATTRIBUTE.getKey(value.value());
         }
-        ResourceLocation.STREAM_CODEC.encode(buffer, Objects.requireNonNull(resourceLocation));
+        Identifier.STREAM_CODEC.encode(buffer, Objects.requireNonNull(resourceLocation));
       }
     };
   }
@@ -247,14 +247,14 @@ public class CuriosCodecs implements ICuriosCodecs {
         int size = ByteBufCodecs.INT.decode(buffer);
         boolean useNativeGui = ByteBufCodecs.BOOL.decode(buffer);
         boolean hasCosmetic = ByteBufCodecs.BOOL.decode(buffer);
-        ResourceLocation icon = ResourceLocation.STREAM_CODEC.decode(buffer);
+        Identifier icon = Identifier.STREAM_CODEC.decode(buffer);
         DropRule dropRule = DropRule.STREAM_CODEC.decode(buffer);
         boolean renderToggle = ByteBufCodecs.BOOL.decode(buffer);
         Set<EntityType<?>> entityTypes =
             ByteBufCodecs.collection(HashSet::new, ByteBufCodecs.registry(Registries.ENTITY_TYPE),
                                      256).decode(buffer);
-        Set<ResourceLocation> validators =
-            ByteBufCodecs.collection(HashSet::new, ResourceLocation.STREAM_CODEC, 256)
+        Set<Identifier> validators =
+            ByteBufCodecs.collection(HashSet::new, Identifier.STREAM_CODEC, 256)
                 .decode(buffer);
         return new SlotType(id, order, size, useNativeGui, hasCosmetic, icon, dropRule,
                             renderToggle, validators, entityTypes);
@@ -267,12 +267,12 @@ public class CuriosCodecs implements ICuriosCodecs {
         ByteBufCodecs.INT.encode(buffer, value.getSize());
         ByteBufCodecs.BOOL.encode(buffer, value.useNativeGui());
         ByteBufCodecs.BOOL.encode(buffer, value.hasCosmetic());
-        ResourceLocation.STREAM_CODEC.encode(buffer, value.getIcon());
+        Identifier.STREAM_CODEC.encode(buffer, value.getIcon());
         DropRule.STREAM_CODEC.encode(buffer, value.getDropRule());
         ByteBufCodecs.BOOL.encode(buffer, value.canToggleRendering());
         ByteBufCodecs.collection(HashSet::new, ByteBufCodecs.registry(Registries.ENTITY_TYPE), 256)
             .encode(buffer, new HashSet<>(value.getDefaultEntityTypes()));
-        ByteBufCodecs.collection(HashSet::new, ResourceLocation.STREAM_CODEC, 256)
+        ByteBufCodecs.collection(HashSet::new, Identifier.STREAM_CODEC, 256)
             .encode(buffer, new HashSet<>(value.getValidators()));
       }
     };

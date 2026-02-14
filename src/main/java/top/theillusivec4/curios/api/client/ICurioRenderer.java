@@ -33,7 +33,6 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -44,9 +43,11 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -235,7 +236,7 @@ public interface ICurioRenderer {
   @Deprecated(forRemoval = true, since = "13.0.0")
   static void renderModel(
       Model<?> model,
-      ResourceLocation textureLocation,
+      Identifier textureLocation,
       PoseStack poseStack,
       MultiBufferSource renderTypeBuffer,
       int packedLight,
@@ -294,7 +295,7 @@ public interface ICurioRenderer {
      * @param stack       The item used for rendering.
      * @param slotContext The context of the slot used for rendering.
      */
-    ResourceLocation getModelTexture(ItemStack stack, SlotContext slotContext);
+    Identifier getModelTexture(ItemStack stack, SlotContext slotContext);
 
     /**
      * Renders the model after all adjustments have been made in
@@ -321,7 +322,7 @@ public interface ICurioRenderer {
               model,
               renderState,
               poseStack,
-              RenderType.armorCutoutNoCull(this.getModelTexture(stack, slotContext)),
+              RenderTypes.armorCutoutNoCull(this.getModelTexture(stack, slotContext)),
               packedLight,
               OverlayTexture.NO_OVERLAY,
               -1,
@@ -336,7 +337,7 @@ public interface ICurioRenderer {
                 model,
                 renderState,
                 poseStack,
-                RenderType.armorEntityGlint(),
+                RenderTypes.armorEntityGlint(),
                 packedLight,
                 OverlayTexture.NO_OVERLAY,
                 -1,
@@ -451,7 +452,7 @@ public interface ICurioRenderer {
               model,
               avatarRenderState,
               poseStack,
-              RenderType.armorCutoutNoCull(this.getModelTexture(stack, slotContext)),
+              RenderTypes.armorCutoutNoCull(this.getModelTexture(stack, slotContext)),
               packedLight,
               OverlayTexture.NO_OVERLAY,
               -1,
@@ -466,7 +467,7 @@ public interface ICurioRenderer {
                 model,
                 avatarRenderState,
                 poseStack,
-                RenderType.armorEntityGlint(),
+                RenderTypes.armorEntityGlint(),
                 packedLight,
                 OverlayTexture.NO_OVERLAY,
                 -1,

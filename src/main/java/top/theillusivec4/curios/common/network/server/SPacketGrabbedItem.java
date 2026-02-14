@@ -24,14 +24,14 @@ import javax.annotation.Nonnull;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.CuriosConstants;
 
 public record SPacketGrabbedItem(ItemStack stack) implements CustomPacketPayload {
 
   public static final Type<SPacketGrabbedItem> TYPE =
-      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "grabbed_item"));
+      new Type<>(Identifier.fromNamespaceAndPath(CuriosConstants.MOD_ID, "grabbed_item"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, SPacketGrabbedItem> STREAM_CODEC =
       StreamCodec.composite(ItemStack.STREAM_CODEC, SPacketGrabbedItem::stack,

@@ -27,7 +27,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
@@ -56,7 +56,7 @@ public class CosmeticButton extends ImageButton implements ICuriosWidget {
   }
 
   @Override
-  public void renderWidget(@Nonnull GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+  public void renderContents(@Nonnull GuiGraphics guiGraphics, int x, int y, float partialTicks) {
     WidgetSprites sprites1;
 
     if (this.parentGui.getMenu().isViewingCosmetics) {
@@ -66,7 +66,7 @@ public class CosmeticButton extends ImageButton implements ICuriosWidget {
     }
     this.setX(this.parentGui.getGuiLeft() - 27);
     this.setY(this.parentGui.getGuiTop() - 18);
-    ResourceLocation resourcelocation = sprites1.get(this.isActive(), this.isHoveredOrFocused());
+    Identifier resourcelocation = sprites1.get(this.isActive(), this.isHoveredOrFocused());
     guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, resourcelocation, this.getX(), this.getY(),
                            this.width, this.height);
   }

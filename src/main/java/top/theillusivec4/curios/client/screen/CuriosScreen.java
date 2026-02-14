@@ -42,14 +42,13 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-import org.joml.Matrix3x2fStack;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.client.ICuriosScreen;
@@ -70,8 +69,8 @@ import top.theillusivec4.curios.config.CuriosClientConfig.Client.ButtonCorner;
 public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
     implements RecipeUpdateListener, ICuriosScreen {
 
-  static final ResourceLocation CURIO_INVENTORY =
-      ResourceLocation.fromNamespaceAndPath(
+  static final Identifier CURIO_INVENTORY =
+      Identifier.fromNamespaceAndPath(
           CuriosConstants.MOD_ID, "textures/gui/curios/inventory.png");
 
   private final EffectsInInventory effects;
@@ -188,7 +187,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
 
   @Override
   public void render(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-    this.effects.renderEffects(guiGraphics, mouseX, mouseY);
+    this.effects.render(guiGraphics, mouseX, mouseY);
     Slot hoveredSlot = this.hoveredSlot;
     // Workaround for slots that are removed due to slot modifier changes
     if (this.hoveredSlot instanceof CurioSlot curioSlot) {
@@ -234,7 +233,6 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
       }
     }
     this.renderTooltip(guiGraphics, mouseX, mouseY);
-    this.effects.renderTooltip(guiGraphics, mouseX, mouseY);
     this.oldMouseX = mouseX;
     this.oldMouseY = mouseY;
   }
@@ -413,7 +411,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  protected void renderSlot(@Nonnull GuiGraphics guiGraphics, Slot slot) {
+  protected void renderSlot(@Nonnull GuiGraphics guiGraphics, Slot slot, int x, int y) {
     int i = slot.x;
     int j = slot.y;
     ItemStack itemstack = slot.getItem();
@@ -463,7 +461,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
     }
 
     if (itemstack.isEmpty() && slot.isActive() && this.minecraft != null) {
-      ResourceLocation rl = slot.getNoItemIcon();
+      Identifier rl = slot.getNoItemIcon();
 
       if (rl != null) {
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, rl, i, j, 16, 16);

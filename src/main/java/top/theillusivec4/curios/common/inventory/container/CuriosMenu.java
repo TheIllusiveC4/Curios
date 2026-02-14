@@ -27,7 +27,7 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -115,7 +115,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
 
     for (int i = 0; i < 4; i++) {
       EquipmentSlot equipmentslot = InventoryMenu.SLOT_IDS[i];
-      ResourceLocation resourcelocation = InventoryMenu.TEXTURE_EMPTY_SLOTS.get(equipmentslot);
+      Identifier resourcelocation = InventoryMenu.TEXTURE_EMPTY_SLOTS.get(equipmentslot);
       this.addSlot(new ArmorSlot(this.player.getInventory(), this.player, equipmentslot, 39 - i, 8,
                                  8 + i * 18, resourcelocation));
     }
@@ -129,7 +129,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
       }
 
       @Override
-      public ResourceLocation getNoItemIcon() {
+      public Identifier getNoItemIcon() {
         return InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD;
       }
     });

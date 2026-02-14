@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.neoforged.neoforge.common.conditions.ICondition;
@@ -54,13 +54,13 @@ public interface ISlotData {
 
   ISlotData renderToggle(boolean renderToggle);
 
-  ISlotData icon(ResourceLocation icon);
+  ISlotData icon(Identifier icon);
 
   ISlotData dropRule(DropRule dropRule);
 
   ISlotData addCondition(ICondition... condition);
 
-  ISlotData addValidator(ResourceLocation... resourceLocation);
+  ISlotData addValidator(Identifier... resourceLocation);
 
   ISlotData addEntity(EntityType<?>... entityTypes);
 
@@ -93,7 +93,7 @@ public interface ISlotData {
 
     Optional<Boolean> hasCosmetic();
 
-    Optional<ResourceLocation> icon();
+    Optional<Identifier> icon();
 
     Optional<DropRule> dropRule();
 
@@ -101,7 +101,7 @@ public interface ISlotData {
 
     List<ICondition> conditions();
 
-    Optional<List<ResourceLocation>> validators();
+    Optional<List<Identifier>> validators();
 
     Optional<List<Either<TagKey<EntityType<?>>, ResourceKey<EntityType<?>>>>> entities();
   }

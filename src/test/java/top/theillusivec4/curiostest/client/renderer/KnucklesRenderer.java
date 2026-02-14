@@ -3,7 +3,7 @@ package top.theillusivec4.curiostest.client.renderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
@@ -13,8 +13,8 @@ import top.theillusivec4.curiostest.client.model.KnucklesModel;
 
 public class KnucklesRenderer implements ICurioRenderer.HumanoidRender {
 
-  private static final ResourceLocation KNUCKLES_TEXTURE =
-      ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID,
+  private static final Identifier KNUCKLES_TEXTURE =
+      Identifier.fromNamespaceAndPath(CuriosTest.MODID,
                                             "textures/entity/knuckles.png");
 
   private final KnucklesModel model;
@@ -31,7 +31,7 @@ public class KnucklesRenderer implements ICurioRenderer.HumanoidRender {
   }
 
   @Override
-  public ResourceLocation getModelTexture(ItemStack stack, SlotContext slotContext) {
+  public Identifier getModelTexture(ItemStack stack, SlotContext slotContext) {
     return KNUCKLES_TEXTURE;
   }
 }

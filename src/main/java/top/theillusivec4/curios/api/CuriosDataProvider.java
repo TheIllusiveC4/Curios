@@ -36,7 +36,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagAppender;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -85,7 +85,7 @@ public abstract class CuriosDataProvider implements DataProvider {
           provider.createSerializationContext(JsonOps.INSTANCE);
       this.slotBuilders.forEach((slot, slotBuilder) -> {
         Path path =
-            this.slotsPathProvider.json(ResourceLocation.fromNamespaceAndPath(this.modId, slot));
+            this.slotsPathProvider.json(Identifier.fromNamespaceAndPath(this.modId, slot));
         list.add(CompletableFuture.supplyAsync(() -> {
           return ISlotData.Entry.CODEC.encodeStart(dynamicOps, slotBuilder.build()).getOrThrow(
               msg -> new RuntimeException("Failed to encode %s: %s".formatted(path, msg)));
@@ -93,7 +93,7 @@ public abstract class CuriosDataProvider implements DataProvider {
       });
       this.entitiesBuilders.forEach((entities, entitiesBuilder) -> {
         Path path = this.entitiesPathProvider.json(
-            ResourceLocation.fromNamespaceAndPath(this.modId, entities));
+            Identifier.fromNamespaceAndPath(this.modId, entities));
         list.add(CompletableFuture.supplyAsync(() -> {
           return IEntitiesData.Entry.CODEC.encodeStart(dynamicOps, entitiesBuilder.build())
               .getOrThrow(

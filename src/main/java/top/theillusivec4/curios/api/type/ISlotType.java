@@ -26,7 +26,7 @@ import java.util.function.BiPredicate;
 import javax.annotation.Nullable;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -72,7 +72,7 @@ public interface ISlotType extends Comparable<ISlotType> {
   }
 
   /**
-   * Gets the {@link ResourceLocation} of the image icon for this slot type.
+   * Gets the {@link Identifier} of the image icon for this slot type.
    *
    * <p>The location is used to set the image icon for the background of the slot type when rendered
    * inside an inventory screen. However, an inventory slot that identifies as a cosmetic slot
@@ -81,7 +81,7 @@ public interface ISlotType extends Comparable<ISlotType> {
    * @return the location for the image icon associated with this slot type. If null or invalid,
    *     {@link ISlotType#GENERIC_ICON} will be used instead.
    */
-  ResourceLocation getIcon();
+  Identifier getIcon();
 
   /**
    * Gets the numbered ordering priority for this slot type.
@@ -159,7 +159,7 @@ public interface ISlotType extends Comparable<ISlotType> {
   DropRule getDropRule();
 
   /**
-   * Gets the {@link ResourceLocation} locations of validators to apply to this slot type.
+   * Gets the {@link Identifier} locations of validators to apply to this slot type.
    *
    * <p>Validators are used to test for item validity, in order to determine whether any given
    * ItemStack can be accepted into a slot of this slot type. This does not determine final
@@ -172,11 +172,11 @@ public interface ISlotType extends Comparable<ISlotType> {
    * from {@link #getId()}.
    *
    * <p>Locations are registered as predicates through
-   * {@link CuriosSlotTypes#registerPredicate(ResourceLocation, BiPredicate)}.
+   * {@link CuriosSlotTypes#registerPredicate(Identifier, BiPredicate)}.
    *
    * @return the set of locations keyed to the validator predicates on this slot type.
    */
-  Set<ResourceLocation> getValidators();
+  Set<Identifier> getValidators();
 
   /**
    * Gets the {@link EntityType} objects to be given this slot type by default.
@@ -188,7 +188,7 @@ public interface ISlotType extends Comparable<ISlotType> {
    * <p>If empty, the entity types will be accepted as
    *
    * <p>Locations are registered as predicates through
-   * {@link CuriosSlotTypes#registerPredicate(ResourceLocation, BiPredicate)}.
+   * {@link CuriosSlotTypes#registerPredicate(Identifier, BiPredicate)}.
    *
    * @return the set of entity types to be given this slot type by default.
    */
@@ -201,7 +201,7 @@ public interface ISlotType extends Comparable<ISlotType> {
   /**
    * The location of an image icon to use when specified image icons are null, missing, or invalid.
    */
-  ResourceLocation GENERIC_ICON = CuriosResources.resource("textures/gui/generic_icon.png");
+  Identifier GENERIC_ICON = CuriosResources.resource("textures/gui/generic_icon.png");
 
   /**
    * The codec used for (de)serializing slot type data.

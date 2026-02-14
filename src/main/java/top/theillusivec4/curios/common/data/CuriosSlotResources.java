@@ -48,7 +48,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.tags.TagKey;
@@ -69,7 +69,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
 
   private static final String folder = "curios";
 
-  public static final ResourceLocation ID = CuriosResources.resource("curios_slots");
+  public static final Identifier ID = CuriosResources.resource("curios_slots");
 
   public static CuriosSlotResources SERVER;
   public static CuriosSlotResources CLIENT = new CuriosSlotResources();
@@ -111,7 +111,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
       );
 
   private RegistryAccess registryAccess;
-  private Map<ResourceLocation, JsonElement> pendingData = Map.of();
+  private Map<Identifier, JsonElement> pendingData = Map.of();
   private Map<String, ISlotType> slots = ImmutableMap.of();
   private Map<EntityType<?>, Map<String, ISlotType>> entitySlots = ImmutableMap.of();
   private Set<String> configSlots = ImmutableSet.of();
@@ -145,10 +145,10 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
     this.idToMods = ImmutableMap.copyOf(idToMods);
   }
 
-  protected void apply(Map<ResourceLocation, JsonElement> object,
+  protected void apply(Map<Identifier, JsonElement> object,
                        @Nonnull ResourceManager resourceManager,
                        @Nonnull ProfilerFiller profiler) {
-    Map<ResourceLocation, JsonElement> sorted = new TreeMap<>((o1, o2) -> {
+    Map<Identifier, JsonElement> sorted = new TreeMap<>((o1, o2) -> {
       String s1 = o1.getNamespace();
       String s2 = o2.getNamespace();
 
@@ -172,7 +172,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
         this.registryAccess.lookupOrThrow(Registries.ENTITY_TYPE);
 
     // First parse through the slot data files
-    for (Map.Entry<ResourceLocation, JsonElement> entry : this.pendingData.entrySet()) {
+    for (Map.Entry<Identifier, JsonElement> entry : this.pendingData.entrySet()) {
 
       if (!entry.getKey().getPath().startsWith("slots")) {
         continue;
@@ -217,12 +217,12 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
       CuriosConstants.LOG.error("Config parsing error", e);
     }
 
-    for (Map.Entry<ResourceLocation, JsonElement> entry : this.pendingData.entrySet()) {
+    for (Map.Entry<Identifier, JsonElement> entry : this.pendingData.entrySet()) {
 
       if (!entry.getKey().getPath().startsWith("entities")) {
         continue;
       }
-      ResourceLocation resourcelocation = entry.getKey();
+      Identifier resourcelocation = entry.getKey();
       IEntitiesData.Entry.CODEC.decode(
               this.registryAccess.createSerializationContext(JsonOps.INSTANCE), entry.getValue())
           .ifSuccess(pair -> {
@@ -385,7 +385,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
           getValueOptionally(entry, "operation", String::toString),
           getValueOptionally(entry, "use_native_gui", Boolean::parseBoolean),
           getValueOptionally(entry, "add_cosmetic", Boolean::parseBoolean),
-          getValueOptionally(entry, "icon", ResourceLocation::tryParse),
+          getValueOptionally(entry, "icon", Identifier::tryParse),
           getValueOptionally(entry, "drop_rule", dropRule -> {
             for (DropRule value : DropRule.values()) {
               if (dropRule.equalsIgnoreCase(value.getSerializedName())) {

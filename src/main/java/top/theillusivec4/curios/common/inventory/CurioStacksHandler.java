@@ -34,7 +34,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.LivingEntity;
@@ -68,8 +68,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   private final CurioInventory curioInventory;
   private final String identifier;
-  private final Map<ResourceLocation, AttributeModifier> modifiers = new HashMap<>();
-  private final Map<ResourceLocation, AttributeModifier> persistentModifiers = new HashMap<>();
+  private final Map<Identifier, AttributeModifier> modifiers = new HashMap<>();
+  private final Map<Identifier, AttributeModifier> persistentModifiers = new HashMap<>();
   private final Multimap<AttributeModifier.Operation, AttributeModifier> modifiersByOperation =
       HashMultimap.create();
 
@@ -387,7 +387,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     this.update();
   }
 
-  public Map<ResourceLocation, AttributeModifier> getModifiers() {
+  public Map<Identifier, AttributeModifier> getModifiers() {
     return this.modifiers;
   }
 
@@ -417,7 +417,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     this.persistentModifiers.put(modifier.id(), modifier);
   }
 
-  public void removeModifier(ResourceLocation id) {
+  public void removeModifier(Identifier id) {
     AttributeModifier modifier = this.modifiers.remove(id);
 
     if (modifier != null) {
@@ -442,9 +442,9 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   public void clearModifiers() {
-    Set<ResourceLocation> ids = new HashSet<>(this.modifiers.keySet());
+    Set<Identifier> ids = new HashSet<>(this.modifiers.keySet());
 
-    for (ResourceLocation id : ids) {
+    for (Identifier id : ids) {
       this.removeModifier(id);
     }
   }

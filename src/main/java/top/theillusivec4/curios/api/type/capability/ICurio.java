@@ -32,7 +32,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
@@ -173,7 +173,7 @@ public interface ICurio {
    */
   @Deprecated(forRemoval = true)
   default Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-      SlotContext slotContext, ResourceLocation id) {
+      SlotContext slotContext, Identifier id) {
     return LinkedHashMultimap.create();
   }
 
@@ -281,7 +281,7 @@ public interface ICurio {
 
   /**
    * Retrieves a list of tooltips when displaying curio attribute modifier information returned by
-   * {@link ICurio#getAttributeModifiers(SlotContext, ResourceLocation)}. By default, this will display a list
+   * {@link ICurio#getAttributeModifiers(SlotContext, Identifier)}. By default, this will display a list
    * similar to the vanilla attribute modifier tooltips.
    *
    * @param tooltips A list of {@link Component} with the attribute modifier information

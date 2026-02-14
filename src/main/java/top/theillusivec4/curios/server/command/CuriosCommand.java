@@ -37,6 +37,7 @@ import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosSlotTypes;
@@ -49,7 +50,7 @@ public class CuriosCommand {
                               CommandBuildContext buildContext) {
 
     LiteralArgumentBuilder<CommandSourceStack> curiosCommand = Commands.literal("curios")
-        .requires(player -> player.hasPermission(2));
+        .requires(player -> player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER));
 
 //    curiosCommand.then(Commands.literal("debug1").executes(context -> {
 //      ServerPlayer serverPlayer = context.getSource().getPlayer();

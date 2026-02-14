@@ -30,7 +30,7 @@ import java.util.Optional;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -49,12 +49,12 @@ public class SlotData implements ISlotData {
   private String operation;
   private Boolean useNativeGui;
   private Boolean hasCosmetic;
-  private ResourceLocation icon;
+  private Identifier icon;
   private DropRule dropRule;
   private Boolean renderToggle;
   private Boolean replace;
   private List<ICondition> conditions;
-  private List<ResourceLocation> validators;
+  private List<Identifier> validators;
   private List<Either<TagKey<EntityType<?>>, ResourceKey<EntityType<?>>>> entities;
 
   public SlotData(String id, boolean includeId) {
@@ -105,7 +105,7 @@ public class SlotData implements ISlotData {
   }
 
   @Override
-  public ISlotData icon(ResourceLocation icon) {
+  public ISlotData icon(Identifier icon) {
     this.icon = icon;
     return this;
   }
@@ -127,7 +127,7 @@ public class SlotData implements ISlotData {
   }
 
   @Override
-  public ISlotData addValidator(ResourceLocation... resourceLocation) {
+  public ISlotData addValidator(Identifier... resourceLocation) {
 
     if (this.validators == null) {
       this.validators = new ArrayList<>();
@@ -232,7 +232,7 @@ public class SlotData implements ISlotData {
     if (this.validators != null) {
       JsonArray arr = new JsonArray();
 
-      for (ResourceLocation slotResultPredicate : this.validators) {
+      for (Identifier slotResultPredicate : this.validators) {
         arr.add(slotResultPredicate.toString());
       }
       jsonObject.add("validators", arr);
@@ -247,11 +247,11 @@ public class SlotData implements ISlotData {
                       Optional<String> operation,
                       Optional<Boolean> useNativeGui,
                       Optional<Boolean> hasCosmetic,
-                      Optional<ResourceLocation> icon,
+                      Optional<Identifier> icon,
                       Optional<DropRule> dropRule,
                       Optional<Boolean> renderToggle,
                       List<ICondition> conditions,
-                      Optional<List<ResourceLocation>> validators,
+                      Optional<List<Identifier>> validators,
                       Optional<List<Either<TagKey<EntityType<?>>, ResourceKey<EntityType<?>>>>> entities)
       implements ISlotData.Entry {
 

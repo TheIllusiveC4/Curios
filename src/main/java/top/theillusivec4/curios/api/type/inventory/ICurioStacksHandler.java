@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -154,9 +154,9 @@ public interface ICurioStacksHandler extends ValueIOSerializable {
   /**
    * Retrieves all the slot modifiers on the handler.
    *
-   * @return A map of modifiers with the ResourceLocation as keys and {@link AttributeModifier} as values
+   * @return A map of modifiers with the Identifier as keys and {@link AttributeModifier} as values
    */
-  Map<ResourceLocation, AttributeModifier> getModifiers();
+  Map<Identifier, AttributeModifier> getModifiers();
 
   /**
    * Retrieves all the permanent slot modifiers on the handler.
@@ -206,7 +206,7 @@ public interface ICurioStacksHandler extends ValueIOSerializable {
    *
    * @param id id of the modifier to remove
    */
-  void removeModifier(ResourceLocation id);
+  void removeModifier(Identifier id);
 
   /**
    * Removes all the slot modifiers on the handler.

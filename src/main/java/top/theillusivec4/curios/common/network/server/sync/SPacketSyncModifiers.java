@@ -29,14 +29,14 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
 public class SPacketSyncModifiers implements CustomPacketPayload {
 
   public static final Type<SPacketSyncModifiers> TYPE =
-      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "sync_modifiers"));
+      new Type<>(Identifier.fromNamespaceAndPath(CuriosConstants.MOD_ID, "sync_modifiers"));
   public static final StreamCodec<RegistryFriendlyByteBuf, SPacketSyncModifiers> STREAM_CODEC =
       new StreamCodec<>() {
         @Nonnull

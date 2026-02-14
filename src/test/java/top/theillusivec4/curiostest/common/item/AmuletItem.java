@@ -25,14 +25,14 @@ import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -50,8 +50,8 @@ import top.theillusivec4.curiostest.client.model.AmuletModel;
 
 public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
 
-  private static final ResourceLocation AMULET_TEXTURE =
-      ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID,
+  private static final Identifier AMULET_TEXTURE =
+      Identifier.fromNamespaceAndPath(CuriosTest.MODID,
                                             "textures/entity/amulet.png");
   private Object model;
 
@@ -107,7 +107,7 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
         amuletModel.setupAnim(humanoidRenderState);
       }
       VertexConsumer vertexconsumer =
-          ItemRenderer.getFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(AMULET_TEXTURE),
+          ItemRenderer.getFoilBuffer(renderTypeBuffer, RenderTypes.armorCutoutNoCull(AMULET_TEXTURE),
                                      false, stack.hasFoil());
       (amuletModel)
           .renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);

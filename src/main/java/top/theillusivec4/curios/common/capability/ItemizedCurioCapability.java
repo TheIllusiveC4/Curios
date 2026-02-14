@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -126,7 +126,7 @@ public class ItemizedCurioCapability implements ICurio {
 
   @Override
   public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-      SlotContext slotContext, ResourceLocation id) {
+      SlotContext slotContext, Identifier id) {
     return this.curioItem.getAttributeModifiers(slotContext, id, this.getStack());
   }
 

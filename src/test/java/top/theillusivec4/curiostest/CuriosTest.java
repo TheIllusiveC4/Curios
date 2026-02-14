@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.core.Holder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.advancements.AdvancementProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
@@ -91,7 +91,7 @@ public class CuriosTest {
     eventBus.addListener(this::gatherData);
     eventBus.addListener(this::registerSlotExtensions);
     NeoForge.EVENT_BUS.addListener(this::attributeModifier);
-    CuriosSlotTypes.registerPredicate(ResourceLocation.fromNamespaceAndPath(MODID, "test"),
+    CuriosSlotTypes.registerPredicate(Identifier.fromNamespaceAndPath(MODID, "test"),
                                      (ctx, stack) -> stack.getItem() == Items.OAK_BOAT);
   }
 
@@ -153,19 +153,19 @@ public class CuriosTest {
 
       @Override
       public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-          SlotContext slotContext, ResourceLocation id) {
+          SlotContext slotContext, Identifier id) {
         Multimap<Holder<Attribute>, AttributeModifier> atts = LinkedHashMultimap.create();
         atts.put(Attributes.MOVEMENT_SPEED,
                  new AttributeModifier(
-                     ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID, "speed_bonus"), 0.1,
+                     Identifier.fromNamespaceAndPath(CuriosTest.MODID, "speed_bonus"), 0.1,
                      AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
         atts.put(Attributes.ARMOR,
                  new AttributeModifier(
-                     ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID, "armor_bonus"), 2,
+                     Identifier.fromNamespaceAndPath(CuriosTest.MODID, "armor_bonus"), 2,
                      AttributeModifier.Operation.ADD_VALUE));
         atts.put(Attributes.KNOCKBACK_RESISTANCE,
                  new AttributeModifier(
-                     ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID, "knockback_resist"),
+                     Identifier.fromNamespaceAndPath(CuriosTest.MODID, "knockback_resist"),
                      0.2,
                      AttributeModifier.Operation.ADD_VALUE));
         CuriosApi.addSlotModifier(atts, "ring", id, 1, AttributeModifier.Operation.ADD_VALUE);
@@ -225,14 +225,14 @@ public class CuriosTest {
             .addModifier(
                 Attributes.ATTACK_DAMAGE,
                 new AttributeModifier(
-                    ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID, "knuckles"),
+                    Identifier.fromNamespaceAndPath(CuriosTest.MODID, "knuckles"),
                     4,
                     AttributeModifier.Operation.ADD_VALUE)
             )
             .addSlotModifier(
                 CuriosSlotTypes.Preset.RING.id(),
                 new AttributeModifier(
-                    ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID, "knuckles"),
+                    Identifier.fromNamespaceAndPath(CuriosTest.MODID, "knuckles"),
                     2,
                     AttributeModifier.Operation.ADD_VALUE))
             .build();
@@ -250,10 +250,10 @@ public class CuriosTest {
 //    if (evt.getSlotContext().identifier().equals("curio")) {
 //      evt.clearModifiers();
 //      evt.addModifier(Attributes.MAX_HEALTH,
-//          new AttributeModifier(ResourceLocation.withDefaultNamespace("test"), 10.0d,
+//          new AttributeModifier(Identifier.withDefaultNamespace("test"), 10.0d,
 //              AttributeModifier.Operation.ADD_VALUE));
 //      evt.addModifier(SlotAttribute.getOrCreate("ring"),
-//          new AttributeModifier(ResourceLocation.withDefaultNamespace("test"), 1.0d,
+//          new AttributeModifier(Identifier.withDefaultNamespace("test"), 1.0d,
 //              AttributeModifier.Operation.ADD_VALUE));
 //    }
   }

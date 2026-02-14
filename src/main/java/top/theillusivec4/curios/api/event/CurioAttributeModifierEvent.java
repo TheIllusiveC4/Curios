@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
@@ -120,7 +120,7 @@ public class CurioAttributeModifierEvent extends Event {
    * @param modifier          The new attribute modifier.
    * @param slotTypePredicate The slot type predicate for which the modifier should apply.
    * @return True if the modifier was added, false if it was already present.
-   * @apiNote Modifiers must have a unique and consistent {@link ResourceLocation} id, or the
+   * @apiNote Modifiers must have a unique and consistent {@link Identifier} id, or the
    *     modifier will not be removed when the item is unequipped.
    */
   public boolean addModifier(Holder<Attribute> attribute, AttributeModifier modifier,
@@ -140,7 +140,7 @@ public class CurioAttributeModifierEvent extends Event {
    * @param modifier  The new attribute modifier.
    * @param slot      The slot identifiers for which the modifier should apply.
    * @return True if the modifier was added, false if it was already present.
-   * @apiNote Modifiers must have a unique and consistent {@link ResourceLocation} id, or the
+   * @apiNote Modifiers must have a unique and consistent {@link Identifier} id, or the
    *     modifier will not be removed when the item is unequipped.
    */
   public boolean addModifier(Holder<Attribute> attribute, AttributeModifier modifier,
@@ -160,7 +160,7 @@ public class CurioAttributeModifierEvent extends Event {
    * @param modifier  The new attribute modifier.
    * @param slotType  The slot types for which the modifier should apply.
    * @return True if the modifier was added, false if it was already present.
-   * @apiNote Modifiers must have a unique and consistent {@link ResourceLocation} id, or the
+   * @apiNote Modifiers must have a unique and consistent {@link Identifier} id, or the
    *     modifier will not be removed when the item is unequipped.
    */
   public boolean addModifier(Holder<Attribute> attribute, AttributeModifier modifier,
@@ -183,7 +183,7 @@ public class CurioAttributeModifierEvent extends Event {
    * @param attribute The attribute the modifier is for.
    * @param modifier  The new attribute modifier.
    * @return True if the modifier was added, false if it was already present.
-   * @apiNote Modifiers must have a unique and consistent {@link ResourceLocation} id, or the
+   * @apiNote Modifiers must have a unique and consistent {@link Identifier} id, or the
    *     modifier will not be removed when the item is unequipped.
    */
   public boolean addModifier(Holder<Attribute> attribute, AttributeModifier modifier) {
@@ -199,7 +199,7 @@ public class CurioAttributeModifierEvent extends Event {
    *
    * @return True if an attribute modifier was removed, false otherwise.
    */
-  public boolean removeModifier(Holder<Attribute> attribute, ResourceLocation modifierId) {
+  public boolean removeModifier(Holder<Attribute> attribute, Identifier modifierId) {
     return this.getBuilder().removeModifier(attribute, modifierId);
   }
 
@@ -209,7 +209,7 @@ public class CurioAttributeModifierEvent extends Event {
    * @param attribute Attribute.
    * @param modifier  Modifier instance.
    * @return True if an attribute was removed, false if no change.
-   * @deprecated Use {@link #removeModifier(Holder, ResourceLocation)} instead to avoid needing
+   * @deprecated Use {@link #removeModifier(Holder, Identifier)} instead to avoid needing
    *     a specific modifier instance.
    */
   @Deprecated(forRemoval = true)
@@ -228,7 +228,7 @@ public class CurioAttributeModifierEvent extends Event {
    * @param attribute The attribute the modifier is for.
    * @param modifier  The new attribute modifier.
    * @param slot      The slot identifiers for which the modifier should apply.
-   * @apiNote Modifiers must have a unique and consistent {@link ResourceLocation} id, or the
+   * @apiNote Modifiers must have a unique and consistent {@link Identifier} id, or the
    *     modifier will not be removed when the item is unequipped.
    */
   public void replaceModifier(Holder<Attribute> attribute, AttributeModifier modifier,
@@ -247,7 +247,7 @@ public class CurioAttributeModifierEvent extends Event {
    * @param attribute The attribute the modifier is for.
    * @param modifier  The new attribute modifier.
    * @param slotType  The slot types for which the modifier should apply.
-   * @apiNote Modifiers must have a unique and consistent {@link ResourceLocation} id, or the
+   * @apiNote Modifiers must have a unique and consistent {@link Identifier} id, or the
    *     modifier will not be removed when the item is unequipped.
    */
   public void replaceModifier(Holder<Attribute> attribute, AttributeModifier modifier,
@@ -267,7 +267,7 @@ public class CurioAttributeModifierEvent extends Event {
    * @param attribute         The attribute the modifier is for.
    * @param modifier          The new attribute modifier.
    * @param slotTypePredicate The slot type predicate for which the modifier should apply.
-   * @apiNote Modifiers must have a unique and consistent {@link ResourceLocation} id, or the
+   * @apiNote Modifiers must have a unique and consistent {@link Identifier} id, or the
    *     modifier will not be removed when the item is unequipped.
    */
   public void replaceModifier(Holder<Attribute> attribute, AttributeModifier modifier,
@@ -434,7 +434,7 @@ public class CurioAttributeModifierEvent extends Event {
      *
      * @return True if a modifier was removed, false otherwise.
      */
-    boolean removeModifier(Holder<Attribute> attribute, ResourceLocation id) {
+    boolean removeModifier(Holder<Attribute> attribute, Identifier id) {
       CurioAttributeModifiers.Entry entry =
           this.entriesByKey.remove(new CurioAttributeModifiersBuilder.Key(attribute, id));
 
@@ -500,7 +500,7 @@ public class CurioAttributeModifierEvent extends Event {
     /**
      * Internal key class. Attribute modifiers are unique by id for each Attribute.
      */
-    private record Key(Holder<? extends Attribute> attribute, ResourceLocation id) {
+    private record Key(Holder<? extends Attribute> attribute, Identifier id) {
 
     }
   }

@@ -34,7 +34,7 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
@@ -105,7 +105,7 @@ public class CurioInventory implements ValueIOSerializable {
     return this.invalidStacks;
   }
 
-  private static final ResourceLocation SIZE_SHIFT = CuriosResources.resource("size_shift");
+  private static final Identifier SIZE_SHIFT = CuriosResources.resource("size_shift");
 
   public void loadInventoryConfiguration() {
     Map<ISlotType, ICurioStacksHandler> defaultInventory = this.createDefaultInventory();

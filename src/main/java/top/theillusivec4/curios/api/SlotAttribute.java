@@ -30,7 +30,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.TooltipFlag;
@@ -62,7 +62,7 @@ public class SlotAttribute extends Attribute {
     return this.id;
   }
 
-  public ResourceLocation resourceLocation() {
+  public Identifier resourceLocation() {
     return CuriosResources.resource(this.getIdentifier());
   }
 

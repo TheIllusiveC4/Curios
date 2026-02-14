@@ -31,7 +31,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -139,12 +139,12 @@ public final class CuriosApi {
   }
 
   /**
-   * Gets a {@link ResourceLocation} based on the provided {@link SlotContext}.
+   * Gets a {@link Identifier} based on the provided {@link SlotContext}.
    *
-   * @param slotContext The SlotContext to base the {@link ResourceLocation} on
-   * @return The ResourceLocation based on the SlotContext
+   * @param slotContext The SlotContext to base the {@link Identifier} on
+   * @return The Identifier based on the SlotContext
    */
-  public static ResourceLocation getSlotId(SlotContext slotContext) {
+  public static Identifier getSlotId(SlotContext slotContext) {
     return CuriosResources.resource(slotContext.identifier() + slotContext.index());
   }
 
@@ -342,7 +342,7 @@ public final class CuriosApi {
    */
   @Deprecated(forRemoval = true)
   public static Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-      SlotContext slotContext, ResourceLocation id, ItemStack stack) {
+      SlotContext slotContext, Identifier id, ItemStack stack) {
     Multimap<Holder<Attribute>, AttributeModifier> modifiers = LinkedHashMultimap.create();
     ICurioItem.forEachModifier(stack, slotContext, modifiers::put);
     return modifiers;
@@ -360,7 +360,7 @@ public final class CuriosApi {
    */
   @Deprecated(forRemoval = true)
   public static void addSlotModifier(Multimap<Holder<Attribute>, AttributeModifier> map,
-                                     String identifier, ResourceLocation id, double amount,
+                                     String identifier, Identifier id, double amount,
                                      AttributeModifier.Operation operation) {
     map.put(SlotAttribute.getOrCreate(identifier),
             new AttributeModifier(id, amount, operation));
@@ -378,7 +378,7 @@ public final class CuriosApi {
    * @deprecated Use {@link CurioAttributeModifiers} to build the modifier on a stack directly.
    */
   @Deprecated(forRemoval = true)
-  public static void addSlotModifier(ItemStack stack, String identifier, ResourceLocation id,
+  public static void addSlotModifier(ItemStack stack, String identifier, Identifier id,
                                      double amount, AttributeModifier.Operation operation,
                                      String slot) {
     addModifier(stack, SlotAttribute.getOrCreate(identifier), id, amount, operation, slot);
@@ -399,7 +399,7 @@ public final class CuriosApi {
    */
   @Deprecated(forRemoval = true)
   public static ItemAttributeModifiers withSlotModifier(
-      ItemAttributeModifiers itemAttributeModifiers, String identifier, ResourceLocation id,
+      ItemAttributeModifiers itemAttributeModifiers, String identifier, Identifier id,
       double amount, AttributeModifier.Operation operation, EquipmentSlotGroup slotGroup) {
     return ItemAttributeModifiers.EMPTY;
   }
@@ -416,7 +416,7 @@ public final class CuriosApi {
    * @deprecated Use {@link CurioAttributeModifiers} to build the modifier on a stack directly.
    */
   @Deprecated(forRemoval = true)
-  public static void addModifier(ItemStack stack, Holder<Attribute> attribute, ResourceLocation id,
+  public static void addModifier(ItemStack stack, Holder<Attribute> attribute, Identifier id,
                                  double amount, AttributeModifier.Operation operation,
                                  String slot) {
     CuriosDataComponents
@@ -425,32 +425,32 @@ public final class CuriosApi {
   }
 
   /**
-   * Registers a new predicate keyed to a {@link ResourceLocation} for deciding which slots are
+   * Registers a new predicate keyed to a {@link Identifier} for deciding which slots are
    * assigned to a given {@link ItemStack}.
    *
-   * @param resourceLocation The unique {@link ResourceLocation} of the validator
+   * @param resourceLocation The unique {@link Identifier} of the validator
    * @param predicate        The predicate to register for a given stack and {@link SlotResult}
-   * @deprecated Use {@link CuriosSlotTypes#registerPredicate(ResourceLocation, BiPredicate)}
+   * @deprecated Use {@link CuriosSlotTypes#registerPredicate(Identifier, BiPredicate)}
    *     instead.
    */
   @Deprecated(forRemoval = true)
-  public static void registerCurioPredicate(ResourceLocation resourceLocation,
+  public static void registerCurioPredicate(Identifier resourceLocation,
                                             Predicate<SlotResult> predicate) {
     CuriosSlotTypes.registerPredicate(resourceLocation, (slotContext, stack) -> predicate.test(
         new SlotResult(slotContext, stack)));
   }
 
   /**
-   * Gets an existing predicate, or empty if none found, keyed to a {@link ResourceLocation} for
+   * Gets an existing predicate, or empty if none found, keyed to a {@link Identifier} for
    * deciding which slots are assigned to a given {@link ItemStack}.
    *
-   * @param resourceLocation The unique {@link ResourceLocation} of the validator
-   * @return An Optional of the predicate found for the ResourceLocation, or empty otherwise
-   * @deprecated Use {@link CuriosSlotTypes#getPredicate(ResourceLocation)} instead.
+   * @param resourceLocation The unique {@link Identifier} of the validator
+   * @return An Optional of the predicate found for the Identifier, or empty otherwise
+   * @deprecated Use {@link CuriosSlotTypes#getPredicate(Identifier)} instead.
    */
   @Deprecated(forRemoval = true)
   public static Optional<Predicate<SlotResult>> getCurioPredicate(
-      ResourceLocation resourceLocation) {
+      Identifier resourceLocation) {
     BiPredicate<SlotContext, ItemStack> predicate = CuriosSlotTypes.getPredicate(resourceLocation);
 
     if (predicate != null) {
@@ -464,12 +464,12 @@ public final class CuriosApi {
   /**
    * Gets all registered predicates deciding which slots are assigned to a given {@link ItemStack}.
    *
-   * @return A map of the registered predicates keyed by {@link ResourceLocation}
+   * @return A map of the registered predicates keyed by {@link Identifier}
    * @deprecated Use {@link CuriosSlotTypes#getPredicates()} instead.
    */
   @Deprecated(forRemoval = true)
-  public static Map<ResourceLocation, Predicate<SlotResult>> getCurioPredicates() {
-    Map<ResourceLocation, Predicate<SlotResult>> result = new LinkedHashMap<>();
+  public static Map<Identifier, Predicate<SlotResult>> getCurioPredicates() {
+    Map<Identifier, Predicate<SlotResult>> result = new LinkedHashMap<>();
     CuriosSlotTypes.getPredicates().forEach((resourceLocation, predicate) -> {
       result.put(resourceLocation,
                  (slotResult) -> predicate.test(slotResult.slotContext(), slotResult.stack()));
@@ -480,13 +480,13 @@ public final class CuriosApi {
   /**
    * Evaluates a set of predicates to determine if a given {@link SlotResult} is a valid assignment.
    *
-   * @param predicates A set of ResourceLocations representing the predicates to iterate
+   * @param predicates A set of Identifiers representing the predicates to iterate
    * @param slotResult The SlotResult containing the {@link SlotContext} and {@link ItemStack}
    * @return True if any of the predicates pass, false otherwise
    * @deprecated Use {@link CuriosSlotTypes#testPredicates(SlotContext, ItemStack, Set)} instead.
    */
   @Deprecated(forRemoval = true)
-  public static boolean testCurioPredicates(Set<ResourceLocation> predicates,
+  public static boolean testCurioPredicates(Set<Identifier> predicates,
                                             SlotResult slotResult) {
     return CuriosSlotTypes.testPredicates(slotResult.slotContext(), slotResult.stack(), predicates);
   }
