@@ -128,10 +128,6 @@ public class CurioInventory implements ValueIOSerializable {
               new AttributeModifier(SIZE_SHIFT, oldSize - defaultSize,
                   AttributeModifier.Operation.ADD_VALUE));
         }
-
-        if (curioStacksHandler instanceof CurioStacksHandler curioStacksHandler1) {
-          curioStacksHandler1.setDataLoaded();
-        }
         int index = 0;
 
         while (index < curioStacksHandler.getSlots() && index < prevStacksHandler.getSlots()) {
@@ -205,7 +201,12 @@ public class CurioInventory implements ValueIOSerializable {
     this.curios.clear();
 
     for (Map.Entry<ISlotType, ICurioStacksHandler> entry : sortedCurios.entrySet()) {
-      this.curios.put(entry.getKey().getId(), entry.getValue());
+      ICurioStacksHandler stacksHandler = entry.getValue();
+
+      if (stacksHandler instanceof CurioStacksHandler curioStacksHandler) {
+        curioStacksHandler.setDataLoaded();
+      }
+      this.curios.put(entry.getKey().getId(), stacksHandler);
     }
   }
 
