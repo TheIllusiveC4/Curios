@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 to [Semantic Versioning](http://semver.org/spec/v2.0.0.html). Prior to version 5.2.0, this projected
 used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [13.0.0+1.21.10] - 2026.02.16
+
+### Added
+- Added `ICurioRenderer#render` method with `SubmitNodeCollector` parameter
+
+### Changed
+- Changed `CuriosCapability#ITEM_HANDLER` type to `ResourceHandler` of `ItemResource`
+- Changed `ICurioRendere#ModelRenderer` methods to take `SubmitNodeCollector` instead of `MultiBufferSource`
+
+### Deprecated
+- Deprecated `ICurioRenderer#render` method with `MultiBufferSource` parameter
+
 ## [12.0.0+1.21.8] - 2026.02.16
 
 ### Added

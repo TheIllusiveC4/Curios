@@ -4,19 +4,14 @@ to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This is a copy of the changelog for the most recent version. For the full version history,
 go [here](https://github.com/TheIllusiveC4/Curios/blob/1.21.8/CHANGELOG.md).
 
-## [12.0.0+1.21.8] - 2026.02.16
+## [13.0.0+1.21.10] - 2026.02.16
 
 ### Added
-- Added new constructors for `CurioCanEquipEvent`, `CurioCanUnequipEvent`, and `CurioChangeEvent`
-- Added `ICuriosItemHandler#loadDatapacks`
+- Added `ICurioRenderer#render` method with `SubmitNodeCollector` parameter
 
 ### Changed
-- `ICuriosItemHandler`, `ICurioStacksHandler`, and `IDynamicStackHandler` now extend `ValueIOSerializable`
+- Changed `CuriosCapability#ITEM_HANDLER` type to `ResourceHandler` of `ItemResource`
+- Changed `ICurioRendere#ModelRenderer` methods to take `SubmitNodeCollector` instead of `MultiBufferSource`
 
 ### Deprecated
-
-- Deprecated old constructors for `CurioCanEquipEvent`, `CurioCanUnequipEvent`, and `CurioChangeEvent`
-- Deprecated tag-based serialization and deserialization methods:
-    - `serializeNBT` and `deserializeNBT` in `IDynamicStackHandler`
-    - `serializeNBT` and `deserializeNBT` in `ICurioStacksHandler`
-    - `writeTag` and `readTag` in `IDynamicStackHandler`
+- Deprecated `ICurioRenderer#render` method with `MultiBufferSource` parameter
