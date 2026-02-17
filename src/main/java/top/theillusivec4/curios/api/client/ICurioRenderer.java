@@ -324,7 +324,7 @@ public interface ICurioRenderer {
               RenderType.armorCutoutNoCull(this.getModelTexture(stack, slotContext)),
               packedLight,
               OverlayTexture.NO_OVERLAY,
-              0,
+              -1,
               null,
               renderState.outlineColor,
               null);
@@ -339,7 +339,7 @@ public interface ICurioRenderer {
                 RenderType.armorEntityGlint(),
                 packedLight,
                 OverlayTexture.NO_OVERLAY,
-                0,
+                -1,
                 null,
                 renderState.outlineColor,
                 null);
@@ -363,21 +363,57 @@ public interface ICurioRenderer {
         float xRotation) {
       // NO-OP
     }
+
+    @Override
+    default <L extends LivingEntityRenderState, T extends EntityModel<? super L>> void render(
+        ItemStack stack,
+        SlotContext slotContext,
+        PoseStack poseStack,
+        SubmitNodeCollector renderTypeBuffer,
+        int packedLight,
+        L renderState,
+        RenderLayerParent<L, T> renderLayerParent,
+        EntityRendererProvider.Context context,
+        float yRotation,
+        float xRotation) {
+      this.prepareModel(
+          stack,
+          slotContext,
+          poseStack,
+          renderTypeBuffer,
+          packedLight,
+          (S) renderState,
+          (RenderLayerParent<S, M>) renderLayerParent,
+          context,
+          yRotation,
+          xRotation);
+      this.renderModel(
+          stack,
+          slotContext,
+          poseStack,
+          renderTypeBuffer,
+          packedLight,
+          (S) renderState,
+          (RenderLayerParent<S, M>) renderLayerParent,
+          context,
+          yRotation,
+          xRotation);
+    }
   }
 
-  //  /**
-//   * Renderer that uses a {@link HumanoidModel} for rendering.
-//   *
-//   * <p>The default methods will call {@link #copyHumanoidProperties(HumanoidModel, EntityModel)}
-//   * and {@link #setupHumanoidAnimations(EntityModel, LivingEntityRenderState)} on the model
-//   * before rendering.
-//   *
-//   * <p>This also implements
-//   * {@link #renderFirstPersonHand(ItemStack, SlotContext, HumanoidArm, PoseStack,
-//   * MultiBufferSource, AvatarRenderState, AbstractClientPlayer, int)} with the same rendering that
-//   * is performed in {@link #render(ItemStack, SlotContext, PoseStack, MultiBufferSource, int,
-//   * LivingEntityRenderState, RenderLayerParent, EntityRendererProvider.Context, float, float)}.
-//   */
+  /**
+   * Renderer that uses a {@link HumanoidModel} for rendering.
+   *
+   * <p>The default methods will call {@link #setupHumanoidAnimations(EntityModel, LivingEntityRenderState)}
+   * on the model before rendering.
+   *
+   * <p>This also implements
+   * {@link #renderFirstPersonHand(ItemStack, SlotContext, HumanoidArm, PoseStack,
+   * SubmitNodeCollector, AvatarRenderState, AbstractClientPlayer, int)}
+   * with the same rendering that is performed in
+   * {@link #render(ItemStack, SlotContext, PoseStack, MultiBufferSource, int,
+   * LivingEntityRenderState, RenderLayerParent, EntityRendererProvider.Context, float, float)}.
+   */
   interface HumanoidRender
       extends ModelRender<HumanoidRenderState, EntityModel<HumanoidRenderState>> {
 
@@ -418,7 +454,7 @@ public interface ICurioRenderer {
               RenderType.armorCutoutNoCull(this.getModelTexture(stack, slotContext)),
               packedLight,
               OverlayTexture.NO_OVERLAY,
-              0,
+              -1,
               null,
               avatarRenderState.outlineColor,
               null);
@@ -433,7 +469,7 @@ public interface ICurioRenderer {
                 RenderType.armorEntityGlint(),
                 packedLight,
                 OverlayTexture.NO_OVERLAY,
-                0,
+                -1,
                 null,
                 avatarRenderState.outlineColor,
                 null);
