@@ -329,10 +329,10 @@ publishing {
 
     repositories {
         maven {
-            url = "${System.getenv('MAVEN_URL')}"
+            url = System.getenv('MAVEN_URL')
             credentials {
-                username = "${System.getenv('MAVEN_USER')}"
-                password = "${System.getenv('MAVEN_PASSWORD')}"
+                username = System.getenv('MAVEN_USER')
+                password = System.getenv('MAVEN_PASSWORD')
             }
         }
     }
