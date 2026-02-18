@@ -33,7 +33,6 @@ public class AmuletModel extends HumanoidModel<HumanoidRenderState> {
 
   public AmuletModel(ModelPart part) {
     super(part);
-    this.setAllVisible(false);
     this.body.visible = true;
   }
 

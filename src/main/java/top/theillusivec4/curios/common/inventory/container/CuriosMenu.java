@@ -271,8 +271,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
         CraftingRecipe craftingrecipe = recipeholder.value();
 
         if (this.resultSlots.setRecipeUsed(serverplayer, recipeholder)) {
-          ItemStack itemstack1 =
-              craftingrecipe.assemble(craftinginput, serverlevel.registryAccess());
+          ItemStack itemstack1 = craftingrecipe.assemble(craftinginput);
 
           if (itemstack1.isItemEnabled(serverlevel.enabledFeatures())) {
             itemstack = itemstack1;

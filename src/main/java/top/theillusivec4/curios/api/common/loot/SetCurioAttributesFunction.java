@@ -43,7 +43,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
@@ -57,9 +56,6 @@ import top.theillusivec4.curios.api.type.ISlotType;
  * Loot function to create curio attribute modifiers and set them on an ItemStack.
  */
 public class SetCurioAttributesFunction extends LootItemConditionalFunction {
-
-  public static final LootItemFunctionType<SetCurioAttributesFunction> TYPE =
-      new LootItemFunctionType<>(SetCurioAttributesFunction.CODEC);
 
   public static final MapCodec<SetCurioAttributesFunction> CODEC = RecordCodecBuilder.mapCodec(
       instance -> commonFields(instance)
@@ -87,16 +83,16 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
 
   @Nonnull
   @Override
-  public LootItemFunctionType<SetCurioAttributesFunction> getType() {
-    return TYPE;
-  }
-
-  @Nonnull
-  @Override
   public Set<ContextKey<?>> getReferencedContextParams() {
     return this.modifiers.stream()
         .flatMap(modifier -> modifier.amount.getReferencedContextParams().stream())
         .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @Nonnull
+  @Override
+  public MapCodec<? extends LootItemConditionalFunction> codec() {
+    return CODEC;
   }
 
   @Nonnull

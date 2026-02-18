@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -48,9 +49,8 @@ public class SlotAttribute extends Attribute {
 
   @SuppressWarnings("unchecked")
   public static Holder<Attribute> getOrCreate(String id) {
-    return (Holder<Attribute>) SLOT_ATTRIBUTES.computeIfAbsent(id,
-                                                               (k) -> new Holder.Direct<>(
-                                                                   new SlotAttribute(id)));
+    return (Holder<Attribute>) SLOT_ATTRIBUTES.computeIfAbsent(
+        id, (_) -> new Holder.Direct<>(new SlotAttribute(id), DataComponentMap.EMPTY));
   }
 
   protected SlotAttribute(String id) {

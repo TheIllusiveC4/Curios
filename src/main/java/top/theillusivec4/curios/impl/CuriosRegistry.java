@@ -28,7 +28,6 @@ import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
@@ -36,7 +35,6 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import top.theillusivec4.curios.api.CurioAttributeModifiers;
 import top.theillusivec4.curios.api.CuriosResources;
-import top.theillusivec4.curios.api.common.loot.SetCurioAttributesFunction;
 import top.theillusivec4.curios.api.internal.services.ICuriosRegistry;
 import top.theillusivec4.curios.common.capability.CurioInventory;
 import top.theillusivec4.curios.common.inventory.container.CuriosMenu;
@@ -54,8 +52,6 @@ public class CuriosRegistry implements ICuriosRegistry {
       DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, CuriosResources.MOD_ID);
   private static final DeferredRegister<MenuType<?>> MENU_TYPES =
       DeferredRegister.create(Registries.MENU, CuriosResources.MOD_ID);
-  private static final DeferredRegister<LootItemFunctionType<?>> LOOT_FUNCTIONS =
-      DeferredRegister.create(Registries.LOOT_FUNCTION_TYPE, CuriosResources.MOD_ID);
   private static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS =
       DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, CuriosResources.MOD_ID);
 
@@ -68,9 +64,6 @@ public class CuriosRegistry implements ICuriosRegistry {
   public static final Supplier<MenuType<CuriosMenu>> CURIO_MENU =
       MENU_TYPES.register("curios_container",
                           () -> IMenuTypeExtension.create(CuriosMenu::new));
-  public static final Supplier<LootItemFunctionType<SetCurioAttributesFunction>> CURIO_ATTRIBUTES =
-      LOOT_FUNCTIONS.register("set_curio_attributes",
-                              () -> new LootItemFunctionType<>(SetCurioAttributesFunction.CODEC));
   public static final Supplier<EquipCurioTrigger> EQUIP_TRIGGER =
       CRITERION_TRIGGERS.register("equip_curio", () -> EquipCurioTrigger.INSTANCE);
 
@@ -90,7 +83,6 @@ public class CuriosRegistry implements ICuriosRegistry {
   public static void init(IEventBus eventBus) {
     ARGUMENT_TYPES.register(eventBus);
     MENU_TYPES.register(eventBus);
-    LOOT_FUNCTIONS.register(eventBus);
     ATTACHMENT_TYPES.register(eventBus);
     CRITERION_TRIGGERS.register(eventBus);
     DATA_COMPONENTS.register(eventBus);

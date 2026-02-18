@@ -178,7 +178,7 @@ public class CuriosCommand {
   private static int replaceItemForPlayer(CommandSourceStack source, ServerPlayer player,
                                           String slot, int index, ItemInput item, int count)
       throws CommandSyntaxException {
-    ItemStack stack = item.createItemStack(count, false);
+    ItemStack stack = item.createItemStack(count);
     CuriosApi.getCuriosInventory(player).ifPresent(inv -> inv.setEquippedCurio(slot, index, stack));
     source.sendSuccess(() -> Component.translatable("commands.curios.replace.success", slot,
                                                     player.getDisplayName(),

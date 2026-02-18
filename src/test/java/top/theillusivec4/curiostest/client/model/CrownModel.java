@@ -33,7 +33,6 @@ public class CrownModel<T extends HumanoidRenderState> extends HumanoidModel<T> 
 
   public CrownModel(ModelPart part) {
     super(part);
-    this.setAllVisible(false);
     this.head.visible = true;
   }
 

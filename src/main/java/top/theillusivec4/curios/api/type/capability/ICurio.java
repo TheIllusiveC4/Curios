@@ -43,6 +43,7 @@ import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.Vec3;
@@ -369,7 +370,7 @@ public interface ICurio {
         livingEntity.level()
             .playLocalSound(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(),
                             SoundEvents.ITEM_BREAK.value(), livingEntity.getSoundSource(), 0.8F,
-                            0.8F + livingEntity.level().random.nextFloat() * 0.4F, false);
+                            0.8F + livingEntity.level().getRandom().nextFloat() * 0.4F, false);
       }
 
       for (int i = 0; i < 5; ++i) {
@@ -385,8 +386,10 @@ public interface ICurio {
         vec3d1 = vec3d1.add(livingEntity.getX(),
                             livingEntity.getY() + livingEntity.getEyeHeight(), livingEntity.getZ());
         livingEntity.level()
-            .addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
-                         vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
+            .addParticle(
+                new ItemParticleOption(ParticleTypes.ITEM,
+                                       ItemStackTemplate.fromNonEmptyStack(stack)),
+                vec3d1.x, vec3d1.y, vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
       }
     }
   }

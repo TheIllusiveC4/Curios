@@ -446,7 +446,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
         int l = slot.getItem().isEmpty() ? 0 : slot.getItem().getCount();
         int i1 =
             AbstractContainerMenu.getQuickCraftPlaceCount(
-                this.quickCraftSlots, this.quickCraftingType, itemstack1)
+                this.quickCraftSlots.size(), this.quickCraftingType, itemstack1)
                 + l;
 
         if (i1 > k) {

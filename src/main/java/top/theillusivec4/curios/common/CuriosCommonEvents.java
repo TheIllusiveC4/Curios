@@ -150,8 +150,8 @@ public class CuriosCommonEvents {
     ItemEntity entityitem = new ItemEntity(livingEntity.level(), livingEntity.getX(), d0,
         livingEntity.getZ(), droppedItem);
     entityitem.setPickUpDelay(40);
-    float f = livingEntity.level().random.nextFloat() * 0.5F;
-    float f1 = livingEntity.level().random.nextFloat() * ((float) Math.PI * 2F);
+    float f = livingEntity.level().getRandom().nextFloat() * 0.5F;
+    float f1 = livingEntity.level().getRandom().nextFloat() * ((float) Math.PI * 2F);
     entityitem.setDeltaMovement((-Mth.sin(f1) * f), 0.20000000298023224D, (Mth.cos(f1) * f));
     return entityitem;
   }
