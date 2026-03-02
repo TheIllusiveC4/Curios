@@ -346,7 +346,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
       } else if (index < 46 &&
           !CuriosSlotTypes.getItemSlotTypes(itemstack, playerIn).isEmpty()) {
 
-        if (!this.moveItemStackTo(itemstack1, 46, this.slots.size(), false)) {
+        if (!this.moveItemToSpecificSlotsOverCurioSlots(itemstack1)) {
           int page = this.findAvailableSlot(itemstack1);
 
           if (page != -1) {
@@ -498,5 +498,65 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
 
   private record ProxySlot(int page, Slot slot) {
 
+  }
+
+
+  private boolean moveItemToSpecificSlotsOverCurioSlots(ItemStack stack) {
+    List<Slot> specificSlots = new ArrayList<>();
+    List<Slot> genericSlots = new ArrayList<>();
+
+    for (int i = 46; i < this.slots.size(); i++) {
+      Slot slot = this.slots.get(i);
+
+      if (slot instanceof CurioSlot curioSlot && curioSlot.mayPlace(stack)) {
+        if (CuriosSlotTypes.Preset.CURIO.id().equals(curioSlot.getIdentifier())) {
+          genericSlots.add(slot);
+        } else {
+          specificSlots.add(slot);
+        }
+      }
+    }
+
+    if (this.moveToSlotList(stack, specificSlots)) {
+      return true;
+    }
+
+    return this.moveToSlotList(stack, genericSlots);
+  }
+
+  private boolean moveToSlotList(ItemStack stack, List<Slot> slots) {
+
+    for (Slot slot : slots) {
+
+      if (!slot.hasItem() && slot.mayPlace(stack)) {
+        slot.set(stack.copy());
+        stack.setCount(0);
+        slot.setChanged();
+        return true;
+      }
+
+      ItemStack existing = slot.getItem();
+
+      if (!existing.isEmpty() &&
+          ItemStack.isSameItemSameComponents(stack, existing)) {
+
+        int maxSize = Math.min(slot.getMaxStackSize(),
+                               stack.getMaxStackSize());
+
+        int transferable =
+            Math.min(stack.getCount(), maxSize - existing.getCount());
+
+        if (transferable > 0) {
+          existing.grow(transferable);
+          stack.shrink(transferable);
+          slot.setChanged();
+          if (stack.isEmpty()) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return stack.isEmpty();
   }
 }
