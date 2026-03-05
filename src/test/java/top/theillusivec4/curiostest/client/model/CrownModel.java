@@ -39,11 +39,12 @@ public class CrownModel<T extends HumanoidRenderState> extends HumanoidModel<T> 
   public static LayerDefinition createLayer() {
     MeshDefinition mesh = HumanoidModel.createMesh(CubeDeformation.NONE, 0.0F);
     PartDefinition part = mesh.getRoot();
-    part.addOrReplaceChild("head",
+    PartDefinition head = part.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
+    head.addOrReplaceChild("hat",
                            CubeListBuilder.create().texOffs(0, 0)
                                .addBox(-3.0F, -12.0F, -3.0F, 6, 4, 6,
                                        CubeDeformation.NONE.extend(1.0F)),
-                           PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F));
+                           PartPose.ZERO);
     return LayerDefinition.create(mesh, 32, 32);
   }
 }

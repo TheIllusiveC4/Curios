@@ -33,6 +33,11 @@ public class KnucklesModel extends HumanoidModel<HumanoidRenderState> {
 
   public KnucklesModel(ModelPart part) {
     super(part);
+
+    for (ModelPart somePart : this.allParts()) {
+      somePart.visible = false;
+    }
+    this.root.visible = true;
     this.rightArm.visible = true;
     this.leftArm.visible = true;
   }
