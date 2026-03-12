@@ -171,10 +171,10 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     AttributeModifier newModifier =
         new AttributeModifier(LEGACY_UUID, "legacy", current, AttributeModifier.Operation.ADDITION);
     this.modifiers.put(newModifier.getId(), newModifier);
-    Collection<AttributeModifier> modifiers =
-        this.getModifiersByOperation(newModifier.getOperation());
-    modifiers.remove(newModifier);
-    modifiers.add(newModifier);
+    synchronized (this.modifiersByOperation) {
+      this.modifiersByOperation.remove(newModifier.getOperation(), newModifier);
+      this.modifiersByOperation.put(newModifier.getOperation(), newModifier);
+    }
     this.persistentModifiers.remove(newModifier);
     this.persistentModifiers.add(newModifier);
     this.flagUpdate();
@@ -437,12 +437,16 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   public Collection<AttributeModifier> getModifiersByOperation(
       AttributeModifier.Operation operation) {
-    return this.modifiersByOperation.get(operation);
+    synchronized (this.modifiersByOperation) {
+      return new ArrayList<>(this.modifiersByOperation.get(operation));
+    }
   }
 
   public void addTransientModifier(AttributeModifier modifier) {
     this.modifiers.put(modifier.getId(), modifier);
-    this.getModifiersByOperation(modifier.getOperation()).add(modifier);
+    synchronized (this.modifiersByOperation) {
+      this.modifiersByOperation.put(modifier.getOperation(), modifier);
+    }
     this.flagUpdate();
   }
 
@@ -456,7 +460,9 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
     if (modifier != null) {
       this.persistentModifiers.remove(modifier);
-      this.getModifiersByOperation(modifier.getOperation()).remove(modifier);
+      synchronized (this.modifiersByOperation) {
+        this.modifiersByOperation.remove(modifier.getOperation(), modifier);
+      }
       this.flagUpdate();
     }
   }
