@@ -21,7 +21,7 @@
 package top.theillusivec4.curios.client.screen.button;
 
 import javax.annotation.Nonnull;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -50,13 +50,13 @@ public class RenderButton extends ImageButton implements ICuriosWidget {
   }
 
   @Override
-  public void renderContents(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
-                           float partialTicks) {
+  public void extractContents(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY,
+                              float partialTicks) {
     // NO-OP
   }
 
-  public void renderButtonOverlay(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
-                                  float partialTicks) {
+  public void extractButtonOverlay(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY,
+                                   float partialTicks) {
     int j = this.xTexStart;
 
     if (!slot.getRenderStatus()) {

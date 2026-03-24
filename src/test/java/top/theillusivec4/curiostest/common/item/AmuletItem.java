@@ -26,7 +26,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -107,8 +107,8 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
         amuletModel.setupAnim(humanoidRenderState);
       }
       VertexConsumer vertexconsumer =
-          ItemRenderer.getFoilBuffer(renderTypeBuffer, RenderTypes.armorCutoutNoCull(AMULET_TEXTURE),
-                                     false, stack.hasFoil());
+          ItemFeatureRenderer.getFoilBuffer(renderTypeBuffer, RenderTypes.armorCutoutNoCull(AMULET_TEXTURE),
+                                           false, stack.hasFoil());
       (amuletModel)
           .renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
     }

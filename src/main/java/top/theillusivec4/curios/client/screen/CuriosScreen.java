@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.ItemSlotMouseAction;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.navigation.ScreenPosition;
@@ -186,10 +186,8 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  public void render(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-    this.effects.render(guiGraphics, mouseX, mouseY);
-    Slot hoveredSlot = this.hoveredSlot;
-    // Workaround for slots that are removed due to slot modifier changes
+  public void extractRenderState(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    this.effects.extractRenderState(guiGraphics, mouseX, mouseY);
     if (this.hoveredSlot instanceof CurioSlot curioSlot) {
       int slots = curioSlot.getItemHandler().getSlots();
       int index = curioSlot.getSlotIndex();
@@ -198,13 +196,13 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
         this.hoveredSlot = null;
       }
     }
-    super.render(guiGraphics, mouseX, mouseY, partialTicks);
+    super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
     boolean isButtonHovered = false;
 
     for (Renderable button : this.renderables) {
 
       if (button instanceof RenderButton) {
-        ((RenderButton) button).renderButtonOverlay(guiGraphics, mouseX, mouseY, partialTicks);
+        ((RenderButton) button).extractButtonOverlay(guiGraphics, mouseX, mouseY, partialTicks);
 
         if (((RenderButton) button).isHovered()) {
           isButtonHovered = true;
@@ -232,7 +230,6 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
         }
       }
     }
-    this.renderTooltip(guiGraphics, mouseX, mouseY);
     this.oldMouseX = mouseX;
     this.oldMouseY = mouseY;
   }
@@ -243,7 +240,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  protected void renderTooltip(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY) {
+  protected void extractTooltip(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
     Minecraft mc = this.minecraft;
 
     if (mc != null) {
@@ -305,16 +302,14 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  protected void renderLabels(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY) {
-    guiGraphics.drawString(this.font, this.title, 97, 6, 4210752, false);
+  protected void extractLabels(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+    guiGraphics.text(this.font, this.title, 97, 6, 4210752, false);
   }
 
-  /**
-   * Draws the background layer of this container (behind the item).
-   */
   @Override
-  public void renderBg(
-      @Nonnull GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+  public void extractBackground(
+      @Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    super.extractBackground(guiGraphics, mouseX, mouseY, partialTicks);
 
     if (this.minecraft != null && this.minecraft.player != null) {
 
@@ -326,7 +321,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
       int j = this.topPos;
       guiGraphics.blit(RenderPipelines.GUI_TEXTURED, INVENTORY_LOCATION, i, j, 0, 0, 176,
           this.imageHeight, 256, 256);
-      InventoryScreen.renderEntityInInventoryFollowsMouse(
+      InventoryScreen.extractEntityInInventoryFollowsMouse(
           guiGraphics,
           i + 26,
           j + 8,
@@ -411,7 +406,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  protected void renderSlot(@Nonnull GuiGraphics guiGraphics, Slot slot, int x, int y) {
+  protected void extractSlot(@Nonnull GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX, int mouseY) {
     int i = slot.x;
     int j = slot.y;
     ItemStack itemstack = slot.getItem();
@@ -420,11 +415,11 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
       itemstack =
           curioSlot.getSlotExtension().getDisplayStack(curioSlot.getSlotContext(), itemstack);
     }
-    boolean flag = false;
-    boolean flag1 =
+    boolean quickCraftStack = false;
+    boolean done =
         slot == this.clickedSlot && !this.draggingItem.isEmpty() && !this.isSplittingStack;
-    ItemStack itemstack1 = this.menu.getCarried();
-    String s = null;
+    ItemStack carried = this.menu.getCarried();
+    String itemCount = null;
 
     if (slot == this.clickedSlot
         && !this.draggingItem.isEmpty()
@@ -433,27 +428,27 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
       itemstack = itemstack.copyWithCount(itemstack.getCount() / 2);
     } else if (this.isQuickCrafting
         && this.quickCraftSlots.contains(slot)
-        && !itemstack1.isEmpty()) {
+        && !carried.isEmpty()) {
 
       if (this.quickCraftSlots.size() == 1) {
         return;
       }
 
-      if (AbstractContainerMenu.canItemQuickReplace(slot, itemstack1, true)
+      if (AbstractContainerMenu.canItemQuickReplace(slot, carried, true)
           && this.menu.canDragTo(slot)) {
-        flag = true;
-        int k = Math.min(itemstack1.getMaxStackSize(), slot.getMaxStackSize(itemstack1));
-        int l = slot.getItem().isEmpty() ? 0 : slot.getItem().getCount();
-        int i1 =
+        quickCraftStack = true;
+        int maxSize = Math.min(carried.getMaxStackSize(), slot.getMaxStackSize(carried));
+        int carry = slot.getItem().isEmpty() ? 0 : slot.getItem().getCount();
+        int newCount =
             AbstractContainerMenu.getQuickCraftPlaceCount(
-                this.quickCraftSlots.size(), this.quickCraftingType, itemstack1)
-                + l;
+                this.quickCraftSlots.size(), this.quickCraftingType, carried)
+                + carry;
 
-        if (i1 > k) {
-          i1 = k;
-          s = ChatFormatting.YELLOW.toString() + k;
+        if (newCount > maxSize) {
+          newCount = maxSize;
+          itemCount = ChatFormatting.YELLOW.toString() + maxSize;
         }
-        itemstack = itemstack1.copyWithCount(i1);
+        itemstack = carried.copyWithCount(newCount);
       } else {
         this.quickCraftSlots.remove(slot);
         this.recalculateQuickCraftRemaining();
@@ -465,16 +460,22 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
 
       if (rl != null) {
         guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, rl, i, j, 16, 16);
-        flag1 = true;
+        done = true;
       }
     }
 
-    if (!flag1) {
+    if (!done) {
 
-      if (flag) {
+      if (quickCraftStack) {
         guiGraphics.fill(i, j, i + 16, j + 16, -2130706433);
       }
-      this.renderSlotContents(guiGraphics, itemstack, slot, s);
+      int seed = slot.x + slot.y * this.imageWidth;
+      if (slot.isFake()) {
+        guiGraphics.fakeItem(itemstack, i, j, seed);
+      } else {
+        guiGraphics.item(itemstack, i, j, seed);
+      }
+      guiGraphics.itemDecorations(this.font, itemstack, i, j, itemCount);
     }
   }
 

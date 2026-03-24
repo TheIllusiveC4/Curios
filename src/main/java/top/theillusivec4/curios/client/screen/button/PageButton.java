@@ -20,14 +20,10 @@
 
 package top.theillusivec4.curios.client.screen.button;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -56,7 +52,7 @@ public class PageButton extends Button implements ICuriosWidget {
   }
 
   @Override
-  public void renderContents(@Nonnull GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+  protected void extractContents(@Nonnull GuiGraphicsExtractor guiGraphics, int x, int y, float partialTicks) {
     int xText = type == Type.NEXT ? 43 : 32;
     int yText = 25;
 
@@ -75,15 +71,10 @@ public class PageButton extends Button implements ICuriosWidget {
     }
 
     if (this.isHovered()) {
-      List<ClientTooltipComponent> tooltip = new ArrayList<>();
       int currentPage = this.parentGui.getMenu().currentPage + 1;
       int totalPages = this.parentGui.getMenu().totalPages;
-      tooltip.add(
-          ClientTooltipComponent.create(
-              Component.translatable("gui.curios.page", currentPage, totalPages)
-                  .getVisualOrderText()));
-      guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltip, x, y,
-                                DefaultTooltipPositioner.INSTANCE, null);
+      guiGraphics.setTooltipForNextFrame(
+          Component.translatable("gui.curios.page", currentPage, totalPages), x, y);
     }
     guiGraphics.blit(RenderPipelines.GUI_TEXTURED, CURIO_INVENTORY, this.getX(), this.getY(), xText,
                      yText, this.width, this.height, 256, 256);

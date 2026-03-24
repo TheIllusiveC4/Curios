@@ -22,7 +22,7 @@ package top.theillusivec4.curios.client.screen.button;
 
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -85,8 +85,8 @@ public class CuriosButton extends ImageButton {
   }
 
   @Override
-  public void renderContents(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
-                           float partialTicks) {
+  public void extractContents(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY,
+                              float partialTicks) {
     Tuple<Integer, Integer> offsets =
         CuriosScreen.getButtonOffset(parentGui instanceof CreativeModeInventoryScreen);
     this.setX(parentGui.getGuiLeft() + offsets.getA() + 2);
@@ -101,6 +101,6 @@ public class CuriosButton extends ImageButton {
         return;
       }
     }
-    super.renderContents(guiGraphics, mouseX, mouseY, partialTicks);
+    super.extractContents(guiGraphics, mouseX, mouseY, partialTicks);
   }
 }

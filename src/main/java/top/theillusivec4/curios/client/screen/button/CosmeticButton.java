@@ -21,7 +21,7 @@
 package top.theillusivec4.curios.client.screen.button;
 
 import javax.annotation.Nonnull;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
@@ -56,7 +56,7 @@ public class CosmeticButton extends ImageButton implements ICuriosWidget {
   }
 
   @Override
-  public void renderContents(@Nonnull GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+  public void extractContents(@Nonnull GuiGraphicsExtractor guiGraphics, int x, int y, float partialTicks) {
     WidgetSprites sprites1;
 
     if (this.parentGui.getMenu().isViewingCosmetics) {
