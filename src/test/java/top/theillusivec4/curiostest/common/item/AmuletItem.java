@@ -20,13 +20,11 @@
 package top.theillusivec4.curiostest.common.item;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -52,7 +50,7 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
 
   private static final Identifier AMULET_TEXTURE =
       Identifier.fromNamespaceAndPath(CuriosTest.MODID,
-                                            "textures/entity/amulet.png");
+                                      "textures/entity/amulet.png");
   private Object model;
 
   public AmuletItem(Item.Properties properties) {
@@ -92,7 +90,7 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
   @Override
   public <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void render(
       ItemStack stack, SlotContext slotContext, PoseStack poseStack,
-      MultiBufferSource renderTypeBuffer, int packedLight, S renderState,
+      SubmitNodeCollector submitNodeCollector, int packedLight, S renderState,
       RenderLayerParent<S, M> renderLayerParent, EntityRendererProvider.Context context,
       float yRotation, float xRotation) {
 
@@ -105,12 +103,10 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
 
       if (renderState instanceof HumanoidRenderState humanoidRenderState) {
         amuletModel.setupAnim(humanoidRenderState);
+        submitNodeCollector.submitModel(amuletModel, humanoidRenderState, poseStack,
+                                        RenderTypes.armorCutoutNoCull(AMULET_TEXTURE), packedLight,
+                                        OverlayTexture.NO_OVERLAY, 0, null);
       }
-      VertexConsumer vertexconsumer =
-          ItemRenderer.getFoilBuffer(renderTypeBuffer, RenderTypes.armorCutoutNoCull(AMULET_TEXTURE),
-                                     false, stack.hasFoil());
-      (amuletModel)
-          .renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
     }
   }
 }

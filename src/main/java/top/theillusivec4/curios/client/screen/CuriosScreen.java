@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.ItemSlotMouseAction;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.navigation.ScreenPosition;
@@ -186,8 +186,8 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  public void render(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-    this.effects.render(guiGraphics, mouseX, mouseY);
+  public void extractRenderState(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    this.effects.extractRenderState(guiGraphics, mouseX, mouseY);
     Slot hoveredSlot = this.hoveredSlot;
     // Workaround for slots that are removed due to slot modifier changes
     if (this.hoveredSlot instanceof CurioSlot curioSlot) {
@@ -198,7 +198,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
         this.hoveredSlot = null;
       }
     }
-    super.render(guiGraphics, mouseX, mouseY, partialTicks);
+    super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
     boolean isButtonHovered = false;
 
     for (Renderable button : this.renderables) {
@@ -232,7 +232,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
         }
       }
     }
-    this.renderTooltip(guiGraphics, mouseX, mouseY);
+    this.extractTooltip(guiGraphics, mouseX, mouseY);
     this.oldMouseX = mouseX;
     this.oldMouseY = mouseY;
   }
@@ -243,7 +243,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  protected void renderTooltip(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY) {
+  protected void extractTooltip(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
     Minecraft mc = this.minecraft;
 
     if (mc != null) {
@@ -305,16 +305,17 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  protected void renderLabels(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY) {
-    guiGraphics.drawString(this.font, this.title, 97, 6, 4210752, false);
+  protected void extractLabels(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+    guiGraphics.text(this.font, this.title, 97, 6, -12566464, false);
   }
 
   /**
    * Draws the background layer of this container (behind the item).
    */
   @Override
-  public void renderBg(
-      @Nonnull GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+  public void extractBackground(
+      @Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    super.extractBackground(guiGraphics, mouseX, mouseY, partialTicks);
 
     if (this.minecraft != null && this.minecraft.player != null) {
 
@@ -326,7 +327,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
       int j = this.topPos;
       guiGraphics.blit(RenderPipelines.GUI_TEXTURED, INVENTORY_LOCATION, i, j, 0, 0, 176,
           this.imageHeight, 256, 256);
-      InventoryScreen.renderEntityInInventoryFollowsMouse(
+      InventoryScreen.extractEntityInInventoryFollowsMouse(
           guiGraphics,
           i + 26,
           j + 8,
@@ -411,7 +412,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  protected void renderSlot(@Nonnull GuiGraphics guiGraphics, Slot slot, int x, int y) {
+  protected void extractSlot(@Nonnull GuiGraphicsExtractor guiGraphics, Slot slot, int x, int y) {
     int i = slot.x;
     int j = slot.y;
     ItemStack itemstack = slot.getItem();

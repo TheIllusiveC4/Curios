@@ -116,7 +116,7 @@ public class CurioInventory implements ValueIOSerializable {
       ISlotType slotType = CuriosSlotTypes.getSlotType(id, this.owner.level().isClientSide());
       ICurioStacksHandler prevStacksHandler = entry.getValue();
 
-      if (defaultInventory.containsKey(slotType)) {
+      if (slotType != null && defaultInventory.containsKey(slotType)) {
         ICurioStacksHandler curioStacksHandler = defaultInventory.get(slotType);
         int defaultSize = curioStacksHandler.getSlots();
         int oldSize = prevStacksHandler.getSlots();

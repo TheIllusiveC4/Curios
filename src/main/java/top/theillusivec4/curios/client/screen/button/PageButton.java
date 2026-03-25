@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
@@ -43,7 +43,7 @@ public class PageButton extends Button implements ICuriosWidget {
   private final Type type;
   private static final Identifier CURIO_INVENTORY =
       Identifier.fromNamespaceAndPath(CuriosConstants.MOD_ID,
-                                            "textures/gui/curios/inventory.png");
+                                      "textures/gui/curios/inventory.png");
 
   public PageButton(CuriosScreen parentGui, int xIn, int yIn, int widthIn, int heightIn,
                     Type type) {
@@ -56,7 +56,8 @@ public class PageButton extends Button implements ICuriosWidget {
   }
 
   @Override
-  public void renderContents(@Nonnull GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+  public void extractContents(@Nonnull GuiGraphicsExtractor guiGraphics, int x, int y,
+                              float partialTicks) {
     int xText = type == Type.NEXT ? 43 : 32;
     int yText = 25;
 
@@ -82,8 +83,8 @@ public class PageButton extends Button implements ICuriosWidget {
           ClientTooltipComponent.create(
               Component.translatable("gui.curios.page", currentPage, totalPages)
                   .getVisualOrderText()));
-      guiGraphics.renderTooltip(Minecraft.getInstance().font, tooltip, x, y,
-                                DefaultTooltipPositioner.INSTANCE, null);
+      guiGraphics.tooltip(Minecraft.getInstance().font, tooltip, x, y,
+                          DefaultTooltipPositioner.INSTANCE, null);
     }
     guiGraphics.blit(RenderPipelines.GUI_TEXTURED, CURIO_INVENTORY, this.getX(), this.getY(), xText,
                      yText, this.width, this.height, 256, 256);

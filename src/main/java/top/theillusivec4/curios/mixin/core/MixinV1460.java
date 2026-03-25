@@ -29,7 +29,7 @@ public class MixinV1460 {
 
   @ModifyArg(
       method = {
-          "lambda$registerTypes$36"
+          "lambda$registerTypes$2"
       },
       at = @At(
           value = "INVOKE",
