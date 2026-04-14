@@ -4,7 +4,7 @@ to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This is a copy of the changelog for the most recent version. For the full version history,
 go [here](https://github.com/TheIllusiveC4/Curios/blob/26.x/CHANGELOG.md).
 
-## [15.0.0-beta.1+26.1] - 2026.03.25
+## [15.0.0-beta.2+26.1.2] - 2026.04.13
 
 ### Changed
-- Updated to Minecraft 26.1
+- Updated to Minecraft 26.1.2

@@ -36,15 +36,16 @@ public class CuriosTestRegistry {
       DeferredRegister.createItems(CuriosTest.MODID);
 
   public static final DeferredItem<Item> RING =
-      ITEMS.registerItem("ring", RingItem::new, new Item.Properties().stacksTo(1).durability(0));
+      ITEMS.registerItem("ring", RingItem::new,
+                         () -> new Item.Properties().stacksTo(1).durability(0));
   public static final DeferredItem<Item> AMULET = ITEMS.registerItem("amulet", AmuletItem::new,
-                                                                     new Item.Properties().stacksTo(
+                                                                     () -> new Item.Properties().stacksTo(
                                                                          1).durability(0));
   public static final DeferredItem<Item> CROWN = ITEMS.registerItem("crown", CrownItem::new,
-                                                                    new Item.Properties().stacksTo(
+                                                                    () -> new Item.Properties().stacksTo(
                                                                         1).durability(2000));
   public static final DeferredItem<Item> KNUCKLES =
-      ITEMS.registerItem("knuckles", KnucklesItem::new, new Item.Properties().stacksTo(1));
+      ITEMS.registerItem("knuckles", KnucklesItem::new, () -> new Item.Properties().stacksTo(1));
 
   public static final DeferredItem<Item> TEST_ARMOR =
       ITEMS.registerItem("test_armor", TestArmor::new);
