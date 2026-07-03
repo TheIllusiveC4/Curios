@@ -43,25 +43,26 @@ jobs:
           J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
           echo "################ Minecraft: ALL Screen-typed members ################"
           javap -p -cp "$J" net.minecraft.client.Minecraft 2>&1 | grep -E "gui.screens.Screen" | head -30
-      - name: find and dump vanilla sources
+      - name: decompile target classes with vineflower
         run: |
-          echo "=== which jar actually contains AbstractContainerScreen.JAVA ==="
-          SRC=$(find /home/runner/.gradle /home/runner/work -name '*.jar' 2>/dev/null | while read j; do if unzip -l "$j" 2>/dev/null | grep -q "AbstractContainerScreen\.java"; then echo "$j"; fi; done | head -1)
-          echo "SRC=$SRC"
-          if [ -z "$SRC" ]; then
-            echo "=== no .java jar; search decompiled output dirs ==="
-            find /home/runner/.gradle/caches/neoformruntime -name 'AbstractContainerScreen.java' 2>/dev/null | head
-            find /home/runner -path '*sources*' -name '*.jar' 2>/dev/null | head -20
-            ACS=$(find /home/runner -name 'AbstractContainerScreen.java' 2>/dev/null | head -1); echo "ACS file: $ACS"
-            MC=$(find /home/runner -name 'Minecraft.java' -path '*net/minecraft*' 2>/dev/null | head -1); echo "MC file: $MC"
-            SRCFILE="$ACS"; MCFILE="$MC"; MODE=file
-          else
-            MODE=jar
-          fi
-          echo "=== ACS extractSlot / renderSlot ==="
-          if [ "$MODE" = jar ]; then unzip -p "$SRC" "*/AbstractContainerScreen.java" 2>/dev/null > /tmp/acs.java || unzip -p "$SRC" "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" > /tmp/acs.java 2>/dev/null; else cp "$SRCFILE" /tmp/acs.java 2>/dev/null; fi
-          grep -nE "extractSlot|renderSlot|lastClickSlot|getCarried|quickCraftSlots|isQuickCrafting|snapback|CarriedItem" /tmp/acs.java | head -30
-          echo "=== extractSlot method body ==="
-          awk 'BEGIN{d=0;s=0} /extractSlot *\(/{s=1} s{print; n=gsub(/\{/,"{"); m=gsub(/\}/,"}"); d+=n-m; if(s&&d==0&&NR>1&&/\}/)exit}' /tmp/acs.java | head -90
-          echo "=== Minecraft screen accessor ==="
-          if [ "$MODE" = file ] && [ -n "$MCFILE" ]; then grep -nE "Screen screen|getScreen|public.*Screen|this.screen" "$MCFILE" | head; fi
+          set +e
+          J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
+          echo "PATCHED=$J"
+          VF=$(find /home/runner/.gradle -iname 'vineflower*.jar' 2>/dev/null | grep -viE 'plugin' | head -1)
+          echo "VINEFLOWER=$VF"
+          if [ -z "$VF" ]; then echo "downloading vineflower"; VF=/tmp/vf.jar; curl -sL -o "$VF" https://github.com/Vineflower/vineflower/releases/download/1.11.1/vineflower-1.11.1.jar; fi
+          mkdir -p /tmp/in /tmp/out
+          cd /tmp/in
+          unzip -o "$J" 'net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.class*' 'net/minecraft/client/Minecraft.class*' >/dev/null 2>&1
+          echo "extracted classes:"; find /tmp/in -name '*.class' | head
+          cd /
+          java -jar "$VF" -dgs=1 /tmp/in /tmp/out >/tmp/vf.log 2>&1
+          echo "vf exit=$? (tail log)"; tail -3 /tmp/vf.log
+          ACS=$(find /tmp/out -name 'AbstractContainerScreen.java' | head -1); echo "ACS=$ACS"
+          MC=$(find /tmp/out -name 'Minecraft.java' | head -1); echo "MC=$MC"
+          echo "################ extractSlot (and neighbors) ################"
+          awk 'BEGIN{d=0;s=0} /(void|private|protected|public).*(extractSlot|renderSlot)[A-Za-z]* *\(/{s=1} s{print; n=gsub(/{/,"{"); m=gsub(/}/,"}"); d+=n-m; if(s&&d<=0&&/}/)exit}' "$ACS" | head -100
+          echo "################ ACS carried/dragging refs ################"
+          grep -nE "getCarried|lastClickSlot|isQuickCrafting|quickCraftSlots|snapback|carried" "$ACS" | head -20
+          echo "################ Minecraft screen field/getter ################"
+          grep -nE "Screen screen|getScreen|public Screen|Screen currentScreen|this.screen ?=" "$MC" | head
