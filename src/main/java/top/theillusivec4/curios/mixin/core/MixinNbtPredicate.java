@@ -22,20 +22,31 @@ package top.theillusivec4.curios.mixin.core;
 
 import net.minecraft.advancements.criterion.NbtPredicate;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.storage.TagValueOutput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import top.theillusivec4.curios.mixin.CuriosCommonMixinHooks;
 
 @Mixin(NbtPredicate.class)
 public class MixinNbtPredicate {
 
-  @ModifyVariable(
-      at = @At("RETURN"),
-      method = "getEntityTagToCompare"
+  @Inject(
+      at = @At(
+          value = "INVOKE",
+          target = "net/minecraft/world/level/storage/TagValueOutput.buildResult()"
+              + "Lnet/minecraft/nbt/CompoundTag;"),
+      method = "getEntityTagToCompare",
+      locals = LocalCapture.CAPTURE_FAILSOFT
   )
-  private static CompoundTag curios$mergeCuriosInventory(CompoundTag compoundTag, Entity entity) {
-    return CuriosCommonMixinHooks.mergeCuriosInventory(compoundTag, entity);
+  private static void curios$mergeCuriosInventory(Entity entity,
+                                                  CallbackInfoReturnable<CompoundTag> cir,
+                                                  ProblemReporter.ScopedCollector reporter,
+                                                  TagValueOutput output) {
+    CuriosCommonMixinHooks.mergeCuriosInventory(reporter, output.buildResult(), entity);
   }
 }

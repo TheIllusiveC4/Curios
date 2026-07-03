@@ -24,19 +24,28 @@ import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.datafix.fixes.References;
+import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -80,7 +89,8 @@ public class CuriosCommonMixinHooks {
           NonNullList<Boolean> renderStates = entry.getValue().getRenders();
           boolean canNeutralize =
               CuriosApi.getCurio(stacks.getStackInSlot(i)).map(curio -> curio
-                      .makesPiglinsNeutral(new SlotContext(entry.getKey(), livingEntity, index, false,
+                      .makesPiglinsNeutral(new SlotContext(entry.getKey(), livingEntity, index,
+                          false,
                           renderStates.size() > index && renderStates.get(index))))
                   .orElse(false);
 
@@ -104,7 +114,8 @@ public class CuriosCommonMixinHooks {
           NonNullList<Boolean> renderStates = entry.getValue().getRenders();
           boolean canWalk =
               CuriosApi.getCurio(stacks.getStackInSlot(i)).map(curio -> curio
-                      .canWalkOnPowderedSnow(new SlotContext(entry.getKey(), livingEntity, index, false,
+                      .canWalkOnPowderedSnow(new SlotContext(entry.getKey(), livingEntity, index,
+                          false,
                           renderStates.size() > index && renderStates.get(index))))
                   .orElse(false);
 
@@ -152,27 +163,48 @@ public class CuriosCommonMixinHooks {
     }).orElse(false);
   }
 
-  public static CompoundTag mergeCuriosInventory(CompoundTag compoundTag, Entity entity) {
+  public static void mergeCuriosInventory(ProblemReporter reporter, CompoundTag output,
+                                          Entity entity) {
 
     if (entity instanceof LivingEntity livingEntity) {
-      ListTag list = compoundTag.getList("Inventory").orElse(new ListTag());
-      return CuriosApi.getCuriosInventory(livingEntity).map(inv -> {
+      ListTag list = output.getList("Inventory").orElse(null);
+
+      if (list == null) {
+        list = new ListTag();
+        output.put("Inventory", list);
+      }
+      DynamicOps<Tag> ops = entity.registryAccess().createSerializationContext(NbtOps.INSTANCE);
+      ListTag workingList = list;
+      CuriosApi.getCuriosInventory(livingEntity).ifPresent(inv -> {
         IItemHandler handler = inv.getEquippedCurios();
 
         for (int i = 0; i < handler.getSlots(); i++) {
           ItemStack stack = handler.getStackInSlot(i);
 
           if (!stack.isEmpty()) {
-            CompoundTag tag = new CompoundTag();
-            tag.store(ItemStack.MAP_CODEC, stack);
-            tag.putByte("Slot", (byte) (4444 + i));
-            list.add(tag);
+            addListElement(workingList, ops, reporter, stack);
           }
         }
-        return compoundTag;
-      }).orElse(compoundTag);
+      });
     }
-    return compoundTag;
+  }
+
+  private static void addListElement(ListTag listTag, DynamicOps<Tag> ops, ProblemReporter reporter,
+                                     ItemStack stack) {
+    DataResult<Tag> encoded =
+        ItemStackWithSlot.CODEC.encodeStart(ops, new ItemStackWithSlot(255, stack));
+    switch (encoded) {
+      case DataResult.Success<Tag> success:
+        listTag.add(success.value());
+        break;
+      case DataResult.Error<Tag> error:
+        reporter.report(
+            new TagValueOutput.EncodeToListFailedProblem("Curios:Inventory", stack, error));
+        Optional<Tag> partial = error.partialValue();
+        Objects.requireNonNull(listTag);
+        partial.ifPresent(listTag::add);
+        break;
+    }
   }
 
   public static boolean containsStack(Player player, ItemStack stack) {

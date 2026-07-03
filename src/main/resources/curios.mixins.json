@@ -8,6 +8,7 @@
     "MixinApplyBonusCount",
     "MixinCuriosTriggersEquip",
     "MixinEnchantedCountIncreaseFunction",
+    "MixinEntitySelectorOptions",
     "MixinInventory",
     "MixinLivingEntity",
     "MixinNbtPredicate",
