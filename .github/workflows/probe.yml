@@ -64,7 +64,5 @@ jobs:
           sed -n '205,300p' "$ACS"
           echo "################ extractSlots + carried render (lines 110,150) ################"
           sed -n '110,155p' "$ACS"
-          echo "################ Minecraft: any Screen-typed field ################"
-          grep -nE "private .*Screen [a-zA-Z]+;|public .*Screen [a-zA-Z]+;|protected .*Screen [a-zA-Z]+;|Screen getScreen|ScreenManager|screenManager" "$MC" | head -20
-          echo "################ CuriosClientPackets needs: how does vanilla read current screen? grep 'this.screen' ################"
-          grep -nE "\bscreen\b" "$MC" | grep -iE "this\.|= screen|return|field" | head -20
+          echo "################ Minecraft: every line containing 'creen' (fields+methods) ################"
+          grep -nE "creen" "$MC" | grep -iE "^\s*(private|public|protected).*[; (]" | grep -vE "//|/\*|\*" | head -60
