@@ -43,16 +43,12 @@ jobs:
           J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
           echo "################ Minecraft: ALL Screen-typed members ################"
           javap -p -cp "$J" net.minecraft.client.Minecraft 2>&1 | grep -E "gui.screens.Screen" | head -30
-      - name: dump vanilla extractSlot source
+      - name: dump vanilla sources
         run: |
-          echo "=== locate MC sources jar ==="
-          SRC=$(find /home/runner/.gradle /home/runner/work -name '*.jar' 2>/dev/null | xargs -I{} sh -c 'unzip -l "{}" 2>/dev/null | grep -q "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" && echo "{}"' 2>/dev/null | head -1)
-          echo "SRC=$SRC"
-          if [ -n "$SRC" ]; then
-            unzip -p "$SRC" "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" 2>/dev/null | grep -nE "extractSlot|void renderSlot|renderSlotContents|lastClickSlot|getCarried|isQuickCrafting|quickCraftSlots|isSplit|draggingItem|snapback" | head -40
-            echo "=== full extractSlot method ==="
-            unzip -p "$SRC" "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" 2>/dev/null | awk '/void extractSlot/{f=1} f{print} /^  }$/{if(f)c++} f&&c>=1{exit}' | head -80
-          else
-            echo "No decompiled sources jar found; listing candidate source jars:"
-            find /home/runner/.gradle -name '*source*.jar' 2>/dev/null | head
-          fi
+          SRC=/home/runner/.gradle/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.7-beta/1f0a5b3b48a10df044a1ee8373c2a897df0544f9/neoforge-26.2.0.7-beta-userdev.jar
+          echo "=== ACS: slot-render related lines ==="
+          unzip -p "$SRC" "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" 2>/dev/null | grep -nE "extractSlot|renderSlot|void .*Slot\(|lastClickSlot|getCarried|isQuickCrafting|quickCraftSlots|snapback|GuiGraphicsExtractor" | head -30
+          echo "=== ACS: extractSlot full (brace-balanced) ==="
+          unzip -p "$SRC" "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" 2>/dev/null | awk 'BEGIN{d=0;started=0} /(void|private|protected|public).*extractSlot *\(/{started=1} started{print; n=gsub(/\{/,"{"); m=gsub(/\}/,"}"); d+=n-m; if(started&&d==0&&/\}/){exit}}' | head -90
+          echo "=== Minecraft.java: how to get current screen ==="
+          unzip -p "$SRC" "net/minecraft/client/Minecraft.java" 2>/dev/null | grep -nE "Screen screen|getScreen|public Screen|this.screen|screenManager|ScreenManager" | head -20
