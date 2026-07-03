@@ -64,5 +64,14 @@ jobs:
           sed -n '205,300p' "$ACS"
           echo "################ extractSlots + carried render (lines 110,150) ################"
           sed -n '110,155p' "$ACS"
-          echo "################ Minecraft: every line containing 'creen' (fields+methods) ################"
-          grep -nE "creen" "$MC" | grep -iE "^\s*(private|public|protected).*[; (]" | grep -vE "//|/\*|\*" | head -60
+          echo "################ Minecraft: field declarations (all) mentioning Screen type ################"
+          grep -nE "^\s*(private|public|protected)[^(]*;" "$MC" | grep -E "Screen" | head -40
+          echo "################ Minecraft: overlay/gui/currentScreen candidates ################"
+          grep -nE "Overlay|this\.gui|IngameGui|Gui gui|getConnection|screen" "$MC" | grep -iE "private|public|protected" | head -30
+          mkdir -p /tmp/art && cp "$MC" /tmp/art/Minecraft.java && cp "$ACS" /tmp/art/AbstractContainerScreen.java
+      - name: upload decompiled sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: decompiled-26.2
+          path: /tmp/art/*.java
+          if-no-files-found: warn
