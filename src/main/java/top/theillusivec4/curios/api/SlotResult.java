@@ -21,6 +21,13 @@
 package top.theillusivec4.curios.api;
 
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import org.jspecify.annotations.Nullable;
 
 public record SlotResult(SlotContext slotContext, ItemStack stack) {
+
+  @Nullable
+  public ItemAccess getItemAccess() {
+    return slotContext().getItemAccess();
+  }
 }

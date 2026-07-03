@@ -49,7 +49,7 @@ import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.common.CuriosCommonEvents;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
-import top.theillusivec4.curios.common.capability.CurioResourceHandler;
+import top.theillusivec4.curios.common.capability.CombinedCuriosResourceHandler;
 import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
 import top.theillusivec4.curios.common.data.CuriosSlotResources;
 import top.theillusivec4.curios.common.integration.CuriosIntegrations;
@@ -99,7 +99,7 @@ public class CuriosCommonMod {
 
                              if (!CuriosSlotTypes.getDefaultEntitySlotTypes(livingEntity)
                                  .isEmpty()) {
-                               return CurioResourceHandler.from(livingEntity);
+                               return CombinedCuriosResourceHandler.from(livingEntity);
                              }
                            }
                            return null;
