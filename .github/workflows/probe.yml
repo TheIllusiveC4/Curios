@@ -41,9 +41,18 @@ jobs:
       - name: member signatures full
         run: |
           J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
-          echo "################ Minecraft: screen field + getters ################"
-          javap -p -cp "$J" net.minecraft.client.Minecraft 2>&1 | grep -iE "Screen screen|getScreen|net.minecraft.client.gui.screens.Screen " | head -20
-          echo "################ AbstractContainerScreen ALL methods ################"
-          javap -p -cp "$J" net.minecraft.client.gui.screens.inventory.AbstractContainerScreen 2>&1 | grep -iE "findSlot|recalculateQuickCraft|Slot |quickCraft|snapback|clickSlot|slotClicked" | head -40
-          echo "################ InventoryScreen xMouse/yMouse ################"
-          javap -p -cp "$J" net.minecraft.client.gui.screens.inventory.InventoryScreen 2>&1 | grep -iE "xMouse|yMouse|Mouse" | head
+          echo "################ Minecraft: ALL Screen-typed members ################"
+          javap -p -cp "$J" net.minecraft.client.Minecraft 2>&1 | grep -E "gui.screens.Screen" | head -30
+      - name: dump vanilla extractSlot source
+        run: |
+          echo "=== locate MC sources jar ==="
+          SRC=$(find /home/runner/.gradle /home/runner/work -name '*.jar' 2>/dev/null | xargs -I{} sh -c 'unzip -l "{}" 2>/dev/null | grep -q "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" && echo "{}"' 2>/dev/null | head -1)
+          echo "SRC=$SRC"
+          if [ -n "$SRC" ]; then
+            unzip -p "$SRC" "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" 2>/dev/null | grep -nE "extractSlot|void renderSlot|renderSlotContents|lastClickSlot|getCarried|isQuickCrafting|quickCraftSlots|isSplit|draggingItem|snapback" | head -40
+            echo "=== full extractSlot method ==="
+            unzip -p "$SRC" "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" 2>/dev/null | awk '/void extractSlot/{f=1} f{print} /^  }$/{if(f)c++} f&&c>=1{exit}' | head -80
+          else
+            echo "No decompiled sources jar found; listing candidate source jars:"
+            find /home/runner/.gradle -name '*source*.jar' 2>/dev/null | head
+          fi
