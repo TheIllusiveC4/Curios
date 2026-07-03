@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelType;
@@ -68,7 +69,7 @@ public class CuriosClientMod {
 
     for (EntityType<?> entityType : evt.getEntityTypes()) {
 
-      if (entityType != EntityType.PLAYER) {
+      if (entityType != EntityTypes.PLAYER) {
         EntityRenderer<?, ?> renderer = evt.getRenderer(entityType);
 
         if (renderer instanceof LivingEntityRenderer livingRenderer) {

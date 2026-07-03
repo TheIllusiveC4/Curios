@@ -63,7 +63,7 @@ public class CuriosButton extends ImageButton {
                 mc.player.clientSideCloseContainer();
                 InventoryScreen inventoryScreen = new InventoryScreen(mc.player);
                 mc.mouseHandler.mouseGrabbed = false;
-                mc.setScreen(inventoryScreen);
+                mc.setScreenAndShow(inventoryScreen);
                 inventoryScreen.xMouse = curiosScreen.oldMouseX;
                 inventoryScreen.yMouse = curiosScreen.oldMouseY;
                 mc.player.inventoryMenu.setCarried(stack);

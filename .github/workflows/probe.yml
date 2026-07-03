@@ -41,13 +41,9 @@ jobs:
       - name: member signatures full
         run: |
           J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
-          echo "################ where is PLAYER entity const ################"
-          unzip -l "$J" | grep -oE '[a-zA-Z0-9/_$]+\.class' | grep -iE 'EntityTypes?\.class|BuiltInEntityTypes|world/entity/player' | sort -u | head
-          for CL in net.minecraft.world.entity.EntityType net.minecraft.world.entity.EntityTypes; do
-            echo ">>> $CL PLAYER field:"; javap -p -cp "$J" "$CL" 2>&1 | grep -iE " PLAYER;| PLAYER " | head
-          done
-          echo "################ AbstractContainerScreen ALL fields ################"
-          javap -p -cp "$J" net.minecraft.client.gui.screens.inventory.AbstractContainerScreen 2>&1 | grep -E ';$' | grep -vE '\(' | head -60
-          echo "################ BlockPos center / Vec3 atCenterOf ################"
-          javap -p -cp "$J" net.minecraft.core.BlockPos 2>&1 | grep -iE "center" | head
-          javap -p -cp "$J" net.minecraft.world.phys.Vec3 2>&1 | grep -iE "atCenterOf|atBottomCenterOf|atLowerCornerOf" | head
+          echo "################ Minecraft: screen field + getters ################"
+          javap -p -cp "$J" net.minecraft.client.Minecraft 2>&1 | grep -iE "Screen screen|getScreen|net.minecraft.client.gui.screens.Screen " | head -20
+          echo "################ AbstractContainerScreen ALL methods ################"
+          javap -p -cp "$J" net.minecraft.client.gui.screens.inventory.AbstractContainerScreen 2>&1 | grep -iE "findSlot|recalculateQuickCraft|Slot |quickCraft|snapback|clickSlot|slotClicked" | head -40
+          echo "################ InventoryScreen xMouse/yMouse ################"
+          javap -p -cp "$J" net.minecraft.client.gui.screens.inventory.InventoryScreen 2>&1 | grep -iE "xMouse|yMouse|Mouse" | head
