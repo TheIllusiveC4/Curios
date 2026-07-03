@@ -22,7 +22,7 @@ jobs:
       - name: Build
         if: success()
         run: ./gradlew build --stacktrace --no-daemon
-      - name: GameTest server (runtime load: mixins, AT, registration)
+      - name: "GameTest server (runtime load - mixins, AT, registration)"
         if: success()
         run: ./gradlew runGameTestServer --stacktrace --no-daemon
       - name: Upload artifacts
