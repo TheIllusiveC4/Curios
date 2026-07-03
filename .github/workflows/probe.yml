@@ -1,0 +1,41 @@
+name: Probe 26.2 API
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Materialize Minecraft artifacts
+        run: ./gradlew createMinecraftArtifacts --stacktrace --no-daemon
+      - name: Locate jars
+        run: |
+          echo "=== candidate MC/NeoForge jars ==="
+          find ~ /home/runner -name '*.jar' 2>/dev/null | grep -iE 'minecraft|neoforge|client-extra|joined' | grep -iE 'source|joined|merged|minecraft|neoforge' | sort -u | tee /tmp/jars.txt
+      - name: Find package locations of moved classes
+        run: |
+          SRC=$(find ~ /home/runner -name '*.jar' 2>/dev/null | grep -iE 'sources' | grep -iE 'minecraft|neoforge|merged|joined' | head -1)
+          echo "Chosen sources jar: $SRC"
+          if [ -z "$SRC" ]; then SRC=$(find ~ /home/runner -name '*.jar' 2>/dev/null | grep -iE 'minecraft|neoforge' | grep -viE 'sources|javadoc' | head -1); echo "Fallback jar: $SRC"; fi
+          for C in Tuple Criterion CriterionTrigger CriterionTriggerInstance SimpleCriterionTrigger ContextAwarePredicate ItemPredicate LocationPredicate NbtPredicate MinMaxBounds MultiBufferSource VertexMultiConsumer SubmitNodeCollector; do
+            echo "--- $C ---"
+            unzip -l "$SRC" 2>/dev/null | grep -iE "/${C}\.(java|class)$|/${C}\$" | grep -iE "net/minecraft|com/mojang" | head -8
+          done
+      - name: Dump key source files
+        run: |
+          SRC=$(find ~ /home/runner -name '*.jar' 2>/dev/null | grep -iE 'sources' | grep -iE 'minecraft|neoforge|merged|joined' | head -1)
+          echo "Using: $SRC"
+          mkdir -p /tmp/x && cd /tmp/x
+          for path in $(unzip -l "$SRC" 2>/dev/null | grep -iE '/(Criterion|MultiBufferSource|SubmitNodeCollector|CriterionTriggerInstance)\.java$' | awk '{print $4}'); do
+            echo "############### $path ###############"
+            unzip -p "$SRC" "$path" 2>/dev/null | head -80
+          done
