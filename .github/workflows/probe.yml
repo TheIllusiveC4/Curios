@@ -43,12 +43,25 @@ jobs:
           J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
           echo "################ Minecraft: ALL Screen-typed members ################"
           javap -p -cp "$J" net.minecraft.client.Minecraft 2>&1 | grep -E "gui.screens.Screen" | head -30
-      - name: dump vanilla sources
+      - name: find and dump vanilla sources
         run: |
-          SRC=/home/runner/.gradle/caches/modules-2/files-2.1/net.neoforged/neoforge/26.2.0.7-beta/1f0a5b3b48a10df044a1ee8373c2a897df0544f9/neoforge-26.2.0.7-beta-userdev.jar
-          echo "=== ACS: slot-render related lines ==="
-          unzip -p "$SRC" "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" 2>/dev/null | grep -nE "extractSlot|renderSlot|void .*Slot\(|lastClickSlot|getCarried|isQuickCrafting|quickCraftSlots|snapback|GuiGraphicsExtractor" | head -30
-          echo "=== ACS: extractSlot full (brace-balanced) ==="
-          unzip -p "$SRC" "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" 2>/dev/null | awk 'BEGIN{d=0;started=0} /(void|private|protected|public).*extractSlot *\(/{started=1} started{print; n=gsub(/\{/,"{"); m=gsub(/\}/,"}"); d+=n-m; if(started&&d==0&&/\}/){exit}}' | head -90
-          echo "=== Minecraft.java: how to get current screen ==="
-          unzip -p "$SRC" "net/minecraft/client/Minecraft.java" 2>/dev/null | grep -nE "Screen screen|getScreen|public Screen|this.screen|screenManager|ScreenManager" | head -20
+          echo "=== which jar actually contains AbstractContainerScreen.JAVA ==="
+          SRC=$(find /home/runner/.gradle /home/runner/work -name '*.jar' 2>/dev/null | while read j; do if unzip -l "$j" 2>/dev/null | grep -q "AbstractContainerScreen\.java"; then echo "$j"; fi; done | head -1)
+          echo "SRC=$SRC"
+          if [ -z "$SRC" ]; then
+            echo "=== no .java jar; search decompiled output dirs ==="
+            find /home/runner/.gradle/caches/neoformruntime -name 'AbstractContainerScreen.java' 2>/dev/null | head
+            find /home/runner -path '*sources*' -name '*.jar' 2>/dev/null | head -20
+            ACS=$(find /home/runner -name 'AbstractContainerScreen.java' 2>/dev/null | head -1); echo "ACS file: $ACS"
+            MC=$(find /home/runner -name 'Minecraft.java' -path '*net/minecraft*' 2>/dev/null | head -1); echo "MC file: $MC"
+            SRCFILE="$ACS"; MCFILE="$MC"; MODE=file
+          else
+            MODE=jar
+          fi
+          echo "=== ACS extractSlot / renderSlot ==="
+          if [ "$MODE" = jar ]; then unzip -p "$SRC" "*/AbstractContainerScreen.java" 2>/dev/null > /tmp/acs.java || unzip -p "$SRC" "net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.java" > /tmp/acs.java 2>/dev/null; else cp "$SRCFILE" /tmp/acs.java 2>/dev/null; fi
+          grep -nE "extractSlot|renderSlot|lastClickSlot|getCarried|quickCraftSlots|isQuickCrafting|snapback|CarriedItem" /tmp/acs.java | head -30
+          echo "=== extractSlot method body ==="
+          awk 'BEGIN{d=0;s=0} /extractSlot *\(/{s=1} s{print; n=gsub(/\{/,"{"); m=gsub(/\}/,"}"); d+=n-m; if(s&&d==0&&NR>1&&/\}/)exit}' /tmp/acs.java | head -90
+          echo "=== Minecraft screen accessor ==="
+          if [ "$MODE" = file ] && [ -n "$MCFILE" ]; then grep -nE "Screen screen|getScreen|public.*Screen|this.screen" "$MCFILE" | head; fi
