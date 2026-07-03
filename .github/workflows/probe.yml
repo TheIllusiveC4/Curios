@@ -60,9 +60,11 @@ jobs:
           echo "vf exit=$? (tail log)"; tail -3 /tmp/vf.log
           ACS=$(find /tmp/out -name 'AbstractContainerScreen.java' | head -1); echo "ACS=$ACS"
           MC=$(find /tmp/out -name 'Minecraft.java' | head -1); echo "MC=$MC"
-          echo "################ extractSlot (and neighbors) ################"
-          awk 'BEGIN{d=0;s=0} /(void|private|protected|public).*(extractSlot|renderSlot)[A-Za-z]* *\(/{s=1} s{print; n=gsub(/{/,"{"); m=gsub(/}/,"}"); d+=n-m; if(s&&d<=0&&/}/)exit}' "$ACS" | head -100
-          echo "################ ACS carried/dragging refs ################"
-          grep -nE "getCarried|lastClickSlot|isQuickCrafting|quickCraftSlots|snapback|carried" "$ACS" | head -20
-          echo "################ Minecraft screen field/getter ################"
-          grep -nE "Screen screen|getScreen|public Screen|Screen currentScreen|this.screen ?=" "$MC" | head
+          echo "################ extractSlot body (lines 205-300) ################"
+          sed -n '205,300p' "$ACS"
+          echo "################ extractSlots + carried render (lines 110,150) ################"
+          sed -n '110,155p' "$ACS"
+          echo "################ Minecraft: any Screen-typed field ################"
+          grep -nE "private .*Screen [a-zA-Z]+;|public .*Screen [a-zA-Z]+;|protected .*Screen [a-zA-Z]+;|Screen getScreen|ScreenManager|screenManager" "$MC" | head -20
+          echo "################ CuriosClientPackets needs: how does vanilla read current screen? grep 'this.screen' ################"
+          grep -nE "\bscreen\b" "$MC" | grep -iE "this\.|= screen|return|field" | head -20
