@@ -17,25 +17,24 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
       - name: Materialize Minecraft artifacts
         run: ./gradlew createMinecraftArtifacts --stacktrace --no-daemon
-      - name: Locate jars
+      - name: Package locations (from patched jar class files)
         run: |
-          echo "=== candidate MC/NeoForge jars ==="
-          find ~ /home/runner -name '*.jar' 2>/dev/null | grep -iE 'minecraft|neoforge|client-extra|joined' | grep -iE 'source|joined|merged|minecraft|neoforge' | sort -u | tee /tmp/jars.txt
-      - name: Find package locations of moved classes
-        run: |
-          SRC=$(find ~ /home/runner -name '*.jar' 2>/dev/null | grep -iE 'sources' | grep -iE 'minecraft|neoforge|merged|joined' | head -1)
-          echo "Chosen sources jar: $SRC"
-          if [ -z "$SRC" ]; then SRC=$(find ~ /home/runner -name '*.jar' 2>/dev/null | grep -iE 'minecraft|neoforge' | grep -viE 'sources|javadoc' | head -1); echo "Fallback jar: $SRC"; fi
-          for C in Tuple Criterion CriterionTrigger CriterionTriggerInstance SimpleCriterionTrigger ContextAwarePredicate ItemPredicate LocationPredicate NbtPredicate MinMaxBounds MultiBufferSource VertexMultiConsumer SubmitNodeCollector; do
+          J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
+          echo "PATCHED JAR: $J"
+          for C in Tuple Criterion CriterionTrigger CriterionTriggerInstance SimpleCriterionTrigger ContextAwarePredicate ItemPredicate LocationPredicate NbtPredicate MinMaxBounds EntityPredicate MultiBufferSource VertexMultiConsumer SubmitNodeCollector PoseStack; do
             echo "--- $C ---"
-            unzip -l "$SRC" 2>/dev/null | grep -iE "/${C}\.(java|class)$|/${C}\$" | grep -iE "net/minecraft|com/mojang" | head -8
+            unzip -l "$J" 2>/dev/null | grep -oE '[a-zA-Z0-9/_$]+\.class' | grep -E "(^|/)${C}(\\\$[A-Za-z0-9_]+)?\.class$" | grep -iE 'net/minecraft|com/mojang' | sort -u | head -12
           done
-      - name: Dump key source files
+      - name: Locate decompiled MC sources jar
         run: |
-          SRC=$(find ~ /home/runner -name '*.jar' 2>/dev/null | grep -iE 'sources' | grep -iE 'minecraft|neoforge|merged|joined' | head -1)
-          echo "Using: $SRC"
-          mkdir -p /tmp/x && cd /tmp/x
-          for path in $(unzip -l "$SRC" 2>/dev/null | grep -iE '/(Criterion|MultiBufferSource|SubmitNodeCollector|CriterionTriggerInstance)\.java$' | awk '{print $4}'); do
-            echo "############### $path ###############"
-            unzip -p "$SRC" "$path" 2>/dev/null | head -80
+          echo "=== searching for MC sources jars ==="
+          find /home/runner/.gradle/caches/neoformruntime /home/runner/work -name '*.jar' 2>/dev/null | xargs -I{} sh -c 'if unzip -l "{}" 2>/dev/null | grep -q "net/minecraft/util/Tuple\|net/minecraft/client/renderer/MultiBufferSource\|net/minecraft/advancements/Criterion"; then echo "HAS-MC: {}"; fi' 2>/dev/null | head
+          echo "=== neoformruntime artifacts dir ==="
+          ls -la /home/runner/.gradle/caches/neoformruntime/artifacts/ 2>/dev/null
+      - name: javap signatures
+        run: |
+          J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
+          for FQ in net.minecraft.advancements.Criterion net.minecraft.advancements.CriterionTrigger net.minecraft.client.renderer.MultiBufferSource net.minecraft.client.renderer.SubmitNodeCollector; do
+            echo "################ javap $FQ ################"
+            javap -cp "$J" -public "$FQ" 2>&1 | head -40 || echo "(not found at $FQ)"
           done
