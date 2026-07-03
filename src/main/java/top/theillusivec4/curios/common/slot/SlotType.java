@@ -5,6 +5,7 @@ import com.mojang.datafixers.util.Either;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -126,7 +127,7 @@ public final class SlotType implements ISlotType {
       this.order = entry.order()
           .map(order -> replace || this.order == null ? order : Math.min(this.order, order))
           .orElse(this.order);
-      String op = entry.operation().orElse("set").toLowerCase();
+      String op = entry.operation().orElse("set").toLowerCase(Locale.ROOT);
       int size = entry.size().orElse(1);
 
       if (op.equalsIgnoreCase("remove")) {

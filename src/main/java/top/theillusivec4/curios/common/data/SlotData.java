@@ -26,6 +26,7 @@ import com.mojang.datafixers.util.Either;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -82,7 +83,7 @@ public class SlotData implements ISlotData {
 
   @Override
   public ISlotData operation(String operation) {
-    this.operation = operation.toLowerCase();
+    this.operation = operation.toLowerCase(Locale.ROOT);
     return this;
   }
 

@@ -26,6 +26,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.ChatFormatting;
@@ -190,7 +191,8 @@ public class CuriosClientEvents {
       String key = "curios.identifier." + id;
       MutableComponent type =
           Component.translatableWithFallback(
-              key, Character.toUpperCase(id.charAt(0)) + id.substring(1).toLowerCase());
+              key, id.substring(0, 1).toUpperCase(Locale.ROOT)
+                  + id.substring(1).toLowerCase(Locale.ROOT));
 
       if (j < slotIds.size() - 1) {
         type = type.append(", ");
@@ -212,8 +214,8 @@ public class CuriosClientEvents {
     Map<String, ISlotType> result = new LinkedHashMap<>();
     Map<String, ISlotType> map =
         player != null
-        ? CuriosSlotTypes.getItemSlotTypes(stack, player)
-        : CuriosSlotTypes.getItemSlotTypes(stack, FMLLoader.getCurrent().getDist().isClient());
+            ? CuriosSlotTypes.getItemSlotTypes(stack, player)
+            : CuriosSlotTypes.getItemSlotTypes(stack, FMLLoader.getCurrent().getDist().isClient());
 
     for (Map.Entry<String, ISlotType> entry : map.entrySet()) {
       ISlotType slotType = entry.getValue();

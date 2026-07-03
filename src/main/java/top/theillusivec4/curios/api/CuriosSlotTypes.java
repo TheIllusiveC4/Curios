@@ -1,5 +1,6 @@
 package top.theillusivec4.curios.api;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
@@ -125,7 +126,7 @@ public final class CuriosSlotTypes {
     RING;
 
     public String id() {
-      return this.toString().toLowerCase();
+      return this.toString().toLowerCase(Locale.ROOT);
     }
   }
 }

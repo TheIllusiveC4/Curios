@@ -22,6 +22,7 @@ package top.theillusivec4.curios.common.inventory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.annotation.Nonnull;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -99,7 +100,7 @@ public class CurioSlot extends SlotItemHandler {
 
   public SlotContext getSlotContext() {
     return new SlotContext(identifier, player, index, isCosmetic,
-                           isCosmetic || this.getRenderStatus());
+        isCosmetic || this.getRenderStatus());
   }
 
   public boolean getRenderStatus() {
@@ -116,15 +117,15 @@ public class CurioSlot extends SlotItemHandler {
     List<Component> oldTooltipCall = this.extension.getSlotTooltip(
         this.getSlotContext(),
         ClientTooltipFlag.of(Minecraft.getInstance().options.advancedItemTooltips
-                             ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL));
+            ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL));
 
     if (!oldTooltipCall.isEmpty()) {
       return oldTooltipCall;
     }
     tooltip.add(
         Component.translatableWithFallback("curios.identifier." + this.identifier,
-                                           this.identifier.substring(0, 1).toUpperCase()
-                                               + this.identifier.substring(1).toLowerCase()));
+            this.identifier.substring(0, 1).toUpperCase(Locale.ROOT)
+                + this.identifier.substring(1).toLowerCase(Locale.ROOT)));
 
     if (this.isCosmetic) {
       tooltip.add(Component.translatable("curios.cosmetic").withStyle(ChatFormatting.LIGHT_PURPLE));
@@ -137,7 +138,7 @@ public class CurioSlot extends SlotItemHandler {
         this.getSlotContext(),
         tooltip,
         ClientTooltipFlag.of(Minecraft.getInstance().options.advancedItemTooltips
-                             ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL));
+            ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL));
     return tooltip;
   }
 
