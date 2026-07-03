@@ -412,7 +412,8 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  protected void extractSlot(@Nonnull GuiGraphicsExtractor guiGraphics, Slot slot, int x, int y) {
+  protected void extractSlot(@Nonnull GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX,
+                             int mouseY) {
     int i = slot.x;
     int j = slot.y;
     ItemStack itemstack = slot.getItem();
@@ -422,17 +423,11 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
           curioSlot.getSlotExtension().getDisplayStack(curioSlot.getSlotContext(), itemstack);
     }
     boolean flag = false;
-    boolean flag1 =
-        slot == this.clickedSlot && !this.draggingItem.isEmpty() && !this.isSplittingStack;
+    boolean flag1 = false;
     ItemStack itemstack1 = this.menu.getCarried();
     String s = null;
 
-    if (slot == this.clickedSlot
-        && !this.draggingItem.isEmpty()
-        && this.isSplittingStack
-        && !itemstack.isEmpty()) {
-      itemstack = itemstack.copyWithCount(itemstack.getCount() / 2);
-    } else if (this.isQuickCrafting
+    if (this.isQuickCrafting
         && this.quickCraftSlots.contains(slot)
         && !itemstack1.isEmpty()) {
 
@@ -461,7 +456,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
       }
     }
 
-    if (itemstack.isEmpty() && slot.isActive() && this.minecraft != null) {
+    if (itemstack.isEmpty() && slot.isActive()) {
       Identifier rl = slot.getNoItemIcon();
 
       if (rl != null) {
