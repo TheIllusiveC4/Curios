@@ -41,8 +41,14 @@ jobs:
       - name: member signatures full
         run: |
           J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
-          echo "################ Minecraft: ALL Screen-typed members ################"
-          javap -p -cp "$J" net.minecraft.client.Minecraft 2>&1 | grep -E "gui.screens.Screen" | head -30
+          echo "################ TagAppender methods ################"
+          javap -p -cp "$J" net.minecraft.data.tags.TagAppender 2>&1 | head -40
+          echo "################ ITagAppenderExtension methods ################"
+          javap -p -cp "$J" net.neoforged.neoforge.common.extensions.ITagAppenderExtension 2>&1 | head -30
+          echo "################ Item -> registry key helpers ################"
+          javap -p -cp "$J" net.minecraft.world.item.Item 2>&1 | grep -iE "builtInRegistryHolder|ResourceKey|Holder" | head
+          echo "################ Items.DIAMOND type ################"
+          javap -p -cp "$J" net.minecraft.world.item.Items 2>&1 | grep -iE "DIAMOND;" | head
       - name: decompile target classes with vineflower
         run: |
           set +e
