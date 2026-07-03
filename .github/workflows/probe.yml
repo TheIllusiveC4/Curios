@@ -31,10 +31,21 @@ jobs:
           find /home/runner/.gradle/caches/neoformruntime /home/runner/work -name '*.jar' 2>/dev/null | xargs -I{} sh -c 'if unzip -l "{}" 2>/dev/null | grep -q "net/minecraft/util/Tuple\|net/minecraft/client/renderer/MultiBufferSource\|net/minecraft/advancements/Criterion"; then echo "HAS-MC: {}"; fi' 2>/dev/null | head
           echo "=== neoformruntime artifacts dir ==="
           ls -la /home/runner/.gradle/caches/neoformruntime/artifacts/ 2>/dev/null
-      - name: javap signatures
+      - name: class locations
         run: |
           J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
-          for FQ in net.minecraft.advancements.Criterion net.minecraft.advancements.CriterionTrigger net.minecraft.client.renderer.MultiBufferSource net.minecraft.client.renderer.SubmitNodeCollector; do
-            echo "################ javap $FQ ################"
-            javap -cp "$J" -public "$FQ" 2>&1 | head -40 || echo "(not found at $FQ)"
+          for C in EntityType BlockPos Minecraft AbstractContainerScreen InventoryScreen; do
+            echo "--- $C ---"
+            unzip -l "$J" 2>/dev/null | grep -oE '[a-zA-Z0-9/_$]+\.class' | grep -E "(^|/)${C}\.class$" | grep -iE 'net/minecraft' | sort -u | head
           done
+      - name: member signatures
+        run: |
+          J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
+          echo "################ EntityType PLAYER/AVATAR ################"
+          javap -p -cp "$J" net.minecraft.world.entity.EntityType 2>&1 | grep -iE "PLAYER|AVATAR" | head
+          echo "################ BlockPos center ################"
+          javap -p -cp "$J" net.minecraft.core.BlockPos 2>&1 | grep -iE "center|Vec3" | head
+          echo "################ Minecraft screen/setScreen ################"
+          javap -p -cp "$J" net.minecraft.client.Minecraft 2>&1 | grep -iE "[sS]creen" | head -30
+          echo "################ AbstractContainerScreen fields ################"
+          javap -p -cp "$J" net.minecraft.client.gui.screens.inventory.AbstractContainerScreen 2>&1 | grep -iE "clickedSlot|draggingItem|isSplittingStack|quickCraft|Slot |snapback|findSlot" | head -30
