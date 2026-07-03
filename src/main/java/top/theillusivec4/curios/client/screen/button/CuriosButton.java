@@ -29,7 +29,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
-import net.minecraft.util.Tuple;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.api.CuriosResources;
@@ -87,11 +87,11 @@ public class CuriosButton extends ImageButton {
   @Override
   public void extractContents(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY,
                            float partialTicks) {
-    Tuple<Integer, Integer> offsets =
+    Pair<Integer, Integer> offsets =
         CuriosScreen.getButtonOffset(parentGui instanceof CreativeModeInventoryScreen);
-    this.setX(parentGui.getGuiLeft() + offsets.getA() + 2);
+    this.setX(parentGui.getGuiLeft() + offsets.getFirst() + 2);
     int yOffset = parentGui instanceof CreativeModeInventoryScreen ? 70 : 85;
-    this.setY(parentGui.getGuiTop() + offsets.getB() + yOffset);
+    this.setY(parentGui.getGuiTop() + offsets.getSecond() + yOffset);
 
     if (parentGui instanceof CreativeModeInventoryScreen gui) {
       boolean isInventoryTab = gui.isInventoryOpen();

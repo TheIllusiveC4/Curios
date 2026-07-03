@@ -27,7 +27,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.util.Tuple;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.inventory.Slot;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
@@ -50,9 +50,9 @@ public class CuriosScreenEvents {
     if (screen instanceof InventoryScreen || screen instanceof CreativeModeInventoryScreen) {
       AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) screen;
       boolean isCreative = screen instanceof CreativeModeInventoryScreen;
-      Tuple<Integer, Integer> offsets = CuriosScreen.getButtonOffset(isCreative);
-      int x = offsets.getA();
-      int y = offsets.getB();
+      Pair<Integer, Integer> offsets = CuriosScreen.getButtonOffset(isCreative);
+      int x = offsets.getFirst();
+      int y = offsets.getSecond();
       int size = isCreative ? 8 : 10;
       int yOffset = isCreative ? 67 : 81;
       evt.addListener(
