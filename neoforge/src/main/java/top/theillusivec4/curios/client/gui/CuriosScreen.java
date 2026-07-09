@@ -325,8 +325,8 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
               components.add(
                   Component.translatable("curios.tooltip.inactive").withStyle(ChatFormatting.RED));
             }
-            guiGraphics.renderTooltip(this.font, components, stack.getTooltipImage(), mouseX,
-                                      mouseY);
+            guiGraphics.renderTooltip(this.font, components, stack.getTooltipImage(), stack,
+                                      mouseX, mouseY);
           }
         }
       }
