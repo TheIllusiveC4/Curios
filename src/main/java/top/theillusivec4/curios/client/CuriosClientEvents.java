@@ -68,7 +68,7 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 public class CuriosClientEvents {
 
   @SubscribeEvent
-  public void renderHand(final RenderArmEvent evt) {
+  public void renderHand(final RenderArmEvent<?> evt) {
     Minecraft mc = Minecraft.getInstance();
 
     if (mc.player != null) {
@@ -106,8 +106,8 @@ public class CuriosClientEvents {
                       poseStack,
                       evt.getSubmitNodeCollector(),
                       avatarRenderState,
-                      evt.getPlayer(),
-                      evt.getPackedLight()
+                      clientPlayer,
+                      evt.getLightCoords()
                   );
                 }
               }

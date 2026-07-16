@@ -43,7 +43,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Tuple;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
@@ -93,7 +93,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
     this.itemSlotMouseActions = new ArrayList<>();
   }
 
-  public static Tuple<Integer, Integer> getButtonOffset(boolean isCreative) {
+  public static Pair<Integer, Integer> getButtonOffset(boolean isCreative) {
     Client client = CuriosClientConfig.CLIENT;
     ButtonCorner corner = client.buttonCorner.get();
     int x = 0;
@@ -106,19 +106,19 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
       x += corner.getXoffset() + client.buttonXOffset.get();
       y += corner.getYoffset() + client.buttonYOffset.get();
     }
-    return new Tuple<>(x, y);
+    return new Pair<>(x, y);
   }
 
   @Override
   public void init() {
     super.init();
     this.panelWidth = this.menu.panelWidth;
-    Tuple<Integer, Integer> offsets = getButtonOffset(false);
+    Pair<Integer, Integer> offsets = getButtonOffset(false);
     this.buttonCurios =
         new CuriosButton(
             this,
-            this.getGuiLeft() + offsets.getA() - 2,
-            this.height / 2 + offsets.getB() - 2,
+            this.getGuiLeft() + offsets.getFirst() - 2,
+            this.height / 2 + offsets.getSecond() - 2,
             10,
             10,
             CuriosButton.BIG);
@@ -412,7 +412,8 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
   }
 
   @Override
-  protected void extractSlot(@Nonnull GuiGraphicsExtractor guiGraphics, Slot slot, int x, int y) {
+  protected void extractSlot(@Nonnull GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX,
+                             int mouseY) {
     int i = slot.x;
     int j = slot.y;
     ItemStack itemstack = slot.getItem();
@@ -422,17 +423,11 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
           curioSlot.getSlotExtension().getDisplayStack(curioSlot.getSlotContext(), itemstack);
     }
     boolean flag = false;
-    boolean flag1 =
-        slot == this.clickedSlot && !this.draggingItem.isEmpty() && !this.isSplittingStack;
+    boolean flag1 = false;
     ItemStack itemstack1 = this.menu.getCarried();
     String s = null;
 
-    if (slot == this.clickedSlot
-        && !this.draggingItem.isEmpty()
-        && this.isSplittingStack
-        && !itemstack.isEmpty()) {
-      itemstack = itemstack.copyWithCount(itemstack.getCount() / 2);
-    } else if (this.isQuickCrafting
+    if (this.isQuickCrafting
         && this.quickCraftSlots.contains(slot)
         && !itemstack1.isEmpty()) {
 
@@ -461,7 +456,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
       }
     }
 
-    if (itemstack.isEmpty() && slot.isActive() && this.minecraft != null) {
+    if (itemstack.isEmpty() && slot.isActive()) {
       Identifier rl = slot.getNoItemIcon();
 
       if (rl != null) {

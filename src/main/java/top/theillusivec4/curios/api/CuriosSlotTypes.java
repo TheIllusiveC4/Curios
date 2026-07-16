@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.loading.FMLLoader;
@@ -39,7 +40,7 @@ public final class CuriosSlotTypes {
   }
 
   public static Map<String, ISlotType> getDefaultPlayerSlotTypes(boolean isClient) {
-    return getDefaultEntitySlotTypes(EntityType.PLAYER, isClient);
+    return getDefaultEntitySlotTypes(EntityTypes.PLAYER, isClient);
   }
 
   public static Map<String, ISlotType> getDefaultEntitySlotTypes(EntityType<?> entityType,

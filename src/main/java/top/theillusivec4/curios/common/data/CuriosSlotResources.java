@@ -55,6 +55,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.api.CuriosTags;
@@ -317,7 +318,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
   }
 
   public Map<String, ISlotType> getPlayerSlots() {
-    return this.getEntitySlots(EntityType.PLAYER);
+    return this.getEntitySlots(EntityTypes.PLAYER);
   }
 
   public Map<String, ISlotType> getEntitySlots(EntityType<?> type) {

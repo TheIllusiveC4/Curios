@@ -42,7 +42,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Mth;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -102,7 +101,7 @@ import top.theillusivec4.curios.impl.CuriosRegistry;
 public class CuriosCommonEvents {
 
   private static void handleDrops(String identifier, LivingEntity livingEntity,
-                                  List<Tuple<Predicate<ItemStack>, DropRule>> dropRules,
+                                  List<Pair<Predicate<ItemStack>, DropRule>> dropRules,
                                   NonNullList<Boolean> renders, IDynamicStackHandler stacks,
                                   boolean cosmetic, Collection<ItemEntity> drops,
                                   boolean keepInventory, LivingDropsEvent evt) {
@@ -114,10 +113,10 @@ public class CuriosCommonEvents {
       if (!stack.isEmpty()) {
         DropRule dropRuleOverride = null;
 
-        for (Tuple<Predicate<ItemStack>, DropRule> override : dropRules) {
+        for (Pair<Predicate<ItemStack>, DropRule> override : dropRules) {
 
-          if (override.getA().test(stack)) {
-            dropRuleOverride = override.getB();
+          if (override.getFirst().test(stack)) {
+            dropRuleOverride = override.getSecond();
           }
         }
         DropRule dropRule = dropRuleOverride != null ? dropRuleOverride : CuriosApi.getCurio(stack)
@@ -274,7 +273,7 @@ public class CuriosCommonEvents {
         DropRulesEvent dropRulesEvent =
             new DropRulesEvent(livingEntity, handler, evt.getSource(), 0, evt.isRecentlyHit());
         NeoForge.EVENT_BUS.post(dropRulesEvent);
-        List<Tuple<Predicate<ItemStack>, DropRule>> dropRules = dropRulesEvent.getOverrides();
+        List<Pair<Predicate<ItemStack>, DropRule>> dropRules = dropRulesEvent.getOverrides();
         boolean keepInventory = false;
 
         if (livingEntity instanceof Player
@@ -330,7 +329,7 @@ public class CuriosCommonEvents {
     CuriosApi.getCurio(stack).ifPresent(
         curio -> CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
           Map<String, ICurioStacksHandler> curios = handler.getCurios();
-          Tuple<IDynamicStackHandler, SlotContext> firstSlot = null;
+          Pair<IDynamicStackHandler, SlotContext> firstSlot = null;
 
           for (Map.Entry<String, ICurioStacksHandler> entry : curios.entrySet()) {
             IDynamicStackHandler stackHandler = entry.getValue().getStacks();
@@ -368,7 +367,7 @@ public class CuriosCommonEvents {
 
                   if (stackHandler.extractItem(i, stack.getMaxStackSize(), true).getCount() ==
                       stack.getCount()) {
-                    firstSlot = new Tuple<>(stackHandler, slotContext);
+                    firstSlot = new Pair<>(stackHandler, slotContext);
                   }
                 }
               }
@@ -376,8 +375,8 @@ public class CuriosCommonEvents {
           }
 
           if (firstSlot != null) {
-            IDynamicStackHandler stackHandler = firstSlot.getA();
-            SlotContext slotContext = firstSlot.getB();
+            IDynamicStackHandler stackHandler = firstSlot.getFirst();
+            SlotContext slotContext = firstSlot.getSecond();
             int i = slotContext.index();
             ItemStack present = stackHandler.getStackInSlot(i);
             stackHandler.setStackInSlot(i, stack.copy());

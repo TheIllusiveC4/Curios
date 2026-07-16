@@ -21,8 +21,6 @@
 package top.theillusivec4.curios.api.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import com.mojang.math.Axis;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
@@ -32,7 +30,6 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -42,11 +39,9 @@ import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -128,38 +123,6 @@ public interface ICurioRenderer {
   /**
    * Renders an ItemStack in a given SlotContext on an entity.
    *
-   * @param stack             The ItemStack being rendered.
-   * @param slotContext       The SlotContext for the slot that the item is found in.
-   * @param poseStack         The PoseStack containing the current transformations.
-   * @param renderTypeBuffer  The buffer for rendering.
-   * @param packedLight       The packed light for rendering.
-   * @param renderState       The render state of the entity used for this rendering instance.
-   * @param renderLayerParent The parent rendering layer and model from the entity.
-   * @param context           The rendering context provided by the entity render layer.
-   * @param yRotation         The y-rotation of the render state.
-   * @param xRotation         The x-rotation of the render state.
-   * @param <S>               The class for the entity's render state.
-   * @param <M>               The class for the entity's model.
-   * @deprecated As of 13.0.0, use {@link ICurioRenderer#render(ItemStack, SlotContext, PoseStack, SubmitNodeCollector, int, LivingEntityRenderState, RenderLayerParent, EntityRendererProvider.Context, float, float)}
-   */
-  @Deprecated
-  default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void render(
-      ItemStack stack,
-      SlotContext slotContext,
-      PoseStack poseStack,
-      MultiBufferSource renderTypeBuffer,
-      int packedLight,
-      S renderState,
-      RenderLayerParent<S, M> renderLayerParent,
-      EntityRendererProvider.Context context,
-      float yRotation,
-      float xRotation) {
-    // NO-OP
-  }
-
-  /**
-   * Renders an ItemStack in a given SlotContext on an entity.
-   *
    * @param stack               The ItemStack being rendered.
    * @param slotContext         The SlotContext for the slot that the item is found in.
    * @param poseStack           The PoseStack containing the current transformations.
@@ -184,9 +147,7 @@ public interface ICurioRenderer {
       EntityRendererProvider.Context context,
       float yRotation,
       float xRotation) {
-    this.render(stack, slotContext, poseStack,
-                Minecraft.getInstance().renderBuffers().bufferSource(), packedLight, renderState,
-                renderLayerParent, context, yRotation, xRotation);
+    // NO-OP
   }
 
   /**
@@ -220,38 +181,6 @@ public interface ICurioRenderer {
       AbstractClientPlayer clientPlayer,
       int packedLight) {
     // NO-OP
-  }
-
-  /**
-   * Renders a model with a texture, optionally with an enchantment glint overlay.
-   *
-   * @param model            The model to be rendered.
-   * @param textureLocation  The location of the texture to be rendered on the model.
-   * @param poseStack        The PoseStack containing the current transformations.
-   * @param renderTypeBuffer The buffer for rendering.
-   * @param packedLight      The packed light for rendering.
-   * @param glintRender      The render type of the enchantment glint overlay, or null to disable.
-   * @deprecated model As of 13.0.0, use {@link net.minecraft.client.renderer.OrderedSubmitNodeCollector#submitModel(Model, Object, PoseStack, RenderType, int, int, int, TextureAtlasSprite, int, ModelFeatureRenderer.CrumblingOverlay)}
-   */
-  @Deprecated(forRemoval = true, since = "13.0.0")
-  static void renderModel(
-      Model<?> model,
-      Identifier textureLocation,
-      PoseStack poseStack,
-      MultiBufferSource renderTypeBuffer,
-      int packedLight,
-      @Nullable RenderType glintRender) {
-    RenderType renderType = model.renderType(textureLocation);
-    VertexConsumer vertexConsumer;
-
-    if (glintRender != null) {
-      vertexConsumer =
-          VertexMultiConsumer.create(
-              renderTypeBuffer.getBuffer(glintRender), renderTypeBuffer.getBuffer(renderType));
-    } else {
-      vertexConsumer = renderTypeBuffer.getBuffer(renderType);
-    }
-    model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
   }
 
   /**
@@ -412,7 +341,7 @@ public interface ICurioRenderer {
    * {@link #renderFirstPersonHand(ItemStack, SlotContext, HumanoidArm, PoseStack,
    * SubmitNodeCollector, AvatarRenderState, AbstractClientPlayer, int)}
    * with the same rendering that is performed in
-   * {@link #render(ItemStack, SlotContext, PoseStack, MultiBufferSource, int,
+   * {@link #render(ItemStack, SlotContext, PoseStack, SubmitNodeCollector, int,
    * LivingEntityRenderState, RenderLayerParent, EntityRendererProvider.Context, float, float)}.
    */
   interface HumanoidRender

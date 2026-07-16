@@ -136,16 +136,16 @@ public abstract class CuriosDataProvider implements DataProvider {
                          (k) -> this.entitiesBuilders.getOrDefault(copyId, createEntitiesData()));
   }
 
-  public final TagAppender<Item, Item> tag(TagKey<Item> tagKey) {
+  public final TagAppender<Item> tag(TagKey<Item> tagKey) {
     return this.itemTagsProvider.tag(tagKey);
   }
 
-  public final TagAppender<Item, Item> tag(String slotId) {
+  public final TagAppender<Item> tag(String slotId) {
     return this.itemTagsProvider.tag(
         TagKey.create(Registries.ITEM, CuriosResources.resource(slotId)));
   }
 
-  public final TagAppender<Item, Item> tag(ISlotData slot) {
+  public final TagAppender<Item> tag(ISlotData slot) {
     return this.itemTagsProvider.tag(
         TagKey.create(Registries.ITEM, CuriosResources.resource(slot.getId())));
   }
@@ -190,7 +190,7 @@ public abstract class CuriosDataProvider implements DataProvider {
 
     @Nonnull
     @Override
-    protected TagAppender<Item, Item> tag(@Nonnull TagKey<Item> tag) {
+    protected TagAppender<Item> tag(@Nonnull TagKey<Item> tag) {
       return super.tag(tag);
     }
 

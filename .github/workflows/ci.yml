@@ -1,0 +1,34 @@
+name: CI Build (port 26.2)
+on:
+  push:
+    branches: [ "26.x" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Compile
+        run: ./gradlew compileJava compileTestJava --stacktrace --no-daemon
+      - name: Build
+        if: success()
+        run: ./gradlew build --stacktrace --no-daemon
+      - name: "GameTest server (runtime load - mixins, AT, registration)"
+        if: success()
+        run: ./gradlew runGameTestServer --stacktrace --no-daemon
+      - name: Upload artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: curios-neoforge-26.2
+          path: build/libs/*.jar
+          if-no-files-found: warn

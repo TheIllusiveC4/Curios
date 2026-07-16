@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import net.minecraft.util.Tuple;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -52,7 +52,7 @@ public class DropRulesEvent extends LivingEvent {
   private final int lootingLevel;
   private final boolean recentlyHit;
   private final ICuriosItemHandler curioHandler; // Curio handler for the entity
-  private final List<Tuple<Predicate<ItemStack>, DropRule>> overrides = new ArrayList<>();
+  private final List<Pair<Predicate<ItemStack>, DropRule>> overrides = new ArrayList<>();
   // List of drop rule overrides
 
   public DropRulesEvent(LivingEntity entity, ICuriosItemHandler handler, DamageSource source,
@@ -90,10 +90,10 @@ public class DropRulesEvent extends LivingEvent {
    *                  no guarantee for the final result.
    */
   public void addOverride(Predicate<ItemStack> predicate, DropRule dropRule) {
-    overrides.add(new Tuple<>(predicate, dropRule));
+    overrides.add(new Pair<>(predicate, dropRule));
   }
 
-  public ImmutableList<Tuple<Predicate<ItemStack>, DropRule>> getOverrides() {
+  public ImmutableList<Pair<Predicate<ItemStack>, DropRule>> getOverrides() {
     return ImmutableList.copyOf(overrides);
   }
 }

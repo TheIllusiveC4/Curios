@@ -1,0 +1,83 @@
+name: Probe 26.2 API
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Materialize Minecraft artifacts
+        run: ./gradlew createMinecraftArtifacts --stacktrace --no-daemon
+      - name: Package locations (from patched jar class files)
+        run: |
+          J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
+          echo "PATCHED JAR: $J"
+          for C in Tuple Criterion CriterionTrigger CriterionTriggerInstance SimpleCriterionTrigger ContextAwarePredicate ItemPredicate LocationPredicate NbtPredicate MinMaxBounds EntityPredicate MultiBufferSource VertexMultiConsumer SubmitNodeCollector PoseStack; do
+            echo "--- $C ---"
+            unzip -l "$J" 2>/dev/null | grep -oE '[a-zA-Z0-9/_$]+\.class' | grep -E "(^|/)${C}(\\\$[A-Za-z0-9_]+)?\.class$" | grep -iE 'net/minecraft|com/mojang' | sort -u | head -12
+          done
+      - name: Locate decompiled MC sources jar
+        run: |
+          echo "=== searching for MC sources jars ==="
+          find /home/runner/.gradle/caches/neoformruntime /home/runner/work -name '*.jar' 2>/dev/null | xargs -I{} sh -c 'if unzip -l "{}" 2>/dev/null | grep -q "net/minecraft/util/Tuple\|net/minecraft/client/renderer/MultiBufferSource\|net/minecraft/advancements/Criterion"; then echo "HAS-MC: {}"; fi' 2>/dev/null | head
+          echo "=== neoformruntime artifacts dir ==="
+          ls -la /home/runner/.gradle/caches/neoformruntime/artifacts/ 2>/dev/null
+      - name: class locations
+        run: |
+          J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
+          for C in EntityType BlockPos Minecraft AbstractContainerScreen InventoryScreen; do
+            echo "--- $C ---"
+            unzip -l "$J" 2>/dev/null | grep -oE '[a-zA-Z0-9/_$]+\.class' | grep -E "(^|/)${C}\.class$" | grep -iE 'net/minecraft' | sort -u | head
+          done
+      - name: member signatures full
+        run: |
+          J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
+          echo "################ TagAppender methods ################"
+          javap -p -cp "$J" net.minecraft.data.tags.TagAppender 2>&1 | head -40
+          echo "################ ITagAppenderExtension methods ################"
+          javap -p -cp "$J" net.neoforged.neoforge.common.extensions.ITagAppenderExtension 2>&1 | head -30
+          echo "################ Item -> registry key helpers ################"
+          javap -p -cp "$J" net.minecraft.world.item.Item 2>&1 | grep -iE "builtInRegistryHolder|ResourceKey|Holder" | head
+          echo "################ Items.DIAMOND type ################"
+          javap -p -cp "$J" net.minecraft.world.item.Items 2>&1 | grep -iE "DIAMOND;" | head
+      - name: decompile target classes with vineflower
+        run: |
+          set +e
+          J=$(find /home/runner/work -name 'minecraft-patched-*.jar' | head -1)
+          echo "PATCHED=$J"
+          VF=$(find /home/runner/.gradle -iname 'vineflower*.jar' 2>/dev/null | grep -viE 'plugin' | head -1)
+          echo "VINEFLOWER=$VF"
+          if [ -z "$VF" ]; then echo "downloading vineflower"; VF=/tmp/vf.jar; curl -sL -o "$VF" https://github.com/Vineflower/vineflower/releases/download/1.11.1/vineflower-1.11.1.jar; fi
+          mkdir -p /tmp/in /tmp/out
+          cd /tmp/in
+          unzip -o "$J" 'net/minecraft/client/gui/screens/inventory/AbstractContainerScreen.class*' 'net/minecraft/client/Minecraft.class*' >/dev/null 2>&1
+          echo "extracted classes:"; find /tmp/in -name '*.class' | head
+          cd /
+          java -jar "$VF" -dgs=1 /tmp/in /tmp/out >/tmp/vf.log 2>&1
+          echo "vf exit=$? (tail log)"; tail -3 /tmp/vf.log
+          ACS=$(find /tmp/out -name 'AbstractContainerScreen.java' | head -1); echo "ACS=$ACS"
+          MC=$(find /tmp/out -name 'Minecraft.java' | head -1); echo "MC=$MC"
+          echo "################ extractSlot body (lines 205-300) ################"
+          sed -n '205,300p' "$ACS"
+          echo "################ extractSlots + carried render (lines 110,150) ################"
+          sed -n '110,155p' "$ACS"
+          echo "################ Minecraft: field declarations (all) mentioning Screen type ################"
+          grep -nE "^\s*(private|public|protected)[^(]*;" "$MC" | grep -E "Screen" | head -40
+          echo "################ Minecraft: overlay/gui/currentScreen candidates ################"
+          grep -nE "Overlay|this\.gui|IngameGui|Gui gui|getConnection|screen" "$MC" | grep -iE "private|public|protected" | head -30
+          mkdir -p /tmp/art && cp "$MC" /tmp/art/Minecraft.java && cp "$ACS" /tmp/art/AbstractContainerScreen.java
+      - name: upload decompiled sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: decompiled-26.2
+          path: /tmp/art/*.java
+          if-no-files-found: warn
