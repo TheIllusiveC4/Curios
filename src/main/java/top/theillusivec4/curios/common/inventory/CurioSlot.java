@@ -36,11 +36,12 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.extensions.ICurioSlotExtension;
+import top.theillusivec4.curios.api.type.ICurioSlot;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.mixin.core.AccessorEntity;
 
-public class CurioSlot extends SlotItemHandler {
+public class CurioSlot extends SlotItemHandler implements ICurioSlot {
 
   private final String identifier;
   private final Player player;
@@ -77,6 +78,7 @@ public class CurioSlot extends SlotItemHandler {
     this.isCosmetic = isCosmetic;
   }
 
+  @Deprecated(forRemoval = true)
   public String getIdentifier() {
     return this.identifier;
   }
@@ -159,5 +161,10 @@ public class CurioSlot extends SlotItemHandler {
   @Override
   public boolean allowModification(@Nonnull Player pPlayer) {
     return true;
+  }
+
+  @Override
+  public String getId() {
+    return this.identifier;
   }
 }
