@@ -68,6 +68,7 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent.PickupXp;
 import net.minecraftforge.event.level.BlockEvent;
@@ -187,6 +188,15 @@ public class CuriosEventHandler {
       }
     }
     return false;
+  }
+
+  @SubscribeEvent
+  public void playerLoggedOut(PlayerLoggedOutEvent evt) {
+    Player player = evt.getEntity();
+
+    if (player != null) {
+      player.getCapability(CuriosCapability.ID_INVENTORY).invalidate();
+    }
   }
 
   @SubscribeEvent
