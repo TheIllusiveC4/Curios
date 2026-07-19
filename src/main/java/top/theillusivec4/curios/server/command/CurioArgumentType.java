@@ -29,16 +29,14 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
+import top.theillusivec4.curios.api.CuriosSlotTypes;
+import top.theillusivec4.curios.api.type.ISlotType;
 
 public class CurioArgumentType implements ArgumentType<String> {
-
-  public static Set<String> slotIds = new HashSet<>();
 
   private static final Collection<String> EXAMPLES = Arrays.asList("ring", "head");
   private static final DynamicCommandExceptionType UNKNOWN_TYPE = new DynamicCommandExceptionType(
@@ -55,7 +53,8 @@ public class CurioArgumentType implements ArgumentType<String> {
   @Override
   public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context,
                                                             SuggestionsBuilder builder) {
-    return SharedSuggestionProvider.suggest(slotIds, builder);
+    return SharedSuggestionProvider.suggest(CuriosSlotTypes.getSlotTypes().values().stream().map(
+        ISlotType::getId), builder);
   }
 
   @Override
@@ -67,7 +66,7 @@ public class CurioArgumentType implements ArgumentType<String> {
   public String parse(StringReader reader) throws CommandSyntaxException {
     String s = reader.readUnquotedString();
 
-    if (!slotIds.contains(s)) {
+    if (CuriosSlotTypes.getSlotType(s) == null) {
       throw UNKNOWN_TYPE.create(s);
     } else {
       return s;

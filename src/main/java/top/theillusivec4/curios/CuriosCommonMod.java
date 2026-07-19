@@ -20,8 +20,6 @@
 
 package top.theillusivec4.curios;
 
-import java.util.HashSet;
-import java.util.Set;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -38,14 +36,12 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.resource.VanillaServerListeners;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.CuriosSlotTypes;
 import top.theillusivec4.curios.api.extensions.RegisterCuriosExtensionsEvent;
 import top.theillusivec4.curios.api.internal.CuriosServices;
-import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.common.CuriosCommonEvents;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
@@ -57,7 +53,6 @@ import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.config.CuriosClientConfig;
 import top.theillusivec4.curios.config.CuriosConfig;
 import top.theillusivec4.curios.impl.CuriosRegistry;
-import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
 import top.theillusivec4.curios.server.command.CuriosSelectorOptions;
 
@@ -70,7 +65,6 @@ public class CuriosCommonMod {
     eventBus.addListener(this::setup);
     eventBus.addListener(this::registerCaps);
     eventBus.addListener(this::registerPayloadHandler);
-    NeoForge.EVENT_BUS.addListener(this::serverAboutToStart);
     NeoForge.EVENT_BUS.addListener(this::registerCommands);
     NeoForge.EVENT_BUS.addListener(this::reload);
     modContainer.registerConfig(ModConfig.Type.CLIENT, CuriosClientConfig.CLIENT_SPEC);
@@ -134,15 +128,6 @@ public class CuriosCommonMod {
         return null;
       }, item);
     }
-  }
-
-  private void serverAboutToStart(ServerAboutToStartEvent evt) {
-    Set<String> slotIds = new HashSet<>();
-
-    for (ISlotType value : CuriosSlotResources.SERVER.getSlots().values()) {
-      slotIds.add(value.getId());
-    }
-    CurioArgumentType.slotIds = slotIds;
   }
 
   private void registerCommands(RegisterCommandsEvent evt) {
