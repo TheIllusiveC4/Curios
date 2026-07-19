@@ -38,6 +38,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -75,6 +76,7 @@ import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
@@ -468,6 +470,14 @@ public class CuriosCommonEvents {
   @SubscribeEvent
   public void tick(EntityTickEvent.Post evt) {
     Entity entity = evt.getEntity();
+    MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+
+    if (server != null && !server.isDedicatedServer()) {
+
+      if (CuriosSlotResources.CLIENT.getSlots().isEmpty()) {
+        return;
+      }
+    }
 
     if (entity instanceof LivingEntity livingEntity) {
       if (livingEntity instanceof Player player
