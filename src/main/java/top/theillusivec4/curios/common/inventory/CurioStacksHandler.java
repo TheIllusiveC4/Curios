@@ -459,30 +459,37 @@ public class CurioStacksHandler implements ICurioStacksHandler {
 
   public void update() {
 
-    if (this.update && this.dataLoaded) {
-      this.update = false;
-      double baseSize = this.baseSize;
+    if (this.dataLoaded) {
+      boolean sizeUpdated = false;
 
-      for (AttributeModifier mod :
-          this.getModifiersByOperation(AttributeModifier.Operation.ADD_VALUE)) {
-        baseSize += mod.amount();
+      while (this.update) {
+        this.update = false;
+        double baseSize = this.baseSize;
+
+        for (AttributeModifier mod :
+            this.getModifiersByOperation(AttributeModifier.Operation.ADD_VALUE)) {
+          baseSize += mod.amount();
+        }
+        double size = baseSize;
+
+        for (AttributeModifier mod :
+            this.getModifiersByOperation(AttributeModifier.Operation.ADD_MULTIPLIED_BASE)) {
+          size += this.baseSize * mod.amount();
+        }
+
+        for (AttributeModifier mod :
+            this.getModifiersByOperation(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)) {
+          size *= mod.amount();
+        }
+        size = Math.max(0, size);
+
+        if (size != this.getSlots()) {
+          this.resize((int) size);
+          sizeUpdated = true;
+        }
       }
-      double size = baseSize;
 
-      for (AttributeModifier mod :
-          this.getModifiersByOperation(AttributeModifier.Operation.ADD_MULTIPLIED_BASE)) {
-        size += this.baseSize * mod.amount();
-      }
-
-      for (AttributeModifier mod :
-          this.getModifiersByOperation(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)) {
-        size *= mod.amount();
-      }
-
-      size = Math.max(0, size);
-
-      if (size != this.getSlots()) {
-        this.resize((int) size);
+      if (sizeUpdated) {
         LivingEntity livingEntity = this.curioInventory.getOwner();
         NeoForge.EVENT_BUS.post(
             new SlotModifiersUpdatedEvent(livingEntity, Set.of(this.identifier)));
