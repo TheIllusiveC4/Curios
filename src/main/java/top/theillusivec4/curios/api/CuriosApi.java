@@ -34,6 +34,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -232,7 +233,7 @@ public final class CuriosApi {
    */
   @Deprecated(forRemoval = true)
   public static Map<String, ISlotType> getPlayerSlots(boolean isClient) {
-    return CuriosApi.getEntitySlots(EntityType.PLAYER, isClient);
+    return CuriosApi.getEntitySlots(EntityTypes.PLAYER, isClient);
   }
 
   /**

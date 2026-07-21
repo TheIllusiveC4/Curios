@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.ClientAvatarEntity;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
@@ -39,6 +40,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -55,6 +57,7 @@ import net.neoforged.neoforge.common.util.AttributeUtil;
 import net.neoforged.neoforge.event.AddAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.GatherSkippedAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import org.jspecify.annotations.NonNull;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.api.CuriosSlotTypes;
@@ -69,7 +72,8 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 public class CuriosClientEvents {
 
   @SubscribeEvent
-  public void renderHand(final RenderArmEvent evt) {
+  public <T extends Avatar & ClientAvatarEntity> void renderHand(
+      final RenderArmEvent<@NonNull T> evt) {
     Minecraft mc = Minecraft.getInstance();
 
     if (mc.player != null) {
@@ -107,8 +111,8 @@ public class CuriosClientEvents {
                       poseStack,
                       evt.getSubmitNodeCollector(),
                       avatarRenderState,
-                      evt.getPlayer(),
-                      evt.getPackedLight()
+                      clientPlayer,
+                      evt.getLightCoords()
                   );
                 }
               }

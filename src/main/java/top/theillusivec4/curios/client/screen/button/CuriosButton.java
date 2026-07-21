@@ -20,6 +20,7 @@
 
 package top.theillusivec4.curios.client.screen.button;
 
+import com.mojang.datafixers.util.Pair;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -29,7 +30,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.api.CuriosResources;
@@ -63,7 +63,7 @@ public class CuriosButton extends ImageButton {
                 mc.player.clientSideCloseContainer();
                 InventoryScreen inventoryScreen = new InventoryScreen(mc.player);
                 mc.mouseHandler.mouseGrabbed = false;
-                mc.setScreen(inventoryScreen);
+                mc.gui.setScreen(inventoryScreen);
                 inventoryScreen.xMouse = curiosScreen.oldMouseX;
                 inventoryScreen.yMouse = curiosScreen.oldMouseY;
                 mc.player.inventoryMenu.setCarried(stack);
@@ -87,11 +87,11 @@ public class CuriosButton extends ImageButton {
   @Override
   public void extractContents(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY,
                            float partialTicks) {
-    Tuple<Integer, Integer> offsets =
+    Pair<Integer, Integer> offsets =
         CuriosScreen.getButtonOffset(parentGui instanceof CreativeModeInventoryScreen);
-    this.setX(parentGui.getGuiLeft() + offsets.getA() + 2);
+    this.setX(parentGui.getLeftPos() + offsets.getFirst() + 2);
     int yOffset = parentGui instanceof CreativeModeInventoryScreen ? 70 : 85;
-    this.setY(parentGui.getGuiTop() + offsets.getB() + yOffset);
+    this.setY(parentGui.getTopPos() + offsets.getSecond() + yOffset);
 
     if (parentGui instanceof CreativeModeInventoryScreen gui) {
       boolean isInventoryTab = gui.isInventoryOpen();

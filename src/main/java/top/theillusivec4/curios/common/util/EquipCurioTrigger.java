@@ -24,11 +24,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.Optional;
 import javax.annotation.Nonnull;
-import net.minecraft.advancements.criterion.ContextAwarePredicate;
-import net.minecraft.advancements.criterion.EntityPredicate;
-import net.minecraft.advancements.criterion.ItemPredicate;
-import net.minecraft.advancements.criterion.LocationPredicate;
-import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
+import net.minecraft.advancements.predicates.ContextAwarePredicate;
+import net.minecraft.advancements.predicates.ItemPredicate;
+import net.minecraft.advancements.predicates.LocationPredicate;
+import net.minecraft.advancements.predicates.entity.EntityPredicate;
+import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -57,25 +57,23 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
     return TriggerInstance.CODEC;
   }
 
-  public void trigger(ServerPlayer serverPlayer, ItemStack stack) {
+  public LootContext getLootContext(ServerPlayer serverPlayer, ItemStack stack) {
     LootParams lootparams = new LootParams.Builder(serverPlayer.level())
-        .withParameter(LootContextParams.ORIGIN, serverPlayer.blockPosition().getCenter())
+        .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(serverPlayer.blockPosition()))
         .withParameter(LootContextParams.THIS_ENTITY, serverPlayer)
         .withParameter(LootContextParams.BLOCK_STATE, serverPlayer.getBlockStateOn())
         .withParameter(LootContextParams.TOOL, stack)
         .create(LootContextParamSets.ADVANCEMENT_LOCATION);
-    LootContext lootcontext = new LootContext.Builder(lootparams).create(Optional.empty());
+    return new LootContext.Builder(lootparams).create(Optional.empty());
+  }
+
+  public void trigger(ServerPlayer serverPlayer, ItemStack stack) {
+    LootContext lootcontext = this.getLootContext(serverPlayer, stack);
     this.trigger(serverPlayer, instance -> instance.matches(null, stack, lootcontext));
   }
 
   public void trigger(SlotContext slotContext, ServerPlayer serverPlayer, ItemStack stack) {
-    LootParams lootparams = new LootParams.Builder(serverPlayer.level())
-        .withParameter(LootContextParams.ORIGIN, serverPlayer.blockPosition().getCenter())
-        .withParameter(LootContextParams.THIS_ENTITY, serverPlayer)
-        .withParameter(LootContextParams.BLOCK_STATE, serverPlayer.getBlockStateOn())
-        .withParameter(LootContextParams.TOOL, stack)
-        .create(LootContextParamSets.ADVANCEMENT_LOCATION);
-    LootContext lootcontext = new LootContext.Builder(lootparams).create(Optional.empty());
+    LootContext lootcontext = this.getLootContext(serverPlayer, stack);
     this.trigger(serverPlayer, instance -> instance.matches(slotContext, stack, lootcontext));
   }
 

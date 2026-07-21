@@ -72,7 +72,7 @@ public class CuriosClientPackets {
   public static void handle(final SPacketPage data) {
     Minecraft mc = Minecraft.getInstance();
     LocalPlayer clientPlayer = mc.player;
-    Screen screen = mc.screen;
+    Screen screen = mc.gui.screen();
 
     if (clientPlayer != null) {
       AbstractContainerMenu container = clientPlayer.containerMenu;
@@ -165,7 +165,7 @@ public class CuriosClientPackets {
                   curiosMenu.resetSlots();
                 }
 
-                if (mc.screen instanceof CuriosScreen screen) {
+                if (mc.gui.screen() instanceof CuriosScreen screen) {
                   screen.updateRenderButtons();
                 }
               }

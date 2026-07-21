@@ -4,9 +4,9 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.advancements.criterion.ItemPredicate;
-import net.minecraft.advancements.criterion.LocationPredicate;
-import net.minecraft.advancements.criterion.MinMaxBounds;
+import net.minecraft.advancements.predicates.ItemPredicate;
+import net.minecraft.advancements.predicates.LocationPredicate;
+import net.minecraft.advancements.predicates.MinMaxBounds;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,6 +17,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biomes;
 import top.theillusivec4.curios.api.CuriosTriggers;
 import top.theillusivec4.curios.api.SlotPredicate;
+import top.theillusivec4.curiostest.CuriosTest;
 
 public class CuriosGenerator implements AdvancementSubProvider {
 
@@ -37,6 +38,6 @@ public class CuriosGenerator implements AdvancementSubProvider {
                                         .of("ring", "necklace")
                                         .withIndex(MinMaxBounds.Ints.between(0, 10)))
                           .build())
-        .save(saver, Identifier.fromNamespaceAndPath("curiostest", "test"));
+        .save(saver, Identifier.fromNamespaceAndPath(CuriosTest.MODID, "test"));
   }
 }

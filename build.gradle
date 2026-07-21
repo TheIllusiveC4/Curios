@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.140'
+    id 'net.neoforged.moddev' version '2.0.141'
     id 'idea'
     id 'com.modrinth.minotaur' version '2.+'
     id 'net.darkhax.curseforgegradle' version '1.+'
@@ -97,7 +97,7 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
-task apiJar(type: Jar) {
+tasks.register('apiJar', Jar) {
     archiveClassifier.set('api')
     include 'top/theillusivec4/curios/api/**/*'
     from sourceSets.main.allSource
@@ -129,8 +129,8 @@ artifacts {
 }
 
 dependencies {
-//    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
-//    localRuntime "mezz.jei:jei-1.21-neoforge:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    localRuntime "mezz.jei:jei-26.2-neoforge:${jei_version}"
 
 //    compileOnly "dev.emi:emi-neoforge:${emi_version}"
 //    localRuntime "dev.emi:emi-neoforge:${emi_version}"
@@ -262,12 +262,14 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     mainFile.changelogType = 'markdown'
     mainFile.changelog = file('CHANGELOG_LATEST.md')
     mainFile.releaseType = "${release_type}"
+    def sourcesFile = mainFile.withAdditionalFile(sourcesJar)
+    def apiFile = mainFile.withAdditionalFile(apiJar)
     "${release_versions}".split(',').each {
         mainFile.addGameVersion("${it}")
+        sourcesFile.gameVersions.add("")
+        apiFile.gameVersions.add("")
     }
     mainFile.addModLoader("NeoForge")
-    mainFile.withAdditionalFile(sourcesJar)
-    mainFile.withAdditionalFile(apiJar)
 
     doLast {
 
