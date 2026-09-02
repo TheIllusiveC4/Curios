@@ -47,5 +47,5 @@
   "gui.curios.page": "Сторінка %d / %d",
   "curios.networking.failed": "Помилка мережі Curios",
   "curios.tooltip.inactive": "Неактивно",
-  "fml.menu.mods.info.description.curios": "Гнучкий і розширюваний API аксесуарів/спорядження для користувачів і розробників."
+  "neoforge.screen.mods.info.description.curios": "Гнучкий і розширюваний API аксесуарів/спорядження для користувачів і розробників."
 }
