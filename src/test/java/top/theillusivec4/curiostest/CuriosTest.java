@@ -19,12 +19,12 @@
 
 package top.theillusivec4.curiostest;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
-import net.minecraft.core.Holder;
+import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.resources.Identifier;
@@ -34,10 +34,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -48,7 +47,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.apache.logging.log4j.LogManager;
@@ -61,7 +59,6 @@ import top.theillusivec4.curios.api.CuriosSlotTypes;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 import top.theillusivec4.curios.api.common.DropRule;
-import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import top.theillusivec4.curios.api.extensions.ICurioSlotExtension;
 import top.theillusivec4.curios.api.extensions.RegisterCuriosExtensionsEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -90,9 +87,8 @@ public class CuriosTest {
     eventBus.addListener(this::registerCaps);
     eventBus.addListener(this::gatherData);
     eventBus.addListener(this::registerSlotExtensions);
-    NeoForge.EVENT_BUS.addListener(this::attributeModifier);
     CuriosSlotTypes.registerPredicate(Identifier.fromNamespaceAndPath(MODID, "test"),
-                                     (ctx, stack) -> stack.getItem() == Items.OAK_BOAT);
+        (ctx, stack) -> stack.getItem() == Items.OAK_BOAT);
   }
 
   private void registerSlotExtensions(final RegisterCuriosExtensionsEvent evt) {
@@ -106,11 +102,10 @@ public class CuriosTest {
 
   private void gatherData(final GatherDataEvent.Client evt) {
     DataGenerator generator = evt.getGenerator();
-    generator.addProvider(true, new AdvancementProvider(generator.getPackOutput(),
-                                                        evt.getLookupProvider(),
-                                                        List.of(new CuriosGenerator())));
+    evt.createReloadableRegistryObjects(new RegistrySetBuilder().add(Registries.ADVANCEMENT,
+        new AdvancementProvider(List.of(CuriosGenerator::new))), Set.of("curiostest"));
     generator.addProvider(true, new CuriosTestProvider("curiostest", generator.getPackOutput(),
-                                                       evt.getLookupProvider()));
+        evt.getReloadableLookupProvider()));
   }
 
   private void registerCaps(final RegisterCapabilitiesEvent evt) {
@@ -130,7 +125,7 @@ public class CuriosTest {
           livingEntity.addEffect(
               new MobEffectInstance(MobEffects.NIGHT_VISION, 300, -1, true, true));
           stack.hurtAndBreak(1, serverLevel, livingEntity,
-                             item -> CuriosApi.broadcastCurioBreakEvent(slotContext));
+              item -> CuriosApi.broadcastCurioBreakEvent(slotContext));
         }
       }
     }, CuriosTestRegistry.CROWN.get());
@@ -152,25 +147,34 @@ public class CuriosTest {
       }
 
       @Override
-      public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-          SlotContext slotContext, Identifier id) {
-        Multimap<Holder<Attribute>, AttributeModifier> atts = LinkedHashMultimap.create();
-        atts.put(Attributes.MOVEMENT_SPEED,
-                 new AttributeModifier(
-                     Identifier.fromNamespaceAndPath(CuriosTest.MODID, "speed_bonus"), 0.1,
-                     AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
-        atts.put(Attributes.ARMOR,
-                 new AttributeModifier(
-                     Identifier.fromNamespaceAndPath(CuriosTest.MODID, "armor_bonus"), 2,
-                     AttributeModifier.Operation.ADD_VALUE));
-        atts.put(Attributes.KNOCKBACK_RESISTANCE,
-                 new AttributeModifier(
-                     Identifier.fromNamespaceAndPath(CuriosTest.MODID, "knockback_resist"),
-                     0.2,
-                     AttributeModifier.Operation.ADD_VALUE));
-        CuriosApi.addSlotModifier(atts, "ring", id, 1, AttributeModifier.Operation.ADD_VALUE);
-        CuriosApi.addSlotModifier(atts, "curio", id, -1, AttributeModifier.Operation.ADD_VALUE);
-        return atts;
+      public CurioAttributeModifiers getDefaultCurioAttributeModifiers() {
+        return CurioAttributeModifiers.builder()
+            .addModifier(Attributes.MOVEMENT_SPEED,
+                new AttributeModifier(
+                    Identifier.fromNamespaceAndPath(CuriosTest.MODID, "speed_bonus"),
+                    0.1,
+                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL))
+            .addModifier(Attributes.ARMOR,
+                new AttributeModifier(
+                    Identifier.fromNamespaceAndPath(CuriosTest.MODID, "armor_bonus"),
+                    2,
+                    AttributeModifier.Operation.ADD_VALUE))
+            .addModifier(Attributes.KNOCKBACK_RESISTANCE,
+                new AttributeModifier(
+                    Identifier.fromNamespaceAndPath(CuriosTest.MODID, "knockback_resist"),
+                    0.2,
+                    AttributeModifier.Operation.ADD_VALUE))
+            .addSlotModifier("ring",
+                new AttributeModifier(
+                    Identifier.fromNamespaceAndPath(CuriosTest.MODID, "add_ring"),
+                    1,
+                    AttributeModifier.Operation.ADD_VALUE))
+            .addSlotModifier("curio",
+                new AttributeModifier(
+                    Identifier.fromNamespaceAndPath(CuriosTest.MODID, "remove_curio"),
+                    -1,
+                    AttributeModifier.Operation.ADD_VALUE))
+            .build();
       }
 
       @Nonnull
@@ -197,7 +201,7 @@ public class CuriosTest {
       }
 
       @Override
-      public boolean isEnderMask(SlotContext slotContext, EnderMan enderMan) {
+      public boolean isEnderMask(SlotContext slotContext, Enderman enderMan) {
         return true;
       }
 
@@ -245,25 +249,12 @@ public class CuriosTest {
     }, CuriosTestRegistry.KNUCKLES.get());
   }
 
-  private void attributeModifier(final CurioAttributeModifierEvent evt) {
-
-//    if (evt.getSlotContext().identifier().equals("curio")) {
-//      evt.clearModifiers();
-//      evt.addModifier(Attributes.MAX_HEALTH,
-//          new AttributeModifier(Identifier.withDefaultNamespace("test"), 10.0d,
-//              AttributeModifier.Operation.ADD_VALUE));
-//      evt.addModifier(SlotAttribute.getOrCreate("ring"),
-//          new AttributeModifier(Identifier.withDefaultNamespace("test"), 1.0d,
-//              AttributeModifier.Operation.ADD_VALUE));
-//    }
-  }
-
   private void creativeTab(final BuildCreativeModeTabContentsEvent evt) {
 
     if (evt.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
       Collection<ItemLike> items =
           List.of(CuriosTestRegistry.AMULET.get(), CuriosTestRegistry.CROWN.get(),
-                  CuriosTestRegistry.KNUCKLES.get(), CuriosTestRegistry.RING.get());
+              CuriosTestRegistry.KNUCKLES.get(), CuriosTestRegistry.RING.get());
 
       for (ItemLike item : items) {
         evt.accept(item);
@@ -273,7 +264,7 @@ public class CuriosTest {
 
   private void clientSetup(final FMLClientSetupEvent evt) {
     ICurioRenderer.register(CuriosTestRegistry.AMULET.get(),
-                            () -> (AmuletItem) CuriosTestRegistry.AMULET.get());
+        () -> (AmuletItem) CuriosTestRegistry.AMULET.get());
     ICurioRenderer.register(CuriosTestRegistry.CROWN.get(), CrownRenderer::new);
     ICurioRenderer.register(CuriosTestRegistry.KNUCKLES.get(), KnucklesRenderer::new);
   }

@@ -66,53 +66,8 @@ public abstract class CurioChangeEvent extends LivingEvent {
     this.to = to;
   }
 
-  /**
-   * A constructor that takes a LivingEntity, a slot's identifier and index, and the
-   * previous/current ItemStacks.
-   *
-   * @param living  The {@link LivingEntity} equipping the ItemStacks.
-   * @param type    The String identifier of the slot that has its contents changed.
-   * @param index   The index of the slot that has its contents changed.
-   * @param from    The previous {@link ItemStack}.
-   * @param to      The current/new {@link ItemStack}.
-   * @see #CurioChangeEvent(LivingEntity, SlotContext, ItemStack, ItemStack)
-   * @deprecated Since 12.0.0, use
-   *        {@link #CurioChangeEvent(LivingEntity, SlotContext, ItemStack, ItemStack)} instead to
-   *        access more slot information through the SlotContext parameter.
-   */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  public CurioChangeEvent(LivingEntity living, String type, int index, @Nonnull ItemStack from,
-                          @Nonnull ItemStack to) {
-    super(living);
-    this.from = from;
-    this.to = to;
-    this.slotContext = new SlotContext(type, living, index, false, true);
-  }
-
   public SlotContext getSlotContext() {
     return this.slotContext;
-  }
-
-  /**
-   * Gets the identifier for the slot's type.
-   *
-   * @see #getSlotContext()
-   * @deprecated Since 12.0.0, use {@link #getSlotContext()} for accessing all slot information.
-   */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  public String getIdentifier() {
-    return this.slotContext.identifier();
-  }
-
-  /**
-   * Gets the index for the slot.
-   *
-   * @see #getSlotContext()
-   * @deprecated Since 12.0.0, use {@link #getSlotContext()} for accessing all slot information.
-   */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  public int getSlotIndex() {
-    return this.slotContext.index();
   }
 
   @Nonnull
@@ -144,25 +99,6 @@ public abstract class CurioChangeEvent extends LivingEvent {
                 @Nonnull ItemStack from, @Nonnull ItemStack to) {
       super(livingEntity, slotContext, from, to);
     }
-
-    /**
-     * A constructor that takes a LivingEntity, a slot's identifier and index, and the
-     * previous/current ItemStacks.
-     *
-     * @param living  The {@link LivingEntity} equipping the ItemStacks.
-     * @param type    The String identifier of the slot that has its items changed.
-     * @param index   The index of the slot that has its items changed.
-     * @param from    The previous {@link ItemStack}.
-     * @param to      The current/new {@link ItemStack}.
-     * @see CurioChangeEvent.Item#Item(LivingEntity, SlotContext, ItemStack, ItemStack)
-     * @deprecated Since 12.0.0, use {@link #Item(LivingEntity, SlotContext, ItemStack, ItemStack)}
-     *      instead to access more slot information through the SlotContext parameter.
-     */
-    @Deprecated(forRemoval = true, since = "12.0.0")
-    public Item(LivingEntity living, String type, int index, @Nonnull ItemStack from,
-                @Nonnull ItemStack to) {
-      super(living, type, index, from, to);
-    }
   }
 
   /**
@@ -183,25 +119,6 @@ public abstract class CurioChangeEvent extends LivingEvent {
     public State(LivingEntity livingEntity, @Nonnull SlotContext slotContext,
                  @Nonnull ItemStack from, @Nonnull ItemStack to) {
       super(livingEntity, slotContext, from, to);
-    }
-
-    /**
-     * A constructor that takes a LivingEntity, a slot's identifier and index, and the
-     * previous/current ItemStacks.
-     *
-     * @param living  The {@link LivingEntity} equipping the ItemStacks.
-     * @param type    The String identifier of the slot that has its stack changed.
-     * @param index   The index of the slot that has its stack changed.
-     * @param from    The previous {@link ItemStack}.
-     * @param to      The current/new {@link ItemStack}.
-     * @see CurioChangeEvent.State#State(LivingEntity, SlotContext, ItemStack, ItemStack)
-     * @deprecated Since 12.0.0, use {@link #State(LivingEntity, SlotContext, ItemStack, ItemStack)}
-     *      instead to access more slot information through the SlotContext parameter.
-     */
-    @Deprecated(forRemoval = true, since = "12.0.0")
-    public State(LivingEntity living, String type, int index, @Nonnull ItemStack from,
-                 @Nonnull ItemStack to) {
-      super(living, type, index, from, to);
     }
   }
 }

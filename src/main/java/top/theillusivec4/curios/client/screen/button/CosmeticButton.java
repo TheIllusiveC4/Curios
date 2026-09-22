@@ -65,8 +65,8 @@ public class CosmeticButton extends ImageButton implements ICuriosWidget {
     } else {
       sprites1 = OFF;
     }
-    this.setX(this.parentGui.getGuiLeft() - 27);
-    this.setY(this.parentGui.getGuiTop() - 18);
+    this.setX(this.parentGui.getLeftPos() - 27);
+    this.setY(this.parentGui.getTopPos() - 18);
     Identifier resourcelocation = sprites1.get(this.isActive(), this.isHoveredOrFocused());
     guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, resourcelocation, this.getX(), this.getY(),
                            this.width, this.height);

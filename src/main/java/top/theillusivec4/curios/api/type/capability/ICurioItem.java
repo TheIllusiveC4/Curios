@@ -32,7 +32,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -46,8 +46,10 @@ import top.theillusivec4.curios.api.type.ISlotType;
 
 /**
  * Designed to be directly implemented on {@link Item} objects.<br/><br/>
- * Curios will automatically create and attach {@link ICurio} capability to any ItemStacks that contain items
- * implementing this interface, redirecting all calls made on such capability to respective methods here.
+ * Curios will automatically create and attach {@link ICurio} capability to any ItemStacks that
+ * contain items
+ * implementing this interface, redirecting all calls made on such capability to respective
+ * methods here.
  *
  * @author Extegral
  */
@@ -76,7 +78,8 @@ public interface ICurioItem {
   }
 
   /**
-   * Called during automatic capability attachment to any ItemStack containing this {@link ICurioItem} instance.
+   * Called during automatic capability attachment to any ItemStack containing this
+   * {@link ICurioItem} instance.
    *
    * @param stack ItemStack in question
    * @return true to attach {@link ICurio} capability to this ItemStack
@@ -191,7 +194,10 @@ public interface ICurioItem {
    * @param slotContext Context about the slot that the ItemStack is in
    * @param id          Slot-unique id
    * @return A map of attribute modifiers to apply
+   * @deprecated Use {@link ICurioItem#getDefaultCurioAttributeModifiers} instead to create default
+   * attribute modifiers for a curio item.
    */
+  @Deprecated(forRemoval = true, since = "17.0.0")
   default Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
       SlotContext slotContext, Identifier id, ItemStack stack) {
     return defaultInstance.getAttributeModifiers(slotContext, id);
@@ -201,7 +207,8 @@ public interface ICurioItem {
    * Called server-side when the ItemStack is equipped by using it (i.e. from the hotbar), after
    * calling {@link ICurioItem#canEquipFromUse(SlotContext, ItemStack)}.
    * <br>
-   * Default implementation plays the equip sound from {@link ICurioItem#getEquipSound(SlotContext, ItemStack)}.
+   * Default implementation plays the equip sound from
+   * {@link ICurioItem#getEquipSound(SlotContext, ItemStack)}.
    * This can be overridden to avoid that, but it is advised to always play something as an auditory
    * feedback for players.
    *
@@ -217,7 +224,7 @@ public interface ICurioItem {
    *
    * @param slotContext Context about the slot that the ItemStack was just equipped into
    * @return {@link ICurio.SoundInfo} containing
-   *     information about the sound event, volume, and pitch
+   * information about the sound event, volume, and pitch
    */
   @Nonnull
   default ICurio.SoundInfo getEquipSound(SlotContext slotContext, ItemStack stack) {
@@ -274,7 +281,8 @@ public interface ICurioItem {
   }
 
   /**
-   * Used client-side to read data tags created by {@link ICurioItem#writeSyncData(SlotContext, ItemStack)}
+   * Used client-side to read data tags created by
+   * {@link ICurioItem#writeSyncData(SlotContext, ItemStack)}
    * received from the server.
    *
    * @param slotContext Context about the slot that the ItemStack is in
@@ -355,7 +363,8 @@ public interface ICurioItem {
   }
 
   /**
-   * Determines whether wearing the curio will allow the user to walk on powder snow, in the same manner as
+   * Determines whether wearing the curio will allow the user to walk on powder snow, in the same
+   * manner as
    * wearing leather boots in vanilla.
    *
    * @param slotContext Context about the slot that the ItemStack is in
@@ -373,7 +382,7 @@ public interface ICurioItem {
    * @param enderMan    The Enderman entity that the user is looking at
    * @return True if it can mask the user from Enderman, false otherwise
    */
-  default boolean isEnderMask(SlotContext slotContext, EnderMan enderMan, ItemStack stack) {
+  default boolean isEnderMask(SlotContext slotContext, Enderman enderMan, ItemStack stack) {
     return defaultInstance.isEnderMask(slotContext, enderMan);
   }
 

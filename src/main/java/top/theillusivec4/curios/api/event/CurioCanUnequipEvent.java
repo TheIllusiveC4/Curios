@@ -68,27 +68,6 @@ public class CurioCanUnequipEvent extends LivingEvent {
     this.result = TriState.DEFAULT;
   }
 
-  /**
-   * A constructor that takes an ItemStack, SlotContext, and a default TriState result.
-   *
-   * @param stack       The {@link ItemStack} that is attempting to be unequipped.
-   * @param slotContext The {@link SlotContext} for the slot that is attempting to be unequipped
-   *                    into.
-   * @param result      The default {@link TriState} to use if none are set by listeners.
-   * @see CurioCanUnequipEvent#CurioCanUnequipEvent(ItemStack, SlotContext, boolean)
-   * @deprecated Since 12.0.0, use {@link #CurioCanUnequipEvent(ItemStack, SlotContext, boolean)}
-   *     instead. This constructor uses an unnecessary and misleading TriState parameter. This will
-   *     be removed in 14.0.0.
-   */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  public CurioCanUnequipEvent(ItemStack stack, SlotContext slotContext, TriState result) {
-    super(slotContext.entity());
-    this.slotContext = slotContext;
-    this.stack = stack;
-    this.originalResult = result.toBoolean(true);
-    this.result = result;
-  }
-
   public boolean getOriginalUnequipResult() {
     return this.originalResult;
   }

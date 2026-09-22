@@ -32,7 +32,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.client.ClientTooltipFlag;
-import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.extensions.ICurioSlotExtension;
@@ -41,7 +41,7 @@ import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curios.mixin.core.AccessorEntity;
 
-public class CurioSlot extends SlotItemHandler implements ICurioSlot {
+public class CurioSlot extends ResourceHandlerSlot implements ICurioSlot {
 
   private final String identifier;
   private final Player player;
@@ -63,7 +63,9 @@ public class CurioSlot extends SlotItemHandler implements ICurioSlot {
       List<Boolean> actives,
       boolean canToggleRender,
       boolean isCosmetic) {
-    super(handler, index, xPosition, yPosition);
+    super(handler,
+        (index1, resource, amount) -> handler.setStackInSlot(index1, resource.toStack(amount)),
+        index, xPosition, yPosition);
     this.identifier = identifier;
     this.renderStatuses = renders;
     this.activeStatuses = actives;
@@ -116,14 +118,6 @@ public class CurioSlot extends SlotItemHandler implements ICurioSlot {
 
   public List<Component> getSlotTooltip() {
     List<Component> tooltip = new ArrayList<>();
-    List<Component> oldTooltipCall = this.extension.getSlotTooltip(
-        this.getSlotContext(),
-        ClientTooltipFlag.of(Minecraft.getInstance().options.advancedItemTooltips
-            ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL));
-
-    if (!oldTooltipCall.isEmpty()) {
-      return oldTooltipCall;
-    }
     tooltip.add(
         Component.translatableWithFallback("curios.identifier." + this.identifier,
             this.identifier.substring(0, 1).toUpperCase(Locale.ROOT)
@@ -145,10 +139,10 @@ public class CurioSlot extends SlotItemHandler implements ICurioSlot {
   }
 
   @Override
-  public void set(@Nonnull ItemStack stack) {
+  public void setStackCopy(@Nonnull ItemStack stack) {
     ItemStack current = this.getItem();
     boolean flag = current.isEmpty() && stack.isEmpty();
-    super.set(stack);
+    super.setStackCopy(stack);
 
     if (!flag
         && !ItemStack.matches(current, stack)

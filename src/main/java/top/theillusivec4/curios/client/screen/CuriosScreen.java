@@ -193,7 +193,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
     Slot hoveredSlot = this.hoveredSlot;
     // Workaround for slots that are removed due to slot modifier changes
     if (this.hoveredSlot instanceof CurioSlot curioSlot) {
-      int slots = curioSlot.getItemHandler().getSlots();
+      int slots = curioSlot.getResourceHandler().size();
       int index = curioSlot.getSlotIndex();
 
       if (index >= slots) {

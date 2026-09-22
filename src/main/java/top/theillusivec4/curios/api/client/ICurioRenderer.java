@@ -255,8 +255,7 @@ public interface ICurioRenderer {
               OverlayTexture.NO_OVERLAY,
               -1,
               null,
-              renderState.outlineColor,
-              null);
+              renderState.outlineColor);
 
       if (stack.hasFoil()) {
         submitNodeCollector
@@ -265,13 +264,12 @@ public interface ICurioRenderer {
                 model,
                 renderState,
                 poseStack,
-                RenderTypes.armorEntityGlint(),
+                RenderTypes.trimmedArmorGlint(),
                 packedLight,
                 OverlayTexture.NO_OVERLAY,
                 -1,
                 null,
-                renderState.outlineColor,
-                null);
+                renderState.outlineColor);
       }
     }
 
@@ -385,8 +383,7 @@ public interface ICurioRenderer {
               OverlayTexture.NO_OVERLAY,
               -1,
               null,
-              avatarRenderState.outlineColor,
-              null);
+              avatarRenderState.outlineColor);
 
       if (stack.hasFoil()) {
         submitNodeCollector
@@ -395,71 +392,13 @@ public interface ICurioRenderer {
                 model,
                 avatarRenderState,
                 poseStack,
-                RenderTypes.armorEntityGlint(),
+                RenderTypes.trimmedArmorGlint(),
                 packedLight,
                 OverlayTexture.NO_OVERLAY,
                 -1,
                 null,
-                avatarRenderState.outlineColor,
-                null);
+                avatarRenderState.outlineColor);
       }
     }
-  }
-
-  /**
-   * Translates the rendering for the curio if the entity is sneaking.
-   *
-   * @param livingEntity The wearer of the curio
-   * @deprecated Use {@link #setupHumanoidAnimations(EntityModel, LivingEntityRenderState)} instead
-   *     for a more robust and complete method to apply all transformations from an entity.
-   */
-  @Deprecated(forRemoval = true)
-  static void translateIfSneaking(final PoseStack matrixStack, final LivingEntity livingEntity) {
-
-    if (livingEntity.isCrouching()) {
-      matrixStack.translate(0.0F, 0.1875F, 0.0F);
-    }
-  }
-
-  /**
-   * Rotates the rendering for the curio if the entity is sneaking. The rotation angle is based on
-   * the body of a player model when sneaking, so this is typically used for items being rendered
-   * on the body.
-   *
-   * @param livingEntity The wearer of the curio
-   * @deprecated Use {@link #setupHumanoidAnimations(EntityModel, LivingEntityRenderState)} instead
-   *     for a more robust and complete method to apply all transformations from an entity.
-   */
-  @Deprecated(forRemoval = true)
-  static void rotateIfSneaking(final PoseStack matrixStack, final LivingEntity livingEntity) {
-
-    if (livingEntity.isCrouching()) {
-      EntityModel<LivingEntityRenderState> entityModel = getModelFromEntity(livingEntity);
-
-      if (entityModel instanceof HumanoidModel<?> humanoidModel) {
-        matrixStack.mulPose(Axis.XP.rotation(humanoidModel.body.xRot));
-      }
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private static EntityModel<LivingEntityRenderState> getModelFromEntity(
-      LivingEntity livingEntity) {
-    EntityRenderer<? super LivingEntity, ?> render =
-        Minecraft.getInstance().getEntityRenderDispatcher()
-            .getRenderer(livingEntity);
-
-    if (!(render instanceof LivingEntityRenderer)) {
-      return null;
-    }
-    LivingEntityRenderer<
-        LivingEntity,
-        LivingEntityRenderState,
-        EntityModel<LivingEntityRenderState>> livingRenderer =
-        (LivingEntityRenderer<
-            LivingEntity,
-            LivingEntityRenderState,
-            EntityModel<LivingEntityRenderState>>) render;
-    return livingRenderer.getModel();
   }
 }

@@ -39,10 +39,8 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.neoforged.neoforge.common.util.ValueIOSerializable;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -94,11 +92,12 @@ public interface ICuriosItemHandler extends ValueIOSerializable {
   Optional<ICurioStacksHandler> getStacksHandler(String identifier);
 
   /**
-   * Gets an {@link IItemHandlerModifiable} that contains all the equipped curio stacks (not including cosmetics).
+   * Gets an {@link ResourceHandler<ItemResource>} that contains all the equipped curio stacks
+   * (not including cosmetics).
    *
    * @return The equipped curio stacks, or empty if there is no curios handler
    */
-  IItemHandlerModifiable getEquippedCurios();
+  ResourceHandler<ItemResource> getEquippedCurios();
 
   /**
    * Replaces the currently equipped item in a specified curio slot, if it exists.
@@ -367,22 +366,6 @@ public interface ICuriosItemHandler extends ValueIOSerializable {
    * Loads the slot configuration from datapacks and applies it to the curios inventory.
    */
   void loadDatapacks();
-
-  /**
-   * Serializes the curios inventory data.
-   *
-   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#serialize(ValueOutput)}.
-   */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  Tag writeTag();
-
-  /**
-   * Deserializes the curios inventory data.
-   *
-   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#deserialize(ValueInput)}.
-   */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  void readTag(Tag tag);
 
   /**
    * Removes the cached modifiers that appear upon deserialization of the handler.

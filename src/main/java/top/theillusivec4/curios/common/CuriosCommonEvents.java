@@ -65,7 +65,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.EntityEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.living.EnderManAngerEvent;
+import net.neoforged.neoforge.event.entity.living.EndermanAngerEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -76,6 +76,8 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
@@ -349,7 +351,7 @@ public class CuriosCommonEvents {
                   renderStates.size() > i && renderStates.get(
                       i));
 
-              if (stackHandler.isItemValid(i, stack) && curio.canEquipFromUse(slotContext)) {
+              if (stackHandler.isValid(i, ItemResource.of(stack)) && curio.canEquipFromUse(slotContext)) {
                 ItemStack present = stackHandler.getStackInSlot(i);
 
                 if (present.isEmpty()) {
@@ -367,7 +369,7 @@ public class CuriosCommonEvents {
                   return;
                 } else if (firstSlot == null) {
 
-                  if (stackHandler.extractItem(i, stack.getMaxStackSize(), true).getCount() ==
+                  if (stackHandler.extract(i, ItemResource.of(stack), stack.getMaxStackSize(), Transaction.open(null)) ==
                       stack.getCount()) {
                     firstSlot = new Pair<>(stackHandler, slotContext);
                   }
@@ -424,7 +426,7 @@ public class CuriosCommonEvents {
   static Map<UUID, Pair<Long, Boolean>> enderManMaskCache = new HashMap<>();
 
   @SubscribeEvent
-  public void enderManAnger(final EnderManAngerEvent evt) {
+  public void enderManAnger(final EndermanAngerEvent evt) {
     // Check cached value first
     if (enderManMaskCache.size() > 500) {
       enderManMaskCache.clear();

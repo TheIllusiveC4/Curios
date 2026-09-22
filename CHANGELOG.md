@@ -6,6 +6,60 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 to [Semantic Versioning](http://semver.org/spec/v2.0.0.html). Prior to version 5.2.0, this projected
 used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [17.0.0-beta+26.3] - 2026.09.21
+### Changed
+- [API] `ICuriosItemHandler#getEquippedCurios` now returns a `ResourceHandler<ItemResource>` instead of the now-removed `IItemHandlerModifiable`
+- [API] `IDynamicStackHandler` extends `ResourceHandler<ItemResource>` instead of the now-removed `IItemHandlerModifiable`. The
+  removed inherited methods are still declared in `IDynamicStackHandler`, so consumers won't be broken, but are deprecated
+  for future removal.
+- Updated to Minecraft 26.3
+
+### Removed
+[API] Removed APIs that were deprecated and due for removal. See below for the full list.
+
+<details>
+<summary>List of removals</summary>
+
+- `CuriosApi`
+  - `MODID` -> use `CuriosResources#MOD_ID`
+  - `getSlot` -> use `CuriosSlotTypes#getSlotType`
+  - `getSlots` -> use `CuriosSlotTypes#getSlotTypes`
+  - `getPlayerSlots` -> use `CuriosSlotTypes#getDefaultPlayerSlots`
+  - `getEntitySlots` -> use `CuriosSlotTypes#getDefaultEntitySlotTypes`
+  - `getItemStackSlots` -> use `CuriosSlotTypes#getItemSlotTypes`
+  - `getAttributeModifers` -> use `ICurioItem#getAttributeModifiers`
+  - `addSlotModifier` and `CuriosApi#addModifier` -> use `CurioAttributeModifiers` to build the modifier on the ItemStack
+  - `withSlotModifier` -> no replacement, defunct code
+  - `registerCurioPredicate` -> use `CuriosSlotTypes#registerPredicate`
+  - `getCurioPredicate` -> use `CuriosSlotTypes#getPredicate`
+  - `getCurioPredicates` -> use `CuriosSlotTypes#getPredicates`
+  - `testCurioPredicates` -> use `CuriosSlotTypes#testPredicates`
+- `ICuriosItemHandler#writeTag` and `readTag` -> use `ICuriosItemHandler#serialize` and `deserialize` respectively
+- `ICurioStacksHandler`
+  - `serializeNBT` and `deserializeNBT` -> use `ICurioStacksHandler#serialize` and `deserialize` respectively
+  - `getCachedModifiers` and `clearCachedModifiers` -> no replacement, defunct code
+- `CurioAttributeModifiers`
+  - `forEach(String,BiConsumer)` -> use `CurioAttributeModifiers#forEach(ISlotType,BiConsumer)` or `forEach(SlotContext,BiConsumer)`
+  - `withModifierAdded(Identifier,AttributeModifier,String)` -> use `CurioAttributeModifiers#withModifierAdded(Holder,AttributeModifier,String)`
+  - `Entry(Identifier,AttributeModifier,String)` -> use `CurioAttributeModifiers#Entry(Holder,AttributeModifier,SlotTypePredicate)`
+  - `Entry#attribute` -> use `CurioAttributeModifiers.Entry#attributeHolder`
+  - `Entry#slot` -> use `CurioAttributeModifiers.Entry#slotType`
+- `CurioAttributeModifierEvent`
+  - `getModifiers` -> use `CurioAttributeModifiers#getImmutableModifiers`
+  - `getOriginalModifiers` -> use `CurioAttributeModifiers#getDefaultModifiers`
+  - `removeAttribute` -> use `CurioAttributeModifiers#removeAllModifiersFor`
+- `CuriosRendererRegistry` -> use `ICurioRenderer#register` and `get`
+- `ICurioRenderer#rotateIfSneaking` and `translateIfSneaking` -> use `ICurioRenderer#setupHumanoidAnimations`
+- `CurioCanEquipEvent(ItemStack,SlotContext,TriState)` -> use `CurioCanEquipEvent(ItemStack,SlotContext,boolean)`
+- `CurioCanUnequipEvent(ItemStack,SlotContext,TriState)` -> use `CurioCanUnequipEvent(ItemStack,SlotContext,boolean)`
+- `CurioChangeEvent`
+  - `<init>(LivingEntity,String,index,ItemStack,ItemStack)` -> use `CurioChangeEvent(LivingEntity,SlotContext,ItemStack,ItemStack)`
+  - `getIdentifier` and `getSlotIndex` -> use `CurioChangeEvent#getSlotContext`
+- `ICurioSlotExtension#getSlotTooltip(SlotContext,TooltipFlag)` -> use `ICurioSlotExtension#getSlotTooltip(SlotContext,List,TooltipFlag)`
+- `IEntitiesData#serialize` and `ISlotData#serialize` -> no replacement, defunct code
+
+</details>
+
 ## [16.0.0+26.2] - 2026.07.20
 
 ### Changed

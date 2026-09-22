@@ -31,7 +31,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -167,7 +167,7 @@ public class ItemizedCurioCapability implements ICurio {
   }
 
   @Override
-  public boolean isEnderMask(SlotContext slotContext, EnderMan enderMan) {
+  public boolean isEnderMask(SlotContext slotContext, Enderman enderMan) {
     return this.curioItem.isEnderMask(slotContext, enderMan, this.getStack());
   }
 

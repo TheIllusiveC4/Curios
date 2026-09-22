@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.141'
+    id 'net.neoforged.moddev' version '2.0.147'
     id 'idea'
     id 'com.modrinth.minotaur' version '2.+'
     id 'net.darkhax.curseforgegradle' version '1.+'
@@ -90,8 +90,8 @@ neoForge {
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/main/resources' }
-sourceSets.test.resources { srcDir 'src/generated/test/resources' }
+sourceSets.main.resources.srcDirs += 'src/generated/main/resources'
+sourceSets.test.resources.srcDirs += 'src/generated/test/resources'
 
 configurations {
     runtimeClasspath.extendsFrom localRuntime
@@ -130,7 +130,7 @@ artifacts {
 
 dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
-    localRuntime "mezz.jei:jei-26.2-neoforge:${jei_version}"
+    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 
 //    compileOnly "dev.emi:emi-neoforge:${emi_version}"
 //    localRuntime "dev.emi:emi-neoforge:${emi_version}"

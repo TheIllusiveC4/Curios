@@ -31,6 +31,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
@@ -385,7 +386,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
       slot.onTake(playerIn, itemstack1);
 
       if (index == 0) {
-        playerIn.drop(itemstack1, false);
+        playerIn.drop(itemstack1, false, Prediction.PREDICTED);
       }
     }
 

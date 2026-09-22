@@ -29,23 +29,26 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootContextUser;
+import net.minecraft.world.level.storage.loot.Validatable;
+import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
-import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProvider;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProviders;
+import org.jspecify.annotations.NonNull;
 import top.theillusivec4.curios.api.CurioAttributeModifiers;
 import top.theillusivec4.curios.api.CuriosDataComponents;
 import top.theillusivec4.curios.api.SlotAttribute;
@@ -74,19 +77,17 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
   final List<Modifier> modifiers;
   final boolean replace;
 
-  SetCurioAttributesFunction(List<LootItemCondition> conditions, List<Modifier> modifiers,
-                             boolean replace) {
+  SetCurioAttributesFunction(Optional<Holder<LootItemCondition>> conditions,
+                             List<Modifier> modifiers, boolean replace) {
     super(conditions);
     this.modifiers = ImmutableList.copyOf(modifiers);
     this.replace = replace;
   }
 
-  @Nonnull
   @Override
-  public Set<ContextKey<?>> getReferencedContextParams() {
-    return this.modifiers.stream()
-        .flatMap(modifier -> modifier.amount.getReferencedContextParams().stream())
-        .collect(ImmutableSet.toImmutableSet());
+  public void validate(@NonNull ValidationContext context) {
+    super.validate(context);
+    Validatable.validate(context, "modifiers", this.modifiers);
   }
 
   @Nonnull
@@ -101,7 +102,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
 
     if (this.replace) {
       stack.set(CuriosDataComponents.ATTRIBUTE_MODIFIERS,
-                this.updateModifiers(context, CurioAttributeModifiers.EMPTY));
+          this.updateModifiers(context, CurioAttributeModifiers.EMPTY));
     } else {
       CuriosDataComponents
           .updateCurioAttributeModifiers(
@@ -120,8 +121,8 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
           Util.getRandom(modifier.slotTypePredicate(), randomsource);
       modifiers = modifiers.withModifierAdded(
           modifier.attribute(),
-          new AttributeModifier(modifier.id(), modifier.amount().getFloat(context),
-                                modifier.operation()),
+          new AttributeModifier(modifier.id(), modifier.amount.value().getFloat(context),
+              modifier.operation()),
           slotTypePredicate
       );
     }
@@ -140,12 +141,12 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
    * @param attribute The attribute to apply the attribute modifier on.
    * @param operation The operation to use for the attribute modifier.
    * @param amount    The amount to use for the attribute modifier, represented as a
-   *                  {@link NumberProvider}.
+   *                  {@link Holder<ContextFloatProvider>}.
    * @return A new builder instance.
    */
   public static SetCurioAttributesFunction.ModifierBuilder modifier(
       Identifier id, Holder<Attribute> attribute, AttributeModifier.Operation operation,
-      NumberProvider amount) {
+      Holder<ContextFloatProvider> amount) {
     return new SetCurioAttributesFunction.ModifierBuilder(id, attribute, operation, amount);
   }
 
@@ -208,7 +209,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
     @Nonnull
     @Override
     public LootItemFunction build() {
-      return new SetCurioAttributesFunction(this.getConditions(), this.modifiers, this.replace);
+      return new SetCurioAttributesFunction(this.getCondition(), this.modifiers, this.replace);
     }
   }
 
@@ -219,14 +220,14 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
    * @param attribute         The attribute to apply the attribute modifier on.
    * @param operation         The operation to use for the attribute modifier.
    * @param amount            The amount to use for the attribute modifier, represented as a
-   *                          {@link NumberProvider}.
+   *                          {@link ContextFloatProvider}.
    * @param slotTypePredicate The {@link SlotTypePredicate} to use for slot matching when applying
    *                          the attribute modifier.
    * @see CurioAttributeModifiers
    */
   public record Modifier(Identifier id, Holder<Attribute> attribute,
-                         AttributeModifier.Operation operation, NumberProvider amount,
-                         List<SlotTypePredicate> slotTypePredicate) {
+                         AttributeModifier.Operation operation, Holder<ContextFloatProvider> amount,
+                         List<SlotTypePredicate> slotTypePredicate) implements LootContextUser {
 
     public static final Codec<SetCurioAttributesFunction.Modifier> CODEC =
         RecordCodecBuilder.create(
@@ -240,7 +241,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
                     AttributeModifier.Operation.CODEC
                         .fieldOf("operation")
                         .forGetter(SetCurioAttributesFunction.Modifier::operation),
-                    NumberProviders.CODEC
+                    ContextFloatProviders.CODEC
                         .fieldOf("amount")
                         .forGetter(SetCurioAttributesFunction.Modifier::amount),
                     SlotTypePredicate.FULL_CODEC
@@ -250,6 +251,12 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
                 )
                 .apply(modifier, SetCurioAttributesFunction.Modifier::new)
         );
+
+    @Override
+    public void validate(@NonNull ValidationContext context) {
+      LootContextUser.super.validate(context);
+      Validatable.validateHolder(context, "amount", this.amount);
+    }
   }
 
   /**
@@ -260,7 +267,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
     private final Identifier id;
     private final Holder<Attribute> attribute;
     private final AttributeModifier.Operation operation;
-    private final NumberProvider amount;
+    private final Holder<ContextFloatProvider> amount;
     private final List<SlotTypePredicate> slotTypePredicates = new ArrayList<>();
 
     /**
@@ -274,10 +281,11 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
      * @param attribute The attribute to apply the attribute modifier on.
      * @param operation The operation to use for the attribute modifier.
      * @param amount    The amount to use for the attribute modifier, represented as a
-     *                  {@link NumberProvider}.
+     *                  {@link Holder<ContextFloatProvider>}.
      */
     public ModifierBuilder(Identifier id, Holder<Attribute> attribute,
-                           AttributeModifier.Operation operation, NumberProvider amount) {
+                           AttributeModifier.Operation operation,
+                           Holder<ContextFloatProvider> amount) {
       this.id = id;
       this.attribute = attribute;
       this.operation = operation;
@@ -323,9 +331,9 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
      */
     public SetCurioAttributesFunction.ModifierBuilder forSlot(ISlotType... slotType) {
       this.slotTypePredicates.add(SlotTypePredicate.builder()
-                                      .withId(Arrays.stream(slotType).map(ISlotType::getId)
-                                                  .toArray(String[]::new))
-                                      .build());
+          .withId(Arrays.stream(slotType).map(ISlotType::getId)
+              .toArray(String[]::new))
+          .build());
       return this;
     }
 
@@ -357,7 +365,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
      */
     public SetCurioAttributesFunction.Modifier build() {
       return new SetCurioAttributesFunction.Modifier(this.id, this.attribute, this.operation,
-                                                     this.amount, this.slotTypePredicates);
+          this.amount, this.slotTypePredicates);
     }
   }
 }

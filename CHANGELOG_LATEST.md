@@ -4,16 +4,13 @@ to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This is a copy of the changelog for the most recent version. For the full version history,
 go [here](https://github.com/TheIllusiveC4/Curios/blob/26.x/CHANGELOG.md).
 
-## [16.0.0+26.2] - 2026.07.20
-
+## [17.0.0-beta+26.3] - 2026.09.21
 ### Changed
-- [API] `top.theillusivec4.curios.api.event.DropRulesEvent#getOverrides()` refactored `net.minecraft.util.Tuple`
-  return type to `com.mojang.datafixers.util.Pair`
-- Cleaned up mixin debug logs
-- Updated to Minecraft 26.2
+- [API] `ICuriosItemHandler#getEquippedCurios` now returns a `ResourceHandler<ItemResource>` instead of the now-removed `IItemHandlerModifiable`
+- [API] `IDynamicStackHandler` extends `ResourceHandler<ItemResource>` instead of the now-removed `IItemHandlerModifiable`. The
+  removed inherited methods are still declared in `IDynamicStackHandler`, so consumers won't be broken, but are deprecated
+  for future removal.
+- Updated to Minecraft 26.3
 
 ### Removed
-- [API] Removed deprecated methods in `top.theillusivec4.curios.api.client.ICurioRenderer` that took a
-  `MultiBufferSource` parameter:
-  - `render` (use the `SubmitNodeCollector` replacement method)
-  - `renderModel`
+- [API] Removed APIs that were deprecated and due for removal. See the full version history for the complete list.

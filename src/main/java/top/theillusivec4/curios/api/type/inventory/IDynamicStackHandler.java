@@ -21,15 +21,14 @@
 package top.theillusivec4.curios.api.type.inventory;
 
 import javax.annotation.Nonnull;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.common.util.ValueIOSerializable;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.resource.Resource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
-public interface IDynamicStackHandler extends IItemHandlerModifiable, ValueIOSerializable {
+public interface IDynamicStackHandler extends ResourceHandler<ItemResource>, ValueIOSerializable {
 
   /**
    * Sets a {@link ItemStack} to the given slot index as the current stack.
@@ -85,24 +84,50 @@ public interface IDynamicStackHandler extends IItemHandlerModifiable, ValueIOSer
   void shrink(int amount);
 
   /**
-   * Writes the data for this handler.
-   *
-   * @return A {@link CompoundTag} representing the serialized data.
-   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#serialize(ValueOutput)}.
+   * @deprecated Use {@link ResourceHandler#isValid(int, Resource)} instead.
    */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  default CompoundTag serializeNBT(HolderLookup.Provider provider) {
-    return new CompoundTag();
+  @Deprecated(since = "17.0.0", forRemoval = true)
+  default boolean isItemValid(int slot, ItemStack stack) {
+    return this.isValid(slot, ItemResource.of(stack));
   }
 
   /**
-   * Reads the data into this handler.
-   *
-   * @param nbt A {@link CompoundTag} representing the serialized data.
-   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#deserialize(ValueInput)}.
+   * @deprecated Use {@link ResourceHandler#getCapacityAsInt(int, Resource)} instead.
    */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  default void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+  @Deprecated(since = "17.0.0", forRemoval = true)
+  default int getSlotLimit(int slot) {
+    return this.getCapacityAsInt(slot, ItemResource.EMPTY);
+  }
 
+  /**
+   * @deprecated Use {@link ResourceHandler#insert} instead.
+   */
+  @Deprecated(since = "17.0.0", forRemoval = true)
+  default ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+    ItemResource resource = ItemResource.of(stack);
+    int toInsert = stack.getCount();
+
+    if (simulate) {
+      int space = this.getCapacityAsInt(slot, resource) - this.getAmountAsInt(slot);
+      return space >= toInsert ? ItemStack.EMPTY : stack.copyWithCount(toInsert - space);
+    }
+    int inserted = this.insert(slot, resource, stack.getMaxStackSize(), Transaction.open(null));
+    return inserted >= toInsert ? ItemStack.EMPTY : stack.copyWithCount(toInsert - inserted);
+  }
+
+  /**
+   * @deprecated Use {@link ResourceHandler#extract} instead.
+   */
+  @Deprecated(since = "17.0.0", forRemoval = true)
+  default ItemStack extractItem(int slot, int amount, boolean simulate) {
+    int existingAmount = this.getAmountAsInt(slot);
+    int extracted = Math.min(existingAmount, amount);
+    ItemResource resource = this.getResource(slot);
+
+    if (!simulate) {
+      extracted =
+          this.extract(slot, this.getResource(slot), existingAmount, Transaction.open(null));
+    }
+    return extracted > 0 ? resource.toStack(extracted) : ItemStack.EMPTY;
   }
 }

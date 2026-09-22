@@ -39,7 +39,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -352,7 +352,7 @@ public interface ICurio {
    * @param enderMan    The Enderman entity that the user is looking at
    * @return True if it can mask the user from Enderman, false otherwise
    */
-  default boolean isEnderMask(SlotContext slotContext, EnderMan enderMan) {
+  default boolean isEnderMask(SlotContext slotContext, Enderman enderMan) {
 
     if (slotContext.entity() instanceof Player player) {
       return getStack().isGazeDisguise(player, enderMan);

@@ -21,9 +21,7 @@
 package top.theillusivec4.curios.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -32,7 +30,6 @@ import net.minecraft.world.inventory.Slot;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-import org.lwjgl.glfw.GLFW;
 import top.theillusivec4.curios.client.screen.button.CuriosButton;
 import top.theillusivec4.curios.common.network.client.CPacketDestroy;
 import top.theillusivec4.curios.config.CuriosClientConfig;
@@ -63,9 +60,8 @@ public class CuriosScreenEvents {
 
   @SubscribeEvent
   public void preMouseClick(final ScreenEvent.MouseButtonPressed.Pre evt) {
-    Window window = Minecraft.getInstance().getWindow();
-    boolean isLeftShiftDown = InputConstants.isKeyDown(window, GLFW.GLFW_KEY_LEFT_SHIFT);
-    boolean isRightShiftDown = InputConstants.isKeyDown(window, GLFW.GLFW_KEY_RIGHT_SHIFT);
+    boolean isLeftShiftDown = InputConstants.isKeyDown(InputConstants.KEY_LSHIFT);
+    boolean isRightShiftDown = InputConstants.isKeyDown(InputConstants.KEY_RSHIFT);
     boolean isShiftDown = isLeftShiftDown || isRightShiftDown;
 
     if (!(evt.getScreen() instanceof CreativeModeInventoryScreen gui) || !isShiftDown

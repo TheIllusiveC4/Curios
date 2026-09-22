@@ -48,11 +48,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
@@ -129,7 +132,7 @@ public class CuriosCommonMixinHooks {
   }
 
   public static int getFortuneLevel(LootContext lootContext) {
-    Entity entity = lootContext.getOptionalParameter(LootContextParams.THIS_ENTITY);
+    Entity entity = lootContext.getOptional(LootContextParams.THIS_ENTITY);
 
     if (entity instanceof LivingEntity livingEntity) {
       return CuriosApi.getCuriosInventory(livingEntity)
@@ -139,7 +142,7 @@ public class CuriosCommonMixinHooks {
   }
 
   public static int getLootingLevel(LootContext lootContext) {
-    Entity entity = lootContext.getOptionalParameter(LootContextParams.ATTACKING_ENTITY);
+    Entity entity = lootContext.getOptional(LootContextParams.ATTACKING_ENTITY);
 
     if (entity instanceof LivingEntity livingEntity) {
       return CuriosApi.getCuriosInventory(livingEntity)
@@ -149,18 +152,12 @@ public class CuriosCommonMixinHooks {
   }
 
   public static boolean isFreezeImmune(LivingEntity livingEntity) {
-    return CuriosApi.getCuriosInventory(livingEntity).map(curios -> {
-      IItemHandlerModifiable handler = curios.getEquippedCurios();
+    ICuriosItemHandler curios = CuriosApi.getCuriosInventoryOrNull(livingEntity);
 
-      for (int i = 0; i < handler.getSlots(); i++) {
-        ItemStack stack = handler.getStackInSlot(i);
-
-        if (stack.is(ItemTags.FREEZE_IMMUNE_WEARABLES)) {
-          return true;
-        }
-      }
-      return false;
-    }).orElse(false);
+    if (curios != null) {
+      return curios.isEquipped(stack -> stack.is(ItemTags.FREEZE_IMMUNE_WEARABLES));
+    }
+    return false;
   }
 
   public static void mergeCuriosInventory(ProblemReporter reporter, CompoundTag output,
@@ -176,10 +173,10 @@ public class CuriosCommonMixinHooks {
       DynamicOps<Tag> ops = entity.registryAccess().createSerializationContext(NbtOps.INSTANCE);
       ListTag workingList = list;
       CuriosApi.getCuriosInventory(livingEntity).ifPresent(inv -> {
-        IItemHandler handler = inv.getEquippedCurios();
+        ResourceHandler<ItemResource> handler = inv.getEquippedCurios();
 
-        for (int i = 0; i < handler.getSlots(); i++) {
-          ItemStack stack = handler.getStackInSlot(i);
+        for (int i = 0; i < handler.size(); i++) {
+          ItemStack stack = ItemUtil.getStack(handler, i);
 
           if (!stack.isEmpty()) {
             addListElement(workingList, ops, reporter, stack);

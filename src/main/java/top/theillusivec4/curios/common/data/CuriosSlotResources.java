@@ -41,7 +41,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -111,7 +110,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
           CuriosSlotResources::new
       );
 
-  private RegistryAccess registryAccess;
+  private HolderLookup.Provider registryLookup;
   private Map<Identifier, JsonElement> pendingData = Map.of();
   private Map<String, ISlotType> slots = ImmutableMap.of();
   private Map<EntityType<?>, Map<String, ISlotType>> entitySlots = ImmutableMap.of();
@@ -122,9 +121,9 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
     super(ExtraCodecs.JSON, FileToIdConverter.json(folder));
   }
 
-  public CuriosSlotResources(RegistryAccess registryAccess) {
+  public CuriosSlotResources(HolderLookup.Provider registryLookup) {
     super(ExtraCodecs.JSON, FileToIdConverter.json(folder));
-    this.registryAccess = registryAccess;
+    this.registryLookup = registryLookup;
   }
 
   public CuriosSlotResources(Map<EntityType<?>, Set<String>> entitySlots,
@@ -170,7 +169,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
     Map<EntityType<?>, ImmutableSet.Builder<String>> entityMap = new HashMap<>();
     Map<String, ImmutableSet.Builder<String>> modMap = new HashMap<>();
     HolderLookup.RegistryLookup<EntityType<?>> registry =
-        this.registryAccess.lookupOrThrow(Registries.ENTITY_TYPE);
+        this.registryLookup.lookupOrThrow(Registries.ENTITY_TYPE);
 
     // First parse through the slot data files
     for (Map.Entry<Identifier, JsonElement> entry : this.pendingData.entrySet()) {
@@ -181,7 +180,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
       String namespace = entry.getKey().getNamespace();
       String id = entry.getKey().getPath().substring("slots/".length());
       ISlotData.Entry.CODEC.decode(
-              this.registryAccess.createSerializationContext(JsonOps.INSTANCE), entry.getValue())
+              this.registryLookup.createSerializationContext(JsonOps.INSTANCE), entry.getValue())
           .ifSuccess(pair -> {
             ISlotData.Entry slotDataEntry = pair.getFirst();
             slotDataEntry.entities().ifPresent(entities -> {
@@ -193,7 +192,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
               }
             });
             slotMap.computeIfAbsent(id, SlotType.Builder::new)
-                .apply(slotDataEntry, this.registryAccess);
+                .apply(slotDataEntry, this.registryLookup);
             modMap.computeIfAbsent(id, (k) -> ImmutableSet.builder())
                 .add(namespace);
           });
@@ -201,7 +200,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
 
     // Secondly parse through the config slot data
     try {
-      Set<String> configs = fromConfig(slotMap, this.registryAccess);
+      Set<String> configs = fromConfig(slotMap, this.registryLookup);
       this.configSlots = ImmutableSet.copyOf(configs);
 
       for (String id : configs) {
@@ -225,7 +224,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
       }
       Identifier resourcelocation = entry.getKey();
       IEntitiesData.Entry.CODEC.decode(
-              this.registryAccess.createSerializationContext(JsonOps.INSTANCE), entry.getValue())
+              this.registryLookup.createSerializationContext(JsonOps.INSTANCE), entry.getValue())
           .ifSuccess(pair -> {
             IEntitiesData.Entry entityDataEntry = pair.getFirst();
             List<EntityType<?>> entities =
@@ -250,7 +249,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
 
                   if (create && slotType == null) {
                     SlotType.Builder slotBuilder = new SlotType.Builder(key);
-                    slotBuilder.apply(slotEntry.slot(), this.registryAccess);
+                    slotBuilder.apply(slotEntry.slot(), this.registryLookup);
                     slotType = slotBuilder;
                     slotMap.put(key, slotBuilder);
                   }

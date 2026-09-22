@@ -140,40 +140,6 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
     }
   }
 
-  @Deprecated(forRemoval = true)
-  public CurioAttributeModifiers withModifierAdded(Identifier attribute,
-                                                   AttributeModifier attributeModifier,
-                                                   String slot) {
-    ImmutableList.Builder<Entry> builder =
-        ImmutableList.builderWithExpectedSize(this.modifiers.size() + 1);
-
-    for (Entry entry : this.modifiers) {
-
-      if (!entry.modifier.id().equals(attributeModifier.id())) {
-        builder.add(entry);
-      }
-    }
-
-    builder.add(new Entry(attribute, attributeModifier, slot));
-    return new CurioAttributeModifiers(builder.build(), this.showInTooltip);
-  }
-
-  @Deprecated(forRemoval = true)
-  public void forEach(String slot, BiConsumer<Identifier, AttributeModifier> consumer) {
-
-    for (Entry entry : this.modifiers) {
-
-      if (entry.slotType().matches(slot)) {
-        AttributeModifier modifier = entry.modifier();
-        consumer.accept(entry.attribute(),
-            new AttributeModifier(
-                modifier.id().withSuffix("/" + slot),
-                modifier.amount(),
-                modifier.operation()));
-      }
-    }
-  }
-
   public static class Builder {
 
     private final ImmutableList.Builder<Entry> entries = ImmutableList.builder();
@@ -259,14 +225,6 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
       this.slotType = slotType;
     }
 
-    @Deprecated(forRemoval = true)
-    public Entry(Identifier attribute, AttributeModifier modifier, String slot) {
-      this.attributeHolder = BuiltInRegistries.ATTRIBUTE.get(attribute)
-          .map(IHolderExtension::getDelegate).orElse(Attributes.ARMOR);
-      this.modifier = modifier;
-      this.slotType = SlotTypePredicate.builder().withId(slot).build();
-    }
-
     public Holder<Attribute> attributeHolder() {
       return this.attributeHolder;
     }
@@ -277,17 +235,6 @@ public record CurioAttributeModifiers(List<Entry> modifiers, boolean showInToolt
 
     public SlotTypePredicate slotType() {
       return this.slotType;
-    }
-
-    @Deprecated(forRemoval = true)
-    public Identifier attribute() {
-      return BuiltInRegistries.ATTRIBUTE.getKey(this.attributeHolder.value());
-    }
-
-    @Deprecated(forRemoval = true)
-    public String slot() {
-      List<String> id = this.slotType.id();
-      return id.isEmpty() ? "curio" : id.getFirst();
     }
   }
 }

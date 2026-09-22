@@ -51,6 +51,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.CuriosSlotTypes;
 import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.common.DropRule;
@@ -74,16 +75,13 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       HashMultimap.create();
 
   private int baseSize;
-  private final IDynamicStackHandler stackHandler;
-  private final IDynamicStackHandler cosmeticStackHandler;
+  private final CuriosStacksResourceHandler stackHandler;
+  private final CuriosStacksResourceHandler cosmeticStackHandler;
   private boolean visible;
   private boolean cosmetic;
   private boolean canToggleRender;
   private DropRule dropRule;
   private boolean update;
-  private NonNullList<Boolean> renderHandler;
-  private NonNullList<Boolean> activeStates;
-  private NonNullList<Boolean> previousActiveStates;
 
   private boolean dataLoaded = false;
 
@@ -106,29 +104,14 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     this.identifier = identifier;
     this.canToggleRender = canToggleRender;
     this.dropRule = dropRule;
-    this.renderHandler = NonNullList.withSize(size, true);
-    this.activeStates = NonNullList.withSize(size, true);
-    this.previousActiveStates = NonNullList.withSize(size, true);
+    LivingEntity owner = curioInventory.getOwner();
+    boolean isClient = owner != null && owner.level().isClientSide();
     this.stackHandler =
-        new DynamicStackHandler(
-            size,
-            (index) ->
-                new SlotContext(
-                    identifier,
-                    curioInventory.getOwner(),
-                    index,
-                    false,
-                    this.getRenders().get(index)));
+        new CuriosStacksResourceHandler(CuriosSlotTypes.getSlotType(identifier, isClient), owner,
+            false);
     this.cosmeticStackHandler =
-        new DynamicStackHandler(
-            size,
-            (index) ->
-                new SlotContext(
-                    identifier,
-                    curioInventory.getOwner(),
-                    index,
-                    true,
-                    this.getRenders().get(index)));
+        new CuriosStacksResourceHandler(CuriosSlotTypes.getSlotType(identifier, isClient), owner,
+            true);
   }
 
   @Override
@@ -146,27 +129,27 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   @Override
   public NonNullList<Boolean> getRenders() {
     this.update();
-    return this.renderHandler;
+    return this.stackHandler.getRenders();
   }
 
   @Override
   public NonNullList<Boolean> getActiveStates() {
     this.update();
-    return this.activeStates;
+    return this.stackHandler.getActiveStates();
   }
 
   @Override
   public void updateActiveState(int index) {
-    this.update();
+    NonNullList<Boolean> activeStates = this.getActiveStates();
     LivingEntity livingEntity = this.curioInventory.getOwner();
 
     if (livingEntity != null && !livingEntity.level().isClientSide()) {
 
-      if (this.activeStates.size() <= index) {
+      if (activeStates.size() <= index) {
         return;
       }
-      boolean current = this.activeStates.get(index);
-      boolean previous = this.previousActiveStates.get(index);
+      boolean current = activeStates.get(index);
+      boolean previous = this.stackHandler.getPreviousActive().get(index);
 
       if (current == previous) {
         return;
@@ -181,7 +164,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   private void deactivateSlot(int index) {
-    this.previousActiveStates.set(index, false);
+    this.stackHandler.getPreviousActive().set(index, false);
     LivingEntity livingEntity = this.curioInventory.getOwner();
     PacketDistributor.sendToPlayersTrackingEntityAndSelf(livingEntity, new SPacketSyncActiveState(
         livingEntity.getId(), identifier, index, false));
@@ -220,7 +203,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   private void activateSlot(int index) {
-    this.previousActiveStates.set(index, true);
+    this.stackHandler.getPreviousActive().set(index, true);
     LivingEntity livingEntity = this.curioInventory.getOwner();
     PacketDistributor.sendToPlayersTrackingEntityAndSelf(
         livingEntity,
@@ -298,33 +281,6 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   @Override
-  public CompoundTag serializeNBT() {
-    LivingEntity livingEntity = this.curioInventory.getOwner();
-    try (
-        ProblemReporter.ScopedCollector problemreporter$scopedcollector =
-            new ProblemReporter.ScopedCollector(livingEntity.problemPath(), CuriosConstants.LOG)) {
-      TagValueOutput tagvalueoutput =
-          TagValueOutput.createWithContext(problemreporter$scopedcollector,
-              livingEntity.registryAccess());
-      this.serialize(tagvalueoutput);
-      return tagvalueoutput.buildResult();
-    }
-  }
-
-  @Override
-  public void deserializeNBT(CompoundTag nbt) {
-    LivingEntity livingEntity = this.curioInventory.getOwner();
-    try (
-        ProblemReporter.ScopedCollector problemreporter$scopedcollector =
-            new ProblemReporter.ScopedCollector(livingEntity.problemPath(), CuriosConstants.LOG)) {
-      this.deserialize(
-          TagValueInput.create(problemreporter$scopedcollector, livingEntity.registryAccess(),
-              nbt));
-    }
-    this.flagUpdate();
-  }
-
-  @Override
   public String getIdentifier() {
     return this.identifier;
   }
@@ -396,11 +352,6 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     return new HashSet<>(this.persistentModifiers.values());
   }
 
-  @Override
-  public Set<AttributeModifier> getCachedModifiers() {
-    return new HashSet<>();
-  }
-
   public Collection<AttributeModifier> getModifiersByOperation(
       AttributeModifier.Operation operation) {
     return this.modifiersByOperation.get(operation);
@@ -447,10 +398,6 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     for (Identifier id : ids) {
       this.removeModifier(id);
     }
-  }
-
-  public void clearCachedModifiers() {
-    // NO-OP
   }
 
   public void setDataLoaded() {
@@ -513,43 +460,9 @@ public class CurioStacksHandler implements ICurioStacksHandler {
         this.loseStacks(this.stackHandler, identifier, change);
         this.stackHandler.shrink(change);
         this.cosmeticStackHandler.shrink(change);
-        NonNullList<Boolean> newList = NonNullList.withSize(Math.max(0, newSize), true);
-
-        for (int i = 0; i < newList.size() && i < this.renderHandler.size(); i++) {
-          newList.set(i, renderHandler.get(i));
-        }
-        this.renderHandler = newList;
-        newList = NonNullList.withSize(Math.max(0, newSize), true);
-
-        for (int i = 0; i < newList.size() && i < this.activeStates.size(); i++) {
-          newList.set(i, this.activeStates.get(i));
-        }
-        this.activeStates = newList;
-        this.previousActiveStates = NonNullList.create();
-
-        for (int i = 0; i < this.activeStates.size(); i++) {
-          this.previousActiveStates.add(i, this.activeStates.get(i));
-        }
       } else {
         this.stackHandler.grow(change);
         this.cosmeticStackHandler.grow(change);
-        NonNullList<Boolean> newList = NonNullList.withSize(Math.max(0, newSize), true);
-
-        for (int i = 0; i < newList.size() && i < this.renderHandler.size(); i++) {
-          newList.set(i, renderHandler.get(i));
-        }
-        this.renderHandler = newList;
-        newList = NonNullList.withSize(Math.max(0, newSize), true);
-
-        for (int i = 0; i < newList.size() && i < this.activeStates.size(); i++) {
-          newList.set(i, this.activeStates.get(i));
-        }
-        this.activeStates = newList;
-        this.previousActiveStates = NonNullList.create();
-
-        for (int i = 0; i < this.activeStates.size(); i++) {
-          this.previousActiveStates.add(i, this.activeStates.get(i));
-        }
       }
     }
   }

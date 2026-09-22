@@ -62,10 +62,10 @@ public class PageButton extends Button implements ICuriosWidget {
     int yText = 25;
 
     if (type == Type.NEXT) {
-      this.setX(this.parentGui.getGuiLeft() - 17);
+      this.setX(this.parentGui.getLeftPos() - 17);
       this.active = this.parentGui.getMenu().currentPage + 1 < this.parentGui.getMenu().totalPages;
     } else {
-      this.setX(this.parentGui.getGuiLeft() - 28);
+      this.setX(this.parentGui.getLeftPos() - 28);
       this.active = this.parentGui.getMenu().currentPage > 0;
     }
 
@@ -84,7 +84,7 @@ public class PageButton extends Button implements ICuriosWidget {
               Component.translatable("gui.curios.page", currentPage, totalPages)
                   .getVisualOrderText()));
       guiGraphics.tooltip(Minecraft.getInstance().font, tooltip, x, y,
-                          DefaultTooltipPositioner.INSTANCE, null);
+                          DefaultTooltipPositioner.INSTANCE, null, true);
     }
     guiGraphics.blit(RenderPipelines.GUI_TEXTURED, CURIO_INVENTORY, this.getX(), this.getY(), xText,
                      yText, this.width, this.height, 256, 256);

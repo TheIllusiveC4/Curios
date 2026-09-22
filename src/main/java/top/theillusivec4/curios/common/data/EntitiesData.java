@@ -154,41 +154,6 @@ public class EntitiesData implements IEntitiesData {
                                   this.conditions != null ? this.conditions : List.of());
   }
 
-  @Override
-  public JsonObject serialize(HolderLookup.Provider provider) {
-    JsonObject jsonObject = new JsonObject();
-
-    if (this.replace != null) {
-      jsonObject.addProperty("replace", this.replace);
-    }
-
-    if (!this.entities.isEmpty()) {
-      JsonArray arr = new JsonArray();
-      this.entities.forEach(entityType -> {
-        entityType.ifLeft(entity -> {
-          arr.add("#" + entity.location());
-        });
-        entityType.ifRight(entity -> {
-          arr.add(entity.identifier().toString());
-        });
-      });
-      jsonObject.add("entities", arr);
-    }
-
-    if (!this.slots.isEmpty()) {
-      JsonArray arr = new JsonArray();
-      for (Either<String, IEntitySlotEntry> slot : this.slots) {
-        arr.add((String) slot.map(str -> str, sl -> sl.slot().id().orElseThrow()));
-      }
-      jsonObject.add("slots", arr);
-    }
-
-    if (this.conditions != null) {
-      ICondition.writeConditions(provider, jsonObject, this.conditions);
-    }
-    return jsonObject;
-  }
-
   public record Entry(boolean replace,
                       List<Either<TagKey<EntityType<?>>, ResourceKey<EntityType<?>>>> entities,
                       List<Either<String, IEntitySlotEntry>> slots,

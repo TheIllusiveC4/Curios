@@ -105,7 +105,7 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
         amuletModel.setupAnim(humanoidRenderState);
         submitNodeCollector.submitModel(amuletModel, humanoidRenderState, poseStack,
                                         RenderTypes.armorCutoutNoCull(AMULET_TEXTURE), packedLight,
-                                        OverlayTexture.NO_OVERLAY, 0, null);
+                                        OverlayTexture.NO_OVERLAY, 0);
       }
     }
   }

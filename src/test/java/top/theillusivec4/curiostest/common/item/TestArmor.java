@@ -11,7 +11,7 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.equipment.ArmorMaterials;
 import net.minecraft.world.item.equipment.ArmorType;
 import top.theillusivec4.curios.CuriosConstants;
-import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotAttribute;
 
 public class TestArmor extends Item {
 
@@ -29,12 +29,20 @@ public class TestArmor extends Item {
     EquipmentSlot slot = this.getEquipmentSlot(stack);
 
     if (slot != null) {
-      modifiers = CuriosApi.withSlotModifier(modifiers, "ring", ARMOR_ID, 1,
-                                             AttributeModifier.Operation.ADD_VALUE,
-                                             EquipmentSlotGroup.bySlot(slot));
-      modifiers = CuriosApi.withSlotModifier(modifiers, "necklace", ARMOR_ID, -3,
-                                             AttributeModifier.Operation.ADD_VALUE,
-                                             EquipmentSlotGroup.bySlot(slot));
+      modifiers = modifiers.withModifierAdded(
+          SlotAttribute.getOrCreate("ring"),
+          new AttributeModifier(
+              ARMOR_ID,
+              1,
+              AttributeModifier.Operation.ADD_VALUE),
+          EquipmentSlotGroup.bySlot(slot));
+      modifiers = modifiers.withModifierAdded(
+          SlotAttribute.getOrCreate("necklace"),
+          new AttributeModifier(
+              ARMOR_ID,
+              -3,
+              AttributeModifier.Operation.ADD_VALUE),
+          EquipmentSlotGroup.bySlot(slot));
     }
     return modifiers;
   }

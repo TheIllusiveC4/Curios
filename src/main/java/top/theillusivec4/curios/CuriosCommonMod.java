@@ -135,7 +135,7 @@ public class CuriosCommonMod {
   }
 
   private void reload(final AddServerReloadListenersEvent evt) {
-    CuriosSlotResources.SERVER = new CuriosSlotResources(evt.getRegistryAccess());
+    CuriosSlotResources.SERVER = new CuriosSlotResources(evt.getServerResources().getRegistryLookup());
     evt.addListener(CuriosSlotResources.ID, CuriosSlotResources.SERVER);
     evt.addDependency(VanillaServerListeners.LAST, CuriosSlotResources.ID);
   }

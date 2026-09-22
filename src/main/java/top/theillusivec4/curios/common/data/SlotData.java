@@ -186,61 +186,6 @@ public class SlotData implements ISlotData {
                               Optional.ofNullable(this.entities));
   }
 
-  @Override
-  public JsonObject serialize(HolderLookup.Provider provider) {
-    JsonObject jsonObject = new JsonObject();
-
-    if (this.replace != null) {
-      jsonObject.addProperty("replace", this.replace);
-    }
-
-    if (this.order != null) {
-      jsonObject.addProperty("order", this.order);
-    }
-
-    if (this.size != null) {
-      jsonObject.addProperty("size", this.size);
-    }
-
-    if (this.operation != null) {
-      jsonObject.addProperty("operation", this.operation);
-    }
-
-    if (this.useNativeGui != null) {
-      jsonObject.addProperty("use_native_gui", this.useNativeGui);
-    }
-
-    if (this.hasCosmetic != null) {
-      jsonObject.addProperty("add_cosmetic", this.hasCosmetic);
-    }
-
-    if (this.icon != null) {
-      jsonObject.addProperty("icon", this.icon.toString());
-    }
-
-    if (this.dropRule != null) {
-      jsonObject.addProperty("drop_rule", this.dropRule.toString());
-    }
-
-    if (this.renderToggle != null) {
-      jsonObject.addProperty("render_toggle", this.renderToggle);
-    }
-
-    if (this.conditions != null) {
-      ICondition.writeConditions(provider, jsonObject, this.conditions);
-    }
-
-    if (this.validators != null) {
-      JsonArray arr = new JsonArray();
-
-      for (Identifier slotResultPredicate : this.validators) {
-        arr.add(slotResultPredicate.toString());
-      }
-      jsonObject.add("validators", arr);
-    }
-    return jsonObject;
-  }
-
   public record Entry(boolean replace,
                       Optional<String> id,
                       Optional<Integer> order,

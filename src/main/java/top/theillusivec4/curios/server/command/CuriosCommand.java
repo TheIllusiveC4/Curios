@@ -39,6 +39,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -285,11 +286,11 @@ public class CuriosCommand {
       stacksHandler.getCosmeticStacks().setStackInSlot(i, ItemStack.EMPTY);
 
       if (!stack1.isEmpty()) {
-        serverPlayer.drop(stack1, true, false);
+        serverPlayer.drop(stack1, true, Prediction.SERVER_ONLY);
       }
 
       if (!stack2.isEmpty()) {
-        serverPlayer.drop(stack2, true, false);
+        serverPlayer.drop(stack2, true, Prediction.SERVER_ONLY);
       }
     }
   }

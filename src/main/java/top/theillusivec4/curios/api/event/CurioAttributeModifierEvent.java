@@ -23,10 +23,7 @@ package top.theillusivec4.curios.api.event;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -63,7 +60,6 @@ public class CurioAttributeModifierEvent extends Event {
 
   private final ItemStack stack;
   private final CurioAttributeModifiers defaultModifiers;
-  private final Multimap<Holder<Attribute>, AttributeModifier> originalMap;
   private CurioAttributeModifierEvent.CurioAttributeModifiersBuilder builder;
 
   @ApiStatus.Internal
@@ -75,7 +71,6 @@ public class CurioAttributeModifierEvent extends Event {
     for (CurioAttributeModifiers.Entry modifier : this.defaultModifiers.modifiers()) {
       modifierMap.put(modifier.attributeHolder(), modifier.modifier());
     }
-    this.originalMap = modifierMap;
   }
 
   /**
@@ -204,20 +199,6 @@ public class CurioAttributeModifierEvent extends Event {
   }
 
   /**
-   * Removes a single modifier for the given attribute.
-   *
-   * @param attribute Attribute.
-   * @param modifier  Modifier instance.
-   * @return True if an attribute was removed, false if no change.
-   * @deprecated Use {@link #removeModifier(Holder, Identifier)} instead to avoid needing
-   *     a specific modifier instance.
-   */
-  @Deprecated(forRemoval = true)
-  public boolean removeModifier(Holder<Attribute> attribute, AttributeModifier modifier) {
-    return this.removeModifier(attribute, modifier.id());
-  }
-
-  /**
    * Adds a new attribute modifier to the given stack, optionally replacing any existing modifiers
    * with the same id.
    *
@@ -321,60 +302,6 @@ public class CurioAttributeModifierEvent extends Event {
       this.builder = new CurioAttributeModifiersBuilder(this.defaultModifiers);
     }
     return this.builder;
-  }
-
-  /**
-   * Returns an unmodifiable view of the attribute multimap. Use other methods from this event to
-   * modify the attributes map.
-   *
-   * <p>Note that adding attributes based on existing attributes may lead to inconsistent results
-   * between the tooltip (client) and the actual attributes (server) if the listener order is
-   * different. Using {@link #getOriginalModifiers()} instead will give more consistent results.
-   *
-   * @deprecated Use {@link #getImmutableModifiers()} to work with {@link CurioAttributeModifiers}
-   *     instances instead of the deprecated attribute map workflows.
-   */
-  @Deprecated(forRemoval = true)
-  public Multimap<Holder<Attribute>, AttributeModifier> getModifiers() {
-    Multimap<Holder<Attribute>, AttributeModifier> modifierMap = LinkedHashMultimap.create();
-
-    for (CurioAttributeModifiers.Entry modifier : this.build().modifiers()) {
-      modifierMap.put(modifier.attributeHolder(), modifier.modifier());
-    }
-    return Multimaps.unmodifiableMultimap(modifierMap);
-  }
-
-  /**
-   * Returns the attribute map before any changes from other event listeners was made.
-   *
-   * @deprecated Use {@link #getDefaultModifiers()} to work with {@link CurioAttributeModifiers}
-   *     instances instead of the deprecated attribute map workflows.
-   */
-  @Deprecated(forRemoval = true)
-  public Multimap<Holder<Attribute>, AttributeModifier> getOriginalModifiers() {
-    return this.originalMap;
-  }
-
-  /**
-   * Removes all modifiers for the given attribute.
-   *
-   * @param attribute Attribute.
-   * @return Collection of removed modifiers.
-   * @deprecated Use {@link #removeAllModifiersFor(Holder)} since the returned collection is
-   *     no longer valid for the new workflow.
-   */
-  @Deprecated(forRemoval = true)
-  public Collection<AttributeModifier> removeAttribute(Holder<Attribute> attribute) {
-    List<AttributeModifier> list = new ArrayList<>();
-
-    for (CurioAttributeModifiers.Entry entry : this.getBuilder().entries) {
-
-      if (entry.attributeHolder().equals(attribute)) {
-        list.add(entry.modifier());
-      }
-    }
-    this.removeAllModifiersFor(attribute);
-    return list;
   }
 
   /**

@@ -39,7 +39,6 @@ import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
@@ -55,16 +54,20 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
+import net.neoforged.neoforge.transfer.item.PlayerInventoryWrapper;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import top.theillusivec4.curios.CuriosCommonMod;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosResources;
+import top.theillusivec4.curios.api.CuriosSlotTypes;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.SlotResult;
+import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
@@ -114,19 +117,8 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
   }
 
   @Override
-  public IItemHandlerModifiable getEquippedCurios() {
-    Map<String, ICurioStacksHandler> curios = this.getCurios();
-    IItemHandlerModifiable[] itemHandlers = new IItemHandlerModifiable[curios.size()];
-    int index = 0;
-
-    for (ICurioStacksHandler stacksHandler : curios.values()) {
-
-      if (index < itemHandlers.length) {
-        itemHandlers[index] = stacksHandler.getStacks();
-        index++;
-      }
-    }
-    return new CombinedInvWrapper(itemHandlers);
+  public ResourceHandler<ItemResource> getEquippedCurios() {
+    return CombinedCuriosResourceHandler.from(this.livingEntity);
   }
 
   @Override
@@ -365,7 +357,10 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
   @Override
   public void loseInvalidStack(ItemStack stack) {
-    this.curioInventory.invalidStacks.add(stack);
+
+    if (!stack.isEmpty()) {
+      this.curioInventory.invalidStacks.add(stack);
+    }
   }
 
   @Override
@@ -374,13 +369,19 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
     if (this.livingEntity != null && !this.curioInventory.invalidStacks.isEmpty()) {
 
       if (this.livingEntity instanceof Player player) {
-        this.curioInventory.invalidStacks.forEach(
-            drop -> ItemHandlerHelper.giveItemToPlayer(player, drop));
+        this.curioInventory.invalidStacks.forEach(drop -> {
+
+          if (!drop.isEmpty()) {
+            PlayerInventoryWrapper.of(player)
+                .placeItemBackInInventory(ItemResource.of(drop), drop.count(),
+                    Transaction.open(null));
+          }
+        });
       } else {
         this.curioInventory.invalidStacks.forEach(
             drop -> {
 
-              if (this.livingEntity.level() instanceof ServerLevel serverLevel) {
+              if (!drop.isEmpty() && this.livingEntity.level() instanceof ServerLevel serverLevel) {
                 ItemEntity ent = this.livingEntity.spawnAtLocation(serverLevel, drop);
                 RandomSource rand = this.livingEntity.getRandom();
 
@@ -511,12 +512,13 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
 
         for (int i = 0; i < data.size(); i++) {
           CompoundTag tag = data.getCompound(i).orElse(new CompoundTag());
-          String identifier = tag.getString("Identifier").orElse("");
-          ICurioStacksHandler stacksHandler = this.curioInventory.asMap().get(identifier);
+          String id = tag.getString("Identifier").orElse("");
+          ICurioStacksHandler stacksHandler = this.curioInventory.asMap().get(id);
+          ISlotType slotType = CuriosSlotTypes.getSlotType(id, entity.level().isClientSide());
 
-          if (stacksHandler != null) {
+          if (slotType != null && stacksHandler != null) {
             CompoundTag stacksData = tag.getCompound("Stacks").orElse(new CompoundTag());
-            ItemStackHandler loaded = new ItemStackHandler();
+            ItemStacksResourceHandler loaded = new ItemStacksResourceHandler(slotType.getSize());
             IDynamicStackHandler stacks = stacksHandler.getStacks();
 
             if (!stacksData.isEmpty()) {
@@ -653,48 +655,16 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
   }
 
   private void loadStacks(
-      ICurioStacksHandler stacksHandler, ItemStackHandler loaded, IDynamicStackHandler stacks) {
+      ICurioStacksHandler stacksHandler, ItemStacksResourceHandler loaded, IDynamicStackHandler stacks) {
 
-    for (int j = 0; j < stacksHandler.getSlots() && j < loaded.getSlots(); j++) {
+    for (int j = 0; j < stacksHandler.getSlots() && j < loaded.size(); j++) {
       ItemStack stack = stacks.getStackInSlot(j);
-      ItemStack loadedStack = loaded.getStackInSlot(j);
+      ItemStack loadedStack = ItemUtil.getStack(loaded, j);
 
       if (stack.isEmpty()) {
         stacks.setStackInSlot(j, loadedStack);
       } else {
         this.loseInvalidStack(stack);
-      }
-    }
-  }
-
-  @Override
-  public Tag writeTag() {
-    LivingEntity entity = this.livingEntity;
-
-    if (entity != null) {
-      try (
-          ProblemReporter.ScopedCollector problemreporter$scopedcollector =
-              new ProblemReporter.ScopedCollector(entity.problemPath(), CuriosConstants.LOG)) {
-        TagValueOutput tagvalueoutput =
-            TagValueOutput.createWithContext(problemreporter$scopedcollector,
-                entity.registryAccess());
-        this.serialize(tagvalueoutput);
-        return tagvalueoutput.buildResult();
-      }
-    }
-    return new CompoundTag();
-  }
-
-  @Override
-  public void readTag(Tag nbt) {
-    LivingEntity entity = this.livingEntity;
-
-    if (nbt instanceof CompoundTag tag && entity != null) {
-      try (
-          ProblemReporter.ScopedCollector problemreporter$scopedcollector =
-              new ProblemReporter.ScopedCollector(entity.problemPath(), CuriosConstants.LOG)) {
-        this.deserialize(
-            TagValueInput.create(problemreporter$scopedcollector, entity.registryAccess(), tag));
       }
     }
   }

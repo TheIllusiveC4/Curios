@@ -123,28 +123,6 @@ public interface ICurioStacksHandler extends ValueIOSerializable {
   boolean hasCosmetic();
 
   /**
-   * Writes the data for this handler.
-   *
-   * @return A {@link CompoundTag} representing the serialized data.
-   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#serialize(ValueOutput)}.
-   */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  default CompoundTag serializeNBT() {
-    return new CompoundTag();
-  }
-
-  /**
-   * Reads the data into this handler.
-   *
-   * @param nbt A {@link CompoundTag} representing the serialized data.
-   * @deprecated As of 12.0.0, use {@link ValueIOSerializable#deserialize(ValueInput)}.
-   */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  default void deserializeNBT(CompoundTag nbt) {
-
-  }
-
-  /**
    * Retrieves the slot identifier associated with the handler.
    *
    * @return The slot identifier
@@ -166,14 +144,6 @@ public interface ICurioStacksHandler extends ValueIOSerializable {
    * @return A set of {@link AttributeModifier}
    */
   Set<AttributeModifier> getPermanentModifiers();
-
-  /**
-   * Retrieves all the transient modifiers that have been deserialized but not yet processed.
-   *
-   * @return A set of {@link AttributeModifier}
-   */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  Set<AttributeModifier> getCachedModifiers();
 
   /**
    * Retrieves all the slot modifiers for a given operation on the handler.
@@ -212,15 +182,6 @@ public interface ICurioStacksHandler extends ValueIOSerializable {
    * Removes all the slot modifiers on the handler.
    */
   void clearModifiers();
-
-  /**
-   * Removes the cached modifiers that appear upon deserialization of the handler.
-   * <br>
-   * Primarily for internal use, used as a workaround to avoid calculating slot stacks before slot
-   * modifiers are initially applied.
-   */
-  @Deprecated(forRemoval = true, since = "12.0.0")
-  void clearCachedModifiers();
 
   /**
    * Copies all the slot modifiers from another instance to this one.

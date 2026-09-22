@@ -72,9 +72,6 @@ public interface ISlotData {
   @ApiStatus.Internal
   ISlotData.Entry build();
 
-  @Deprecated(forRemoval = true)
-  JsonObject serialize(HolderLookup.Provider provider);
-
   interface Entry {
 
     Codec<ISlotData.Entry> CODEC = CuriosServices.CODECS.slotDataEntryCodec();

@@ -57,7 +57,6 @@ import net.neoforged.neoforge.common.util.AttributeUtil;
 import net.neoforged.neoforge.event.AddAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.GatherSkippedAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import org.jspecify.annotations.NonNull;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.api.CuriosSlotTypes;
@@ -73,7 +72,7 @@ public class CuriosClientEvents {
 
   @SubscribeEvent
   public <T extends Avatar & ClientAvatarEntity> void renderHand(
-      final RenderArmEvent<@NonNull T> evt) {
+      final RenderArmEvent evt) {
     Minecraft mc = Minecraft.getInstance();
 
     if (mc.player != null) {
