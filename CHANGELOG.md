@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 to [Semantic Versioning](http://semver.org/spec/v2.0.0.html). Prior to version 5.2.0, this projected
 used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [17.0.0-beta.2+26.3] - 2026.09.26
+### Fixed
+- Fixed items losing changes while inside a curio slot
+- Fixed broken category localization in key bindings screen
+
 ## [17.0.0-beta+26.3] - 2026.09.21
 ### Changed
 - [API] `ICuriosItemHandler#getEquippedCurios` now returns a `ResourceHandler<ItemResource>` instead of the now-removed `IItemHandlerModifiable`
