@@ -40,7 +40,7 @@
   "curios.modifiers.charm": "When worn as charm:",
   "curios.modifiers.hands": "When on hands:",
   "curios.modifiers.bracelet": "When worn as bracelet:",
-  "key.curios.category": "Curios",
+  "key.category.curios.general": "Curios",
   "key.curios.open.desc": "Open/Close Curios Inventory",
   "gui.curios.toggle": "Toggle Visibility",
   "gui.curios.toggle.cosmetics": "Toggle Cosmetics",

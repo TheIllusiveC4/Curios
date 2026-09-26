@@ -124,7 +124,7 @@ public class CuriosClientEvents {
   @SubscribeEvent
   public void onClientTick(ClientTickEvent.Post evt) {
 
-    if (CuriosKeyMappings.OPEN_CURIOS_INVENTORY.consumeClick() && Minecraft.getInstance()
+    if (CuriosKeyMappings.OPEN_CURIOS_INVENTORY.get().consumeClick() && Minecraft.getInstance()
         .isWindowActive()) {
       ClientPacketDistributor.sendToServer(new CPacketOpenCurios(ItemStack.EMPTY));
     }

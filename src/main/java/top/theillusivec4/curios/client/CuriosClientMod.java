@@ -49,7 +49,7 @@ public class CuriosClientMod {
 
   private void registerKeys(final RegisterKeyMappingsEvent evt) {
     evt.registerCategory(CuriosKeyMappings.CURIOS_KEY_CATEGORY);
-    evt.register(CuriosKeyMappings.OPEN_CURIOS_INVENTORY);
+    evt.register(CuriosKeyMappings.OPEN_CURIOS_INVENTORY.get());
   }
 
   private void setupClient(final FMLClientSetupEvent evt) {

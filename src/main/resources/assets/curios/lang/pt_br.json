@@ -33,7 +33,7 @@
   "curios.modifiers.charm": "Quando como amuleto:",
   "curios.modifiers.hands": "Quando nas mãos:",
   "curios.modifiers.bracelet": "Quando usado como bracelete:",
-  "key.curios.category": "Curios",
+  "key.category.curios.general": "Curios",
   "key.curios.open.desc": "Abrir/Fechar Inventário do Curios",
   "gui.curios.toggle": "Alternar visibilidade"
 }

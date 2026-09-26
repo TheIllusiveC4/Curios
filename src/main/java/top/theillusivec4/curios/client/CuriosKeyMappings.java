@@ -22,13 +22,14 @@ package top.theillusivec4.curios.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.neoforged.neoforge.common.util.Lazy;
 import top.theillusivec4.curios.api.CuriosResources;
 
 public class CuriosKeyMappings {
 
   public static final KeyMapping.Category CURIOS_KEY_CATEGORY = new KeyMapping.Category(
-      CuriosResources.resource("key.curios.category"));
+      CuriosResources.resource("general"));
 
-  public static final KeyMapping OPEN_CURIOS_INVENTORY =
-      new KeyMapping("key.curios.open.desc",  InputConstants.KEY_G, CURIOS_KEY_CATEGORY);
+  public static final Lazy<KeyMapping> OPEN_CURIOS_INVENTORY = Lazy.of(
+      () -> new KeyMapping("key.curios.open.desc", InputConstants.KEY_G, CURIOS_KEY_CATEGORY));
 }

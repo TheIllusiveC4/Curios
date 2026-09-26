@@ -294,7 +294,7 @@ public class CuriosScreen extends AbstractRecipeBookScreen<CuriosMenu>
 
     if (super.keyPressed(event)) {
       return true;
-    } else if (CuriosKeyMappings.OPEN_CURIOS_INVENTORY.isActiveAndMatches(
+    } else if (CuriosKeyMappings.OPEN_CURIOS_INVENTORY.get().isActiveAndMatches(
         InputConstants.getKey(event))) {
       LocalPlayer playerEntity = this.getMinecraft().player;
 

@@ -40,7 +40,7 @@
     "curios.modifiers.charm": "Khi trang bị làm bùa:",
     "curios.modifiers.hands": "Khi ở trên tay:",
     "curios.modifiers.bracelet": "Khi trang bị làm vòng tay:",
-    "key.curios.category": "Phụ Kiện",
+    "key.category.curios.general": "Phụ Kiện",
     "key.curios.open.desc": "Mở/Đóng Kho Đồ Phụ Kiện",
     "gui.curios.toggle": "Thao Tác Hiển Thị"
   }
