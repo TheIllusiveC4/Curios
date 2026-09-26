@@ -116,6 +116,7 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
   private Map<EntityType<?>, Map<String, ISlotType>> entitySlots = ImmutableMap.of();
   private Set<String> configSlots = ImmutableSet.of();
   private Map<String, Set<String>> idToMods = ImmutableMap.of();
+  private boolean populated = false;
 
   public CuriosSlotResources() {
     super(ExtraCodecs.JSON, FileToIdConverter.json(folder));
@@ -164,7 +165,12 @@ public class CuriosSlotResources extends SimpleJsonResourceReloadListener<JsonEl
     this.pendingData = sorted;
   }
 
+  public boolean isPopulated() {
+    return this.populated;
+  }
+
   public void populateData() {
+    this.populated = true;
     Map<String, SlotType.Builder> slotMap = new HashMap<>();
     Map<EntityType<?>, ImmutableSet.Builder<String>> entityMap = new HashMap<>();
     Map<String, ImmutableSet.Builder<String>> modMap = new HashMap<>();
