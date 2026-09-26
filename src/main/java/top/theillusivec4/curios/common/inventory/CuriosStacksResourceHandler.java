@@ -148,14 +148,20 @@ public class CuriosStacksResourceHandler extends ItemStacksResourceHandler imple
 
   @Override
   public void setStackInSlot(int slot, ItemStack stack) {
-    Objects.checkIndex(slot, this.size());
-    this.set(slot, ItemResource.of(stack), stack.count());
+    int count = stack.count();
+    TransferPreconditions.checkNonNegative(count);
+
+    if (stack.isEmpty() && count > 0) {
+      throw new IllegalArgumentException("Stack is empty but the count is positive: " + count);
+    }
+    ItemStack oldContents = this.stacks.set(slot, stack);
+    this.onContentsChanged(slot, oldContents);
   }
 
   @Override
   public ItemStack getStackInSlot(int slot) {
     Objects.checkIndex(slot, this.size());
-    return ItemUtil.getStack(this, slot);
+    return this.stacks.get(slot);
   }
 
   @Override
