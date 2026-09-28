@@ -4,7 +4,7 @@
   "curios.tooltip.slot": "Yuva:",
   "curios.cosmetic": "Kozmetik",
   "commands.curios.set.success": "Tür %s şimdi %s yuvalara ayarlandı. %s için",
-  "commands.curios.add.success": "%s türünde &d yuvalar, %s'e eklendi",
+  "commands.curios.add.success": "%s türünde %d yuvalar, %s'e eklendi",
   "commands.curios.remove.success": "%s türünde %d yuvalar, %s'den kaldırıldı",
   "commands.curios.unlock.success": "Yuva %s, %s için açıldı",
   "commands.curios.lock.success": "Yuva %s, %s için kilitlendi",
