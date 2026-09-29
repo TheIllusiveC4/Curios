@@ -228,9 +228,20 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
   }
 
   public Map<String, ISlotType> getEntitySlots(EntityType<?> type) {
+    Map<EntityType<?>, Map<String, ISlotType>> slots = this.entitySlots;
 
-    if (this.entitySlots.containsKey(type)) {
-      return this.entitySlots.get(type);
+    if (slots instanceof ImmutableMap) {
+      // ImmutableMap never holds null values, so one lookup answers both questions
+      Map<String, ISlotType> result = slots.get(type);
+
+      if (result != null) {
+        return result;
+      }
+      return ImmutableMap.of();
+    }
+
+    if (slots.containsKey(type)) {
+      return slots.get(type);
     }
     return ImmutableMap.of();
   }
