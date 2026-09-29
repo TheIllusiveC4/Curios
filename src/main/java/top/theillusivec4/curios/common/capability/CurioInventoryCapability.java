@@ -21,7 +21,9 @@ package top.theillusivec4.curios.common.capability;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -594,7 +596,7 @@ public class CurioInventoryCapability {
 
     @Override
     public void clearCachedSlotModifiers() {
-      Multimap<String, AttributeModifier> slots = HashMultimap.create();
+      Map<String, Set<AttributeModifier>> slots = null;
 
       for (Map.Entry<String, ICurioStacksHandler> entry : this.curios.entrySet()) {
         ICurioStacksHandler stacksHandler = entry.getValue();
@@ -619,7 +621,7 @@ public class CurioInventoryCapability {
               for (Attribute attribute : map.keySet()) {
 
                 if (attribute instanceof SlotAttribute wrapper) {
-                  slots.putAll(wrapper.getIdentifier(), map.get(attribute));
+                  slots = collectSlotModifiers(slots, wrapper.getIdentifier(), map.get(attribute));
                 }
               }
             }
@@ -627,7 +629,11 @@ public class CurioInventoryCapability {
         }
       }
 
-      for (Map.Entry<String, Collection<AttributeModifier>> entry : slots.asMap().entrySet()) {
+      if (slots == null) {
+        return;
+      }
+
+      for (Map.Entry<String, Set<AttributeModifier>> entry : slots.entrySet()) {
         String id = entry.getKey();
         ICurioStacksHandler stacksHandler = this.curios.get(id);
 
@@ -649,6 +655,30 @@ public class CurioInventoryCapability {
         result.putAll(entry.getKey(), entry.getValue().getModifiers().values());
       }
       return result;
+    }
+
+    private static Map<String, Set<AttributeModifier>> collectSlotModifiers(
+        @Nullable Map<String, Set<AttributeModifier>> slots, String id,
+        Collection<AttributeModifier> modifiers) {
+
+      if (modifiers.isEmpty()) {
+        return slots;
+      }
+
+      if (slots == null) {
+        // Sized like the HashMultimap this replaces
+        slots = Maps.newHashMapWithExpectedSize(12);
+      }
+      Set<AttributeModifier> collected = slots.get(id);
+
+      if (collected == null) {
+        collected = Sets.newHashSetWithExpectedSize(2);
+        collected.addAll(modifiers);
+        slots.put(id, collected);
+      } else {
+        collected.addAll(modifiers);
+      }
+      return slots;
     }
 
     private void loadStacks(ICurioStacksHandler stacksHandler, ItemStackHandler loaded,
