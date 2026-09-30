@@ -68,8 +68,8 @@ public class CuriosCommonMod {
     NeoForge.EVENT_BUS.addListener(this::registerCommands);
     NeoForge.EVENT_BUS.addListener(this::reload);
     modContainer.registerConfig(ModConfig.Type.CLIENT, CuriosClientConfig.CLIENT_SPEC);
-    modContainer.registerConfig(ModConfig.Type.COMMON, CuriosConfig.COMMON_SPEC);
-    modContainer.registerConfig(ModConfig.Type.SERVER, CuriosConfig.SERVER_SPEC);
+    modContainer.registerConfig(ModConfig.Type.LOCAL, CuriosConfig.COMMON_SPEC);
+    modContainer.registerConfig(ModConfig.Type.SYNCED, CuriosConfig.SERVER_SPEC);
   }
 
   private void registerPayloadHandler(final RegisterPayloadHandlersEvent evt) {
