@@ -34,6 +34,10 @@ public record SPacketSyncStack(int entityId, String curioId, int slotId, ItemSta
                                int handlerType, CompoundTag compoundTag) implements
     CustomPacketPayload {
 
+  public SPacketSyncStack {
+    stack = stack.isEmpty() ? stack : stack.copy();
+  }
+
   public static final Type<SPacketSyncStack> TYPE =
       new Type<>(Identifier.fromNamespaceAndPath(CuriosConstants.MOD_ID, "sync_stack"));
 
