@@ -811,6 +811,10 @@ public class CurioInventoryCapability {
     @Override
     public <T> LazyOptional<T> getCapability(@Nullable Capability<T> capability, Direction facing) {
 
+      if (capability != CuriosCapability.INVENTORY) {
+        return LazyOptional.empty();
+      }
+
       if (CuriosApi.getEntitySlots(this.wearer).isEmpty()) {
         return LazyOptional.empty();
       }
