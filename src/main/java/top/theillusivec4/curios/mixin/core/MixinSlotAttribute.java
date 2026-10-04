@@ -20,6 +20,8 @@ public class MixinSlotAttribute {
 
   @Inject(at = @At("HEAD"), method = "getOrCreate", cancellable = true)
   private static void curios$slotAttribute(String id, CallbackInfoReturnable<SlotAttribute> ci) {
-    ci.setReturnValue(SLOT_ATTRIBUTES.computeIfAbsent(id, CuriosHelper.SlotAttributeWrapper::new));
+    synchronized (SLOT_ATTRIBUTES) {
+      ci.setReturnValue(SLOT_ATTRIBUTES.computeIfAbsent(id, CuriosHelper.SlotAttributeWrapper::new));
+    }
   }
 }
