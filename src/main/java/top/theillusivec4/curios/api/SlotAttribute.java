@@ -11,7 +11,9 @@ public class SlotAttribute extends Attribute {
   private final String identifier;
 
   public static SlotAttribute getOrCreate(String id) {
-    return SLOT_ATTRIBUTES.computeIfAbsent(id, SlotAttribute::new);
+    synchronized (SLOT_ATTRIBUTES) {
+      return SLOT_ATTRIBUTES.computeIfAbsent(id, SlotAttribute::new);
+    }
   }
 
   protected SlotAttribute(String identifier) {

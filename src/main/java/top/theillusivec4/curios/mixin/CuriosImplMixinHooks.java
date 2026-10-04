@@ -273,7 +273,9 @@ public class CuriosImplMixinHooks {
 
   public static UUID getUuid(SlotContext slotContext) {
     String key = slotContext.identifier() + slotContext.index();
-    return UUIDS.computeIfAbsent(key, (k) -> UUID.nameUUIDFromBytes(k.getBytes()));
+    synchronized (UUIDS) {
+      return UUIDS.computeIfAbsent(key, (k) -> UUID.nameUUIDFromBytes(k.getBytes()));
+    }
   }
 
   private static final Map<ResourceLocation, Predicate<SlotResult>> SLOT_RESULT_PREDICATES =
@@ -306,14 +308,45 @@ public class CuriosImplMixinHooks {
     return false;
   }
 
+  private static final Map<String, TagKey<Item>> SLOT_TAGS = new ConcurrentHashMap<>();
+  private static final TagKey<Item> CURIO_TAG = ItemTags.create(new ResourceLocation(CuriosApi.MODID, "curio"));
+
+  private static TagKey<Item> getSlotTag(String id) {
+    if (id != null) {
+      TagKey<Item> cached = SLOT_TAGS.get(id);
+      if (cached != null) {
+        return cached;
+      }
+    }
+    TagKey<Item> tag = ItemTags.create(new ResourceLocation(CuriosApi.MODID, id));
+    // Leave nonstandard paths to ResourceLocation on every call, including modded validation.
+    if (id != null && SLOT_TAGS.size() < 4096 && isStandardPath(id)) {
+      TagKey<Item> cached = SLOT_TAGS.putIfAbsent(id, tag);
+      if (cached != null) {
+        return cached;
+      }
+    }
+    return tag;
+  }
+
+  private static boolean isStandardPath(String id) {
+    for (int i = 0; i < id.length(); i++) {
+      char c = id.charAt(i);
+      if (!(c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '/' || c == '.')) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   static {
     registerCurioPredicate(new ResourceLocation(CuriosApi.MODID, "all"), (slotResult) -> true);
     registerCurioPredicate(new ResourceLocation(CuriosApi.MODID, "none"),
         (slotResult) -> false);
     registerCurioPredicate(new ResourceLocation(CuriosApi.MODID, "tag"), (slotResult) -> {
       String id = slotResult.slotContext().identifier();
-      TagKey<Item> tag1 = ItemTags.create(new ResourceLocation(CuriosApi.MODID, id));
-      TagKey<Item> tag2 = ItemTags.create(new ResourceLocation(CuriosApi.MODID, "curio"));
+      TagKey<Item> tag1 = getSlotTag(id);
+      TagKey<Item> tag2 = CURIO_TAG;
       ItemStack stack = slotResult.stack();
       return stack.is(tag1) || stack.is(tag2);
     });
