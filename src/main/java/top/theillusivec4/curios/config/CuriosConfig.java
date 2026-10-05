@@ -28,20 +28,20 @@ import top.theillusivec4.curios.api.CuriosResources;
 
 public class CuriosConfig {
 
-  public static final ModConfigSpec SERVER_SPEC;
+  public static final ModConfigSpec SYNCED_SPEC;
   public static final Server SERVER;
-  public static final ModConfigSpec COMMON_SPEC;
+  public static final ModConfigSpec LOCAL_SPEC;
   public static final Common COMMON;
   private static final String CONFIG_PREFIX = "gui." + CuriosResources.MOD_ID + ".config.";
 
   static {
     final Pair<Server, ModConfigSpec> specPair = new ModConfigSpec.Builder()
         .configure(Server::new);
-    SERVER_SPEC = specPair.getRight();
+    SYNCED_SPEC = specPair.getRight();
     SERVER = specPair.getLeft();
     final Pair<Common, ModConfigSpec> cspecPair = new ModConfigSpec.Builder()
         .configure(Common::new);
-    COMMON_SPEC = cspecPair.getRight();
+    LOCAL_SPEC = cspecPair.getRight();
     COMMON = cspecPair.getLeft();
   }
 
