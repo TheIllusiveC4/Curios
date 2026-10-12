@@ -158,9 +158,11 @@ public class CuriosImplMixinHooks {
   }
 
   public static Multimap<Attribute, AttributeModifier> getAttributeModifiers(
-      SlotContext slotContext, UUID uuid, ItemStack stack) {
+          SlotContext slotContext, UUID uuid, ItemStack stack) {
     Multimap<Attribute, AttributeModifier> multimap = HashMultimap.create();
 
+    multimap = getCurio(stack).map(curio -> curio.getAttributeModifiers(slotContext, uuid))
+            .orElse(multimap);
     if (stack.getTag() != null && stack.getTag().contains("CurioAttributeModifiers", 9)) {
       ListTag listnbt = stack.getTag().getList("CurioAttributeModifiers", 10);
       String identifier = slotContext.identifier();
@@ -168,7 +170,7 @@ public class CuriosImplMixinHooks {
       for (int i = 0; i < listnbt.size(); ++i) {
         CompoundTag compoundnbt = listnbt.getCompound(i);
 
-        if (compoundnbt.getString("Slot").equals(identifier)) {
+        if (compoundnbt.getString("Slot").equals(identifier)|| identifier.equals("curio")) {
           ResourceLocation rl = ResourceLocation.tryParse(compoundnbt.getString("AttributeName"));
           UUID id = uuid;
 
@@ -180,7 +182,7 @@ public class CuriosImplMixinHooks {
 
             if (id.getLeastSignificantBits() != 0L && id.getMostSignificantBits() != 0L) {
               AttributeModifier.Operation operation =
-                  AttributeModifier.Operation.fromValue(compoundnbt.getInt("Operation"));
+                      AttributeModifier.Operation.fromValue(compoundnbt.getInt("Operation"));
               double amount = compoundnbt.getDouble("Amount");
               String name = compoundnbt.getString("Name");
 
@@ -204,11 +206,11 @@ public class CuriosImplMixinHooks {
         }
       }
     } else {
-      multimap = getCurio(stack).map(curio -> curio.getAttributeModifiers(slotContext, uuid))
-          .orElse(multimap);
+//      multimap = getCurio(stack).map(curio -> curio.getAttributeModifiers(slotContext, uuid))
+//          .orElse(multimap);
     }
     CurioAttributeModifierEvent evt =
-        new CurioAttributeModifierEvent(stack, slotContext, uuid, multimap);
+            new CurioAttributeModifierEvent(stack, slotContext, uuid, multimap);
     MinecraftForge.EVENT_BUS.post(evt);
     return LinkedHashMultimap.create(evt.getModifiers());
   }
