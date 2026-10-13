@@ -194,6 +194,11 @@ public class CuriosCommonEvents {
 
   @SubscribeEvent
   public void onDatapackSync(OnDatapackSyncEvent evt) {
+    // Each /reload replaces SERVER with a new instance that is only populated on server start, so
+    // after a reload the slots were empty and clients were told there are no slots at all.
+    if (!CuriosSlotResources.SERVER.isPopulated()) {
+      CuriosSlotResources.SERVER.populateData();
+    }
 
     if (evt.getPlayer() == null) {
       PlayerList playerList = evt.getPlayerList();
