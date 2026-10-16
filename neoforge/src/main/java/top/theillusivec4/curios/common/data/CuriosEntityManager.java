@@ -198,12 +198,16 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
 
       if (entity.startsWith("#")) {
         BuiltInRegistries.ENTITY_TYPE.getTag(
-                TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse(entity)))
-            .ifPresent(named -> {
-              for (Holder<EntityType<?>> entityTypeHolder : named) {
-                toAdd.add(entityTypeHolder.value());
-              }
-            });
+            TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse(entity.substring(1))))
+            .ifPresentOrElse(
+                named -> {
+                  for (Holder<EntityType<?>> entityTypeHolder : named) {
+                    toAdd.add(entityTypeHolder.value());
+                  }
+                },
+                () -> { // Couldn't find the entity type tag
+                  CuriosConstants.LOG.error("Couldn't find entity type tag: {}!", entity);
+                });
       } else {
         EntityType<?> type =
             BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse(entity)).orElse(null);
