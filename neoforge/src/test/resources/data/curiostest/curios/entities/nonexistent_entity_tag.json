@@ -1,0 +1,9 @@
+{
+  "entities": ["#minecraft:nonexistent_entity_tag", "minecraft:creeper"],
+  "slots": ["ring"],
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:true"
+    }
+  ]
+}
