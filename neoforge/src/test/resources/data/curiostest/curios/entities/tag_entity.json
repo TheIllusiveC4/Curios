@@ -1,0 +1,9 @@
+{
+  "entities": ["#minecraft:skeletons"],
+  "slots": ["ring"],
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:true"
+    }
+  ]
+}
