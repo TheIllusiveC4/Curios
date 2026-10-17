@@ -66,6 +66,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.entity.EntityEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.EnderManAngerEvent;
@@ -281,6 +282,14 @@ public class CuriosEventHandler {
       Map<String, ResourceLocation> icons = new HashMap<>();
       slotTypes.forEach(type -> icons.put(type.getIdentifier(), type.getIcon()));
       PacketDistributor.sendToPlayer(mp, new SPacketSetIcons(icons));
+    }
+  }
+
+  @SubscribeEvent
+  public void onTagsUpdated(TagsUpdatedEvent event) {
+    if (event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) {
+      CuriosEntityManager.SERVER.rebuildEntitySlots(
+        event.getRegistryAccess().registryOrThrow(Registries.ENTITY_TYPE));
     }
   }
 
