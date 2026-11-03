@@ -105,8 +105,6 @@ public class CurioInventory implements ValueIOSerializable {
     return this.invalidStacks;
   }
 
-  private static final Identifier SIZE_SHIFT = CuriosResources.resource("size_shift");
-
   public void loadInventoryConfiguration() {
     Map<ISlotType, ICurioStacksHandler> defaultInventory = this.createDefaultInventory();
     SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = new TreeMap<>(defaultInventory);
@@ -118,15 +116,11 @@ public class CurioInventory implements ValueIOSerializable {
 
       if (slotType != null && defaultInventory.containsKey(slotType)) {
         ICurioStacksHandler curioStacksHandler = defaultInventory.get(slotType);
-        int defaultSize = curioStacksHandler.getSlots();
-        int oldSize = prevStacksHandler.getSlots();
-        curioStacksHandler.copyModifiers(prevStacksHandler);
 
-        if (oldSize != defaultSize) {
-          curioStacksHandler.addTransientModifier(
-              new AttributeModifier(SIZE_SHIFT, oldSize - defaultSize,
-                  AttributeModifier.Operation.ADD_VALUE));
+        if (curioStacksHandler instanceof CurioStacksHandler impl) {
+          impl.setDataLoaded();
         }
+        curioStacksHandler.copyModifiers(prevStacksHandler);
         int index = 0;
 
         while (index < curioStacksHandler.getSlots() && index < prevStacksHandler.getSlots()) {
@@ -200,12 +194,7 @@ public class CurioInventory implements ValueIOSerializable {
     this.curios.clear();
 
     for (Map.Entry<ISlotType, ICurioStacksHandler> entry : sortedCurios.entrySet()) {
-      ICurioStacksHandler stacksHandler = entry.getValue();
-
-      if (stacksHandler instanceof CurioStacksHandler curioStacksHandler) {
-        curioStacksHandler.setDataLoaded();
-      }
-      this.curios.put(entry.getKey().getId(), stacksHandler);
+      this.curios.put(entry.getKey().getId(), entry.getValue());
     }
   }
 

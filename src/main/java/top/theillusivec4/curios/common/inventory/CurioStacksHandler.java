@@ -340,6 +340,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     for (AttributeModifier persistentModifier : other.getPermanentModifiers()) {
       this.addPermanentModifier(persistentModifier);
     }
+    this.flagUpdate();
     this.update();
   }
 
