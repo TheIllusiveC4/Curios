@@ -4,10 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "curios.refmap.json",
   "mixins": [
-    "MixinApplyBonusCount",
     "MixinCuriosApi",
     "MixinCuriosDataProvider",
-    "MixinEnchantedCountIncreaseFunction",
     "MixinInventory",
     "MixinLivingEntity",
     "MixinNbtPredicate",
