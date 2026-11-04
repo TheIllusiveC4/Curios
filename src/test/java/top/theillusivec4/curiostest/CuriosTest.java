@@ -48,6 +48,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.data.event.GatherDataRegistryEntriesEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -85,6 +86,7 @@ public class CuriosTest {
     eventBus.addListener(this::registerLayers);
     eventBus.addListener(this::creativeTab);
     eventBus.addListener(this::registerCaps);
+    eventBus.addListener(this::gatherRegistries);
     eventBus.addListener(this::gatherData);
     eventBus.addListener(this::registerSlotExtensions);
     CuriosSlotTypes.registerPredicate(Identifier.fromNamespaceAndPath(MODID, "test"),
@@ -100,11 +102,14 @@ public class CuriosTest {
     }, "test");
   }
 
+  private void gatherRegistries(final GatherDataRegistryEntriesEvent evt) {
+    evt.gatherFor(MODID)
+            .add(Registries.ADVANCEMENT, new AdvancementProvider(List.of(CuriosGenerator::new)));
+  }
+
   private void gatherData(final GatherDataEvent.Client evt) {
     DataGenerator generator = evt.getGenerator();
-    evt.createReloadableRegistryObjects(new RegistrySetBuilder().add(Registries.ADVANCEMENT,
-        new AdvancementProvider(List.of(CuriosGenerator::new))), Set.of("curiostest"));
-    generator.addProvider(true, new CuriosTestProvider("curiostest", generator.getPackOutput(),
+    generator.addProvider(true, new CuriosTestProvider(MODID, generator.getPackOutput(),
         evt.getReloadableLookupProvider()));
   }
 
