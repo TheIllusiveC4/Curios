@@ -46,10 +46,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemUtil;
 import org.apache.commons.lang3.ArrayUtils;
@@ -129,26 +126,6 @@ public class CuriosCommonMixinHooks {
       }
       return false;
     }).orElse(false);
-  }
-
-  public static int getFortuneLevel(LootContext lootContext) {
-    Entity entity = lootContext.getOptional(LootContextParams.THIS_ENTITY);
-
-    if (entity instanceof LivingEntity livingEntity) {
-      return CuriosApi.getCuriosInventory(livingEntity)
-          .map(handler -> handler.getFortuneLevel(lootContext)).orElse(0);
-    }
-    return 0;
-  }
-
-  public static int getLootingLevel(LootContext lootContext) {
-    Entity entity = lootContext.getOptional(LootContextParams.ATTACKING_ENTITY);
-
-    if (entity instanceof LivingEntity livingEntity) {
-      return CuriosApi.getCuriosInventory(livingEntity)
-          .map(handler -> handler.getLootingLevel(lootContext)).orElse(0);
-    }
-    return 0;
   }
 
   public static boolean isFreezeImmune(LivingEntity livingEntity) {

@@ -4,9 +4,7 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "AccessorEntity",
-    "MixinApplyBonusCount",
     "MixinCuriosTriggersEquip",
-    "MixinEnchantedCountIncreaseFunction",
     "MixinEntitySelectorOptions",
     "MixinInventory",
     "MixinLivingEntity",

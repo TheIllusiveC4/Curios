@@ -58,11 +58,20 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.event.enchanting.EnchantedBlockLootEvent;
+import net.neoforged.neoforge.event.enchanting.EnchantedEntityLootEvent;
 import net.neoforged.neoforge.event.entity.EntityEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.EndermanAngerEvent;
@@ -185,6 +194,57 @@ public class CuriosCommonEvents {
       }
     }
     return false;
+  }
+
+  @SubscribeEvent
+  public void enchantedBlockLooted(EnchantedBlockLootEvent evt) {
+
+    if (evt.getEnchantment().is(Enchantments.FORTUNE)) {
+      Entity entity = evt.getEntity();
+      LevelAccessor level = evt.getLevel();
+
+      if (entity instanceof LivingEntity livingEntity && level instanceof ServerLevelAccessor serverLevelAccessor) {
+        CuriosApi.getCuriosInventory(livingEntity).ifPresent(curios -> {
+          LootParams lootparams = new LootParams.Builder(serverLevelAccessor.getLevel())
+              .withOptionalParameter(LootContextParams.THIS_ENTITY, livingEntity)
+              .withParameter(LootContextParams.BLOCK_STATE, evt.getState())
+              .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(evt.getPos()))
+              .withParameter(LootContextParams.TOOL, evt.getTool())
+              .create(LootContextParamSets.BLOCK);
+          int fortuneLevel = curios.getFortuneLevel(new LootContext.Builder(lootparams).create(Optional.empty()));
+
+          if (fortuneLevel > 0) {
+            int enchantmentLevel = evt.getEnchantmentLevel();
+            evt.setEnchantmentLevel(enchantmentLevel + fortuneLevel);
+          }
+        });
+      }
+    }
+  }
+
+  @SubscribeEvent
+  public void enchantedEntityLooted(EnchantedEntityLootEvent evt) {
+
+    if (evt.getEnchantment().is(Enchantments.LOOTING)) {
+      Entity entity = evt.getAttacker();
+
+      if (entity instanceof LivingEntity livingEntity && livingEntity.level() instanceof ServerLevel serverLevel) {
+        CuriosApi.getCuriosInventory(livingEntity).ifPresent(curios -> {
+          LootParams lootparams = new LootParams.Builder(serverLevel)
+              .withOptionalParameter(LootContextParams.ATTACKING_ENTITY, livingEntity)
+              .withParameter(LootContextParams.THIS_ENTITY, evt.getEntity())
+              .withParameter(LootContextParams.DAMAGE_SOURCE, evt.getDamageSource())
+              .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(evt.getEntity().getOnPos()))
+              .create(LootContextParamSets.ENTITY);
+          int lootingLevel = curios.getLootingLevel(new LootContext.Builder(lootparams).create(Optional.empty()));
+
+          if (lootingLevel > 0) {
+            int enchantmentLevel = evt.getEnchantmentLevel();
+            evt.setEnchantmentLevel(enchantmentLevel + lootingLevel);
+          }
+        });
+      }
+    }
   }
 
   @SubscribeEvent
