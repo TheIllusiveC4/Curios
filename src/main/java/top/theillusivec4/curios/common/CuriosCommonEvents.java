@@ -196,6 +196,7 @@ public class CuriosCommonEvents {
   public void onDatapackSync(OnDatapackSyncEvent evt) {
 
     if (evt.getPlayer() == null) {
+      CuriosSlotResources.SERVER.populateData();
       PlayerList playerList = evt.getPlayerList();
 
       for (ServerPlayer player : playerList.getPlayers()) {
