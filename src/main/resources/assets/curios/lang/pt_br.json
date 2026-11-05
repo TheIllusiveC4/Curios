@@ -10,7 +10,10 @@
   "commands.curios.lock.success": "Slot %s foi bloqueado por %s",
   "commands.curios.clear.success": "Slot %s foi limpo para %s",
   "commands.curios.clearAll.success": "Todos os slots foram limpo para %s",
+  "commands.curios.drop.success": "Itens descartados no slot %s para %s",
+  "commands.curios.dropAll.success": "Itens descartados em todos os slots para %s",
   "commands.curios.reset.success": "Redefinir slots para %s",
+  "commands.curios.replace.success": "Slot substituído %s para %s com %s",
   "argument.entity.options.curios.description": "Inventário de acessórios da entidade",
   "argument.curios.type.unknown": "Tipo de slot de acessório desconhecido %s",
   "curios.identifier.curio": "Acessório",
@@ -23,6 +26,10 @@
   "curios.identifier.charm": "Amuleto",
   "curios.identifier.hands": "Mãos",
   "curios.identifier.bracelet": "Bracelete",
+  "curios.modifiers.slots.plus": "+%s %s Slot",
+  "curios.modifiers.slots.plus.multiple": "+%s %s Slots",
+  "curios.modifiers.slots.take": "%s %s Slot",
+  "curios.modifiers.slots.take.multiple": "%s %s Slots",
   "curios.modifiers.curio": "Quando usado como acessórios:",
   "curios.modifiers.necklace": "Quando no pescoço:",
   "curios.modifiers.ring": "Quando como anel:",
@@ -35,5 +42,9 @@
   "curios.modifiers.bracelet": "Quando usado como bracelete:",
   "key.curios.category": "Curios",
   "key.curios.open.desc": "Abrir/Fechar Inventário do Curios",
-  "gui.curios.toggle": "Alternar visibilidade"
+  "gui.curios.toggle": "Alternar visibilidade",
+  "gui.curios.toggle.cosmetics": "Alternar cosméticos",
+  "gui.curios.page": "Página %d / %d",
+  "curios.networking.failed": "Falha de Rede Curios",
+  "curios.tooltip.inactive": "Inativo"
 }
