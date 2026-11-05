@@ -1,0 +1,9 @@
+{
+  "entities": ["#minecraft:zombies"],
+  "slots": ["nonexistent_slot", "ring"],
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:true"
+    }
+  ]
+}
