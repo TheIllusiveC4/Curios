@@ -51,6 +51,6 @@ public class KnucklesRenderer implements ICurioRenderer {
         .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(KNUCKLES_TEXTURE),
             stack.hasFoil());
     this.model
-        .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1);
+        .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, -1);
   }
 }

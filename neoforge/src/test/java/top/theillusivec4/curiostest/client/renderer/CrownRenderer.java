@@ -45,6 +45,6 @@ public class CrownRenderer<L extends LivingEntity> implements ICurioRenderer {
     ICurioRenderer.followHeadRotations(slotContext.entity(), this.model.crown);
     VertexConsumer vertexconsumer = ItemRenderer.getArmorFoilBuffer(renderTypeBuffer,
         RenderType.armorCutoutNoCull(CROWN_TEXTURE), stack.hasFoil());
-    this.model.renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1);
+    this.model.renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, -1);
   }
 }

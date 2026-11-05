@@ -109,7 +109,7 @@ public class AmuletItem extends Item implements ICurioItem, ICurioRenderer {
           .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(AMULET_TEXTURE),
               stack.hasFoil());
       ((AmuletModel<?>) this.model)
-          .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1);
+          .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, -1);
     }
   }
 }
