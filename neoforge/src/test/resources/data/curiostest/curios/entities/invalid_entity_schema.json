@@ -1,0 +1,9 @@
+{
+  "entities": ["minecraft:cow"],
+  "slots": {},
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:true"
+    }
+  ]
+}
