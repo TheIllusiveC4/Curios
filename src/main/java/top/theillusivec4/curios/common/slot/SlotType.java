@@ -5,13 +5,14 @@ import com.mojang.datafixers.util.Either;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import top.theillusivec4.curios.api.CuriosResources;
@@ -27,15 +28,15 @@ public final class SlotType implements ISlotType {
   private final int size;
   private final boolean useNativeGui;
   private final boolean hasCosmetic;
-  private final ResourceLocation icon;
+  private final Identifier icon;
   private final DropRule dropRule;
   private final boolean renderToggle;
-  private final Set<ResourceLocation> validators;
+  private final Set<Identifier> validators;
   private final Set<EntityType<?>> entities;
 
   public SlotType(String id, int order, int size, boolean useNativeGui, boolean hasCosmetic,
-                  ResourceLocation icon, DropRule dropRule, boolean renderToggle,
-                  Set<ResourceLocation> validators, Set<EntityType<?>> entities) {
+                  Identifier icon, DropRule dropRule, boolean renderToggle,
+                  Set<Identifier> validators, Set<EntityType<?>> entities) {
     this.id = id;
     this.order = order;
     this.size = size;
@@ -59,7 +60,7 @@ public final class SlotType implements ISlotType {
   }
 
   @Override
-  public ResourceLocation getIcon() {
+  public Identifier getIcon() {
     return this.icon;
   }
 
@@ -94,7 +95,7 @@ public final class SlotType implements ISlotType {
   }
 
   @Override
-  public Set<ResourceLocation> getValidators() {
+  public Set<Identifier> getValidators() {
     return ImmutableSet.copyOf(this.validators);
   }
 
@@ -112,9 +113,9 @@ public final class SlotType implements ISlotType {
     private Boolean useNativeGui = null;
     private Boolean hasCosmetic = null;
     private Boolean renderToggle = null;
-    private ResourceLocation icon = null;
+    private Identifier icon = null;
     private DropRule dropRule = null;
-    private Set<ResourceLocation> validators = null;
+    private Set<Identifier> validators = null;
     private Set<EntityType<?>> entityTypes = null;
 
     public Builder(String id) {
@@ -126,7 +127,7 @@ public final class SlotType implements ISlotType {
       this.order = entry.order()
           .map(order -> replace || this.order == null ? order : Math.min(this.order, order))
           .orElse(this.order);
-      String op = entry.operation().orElse("set").toLowerCase();
+      String op = entry.operation().orElse("set").toLowerCase(Locale.ROOT);
       int size = entry.size().orElse(1);
 
       if (op.equalsIgnoreCase("remove")) {

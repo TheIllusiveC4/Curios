@@ -20,8 +20,6 @@
 
 package top.theillusivec4.curios;
 
-import java.util.HashSet;
-import java.util.Set;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -38,18 +36,16 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.resource.VanillaServerListeners;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.CuriosSlotTypes;
 import top.theillusivec4.curios.api.extensions.RegisterCuriosExtensionsEvent;
 import top.theillusivec4.curios.api.internal.CuriosServices;
-import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.common.CuriosCommonEvents;
 import top.theillusivec4.curios.common.capability.CurioInventoryCapability;
-import top.theillusivec4.curios.common.capability.CurioItemHandler;
+import top.theillusivec4.curios.common.capability.CombinedCuriosResourceHandler;
 import top.theillusivec4.curios.common.capability.ItemizedCurioCapability;
 import top.theillusivec4.curios.common.data.CuriosSlotResources;
 import top.theillusivec4.curios.common.integration.CuriosIntegrations;
@@ -57,7 +53,6 @@ import top.theillusivec4.curios.common.network.NetworkHandler;
 import top.theillusivec4.curios.config.CuriosClientConfig;
 import top.theillusivec4.curios.config.CuriosConfig;
 import top.theillusivec4.curios.impl.CuriosRegistry;
-import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
 import top.theillusivec4.curios.server.command.CuriosSelectorOptions;
 
@@ -70,12 +65,11 @@ public class CuriosCommonMod {
     eventBus.addListener(this::setup);
     eventBus.addListener(this::registerCaps);
     eventBus.addListener(this::registerPayloadHandler);
-    NeoForge.EVENT_BUS.addListener(this::serverAboutToStart);
     NeoForge.EVENT_BUS.addListener(this::registerCommands);
     NeoForge.EVENT_BUS.addListener(this::reload);
     modContainer.registerConfig(ModConfig.Type.CLIENT, CuriosClientConfig.CLIENT_SPEC);
-    modContainer.registerConfig(ModConfig.Type.COMMON, CuriosConfig.COMMON_SPEC);
-    modContainer.registerConfig(ModConfig.Type.SERVER, CuriosConfig.SERVER_SPEC);
+    modContainer.registerConfig(ModConfig.Type.LOCAL, CuriosConfig.COMMON_SPEC);
+    modContainer.registerConfig(ModConfig.Type.SYNCED, CuriosConfig.SERVER_SPEC);
   }
 
   private void registerPayloadHandler(final RegisterPayloadHandlersEvent evt) {
@@ -99,7 +93,7 @@ public class CuriosCommonMod {
 
                              if (!CuriosSlotTypes.getDefaultEntitySlotTypes(livingEntity)
                                  .isEmpty()) {
-                               return new CurioItemHandler(livingEntity);
+                               return CombinedCuriosResourceHandler.from(livingEntity);
                              }
                            }
                            return null;
@@ -136,21 +130,12 @@ public class CuriosCommonMod {
     }
   }
 
-  private void serverAboutToStart(ServerAboutToStartEvent evt) {
-    Set<String> slotIds = new HashSet<>();
-
-    for (ISlotType value : CuriosSlotResources.SERVER.getSlots().values()) {
-      slotIds.add(value.getId());
-    }
-    CurioArgumentType.slotIds = slotIds;
-  }
-
   private void registerCommands(RegisterCommandsEvent evt) {
     CuriosCommand.register(evt.getDispatcher(), evt.getBuildContext());
   }
 
   private void reload(final AddServerReloadListenersEvent evt) {
-    CuriosSlotResources.SERVER = new CuriosSlotResources(evt.getRegistryAccess());
+    CuriosSlotResources.SERVER = new CuriosSlotResources(evt.getServerResources().getRegistryLookup());
     evt.addListener(CuriosSlotResources.ID, CuriosSlotResources.SERVER);
     evt.addDependency(VanillaServerListeners.LAST, CuriosSlotResources.ID);
   }

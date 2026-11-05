@@ -21,7 +21,6 @@
 package top.theillusivec4.curios.api.type.capability;
 
 import com.google.common.collect.Multimap;
-import com.mojang.logging.LogUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,21 +30,22 @@ import javax.annotation.Nullable;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import org.slf4j.Logger;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
-public interface ICuriosItemHandler {
-
-  Logger LOGGER = LogUtils.getLogger();
+public interface ICuriosItemHandler extends ValueIOSerializable {
 
   /**
    * A map of the current curios, keyed by the {@link ISlotType} identifier.
@@ -92,11 +92,12 @@ public interface ICuriosItemHandler {
   Optional<ICurioStacksHandler> getStacksHandler(String identifier);
 
   /**
-   * Gets an {@link IItemHandlerModifiable} that contains all the equipped curio stacks (not including cosmetics).
+   * Gets an {@link ResourceHandler<ItemResource>} that contains all the equipped curio stacks
+   * (not including cosmetics).
    *
    * @return The equipped curio stacks, or empty if there is no curios handler
    */
-  IItemHandlerModifiable getEquippedCurios();
+  ResourceHandler<ItemResource> getEquippedCurios();
 
   /**
    * Replaces the currently equipped item in a specified curio slot, if it exists.
@@ -296,9 +297,9 @@ public interface ICuriosItemHandler {
    * @param amount    Amount for the attribute modifier
    * @param operation Operation for the attribute modifier
    */
-  default void addTransientSlotModifier(String slot, ResourceLocation id, double amount,
+  default void addTransientSlotModifier(String slot, Identifier id, double amount,
                                         AttributeModifier.Operation operation) {
-    LOGGER.error("Missing method implementation!");
+
   }
 
   /**
@@ -320,9 +321,9 @@ public interface ICuriosItemHandler {
    * @param amount    Amount for the attribute modifier
    * @param operation Operation for the attribute modifier
    */
-  default void addPermanentSlotModifier(String slot, ResourceLocation id, double amount,
+  default void addPermanentSlotModifier(String slot, Identifier id, double amount,
                                         AttributeModifier.Operation operation) {
-    LOGGER.error("Missing method implementation!");
+
   }
 
   /**
@@ -338,8 +339,8 @@ public interface ICuriosItemHandler {
    * @param slot Identifier of the {@link ISlotType} to remove the modifier from
    * @param id   id of the {@link AttributeModifier} to remove
    */
-  default void removeSlotModifier(String slot, ResourceLocation id) {
-    LOGGER.error("Missing method implementation!");
+  default void removeSlotModifier(String slot, Identifier id) {
+
   }
 
   /**
@@ -362,14 +363,9 @@ public interface ICuriosItemHandler {
   Multimap<String, AttributeModifier> getModifiers();
 
   /**
-   * Serializes the curios inventory data
+   * Loads the slot configuration from datapacks and applies it to the curios inventory.
    */
-  Tag writeTag();
-
-  /**
-   * Deserializes the curios inventory data
-   */
-  void readTag(Tag tag);
+  void loadDatapacks();
 
   /**
    * Removes the cached modifiers that appear upon deserialization of the handler.

@@ -32,17 +32,18 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.Vec3;
@@ -173,7 +174,7 @@ public interface ICurio {
    */
   @Deprecated(forRemoval = true)
   default Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-      SlotContext slotContext, ResourceLocation id) {
+      SlotContext slotContext, Identifier id) {
     return LinkedHashMultimap.create();
   }
 
@@ -281,7 +282,7 @@ public interface ICurio {
 
   /**
    * Retrieves a list of tooltips when displaying curio attribute modifier information returned by
-   * {@link ICurio#getAttributeModifiers(SlotContext, ResourceLocation)}. By default, this will display a list
+   * {@link ICurio#getAttributeModifiers(SlotContext, Identifier)}. By default, this will display a list
    * similar to the vanilla attribute modifier tooltips.
    *
    * @param tooltips A list of {@link Component} with the attribute modifier information
@@ -351,7 +352,7 @@ public interface ICurio {
    * @param enderMan    The Enderman entity that the user is looking at
    * @return True if it can mask the user from Enderman, false otherwise
    */
-  default boolean isEnderMask(SlotContext slotContext, EnderMan enderMan) {
+  default boolean isEnderMask(SlotContext slotContext, Enderman enderMan) {
 
     if (slotContext.entity() instanceof Player player) {
       return getStack().isGazeDisguise(player, enderMan);
@@ -369,7 +370,7 @@ public interface ICurio {
         livingEntity.level()
             .playLocalSound(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(),
                             SoundEvents.ITEM_BREAK.value(), livingEntity.getSoundSource(), 0.8F,
-                            0.8F + livingEntity.level().random.nextFloat() * 0.4F, false);
+                            0.8F + livingEntity.level().getRandom().nextFloat() * 0.4F, false);
       }
 
       for (int i = 0; i < 5; ++i) {
@@ -385,8 +386,10 @@ public interface ICurio {
         vec3d1 = vec3d1.add(livingEntity.getX(),
                             livingEntity.getY() + livingEntity.getEyeHeight(), livingEntity.getZ());
         livingEntity.level()
-            .addParticle(new ItemParticleOption(ParticleTypes.ITEM, stack), vec3d1.x, vec3d1.y,
-                         vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
+            .addParticle(
+                new ItemParticleOption(ParticleTypes.ITEM,
+                                       ItemStackTemplate.fromNonEmptyStack(stack)),
+                vec3d1.x, vec3d1.y, vec3d1.z, vec3d.x, vec3d.y + 0.05D, vec3d.z);
       }
     }
   }

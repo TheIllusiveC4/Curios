@@ -33,7 +33,7 @@
   "curios.modifiers.charm": "符佩時：",
   "curios.modifiers.hands": "手飾佩時：",
   "curios.modifiers.bracelet": "鐲佩時：",
-  "key.curios.category": "飾物",
+  "key.category.curios.general": "飾物",
   "key.curios.open.desc": "啟閉飾物格",
   "gui.curios.toggle": "換可視者"
 }

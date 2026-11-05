@@ -6,6 +6,152 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 to [Semantic Versioning](http://semver.org/spec/v2.0.0.html). Prior to version 5.2.0, this projected
 used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [17.0.0+26.3] - 2026.11.03
+### Added
+- Added `ca_es` localization (thanks Nimlise!) [#653](https://github.com/TheIllusiveC4/Curios/pull/653)
+### Changed
+- Migrated Fortune and Looting hooks to NeoForge API events
+- Updated required NeoForge to >=26.3.0.97
+### Fixed
+- Fixed slot modifiers failing to persist on world/data reload
+- Fixed `/reload` command failing to populate slot data [#659](https://github.com/TheIllusiveC4/Curios/issues/659)
+- Fixed transient ItemStack desyncs causing client disconnects (thanks lynnpye!) [#643](https://github.com/TheIllusiveC4/Curios/pull/643)
+
+## [17.0.0-beta.3+26.3] - 2026.10.11
+### Fixed
+- Fixed compatibility with NeoForge versions >=26.3.0.37-beta (thanks Mrbysco!) [#641](https://github.com/TheIllusiveC4/Curios/pull/641)
+
+## [17.0.0-beta.2+26.3] - 2026.09.26
+### Fixed
+- Fixed items losing changes while inside a curio slot
+- Fixed broken category localization in key bindings screen
+
+## [17.0.0-beta+26.3] - 2026.09.21
+### Changed
+- [API] `ICuriosItemHandler#getEquippedCurios` now returns a `ResourceHandler<ItemResource>` instead of the now-removed `IItemHandlerModifiable`
+- [API] `IDynamicStackHandler` extends `ResourceHandler<ItemResource>` instead of the now-removed `IItemHandlerModifiable`. The
+  removed inherited methods are still declared in `IDynamicStackHandler`, so consumers won't be broken, but are deprecated
+  for future removal.
+- Updated to Minecraft 26.3
+
+### Removed
+[API] Removed APIs that were deprecated and due for removal. See below for the full list.
+
+<details>
+<summary>List of removals</summary>
+
+- `CuriosApi`
+  - `MODID` -> use `CuriosResources#MOD_ID`
+  - `getSlot` -> use `CuriosSlotTypes#getSlotType`
+  - `getSlots` -> use `CuriosSlotTypes#getSlotTypes`
+  - `getPlayerSlots` -> use `CuriosSlotTypes#getDefaultPlayerSlots`
+  - `getEntitySlots` -> use `CuriosSlotTypes#getDefaultEntitySlotTypes`
+  - `getItemStackSlots` -> use `CuriosSlotTypes#getItemSlotTypes`
+  - `getAttributeModifers` -> use `ICurioItem#getAttributeModifiers`
+  - `addSlotModifier` and `CuriosApi#addModifier` -> use `CurioAttributeModifiers` to build the modifier on the ItemStack
+  - `withSlotModifier` -> no replacement, defunct code
+  - `registerCurioPredicate` -> use `CuriosSlotTypes#registerPredicate`
+  - `getCurioPredicate` -> use `CuriosSlotTypes#getPredicate`
+  - `getCurioPredicates` -> use `CuriosSlotTypes#getPredicates`
+  - `testCurioPredicates` -> use `CuriosSlotTypes#testPredicates`
+- `ICuriosItemHandler#writeTag` and `readTag` -> use `ICuriosItemHandler#serialize` and `deserialize` respectively
+- `ICurioStacksHandler`
+  - `serializeNBT` and `deserializeNBT` -> use `ICurioStacksHandler#serialize` and `deserialize` respectively
+  - `getCachedModifiers` and `clearCachedModifiers` -> no replacement, defunct code
+- `CurioAttributeModifiers`
+  - `forEach(String,BiConsumer)` -> use `CurioAttributeModifiers#forEach(ISlotType,BiConsumer)` or `forEach(SlotContext,BiConsumer)`
+  - `withModifierAdded(Identifier,AttributeModifier,String)` -> use `CurioAttributeModifiers#withModifierAdded(Holder,AttributeModifier,String)`
+  - `Entry(Identifier,AttributeModifier,String)` -> use `CurioAttributeModifiers#Entry(Holder,AttributeModifier,SlotTypePredicate)`
+  - `Entry#attribute` -> use `CurioAttributeModifiers.Entry#attributeHolder`
+  - `Entry#slot` -> use `CurioAttributeModifiers.Entry#slotType`
+- `CurioAttributeModifierEvent`
+  - `getModifiers` -> use `CurioAttributeModifiers#getImmutableModifiers`
+  - `getOriginalModifiers` -> use `CurioAttributeModifiers#getDefaultModifiers`
+  - `removeAttribute` -> use `CurioAttributeModifiers#removeAllModifiersFor`
+- `CuriosRendererRegistry` -> use `ICurioRenderer#register` and `get`
+- `ICurioRenderer#rotateIfSneaking` and `translateIfSneaking` -> use `ICurioRenderer#setupHumanoidAnimations`
+- `CurioCanEquipEvent(ItemStack,SlotContext,TriState)` -> use `CurioCanEquipEvent(ItemStack,SlotContext,boolean)`
+- `CurioCanUnequipEvent(ItemStack,SlotContext,TriState)` -> use `CurioCanUnequipEvent(ItemStack,SlotContext,boolean)`
+- `CurioChangeEvent`
+  - `<init>(LivingEntity,String,index,ItemStack,ItemStack)` -> use `CurioChangeEvent(LivingEntity,SlotContext,ItemStack,ItemStack)`
+  - `getIdentifier` and `getSlotIndex` -> use `CurioChangeEvent#getSlotContext`
+- `ICurioSlotExtension#getSlotTooltip(SlotContext,TooltipFlag)` -> use `ICurioSlotExtension#getSlotTooltip(SlotContext,List,TooltipFlag)`
+- `IEntitiesData#serialize` and `ISlotData#serialize` -> no replacement, defunct code
+
+</details>
+
+## [16.0.0+26.2] - 2026.07.20
+
+### Changed
+- [API] `top.theillusivec4.curios.api.event.DropRulesEvent#getOverrides()` refactored `net.minecraft.util.Tuple`
+  return type to `com.mojang.datafixers.util.Pair`
+- Cleaned up mixin debug logs
+- Updated to Minecraft 26.2
+
+### Removed
+- [API] Removed deprecated methods in `top.theillusivec4.curios.api.client.ICurioRenderer` that took a
+  `MultiBufferSource` parameter:
+  - `render` (use the `SubmitNodeCollector` replacement method)
+  - `renderModel`
+
+## [15.0.0+26.1.2] - 2026.07.19
+
+### Added
+- [API] Added `SlotResult#getItemAccess` and `SlotContext#getItemAccess` as helper methods
+to access curios storage
+- [API] Added `ICurioSlot` interface to expose slot methods and fields on menus
+
+### Fixed
+- Fixed `/data` commands errors when using curio slots [#617](https://github.com/TheIllusiveC4/Curios/issues/617)
+- Fixed resource path crash from system locale [#611](https://github.com/TheIllusiveC4/Curios/issues/611)
+- Fixed commands not syncing or working as expected
+- Fixed cascading slot modifier crash [#609](https://github.com/TheIllusiveC4/Curios/issues/609)
+- Fixed attribute modifier loading in single-player [#614](https://github.com/TheIllusiveC4/Curios/issues/614)
+
+## [15.0.0-beta.2+26.1.2] - 2026.04.13
+
+### Changed
+- Updated to Minecraft 26.1.2
+
+## [15.0.0-beta.1+26.1] - 2026.03.25
+
+### Changed
+- Updated to Minecraft 26.1
+
+## [14.0.0+1.21.11] - 2026.02.16
+
+### Changed
+- Updated to Minecraft 1.21.11
+
+## [13.0.0+1.21.10] - 2026.02.16
+
+### Added
+- Added `ICurioRenderer#render` method with `SubmitNodeCollector` parameter
+
+### Changed
+- Changed `CuriosCapability#ITEM_HANDLER` type to `ResourceHandler` of `ItemResource`
+- Changed `ICurioRendere#ModelRenderer` methods to take `SubmitNodeCollector` instead of `MultiBufferSource`
+
+### Deprecated
+- Deprecated `ICurioRenderer#render` method with `MultiBufferSource` parameter
+
+## [12.0.0+1.21.8] - 2026.02.16
+
+### Added
+- Added new constructors for `CurioCanEquipEvent`, `CurioCanUnequipEvent`, and `CurioChangeEvent`
+- Added `ICuriosItemHandler#loadDatapacks`
+
+### Changed
+- `ICuriosItemHandler`, `ICurioStacksHandler`, and `IDynamicStackHandler` now extend `ValueIOSerializable`
+
+### Deprecated
+
+- Deprecated old constructors for `CurioCanEquipEvent`, `CurioCanUnequipEvent`, and `CurioChangeEvent`
+- Deprecated tag-based serialization and deserialization methods:
+  - `serializeNBT` and `deserializeNBT` in `IDynamicStackHandler`
+  - `serializeNBT` and `deserializeNBT` in `ICurioStacksHandler`
+  - `writeTag` and `readTag` in `IDynamicStackHandler`
+
 ## [11.0.1+1.21.5] - 2025.05.17
 
 ### Fixed
@@ -15,7 +161,7 @@ used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/con
 ## [11.0.0+1.21.5] - 2025.05.15
 
 ### Changed
-- 
+
 - Updated to Minecraft 1.21.5
 
 ## [10.0.0+1.21.4] - 2025.05.15
@@ -25,19 +171,20 @@ guide.
 
 ### Added
 
-- Added ways for developers to listen to state changes (when an item is the same) and differentiate them from item changes:
-  - `CurioChangeEvent` is now abstract, with added `CurioChangeEvent.Item` and `CurioChangeEvent.State` subclasses
-  - `onStateChange` method added to `ICurio` and `ICurioItem`
+- Added ways for developers to listen to state changes (when an item is the same) and differentiate them from item
+  changes:
+    - `CurioChangeEvent` is now abstract, with added `CurioChangeEvent.Item` and `CurioChangeEvent.State` subclasses
+    - `onStateChange` method added to `ICurio` and `ICurioItem`
 - A new preset slot type, `feet`, has been added with an included default icon
 - Added slot type predicates for more advanced checking in `CurioAttributeModifier`
 - Added new data generation options, including the ability to generate tags within the same provider as the Curios data
 - Added `curios:player_like` entity type tag, with entries for players and armor stands
 - Added `entities` field to slot type data files for marking default entity types to add the slot type to automatically,
-without needing a corresponding `curios/entities` file
+  without needing a corresponding `curios/entities` file
 - Added the ability to create slots directly inside `curios/entities` data files, without needing a corresponding
-`curios/slots` file
+  `curios/slots` file
 - Added `curios:generic_exclusions` item tag for declaring curio items that should not be equipable into the generic
-`curio` slot by default
+  `curio` slot by default
 - Added preset slot type constants and tags to `CuriosSlotTypes` and `CuriosTags` respectively
 
 ### Changed

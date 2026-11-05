@@ -20,21 +20,18 @@
 
 package top.theillusivec4.curios.client.screen.button;
 
-import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.datafixers.util.Pair;
 import javax.annotation.Nonnull;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
-import top.theillusivec4.curios.api.CuriosApi;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
@@ -66,11 +63,11 @@ public class CuriosButton extends ImageButton {
                 mc.player.clientSideCloseContainer();
                 InventoryScreen inventoryScreen = new InventoryScreen(mc.player);
                 mc.mouseHandler.mouseGrabbed = false;
-                mc.setScreen(inventoryScreen);
+                mc.gui.setScreen(inventoryScreen);
                 inventoryScreen.xMouse = curiosScreen.oldMouseX;
                 inventoryScreen.yMouse = curiosScreen.oldMouseY;
                 mc.player.inventoryMenu.setCarried(stack);
-                PacketDistributor.sendToServer(new CPacketOpenVanilla(stack));
+                ClientPacketDistributor.sendToServer(new CPacketOpenVanilla(stack));
               } else {
 
                 if (parentGui instanceof InventoryScreen inventory) {
@@ -80,7 +77,7 @@ public class CuriosButton extends ImageButton {
                     recipeBookGui.toggleVisibility();
                   }
                 }
-                PacketDistributor.sendToServer(new CPacketOpenCurios(stack));
+                ClientPacketDistributor.sendToServer(new CPacketOpenCurios(stack));
               }
             }
           });
@@ -88,13 +85,13 @@ public class CuriosButton extends ImageButton {
   }
 
   @Override
-  public void renderWidget(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
+  public void extractContents(@Nonnull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY,
                            float partialTicks) {
-    Tuple<Integer, Integer> offsets =
+    Pair<Integer, Integer> offsets =
         CuriosScreen.getButtonOffset(parentGui instanceof CreativeModeInventoryScreen);
-    this.setX(parentGui.getGuiLeft() + offsets.getA() + 2);
+    this.setX(parentGui.getLeftPos() + offsets.getFirst() + 2);
     int yOffset = parentGui instanceof CreativeModeInventoryScreen ? 70 : 85;
-    this.setY(parentGui.getGuiTop() + offsets.getB() + yOffset);
+    this.setY(parentGui.getTopPos() + offsets.getSecond() + yOffset);
 
     if (parentGui instanceof CreativeModeInventoryScreen gui) {
       boolean isInventoryTab = gui.isInventoryOpen();
@@ -104,6 +101,6 @@ public class CuriosButton extends ImageButton {
         return;
       }
     }
-    super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+    super.extractContents(guiGraphics, mouseX, mouseY, partialTicks);
   }
 }

@@ -46,7 +46,7 @@
   "curios.modifiers.slots.take.0": "-%s %s Steckplätze",
   "curios.modifiers.slots.take.1": "-%s%% %s Steckplätze",
   "curios.modifiers.slots.take.2": "-%s%% %s Steckplätze",
-  "key.curios.category": "Curios",
+  "key.category.curios.general": "Curios",
   "key.curios.open.desc": "Öffne/Schließe Curios Inventar",
   "gui.curios.toggle": "Sichtbarkeit umschalten",
   "gui.curios.toggle.cosmetics": "Kosmetika Umschalten",

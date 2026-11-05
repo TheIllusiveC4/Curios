@@ -1,10 +1,12 @@
 package top.theillusivec4.curios.api;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.loading.FMLLoader;
@@ -14,7 +16,7 @@ import top.theillusivec4.curios.api.type.ISlotType;
 public final class CuriosSlotTypes {
 
   public static ISlotType getSlotType(String id) {
-    return getSlotType(id, FMLLoader.getDist().isClient());
+    return getSlotType(id, FMLLoader.getCurrent().getDist().isClient());
   }
 
   public static ISlotType getSlotType(String id, boolean isClient) {
@@ -22,7 +24,7 @@ public final class CuriosSlotTypes {
   }
 
   public static Map<String, ISlotType> getSlotTypes() {
-    return getSlotTypes(FMLLoader.getDist().isClient());
+    return getSlotTypes(FMLLoader.getCurrent().getDist().isClient());
   }
 
   public static Map<String, ISlotType> getSlotTypes(boolean isClient) {
@@ -39,7 +41,7 @@ public final class CuriosSlotTypes {
   }
 
   public static Map<String, ISlotType> getDefaultPlayerSlotTypes(boolean isClient) {
-    return getDefaultEntitySlotTypes(EntityType.PLAYER, isClient);
+    return getDefaultEntitySlotTypes(EntityTypes.PLAYER, isClient);
   }
 
   public static Map<String, ISlotType> getDefaultEntitySlotTypes(EntityType<?> entityType,
@@ -51,24 +53,24 @@ public final class CuriosSlotTypes {
     return CuriosServices.SLOTS.getSlotTypes(livingEntity);
   }
 
-  public static void registerPredicate(ResourceLocation resourceLocation,
+  public static void registerPredicate(Identifier resourceLocation,
                                        BiPredicate<SlotContext, ItemStack> slotContent) {
     CuriosServices.SLOTS.registerPredicate(resourceLocation, slotContent);
   }
 
   public static BiPredicate<SlotContext, ItemStack> getPredicate(
-      ResourceLocation resourceLocation) {
+      Identifier resourceLocation) {
     return CuriosServices.SLOTS.getPredicate(resourceLocation);
   }
 
-  public static Map<ResourceLocation, BiPredicate<SlotContext, ItemStack>> getPredicates() {
+  public static Map<Identifier, BiPredicate<SlotContext, ItemStack>> getPredicates() {
     return CuriosServices.SLOTS.getPredicates();
   }
 
   public static boolean testPredicates(SlotContext slotContent, ItemStack stack,
-                                       Set<ResourceLocation> locations) {
+                                       Set<Identifier> locations) {
 
-    for (ResourceLocation resourceLocation : locations) {
+    for (Identifier resourceLocation : locations) {
       BiPredicate<SlotContext, ItemStack> predicate = getPredicate(resourceLocation);
 
       if (predicate != null && predicate.test(slotContent, stack)) {
@@ -125,7 +127,7 @@ public final class CuriosSlotTypes {
     RING;
 
     public String id() {
-      return this.toString().toLowerCase();
+      return this.toString().toLowerCase(Locale.ROOT);
     }
   }
 }

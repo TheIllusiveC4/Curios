@@ -61,24 +61,4 @@ public interface ICurioSlotExtension {
                                          TooltipFlag tooltipFlag) {
     return originalTooltip;
   }
-
-  /**
-   * Gets the tooltip to display for a given {@link SlotContext}.
-   *
-   * <p>This is only fired on the logical client, and will override the default tooltip for the slot
-   * which shows its localized name when the slot does not contain an item.
-   *
-   * <p>This tooltip still follows the normal logic of appearing only when the slot does not contain
-   * an item. In those cases, the tooltip behavior will still be delegated to the item.
-   *
-   * @param slotContext The slot context for the slot being hovered
-   * @param tooltipFlag The tooltip flag that has been set on the current client
-   * @return The tooltip to be rendered
-   * @deprecated Replaced by {{@link #getSlotTooltip(SlotContext, List, TooltipFlag)}} with an extra
-   *     parameter for modifying or replacing the original tooltip.
-   */
-  @Deprecated(forRemoval = true)
-  default List<Component> getSlotTooltip(SlotContext slotContext, TooltipFlag tooltipFlag) {
-    return List.of();
-  }
 }

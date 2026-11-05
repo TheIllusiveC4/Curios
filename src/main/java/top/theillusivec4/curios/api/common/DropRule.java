@@ -1,6 +1,7 @@
 package top.theillusivec4.curios.api.common;
 
 import io.netty.buffer.ByteBuf;
+import java.util.Locale;
 import javax.annotation.Nonnull;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -24,6 +25,6 @@ public enum DropRule implements StringRepresentable {
   @Nonnull
   @Override
   public String getSerializedName() {
-    return this.name().toLowerCase();
+    return this.name().toLowerCase(Locale.ROOT);
   }
 }

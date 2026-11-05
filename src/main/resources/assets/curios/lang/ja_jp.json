@@ -29,6 +29,6 @@
   "curios.modifiers.body": "身体に着用する場合:",
   "curios.modifiers.charm": "チャームとして着用した場合:",
   "curios.modifiers.hands": "手に着用する場合:",
-  "key.curios.category": "キュリオス",
+  "key.category.curios.general": "キュリオス",
   "key.curios.open.desc": "キュリオスインベントリを開く/閉じる"
 }

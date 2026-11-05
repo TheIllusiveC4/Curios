@@ -36,7 +36,7 @@
   "curios.modifiers.charm": "Nazarlık olarak takıldığında:",
   "curios.modifiers.hands": "Ellerdeyken:",
   "curios.modifiers.bracelet": "Bileklik olarak takıldığında:",
-  "key.curios.category": "Curios",
+  "key.category.curios.general": "Curios",
   "key.curios.open.desc": "Curios Envanterini Aç/Kapat",
   "gui.curios.toggle": "Görünürlüğü Değiştir",
   "gui.curios.toggle.cosmetics": "Kozmetikleri Değiştir",

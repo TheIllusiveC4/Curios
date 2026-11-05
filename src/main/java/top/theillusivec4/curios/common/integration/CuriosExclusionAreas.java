@@ -14,8 +14,8 @@ public class CuriosExclusionAreas {
 
     if (player != null) {
       List<Rect2i> areas = new ArrayList<>();
-      int left = screen.getGuiLeft() - screen.panelWidth;
-      int top = screen.getGuiTop();
+      int left = screen.getLeftPos() - screen.panelWidth;
+      int top = screen.getTopPos();
 
       List<Integer> list = screen.getMenu().grid;
       int height = 0;
@@ -24,7 +24,7 @@ public class CuriosExclusionAreas {
         height = list.getFirst() * 18 + 14;
 
         if (screen.getMenu().hasCosmetics) {
-          areas.add(new Rect2i(screen.getGuiLeft() - 30, top - 34, 28, 34));
+          areas.add(new Rect2i(screen.getLeftPos() - 30, top - 34, 28, 34));
         }
       }
       areas.add(new Rect2i(left, top, screen.panelWidth, height));

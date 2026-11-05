@@ -21,6 +21,11 @@
 package top.theillusivec4.curios.api;
 
 import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import org.jspecify.annotations.Nullable;
+import top.theillusivec4.curios.api.common.inventory.CuriosResourceHandler;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 /**
  * Record representing the accessible slot information related to its context.
@@ -34,4 +39,17 @@ import net.minecraft.world.entity.LivingEntity;
 public record SlotContext(String identifier, LivingEntity entity, int index, boolean cosmetic,
                           boolean visible) {
 
+  @Nullable
+  public ItemAccess getItemAccess() {
+    ICuriosItemHandler inv = CuriosApi.getCuriosInventoryOrNull(entity);
+
+    if (inv != null) {
+      return inv.getStacksHandler(identifier).map(stacksHandler -> {
+        IDynamicStackHandler stacks =
+            cosmetic ? stacksHandler.getCosmeticStacks() : stacksHandler.getStacks();
+        return ItemAccess.forHandlerIndex(new CuriosResourceHandler(stacks), index);
+      }).orElse(null);
+    }
+    return null;
+  }
 }

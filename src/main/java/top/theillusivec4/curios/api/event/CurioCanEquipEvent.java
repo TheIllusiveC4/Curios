@@ -20,14 +20,16 @@
 
 package top.theillusivec4.curios.api.event;
 
+import javax.annotation.Nonnull;
 import net.minecraft.util.TriState;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
+import org.jetbrains.annotations.ApiStatus;
 import top.theillusivec4.curios.api.SlotContext;
 
 /**
- * CurioEquipEvent is fired when a curio item is about to be equipped and allows an event listener
- * to specify whether it should or not.
+ * CurioCanEquipEvent is fired when a curio item is about to be equipped and allows an event
+ * listener to specify whether it should or not.
  *
  * <p>This event is fired when
  * {@link top.theillusivec4.curios.api.type.capability.ICurio#canEquip(SlotContext)} is checked.
@@ -45,17 +47,37 @@ public class CurioCanEquipEvent extends LivingEvent {
 
   private final SlotContext slotContext;
   private final ItemStack stack;
+  private final boolean originalResult;
   private TriState result;
 
-  public CurioCanEquipEvent(ItemStack stack, SlotContext slotContext, TriState result) {
+  /**
+   * A constructor that takes an ItemStack, SlotContext, and a boolean result.
+   *
+   * @param stack          The {@link ItemStack} that is attempting to be equipped.
+   * @param slotContext    The {@link SlotContext} for the slot that is attempting to be equipped
+   *                       into.
+   * @param originalResult The original result of the equip attempt before the event.
+   */
+  @ApiStatus.Internal
+  public CurioCanEquipEvent(ItemStack stack, @Nonnull SlotContext slotContext,
+                            boolean originalResult) {
     super(slotContext.entity());
     this.slotContext = slotContext;
     this.stack = stack;
-    this.result = result;
+    this.originalResult = originalResult;
+    this.result = TriState.DEFAULT;
+  }
+
+  public boolean getOriginalEquipResult() {
+    return this.originalResult;
   }
 
   public TriState getEquipResult() {
     return this.result;
+  }
+
+  public void setEquipResult(boolean result) {
+    this.result = result ? TriState.TRUE : TriState.FALSE;
   }
 
   public void setEquipResult(TriState result) {

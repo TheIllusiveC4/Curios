@@ -26,11 +26,12 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.TooltipFlag;
@@ -48,9 +49,8 @@ public class SlotAttribute extends Attribute {
 
   @SuppressWarnings("unchecked")
   public static Holder<Attribute> getOrCreate(String id) {
-    return (Holder<Attribute>) SLOT_ATTRIBUTES.computeIfAbsent(id,
-                                                               (k) -> new Holder.Direct<>(
-                                                                   new SlotAttribute(id)));
+    return (Holder<Attribute>) SLOT_ATTRIBUTES.computeIfAbsent(
+        id, (_) -> new Holder.Direct<>(new SlotAttribute(id), DataComponentMap.EMPTY));
   }
 
   protected SlotAttribute(String id) {
@@ -62,7 +62,7 @@ public class SlotAttribute extends Attribute {
     return this.id;
   }
 
-  public ResourceLocation resourceLocation() {
+  public Identifier resourceLocation() {
     return CuriosResources.resource(this.getIdentifier());
   }
 

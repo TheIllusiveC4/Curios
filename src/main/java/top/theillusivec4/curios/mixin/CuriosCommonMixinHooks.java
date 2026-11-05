@@ -24,27 +24,35 @@ import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.datafix.fixes.References;
+import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
@@ -81,7 +89,8 @@ public class CuriosCommonMixinHooks {
           NonNullList<Boolean> renderStates = entry.getValue().getRenders();
           boolean canNeutralize =
               CuriosApi.getCurio(stacks.getStackInSlot(i)).map(curio -> curio
-                      .makesPiglinsNeutral(new SlotContext(entry.getKey(), livingEntity, index, false,
+                      .makesPiglinsNeutral(new SlotContext(entry.getKey(), livingEntity, index,
+                          false,
                           renderStates.size() > index && renderStates.get(index))))
                   .orElse(false);
 
@@ -105,7 +114,8 @@ public class CuriosCommonMixinHooks {
           NonNullList<Boolean> renderStates = entry.getValue().getRenders();
           boolean canWalk =
               CuriosApi.getCurio(stacks.getStackInSlot(i)).map(curio -> curio
-                      .canWalkOnPowderedSnow(new SlotContext(entry.getKey(), livingEntity, index, false,
+                      .canWalkOnPowderedSnow(new SlotContext(entry.getKey(), livingEntity, index,
+                          false,
                           renderStates.size() > index && renderStates.get(index))))
                   .orElse(false);
 
@@ -118,61 +128,57 @@ public class CuriosCommonMixinHooks {
     }).orElse(false);
   }
 
-  public static int getFortuneLevel(LootContext lootContext) {
-    Entity entity = lootContext.getOptionalParameter(LootContextParams.THIS_ENTITY);
-
-    if (entity instanceof LivingEntity livingEntity) {
-      return CuriosApi.getCuriosInventory(livingEntity)
-          .map(handler -> handler.getFortuneLevel(lootContext)).orElse(0);
-    }
-    return 0;
-  }
-
-  public static int getLootingLevel(LootContext lootContext) {
-    Entity entity = lootContext.getOptionalParameter(LootContextParams.ATTACKING_ENTITY);
-
-    if (entity instanceof LivingEntity livingEntity) {
-      return CuriosApi.getCuriosInventory(livingEntity)
-          .map(handler -> handler.getLootingLevel(lootContext)).orElse(0);
-    }
-    return 0;
-  }
-
   public static boolean isFreezeImmune(LivingEntity livingEntity) {
-    return CuriosApi.getCuriosInventory(livingEntity).map(curios -> {
-      IItemHandlerModifiable handler = curios.getEquippedCurios();
+    ICuriosItemHandler curios = CuriosApi.getCuriosInventoryOrNull(livingEntity);
 
-      for (int i = 0; i < handler.getSlots(); i++) {
-        ItemStack stack = handler.getStackInSlot(i);
-
-        if (stack.is(ItemTags.FREEZE_IMMUNE_WEARABLES)) {
-          return true;
-        }
-      }
-      return false;
-    }).orElse(false);
+    if (curios != null) {
+      return curios.isEquipped(stack -> stack.is(ItemTags.FREEZE_IMMUNE_WEARABLES));
+    }
+    return false;
   }
 
-  public static CompoundTag mergeCuriosInventory(CompoundTag compoundTag, Entity entity) {
+  public static void mergeCuriosInventory(ProblemReporter reporter, CompoundTag output,
+                                          Entity entity) {
 
     if (entity instanceof LivingEntity livingEntity) {
-      ListTag list = compoundTag.getList("Inventory").orElse(new ListTag());
-      return CuriosApi.getCuriosInventory(livingEntity).map(inv -> {
-        IItemHandler handler = inv.getEquippedCurios();
+      ListTag list = output.getList("Inventory").orElse(null);
 
-        for (int i = 0; i < handler.getSlots(); i++) {
-          ItemStack stack = handler.getStackInSlot(i);
+      if (list == null) {
+        list = new ListTag();
+        output.put("Inventory", list);
+      }
+      DynamicOps<Tag> ops = entity.registryAccess().createSerializationContext(NbtOps.INSTANCE);
+      ListTag workingList = list;
+      CuriosApi.getCuriosInventory(livingEntity).ifPresent(inv -> {
+        ResourceHandler<ItemResource> handler = inv.getEquippedCurios();
+
+        for (int i = 0; i < handler.size(); i++) {
+          ItemStack stack = ItemUtil.getStack(handler, i);
 
           if (!stack.isEmpty()) {
-            CompoundTag tag = new CompoundTag();
-            tag.putByte("Slot", (byte) (4444 + i));
-            list.add(stack.save(livingEntity.registryAccess(), tag));
+            addListElement(workingList, ops, reporter, stack);
           }
         }
-        return compoundTag;
-      }).orElse(compoundTag);
+      });
     }
-    return compoundTag;
+  }
+
+  private static void addListElement(ListTag listTag, DynamicOps<Tag> ops, ProblemReporter reporter,
+                                     ItemStack stack) {
+    DataResult<Tag> encoded =
+        ItemStackWithSlot.CODEC.encodeStart(ops, new ItemStackWithSlot(255, stack));
+    switch (encoded) {
+      case DataResult.Success<Tag> success:
+        listTag.add(success.value());
+        break;
+      case DataResult.Error<Tag> error:
+        reporter.report(
+            new TagValueOutput.EncodeToListFailedProblem("Curios:Inventory", stack, error));
+        Optional<Tag> partial = error.partialValue();
+        Objects.requireNonNull(listTag);
+        partial.ifPresent(listTag::add);
+        break;
+    }
   }
 
   public static boolean containsStack(Player player, ItemStack stack) {
@@ -188,6 +194,7 @@ public class CuriosCommonMixinHooks {
   }
 
   public static boolean contains(Player player, Predicate<ItemStack> predicate) {
-    return CuriosApi.getCuriosInventory(player).flatMap(inv -> inv.findFirstCurio(predicate)).isPresent();
+    return CuriosApi.getCuriosInventory(player).flatMap(inv -> inv.findFirstCurio(predicate))
+        .isPresent();
   }
 }

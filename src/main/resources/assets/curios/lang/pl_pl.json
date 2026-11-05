@@ -40,7 +40,7 @@
   "curios.modifiers.charm": "Kiedy noszony jako amulet:",
   "curios.modifiers.hands": "Kiedy na rękach:",
   "curios.modifiers.bracelet": "Kiedy noszona jako bransoleta:",
-  "key.curios.category": "Curios",
+  "key.category.curios.general": "Curios",
   "key.curios.open.desc": "Otwórz/zamknij ekwipunek Curios",
   "gui.curios.toggle": "Przełącz widoczność",
   "gui.curios.toggle.cosmetics": "Przełącz elementy kosmetyczne",

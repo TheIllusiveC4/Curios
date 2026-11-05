@@ -83,8 +83,7 @@ public class CuriosSelectorOptions {
   private static boolean matches(Entity entity, Set<String> slots, int min, int max,
                                  CompoundTag inputStack, boolean invert, boolean exclusive) {
     if (entity instanceof LivingEntity livingEntity) {
-      ItemStack stack =
-          ItemStack.parse(livingEntity.registryAccess(), inputStack).orElse(ItemStack.EMPTY);
+      ItemStack stack = inputStack.read(ItemStack.MAP_CODEC).orElse(ItemStack.EMPTY);
 
       if (!stack.isEmpty()) {
         stack.setCount(Math.max(1, stack.getCount()));

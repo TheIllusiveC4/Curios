@@ -25,12 +25,14 @@ import java.util.Map;
 import java.util.Set;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import top.theillusivec4.curios.api.common.DropRule;
-import top.theillusivec4.curios.api.type.capability.ICurio;
 
-public interface ICurioStacksHandler {
+public interface ICurioStacksHandler extends ValueIOSerializable {
 
   /**
    * Gets the {@link IDynamicStackHandler} for the equipped curio stacks.
@@ -98,6 +100,13 @@ public interface ICurioStacksHandler {
   int getSlots();
 
   /**
+   * Gets the base number of slots for equipped curio stacks, before slot modifiers are applied.
+   *
+   * @return The base number of slots for equipped curio stacks.
+   */
+  int getBaseSize();
+
+  /**
    * Gets whether this stack handler should be visible. This does not lock the stack handler
    * from being used regardless.
    *
@@ -114,20 +123,6 @@ public interface ICurioStacksHandler {
   boolean hasCosmetic();
 
   /**
-   * Writes the data for this handler.
-   *
-   * @return A {@link CompoundTag} representing the serialized data
-   */
-  CompoundTag serializeNBT();
-
-  /**
-   * Reads the data into this handler.
-   *
-   * @param nbt A {@link CompoundTag} representing the serialized data
-   */
-  void deserializeNBT(CompoundTag nbt);
-
-  /**
    * Retrieves the slot identifier associated with the handler.
    *
    * @return The slot identifier
@@ -137,9 +132,9 @@ public interface ICurioStacksHandler {
   /**
    * Retrieves all the slot modifiers on the handler.
    *
-   * @return A map of modifiers with the ResourceLocation as keys and {@link AttributeModifier} as values
+   * @return A map of modifiers with the Identifier as keys and {@link AttributeModifier} as values
    */
-  Map<ResourceLocation, AttributeModifier> getModifiers();
+  Map<Identifier, AttributeModifier> getModifiers();
 
   /**
    * Retrieves all the permanent slot modifiers on the handler.
@@ -149,13 +144,6 @@ public interface ICurioStacksHandler {
    * @return A set of {@link AttributeModifier}
    */
   Set<AttributeModifier> getPermanentModifiers();
-
-  /**
-   * Retrieves all the transient modifiers that have been deserialized but not yet processed.
-   *
-   * @return A set of {@link AttributeModifier}
-   */
-  Set<AttributeModifier> getCachedModifiers();
 
   /**
    * Retrieves all the slot modifiers for a given operation on the handler.
@@ -188,20 +176,12 @@ public interface ICurioStacksHandler {
    *
    * @param id id of the modifier to remove
    */
-  void removeModifier(ResourceLocation id);
+  void removeModifier(Identifier id);
 
   /**
    * Removes all the slot modifiers on the handler.
    */
   void clearModifiers();
-
-  /**
-   * Removes the cached modifiers that appear upon deserialization of the handler.
-   * <br>
-   * Primarily for internal use, used as a workaround to avoid calculating slot stacks before slot
-   * modifiers are initially applied.
-   */
-  void clearCachedModifiers();
 
   /**
    * Copies all the slot modifiers from another instance to this one.
@@ -220,7 +200,9 @@ public interface ICurioStacksHandler {
    *
    * @return The data represented as a {@link CompoundTag}
    */
-  CompoundTag getSyncTag();
+  default CompoundTag getSyncTag() {
+    return new CompoundTag();
+  }
 
   /**
    * Applies the NBT data synced to clients.
@@ -229,5 +211,7 @@ public interface ICurioStacksHandler {
    *
    * @param tag The data represented as a {@link CompoundTag}
    */
-  void applySyncTag(CompoundTag tag);
+  default void applySyncTag(CompoundTag tag) {
+
+  }
 }

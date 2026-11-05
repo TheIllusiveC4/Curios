@@ -40,7 +40,7 @@
   "curios.modifiers.charm": "Come amuleto:",
   "curios.modifiers.hands": "Sulle mani:",
   "curios.modifiers.bracelet": "Al polso:",
-  "key.curios.category": "Curios",
+  "key.category.curios.general": "Curios",
   "key.curios.open.desc": "Apri/Chiudi l'inventario di Curios",
   "gui.curios.toggle": "Mostra/Nascondi"
 }

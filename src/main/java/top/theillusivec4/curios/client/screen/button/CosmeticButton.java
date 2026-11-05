@@ -21,15 +21,14 @@
 package top.theillusivec4.curios.client.screen.button;
 
 import javax.annotation.Nonnull;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.PacketDistributor;
-import top.theillusivec4.curios.api.CuriosApi;
+import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.client.screen.CuriosScreen;
 import top.theillusivec4.curios.common.network.client.CPacketToggleCosmetics;
@@ -49,7 +48,7 @@ public class CosmeticButton extends ImageButton implements ICuriosWidget {
     super(xIn, yIn, widthIn, heightIn, OFF,
           (button) -> {
             parentGui.getMenu().toggleCosmetics();
-            PacketDistributor.sendToServer(
+            ClientPacketDistributor.sendToServer(
                 new CPacketToggleCosmetics(parentGui.getMenu().containerId));
           });
     this.parentGui = parentGui;
@@ -57,7 +56,8 @@ public class CosmeticButton extends ImageButton implements ICuriosWidget {
   }
 
   @Override
-  public void renderWidget(@Nonnull GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+  public void extractContents(@Nonnull GuiGraphicsExtractor guiGraphics, int x, int y,
+                              float partialTicks) {
     WidgetSprites sprites1;
 
     if (this.parentGui.getMenu().isViewingCosmetics) {
@@ -65,10 +65,10 @@ public class CosmeticButton extends ImageButton implements ICuriosWidget {
     } else {
       sprites1 = OFF;
     }
-    this.setX(this.parentGui.getGuiLeft() - 27);
-    this.setY(this.parentGui.getGuiTop() - 18);
-    ResourceLocation resourcelocation = sprites1.get(this.isActive(), this.isHoveredOrFocused());
-    guiGraphics.blitSprite(RenderType::guiTextured, resourcelocation, this.getX(), this.getY(),
+    this.setX(this.parentGui.getLeftPos() - 27);
+    this.setY(this.parentGui.getTopPos() - 18);
+    Identifier resourcelocation = sprites1.get(this.isActive(), this.isHoveredOrFocused());
+    guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, resourcelocation, this.getX(), this.getY(),
                            this.width, this.height);
   }
 }

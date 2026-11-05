@@ -27,10 +27,11 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
@@ -87,7 +88,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
   public CuriosMenu(int windowId, Inventory playerInventory) {
     super(CuriosRegistry.CURIO_MENU.get(), windowId, 2, 2);
     this.player = playerInventory.player;
-    this.isLocalWorld = this.player.level().isClientSide;
+    this.isLocalWorld = this.player.level().isClientSide();
     this.curiosHandler = CuriosApi.getCuriosInventory(this.player).orElse(null);
     this.resetSlots();
   }
@@ -115,7 +116,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
 
     for (int i = 0; i < 4; i++) {
       EquipmentSlot equipmentslot = InventoryMenu.SLOT_IDS[i];
-      ResourceLocation resourcelocation = InventoryMenu.TEXTURE_EMPTY_SLOTS.get(equipmentslot);
+      Identifier resourcelocation = InventoryMenu.TEXTURE_EMPTY_SLOTS.get(equipmentslot);
       this.addSlot(new ArmorSlot(this.player.getInventory(), this.player, equipmentslot, 39 - i, 8,
                                  8 + i * 18, resourcelocation));
     }
@@ -129,7 +130,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
       }
 
       @Override
-      public ResourceLocation getNoItemIcon() {
+      public Identifier getNoItemIcon() {
         return InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD;
       }
     });
@@ -271,8 +272,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
         CraftingRecipe craftingrecipe = recipeholder.value();
 
         if (this.resultSlots.setRecipeUsed(serverplayer, recipeholder)) {
-          ItemStack itemstack1 =
-              craftingrecipe.assemble(craftinginput, serverlevel.registryAccess());
+          ItemStack itemstack1 = craftingrecipe.assemble(craftinginput);
 
           if (itemstack1.isItemEnabled(serverlevel.enabledFeatures())) {
             itemstack = itemstack1;
@@ -292,7 +292,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
     super.removed(playerIn);
     this.craftResult.clearContent();
 
-    if (!playerIn.level().isClientSide) {
+    if (!playerIn.level().isClientSide()) {
       this.clearContainer(playerIn, this.craftMatrix);
     }
   }
@@ -386,7 +386,7 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
       slot.onTake(playerIn, itemstack1);
 
       if (index == 0) {
-        playerIn.drop(itemstack1, false);
+        playerIn.drop(itemstack1, false, Prediction.PREDICTED);
       }
     }
 

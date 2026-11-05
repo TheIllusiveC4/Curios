@@ -2,7 +2,7 @@ package top.theillusivec4.curios.api.internal.services;
 
 import java.util.Map;
 import java.util.function.BiPredicate;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -29,10 +29,10 @@ public interface ICuriosSlots {
 
   IEntitiesData getEntitiesData();
 
-  void registerPredicate(ResourceLocation resourceLocation,
+  void registerPredicate(Identifier resourceLocation,
                          BiPredicate<SlotContext, ItemStack> slotContent);
 
-  BiPredicate<SlotContext, ItemStack> getPredicate(ResourceLocation resourceLocation);
+  BiPredicate<SlotContext, ItemStack> getPredicate(Identifier resourceLocation);
 
-  Map<ResourceLocation, BiPredicate<SlotContext, ItemStack>> getPredicates();
+  Map<Identifier, BiPredicate<SlotContext, ItemStack>> getPredicates();
 }

@@ -26,18 +26,21 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.ClientAvatarEntity;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -47,13 +50,13 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderArmEvent;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.AttributeTooltipContext;
 import net.neoforged.neoforge.common.util.AttributeUtil;
 import net.neoforged.neoforge.event.AddAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.GatherSkippedAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosResources;
 import top.theillusivec4.curios.api.CuriosSlotTypes;
@@ -68,7 +71,8 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 public class CuriosClientEvents {
 
   @SubscribeEvent
-  public void renderHand(final RenderArmEvent evt) {
+  public <T extends Avatar & ClientAvatarEntity> void renderHand(
+      final RenderArmEvent evt) {
     Minecraft mc = Minecraft.getInstance();
 
     if (mc.player != null) {
@@ -79,7 +83,7 @@ public class CuriosClientEvents {
           entityRenderer = mc.getEntityRenderDispatcher().getRenderer(clientPlayer);
       EntityRenderState renderState = entityRenderer.createRenderState();
 
-      if (renderState instanceof PlayerRenderState playerRenderState) {
+      if (renderState instanceof AvatarRenderState avatarRenderState) {
         CuriosApi.getCuriosInventory(clientPlayer)
             .ifPresent(handler -> handler.getCurios().forEach((id, stacksHandler) -> {
               IDynamicStackHandler stackHandler = stacksHandler.getStacks();
@@ -104,10 +108,10 @@ public class CuriosClientEvents {
                       slotContext,
                       evt.getArm(),
                       poseStack,
-                      evt.getMultiBufferSource(),
-                      playerRenderState,
-                      evt.getPlayer(),
-                      evt.getPackedLight()
+                      evt.getSubmitNodeCollector(),
+                      avatarRenderState,
+                      clientPlayer,
+                      evt.getLightCoords()
                   );
                 }
               }
@@ -120,9 +124,9 @@ public class CuriosClientEvents {
   @SubscribeEvent
   public void onClientTick(ClientTickEvent.Post evt) {
 
-    if (CuriosKeyMappings.OPEN_CURIOS_INVENTORY.consumeClick() && Minecraft.getInstance()
+    if (CuriosKeyMappings.OPEN_CURIOS_INVENTORY.get().consumeClick() && Minecraft.getInstance()
         .isWindowActive()) {
-      PacketDistributor.sendToServer(new CPacketOpenCurios(ItemStack.EMPTY));
+      ClientPacketDistributor.sendToServer(new CPacketOpenCurios(ItemStack.EMPTY));
     }
   }
 
@@ -190,7 +194,8 @@ public class CuriosClientEvents {
       String key = "curios.identifier." + id;
       MutableComponent type =
           Component.translatableWithFallback(
-              key, Character.toUpperCase(id.charAt(0)) + id.substring(1).toLowerCase());
+              key, id.substring(0, 1).toUpperCase(Locale.ROOT)
+                  + id.substring(1).toLowerCase(Locale.ROOT));
 
       if (j < slotIds.size() - 1) {
         type = type.append(", ");
@@ -212,8 +217,8 @@ public class CuriosClientEvents {
     Map<String, ISlotType> result = new LinkedHashMap<>();
     Map<String, ISlotType> map =
         player != null
-        ? CuriosSlotTypes.getItemSlotTypes(stack, player)
-        : CuriosSlotTypes.getItemSlotTypes(stack, FMLLoader.getDist().isClient());
+            ? CuriosSlotTypes.getItemSlotTypes(stack, player)
+            : CuriosSlotTypes.getItemSlotTypes(stack, FMLLoader.getCurrent().getDist().isClient());
 
     for (Map.Entry<String, ISlotType> entry : map.entrySet()) {
       ISlotType slotType = entry.getValue();

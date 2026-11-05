@@ -64,9 +64,6 @@ public interface IEntitiesData {
   @ApiStatus.Internal
   IEntitiesData.Entry build();
 
-  @Deprecated(forRemoval = true)
-  JsonObject serialize(HolderLookup.Provider provider);
-
   interface Entry {
 
     Codec<IEntitiesData.Entry> CODEC = CuriosServices.CODECS.entitiesDataEntryCodec();

@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.BiPredicate;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -27,7 +27,7 @@ import top.theillusivec4.curios.common.data.SlotData;
 
 public class CuriosSlots implements ICuriosSlots {
 
-  private static final Map<ResourceLocation, BiPredicate<SlotContext, ItemStack>> PREDICATES =
+  private static final Map<Identifier, BiPredicate<SlotContext, ItemStack>> PREDICATES =
       Object2ObjectMaps.synchronize(new Object2ObjectArrayMap<>());
 
   private static CuriosSlotResources getSidedSlots(boolean isClient) {
@@ -100,18 +100,18 @@ public class CuriosSlots implements ICuriosSlots {
   }
 
   @Override
-  public void registerPredicate(ResourceLocation resourceLocation,
+  public void registerPredicate(Identifier resourceLocation,
                                 BiPredicate<SlotContext, ItemStack> predicate) {
     PREDICATES.put(resourceLocation, predicate);
   }
 
   @Override
-  public BiPredicate<SlotContext, ItemStack> getPredicate(ResourceLocation resourceLocation) {
+  public BiPredicate<SlotContext, ItemStack> getPredicate(Identifier resourceLocation) {
     return PREDICATES.get(resourceLocation);
   }
 
   @Override
-  public Map<ResourceLocation, BiPredicate<SlotContext, ItemStack>> getPredicates() {
+  public Map<Identifier, BiPredicate<SlotContext, ItemStack>> getPredicates() {
     return ImmutableMap.copyOf(PREDICATES);
   }
 

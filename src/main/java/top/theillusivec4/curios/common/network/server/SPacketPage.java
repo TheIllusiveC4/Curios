@@ -25,13 +25,13 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import top.theillusivec4.curios.CuriosConstants;
 
 public record SPacketPage(int windowId, int page) implements CustomPacketPayload {
 
   public static final Type<SPacketPage> TYPE =
-      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "server_page"));
+      new Type<>(Identifier.fromNamespaceAndPath(CuriosConstants.MOD_ID, "server_page"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, SPacketPage> STREAM_CODEC =
       StreamCodec.composite(ByteBufCodecs.INT, SPacketPage::windowId, ByteBufCodecs.INT,
