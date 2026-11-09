@@ -4,13 +4,9 @@ to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This is a copy of the changelog for the most recent version. For the full version history,
 go [here](https://github.com/TheIllusiveC4/Curios/blob/26.x/CHANGELOG.md).
 
-## [17.0.0+26.3] - 2026.11.03
-### Added
-- Added `ca_es` localization (thanks Nimlise!) [#653](https://github.com/TheIllusiveC4/Curios/pull/653)
+## [17.0.1+26.3] - 2026.11.08
 ### Changed
-- Migrated Fortune and Looting hooks to NeoForge API events
-- Updated required NeoForge to >=26.3.0.97
+- Updated `uk_ua` localization (thanks StarmanMine142!) [#570](https://github.com/TheIllusiveC4/Curios/pull/570)
+- Updated `pt_br` localization (thanks PrincessStellar!) [#549](https://github.com/TheIllusiveC4/Curios/pull/549)
 ### Fixed
-- Fixed slot modifiers failing to persist on world/data reload
-- Fixed `/reload` command failing to populate slot data [#659](https://github.com/TheIllusiveC4/Curios/issues/659)
-- Fixed transient ItemStack desyncs causing client disconnects (thanks lynnpye!) [#643](https://github.com/TheIllusiveC4/Curios/pull/643)
+- Fixed intermittent crash when dropping items [#663](https://github.com/TheIllusiveC4/Curios/issues/663)

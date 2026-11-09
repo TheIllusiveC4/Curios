@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 to [Semantic Versioning](http://semver.org/spec/v2.0.0.html). Prior to version 5.2.0, this projected
 used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [17.0.1+26.3] - 2026.11.08
+### Changed
+- Updated `uk_ua` localization (thanks StarmanMine142!) [#570](https://github.com/TheIllusiveC4/Curios/pull/570)
+- Updated `pt_br` localization (thanks PrincessStellar!) [#549](https://github.com/TheIllusiveC4/Curios/pull/549)
+### Fixed
+- Fixed intermittent crash when dropping items [#663](https://github.com/TheIllusiveC4/Curios/issues/663)
+
 ## [17.0.0+26.3] - 2026.11.03
 ### Added
 - Added `ca_es` localization (thanks Nimlise!) [#653](https://github.com/TheIllusiveC4/Curios/pull/653)
