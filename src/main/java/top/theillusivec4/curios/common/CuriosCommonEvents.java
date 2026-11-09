@@ -361,7 +361,8 @@ public class CuriosCommonEvents {
             new CurioDropsEvent(livingEntity, handler, evt.getSource(), curioDrops, 0,
                 evt.isRecentlyHit()));
 
-        if (!dropsEvent.isCanceled()) {
+        //noinspection ConstantValue
+        if (!dropsEvent.isCanceled() && drops != null) {
           drops.addAll(curioDrops);
         }
       });
