@@ -58,6 +58,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.type.ICuriosMenu;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
@@ -602,7 +603,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
       Slot slot = this.slots.get(i);
 
       if (slot instanceof CurioSlot curioSlot && curioSlot.mayPlace(stack)) {
-        if (CuriosSlotTypes.Preset.CURIO.id().equals(curioSlot.getIdentifier())) {
+        if (SlotTypePreset.CURIO.getIdentifier().equals(curioSlot.getIdentifier())) {
           genericSlots.add(slot);
         } else {
           specificSlots.add(slot);
@@ -613,7 +614,6 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
     if (this.moveToSlotList(stack, specificSlots)) {
       return true;
     }
-
     return this.moveToSlotList(stack, genericSlots);
   }
 
@@ -627,7 +627,6 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
         slot.setChanged();
         return true;
       }
-
       ItemStack existing = slot.getItem();
 
       if (!existing.isEmpty() &&
@@ -649,7 +648,6 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
         }
       }
     }
-
     return stack.isEmpty();
   }
 }
