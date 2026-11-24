@@ -316,11 +316,12 @@ public class CuriosEventHandler {
   public void playerClone(PlayerEvent.Clone evt) {
     Player player = evt.getEntity();
     Player oldPlayer = evt.getOriginal();
-    oldPlayer.revive();
+    oldPlayer.reviveCaps();
     LazyOptional<ICuriosItemHandler> oldHandler = CuriosApi.getCuriosInventory(oldPlayer);
     LazyOptional<ICuriosItemHandler> newHandler = CuriosApi.getCuriosInventory(player);
     oldHandler.ifPresent(
         oldCurios -> newHandler.ifPresent(newCurios -> newCurios.readTag(oldCurios.writeTag())));
+    oldPlayer.invalidateCaps();
   }
 
   @SubscribeEvent(priority = EventPriority.HIGHEST)
