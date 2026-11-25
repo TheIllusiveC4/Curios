@@ -28,6 +28,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,12 +66,8 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
   private Map<EntityType<?>, Map<String, ISlotType>> entitySlots = ImmutableMap.of();
   private Map<String, Set<String>> idToMods = ImmutableMap.of();
 
-  /**
-   * Parsed entity slot assignments, keyed by datapack resource location.
-   * Stored as a member by {@link #apply(Map, ResourceManager, ProfilerFiller)}
-   * so that entity tags can be resolved after tags finish loading.
-   */
-  private Map<ResourceLocation, JsonObject> entitySlotAssignmentsByResource = ImmutableMap.of();
+  private final Map<EntityType<?>, ImmutableMap.Builder<String, ISlotType>> pendingEntitySlots = new HashMap<>();
+  private final Map<ResourceLocation, ImmutableMap.Builder<String, ISlotType>> pendingTaggedEntitySlots = new HashMap<>();
 
   public CuriosEntityManager() {
     super(GSON, "curios/entities");
@@ -97,8 +94,9 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
                 }
               }));
     });
-
-    Map<ResourceLocation, JsonObject> parsedEntitySlotAssignments = new LinkedHashMap<>();
+    this.pendingEntitySlots.clear();
+    this.pendingTaggedEntitySlots.clear();
+    Map<String, ImmutableSet.Builder<String>> namespacesByDefinitionId = new HashMap<>();
 
     for (Map.Entry<ResourceLocation, JsonElement> entityAssignmentEntry : sortedEntityAssignments.entrySet()) {
       ResourceLocation assignmentLocation = entityAssignmentEntry.getKey();
@@ -111,7 +109,38 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
         JsonObject assignmentJson = GsonHelper.convertToJsonObject(entityAssignmentEntry.getValue(), "top element");
 
         if (ICondition.conditionsMatched(JsonOps.INSTANCE, assignmentJson)) {
-          parsedEntitySlotAssignments.put(assignmentLocation, assignmentJson);
+          Map<String, ISlotType> parsedSlots = parseSlots(assignmentJson);
+          Pair<Set<EntityType<?>>, Set<ResourceLocation>> parsedEntities = parseEntities(assignmentJson);
+          boolean replace = GsonHelper.getAsBoolean(assignmentJson, "replace", false);
+
+          for (EntityType<?> entityType : parsedEntities.getFirst()) {
+
+            if (replace) {
+              ImmutableMap.Builder<String, ISlotType> slotBuilder = ImmutableMap.builder();
+              slotBuilder.putAll(parsedSlots);
+              this.pendingEntitySlots.put(entityType, slotBuilder);
+            } else {
+              this.pendingEntitySlots
+                  .computeIfAbsent(entityType, (k) -> ImmutableMap.builder())
+                  .putAll(parsedSlots);
+            }
+          }
+
+          for (ResourceLocation resourceLocation : parsedEntities.getSecond()) {
+
+            if (replace) {
+              ImmutableMap.Builder<String, ISlotType> slotBuilder = ImmutableMap.builder();
+              slotBuilder.putAll(parsedSlots);
+              this.pendingTaggedEntitySlots.put(resourceLocation, slotBuilder);
+            } else {
+              this.pendingTaggedEntitySlots
+                  .computeIfAbsent(resourceLocation, (k) -> ImmutableMap.builder())
+                  .putAll(parsedSlots);
+            }
+          }
+          namespacesByDefinitionId
+              .computeIfAbsent(assignmentLocation.getPath(), (k) -> ImmutableSet.builder())
+              .add(assignmentLocation.getNamespace());
         } else {
           CuriosConstants.LOG.debug(
               "Skipping loading entity file {} as its conditions were not met",
@@ -121,79 +150,108 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
         CuriosConstants.LOG.error("Failed to parse curio entity slot assignment {}", assignmentLocation, e);
       }
     }
-
-    this.entitySlotAssignmentsByResource = ImmutableMap.copyOf(parsedEntitySlotAssignments);
-  }
-
-  public void rebuildEntitySlots(Registry<EntityType<?>> entityTypeRegistry) {
-    Map<String, ImmutableSet.Builder<String>> namespacesByDefinitionId = new HashMap<>();
-    Map<EntityType<?>, ImmutableMap.Builder<String, ISlotType>> entitySlotBuilders = new HashMap<>();
-
-    for (Map.Entry<ResourceLocation, JsonObject> resourceEntry : this.entitySlotAssignmentsByResource.entrySet()) {
-      ResourceLocation resourceLocation = resourceEntry.getKey();
-      JsonObject slotAssignmentJson = resourceEntry.getValue();
-
-      try {
-        for (Map.Entry<EntityType<?>, Map<String, ISlotType>> entitySlotsEntry :
-            getSlotsForEntities(slotAssignmentJson, resourceLocation, entityTypeRegistry).entrySet()) {
-
-          EntityType<?> entityType = entitySlotsEntry.getKey();
-          Map<String, ISlotType> assignedSlots = entitySlotsEntry.getValue();
-
-
-          if (GsonHelper.getAsBoolean(slotAssignmentJson, "replace", false)) {
-            ImmutableMap.Builder<String, ISlotType> slotBuilder = ImmutableMap.builder();
-            slotBuilder.putAll(assignedSlots);
-            entitySlotBuilders.put(entityType, slotBuilder);
-          } else {
-            entitySlotBuilders.computeIfAbsent(entityType, (k) -> ImmutableMap.builder())
-                .putAll(assignedSlots);
-          }
-
-          namespacesByDefinitionId
-            .computeIfAbsent(resourceLocation.getPath(), (k) -> ImmutableSet.builder())
-            .add(resourceLocation.getNamespace());
-        }
-      } catch (IllegalArgumentException | JsonParseException e) {
-        CuriosConstants.LOG.error("Failed to resolve curio entity slot assignment {} after tags loaded", resourceLocation, e);
-      }
-    }
-
     Map<String, ISlotType> configuredSlotTypes = new HashMap<>();
 
     for (String configuredSlotId : CuriosSlotManager.SERVER.getConfigSlots()) {
       CuriosSlotManager.SERVER
-        .getSlot(configuredSlotId)
-        .ifPresentOrElse(
-            (slot) -> configuredSlotTypes.put(configuredSlotId, slot),
-            () -> CuriosConstants.LOG.error("Configured slot type '{}' is missing from the server slot registry", configuredSlotId
-        )
-      );
+          .getSlot(configuredSlotId)
+          .ifPresentOrElse(
+              (slot) -> configuredSlotTypes.put(configuredSlotId, slot),
+              () -> CuriosConstants.LOG.error("Configured slot type '{}' is missing from the server slot registry", configuredSlotId)
+          );
     }
-
     ImmutableMap.Builder<String, ISlotType> playerSlotBuilder =
-        entitySlotBuilders.computeIfAbsent(
+        this.pendingEntitySlots.computeIfAbsent(
             EntityType.PLAYER,
             (k) -> ImmutableMap.builder());
     playerSlotBuilder.putAll(configuredSlotTypes);
-
-    this.entitySlots = entitySlotBuilders
-      .entrySet()
-      .stream()
-      .collect(
-        ImmutableMap.toImmutableMap(
-          Map.Entry::getKey,
-          entitySlotEntry -> entitySlotEntry.getValue().buildKeepingLast()));
-
     this.idToMods = namespacesByDefinitionId
-      .entrySet()
-      .stream()
-      .collect(
-        ImmutableMap.toImmutableMap(
-          Map.Entry::getKey,
-          entry -> entry.getValue().build()));
+        .entrySet()
+        .stream()
+        .collect(
+            ImmutableMap.toImmutableMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().build()));
+    this.entitySlots = this.pendingEntitySlots
+        .entrySet()
+        .stream()
+        .collect(
+            ImmutableMap.toImmutableMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().buildKeepingLast()));
+  }
 
-    CuriosConstants.LOG.info("Loaded {} curio entities", entitySlotBuilders.size());
+  private static Map<String, ISlotType> parseSlots(JsonObject jsonObject) {
+    JsonArray jsonSlots = GsonHelper.getAsJsonArray(jsonObject, "slots", new JsonArray());
+    Map<String, ISlotType> slots = new HashMap<>();
+
+    for (JsonElement jsonSlot : jsonSlots) {
+      String id = jsonSlot.getAsString();
+      CuriosSlotManager.SERVER.getSlot(id).ifPresentOrElse(slot -> slots.put(id, slot),
+          () -> CuriosConstants.LOG.error("{} is not a registered slot type!", id));
+    }
+    return slots;
+  }
+
+  private static Pair<Set<EntityType<?>>, Set<ResourceLocation>> parseEntities(JsonObject jsonObject) {
+    JsonArray jsonEntities = GsonHelper.getAsJsonArray(jsonObject, "entities", new JsonArray());
+    Set<EntityType<?>> addEntities = new HashSet<>();
+    Set<ResourceLocation> addTags = new HashSet<>();
+
+    for (JsonElement jsonEntity : jsonEntities) {
+      String entity = jsonEntity.getAsString();
+
+      if (entity.startsWith("#")) {
+        addTags.add(ResourceLocation.parse(entity.substring(1)));
+      } else {
+        EntityType<?> type =
+            BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse(entity)).orElse(null);
+
+        if (type != null) {
+          addEntities.add(type);
+        } else {
+          CuriosConstants.LOG.error("{} is not a registered entity type!", entity);
+        }
+      }
+    }
+    return Pair.of(addEntities, addTags);
+  }
+
+  public void buildEntitySlotsWithTags(Registry<EntityType<?>> entityTypeRegistry) {
+
+    // An unexpected empty state in the pre-built entity slot map shouldn't process tagged entities
+    // into the map either.
+    if (this.entitySlots.isEmpty()) {
+      return;
+    }
+
+    for (Map.Entry<ResourceLocation, ImmutableMap.Builder<String, ISlotType>> entry :
+        this.pendingTaggedEntitySlots.entrySet()) {
+      entityTypeRegistry.getTag(TagKey.create(Registries.ENTITY_TYPE, entry.getKey()))
+          .ifPresentOrElse(
+              named -> {
+                Map<String, ISlotType> slots = entry.getValue().build();
+
+                for (Holder<EntityType<?>> entityTypeHolder : named) {
+                  this.pendingEntitySlots
+                      .computeIfAbsent(entityTypeHolder.value(), (k) -> ImmutableMap.builder())
+                      .putAll(slots);
+                }
+              },
+              () -> { // Couldn't find the entity type tag
+                CuriosConstants.LOG.error("Couldn't find entity type tag: {}!", entry.getKey());
+              });
+    }
+    this.entitySlots = this.pendingEntitySlots
+        .entrySet()
+        .stream()
+        .collect(
+            ImmutableMap.toImmutableMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().buildKeepingLast()));
+    CuriosConstants.LOG.info("Loaded {} curio entities", this.pendingEntitySlots.size());
+    this.pendingEntitySlots.clear();
+    this.pendingTaggedEntitySlots.clear();
   }
 
   public static ListTag getSyncPacket() {
@@ -241,56 +299,6 @@ public class CuriosEntityManager extends SimpleJsonResourceReloadListener {
     }
     CLIENT.entitySlots = map.entrySet().stream().collect(
         ImmutableMap.toImmutableMap(Map.Entry::getKey, (entry) -> entry.getValue().build()));
-  }
-
-  private static Map<EntityType<?>, Map<String, ISlotType>> getSlotsForEntities(
-      JsonObject jsonObject,
-      ResourceLocation resourceLocation,
-      Registry<EntityType<?>> entityTypeRegistry) {
-    Map<EntityType<?>, Map<String, ISlotType>> map = new HashMap<>();
-
-    JsonArray jsonEntities = GsonHelper.getAsJsonArray(jsonObject, "entities", new JsonArray());
-    Set<EntityType<?>> toAdd = new HashSet<>();
-
-    for (JsonElement jsonEntity : jsonEntities) {
-      String entity = jsonEntity.getAsString();
-
-      if (entity.startsWith("#")) {
-        entityTypeRegistry.getTag(
-            TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse(entity.substring(1))))
-            .ifPresentOrElse(
-                named -> {
-                  for (Holder<EntityType<?>> entityTypeHolder : named) {
-                    toAdd.add(entityTypeHolder.value());
-                  }
-                },
-                () -> { // Couldn't find the entity type tag
-                  CuriosConstants.LOG.error("Couldn't find entity type tag: {}!", entity);
-                });
-      } else {
-        EntityType<?> type =
-            entityTypeRegistry.getOptional(ResourceLocation.parse(entity)).orElse(null);
-
-        if (type != null) {
-          toAdd.add(type);
-        } else {
-          CuriosConstants.LOG.error("{} is not a registered entity type!", entity);
-        }
-      }
-    }
-    JsonArray jsonSlots = GsonHelper.getAsJsonArray(jsonObject, "slots", new JsonArray());
-    Map<String, ISlotType> slots = new HashMap<>();
-
-    for (JsonElement jsonSlot : jsonSlots) {
-      String id = jsonSlot.getAsString();
-      CuriosSlotManager.SERVER.getSlot(id).ifPresentOrElse(slot -> slots.put(id, slot),
-          () -> CuriosConstants.LOG.error("{} is not a registered slot type!", id));
-    }
-
-    for (EntityType<?> entityType : toAdd) {
-      map.computeIfAbsent(entityType, (k) -> new HashMap<>()).putAll(slots);
-    }
-    return map;
   }
 
   public Map<String, ISlotType> getEntitySlots(EntityType<?> type) {

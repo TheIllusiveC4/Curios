@@ -63,7 +63,6 @@ import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -113,7 +112,6 @@ import top.theillusivec4.curios.common.network.server.sync.SPacketSyncData;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncModifiers;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack;
 import top.theillusivec4.curios.common.network.server.sync.SPacketSyncStack.HandlerType;
-import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 
 public class CuriosEventHandler {
 
@@ -351,7 +349,7 @@ public class CuriosEventHandler {
   @SubscribeEvent
   public void onTagsUpdated(TagsUpdatedEvent event) {
     if (event.getUpdateCause() == TagsUpdatedEvent.UpdateCause.SERVER_DATA_LOAD) {
-      CuriosEntityManager.SERVER.rebuildEntitySlots(
+      CuriosEntityManager.SERVER.buildEntitySlotsWithTags(
         event.getRegistryAccess().registryOrThrow(Registries.ENTITY_TYPE));
     }
   }
