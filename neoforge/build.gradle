@@ -91,6 +91,8 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
     "${release_versions}".split(',').each {
         mainFile.addGameVersion("${it}")
     }
+    mainFile.addEnvironment("Client")
+    mainFile.addEnvironment("Server")
     mainFile.withAdditionalFile(sourcesJar)
     mainFile.withAdditionalFile(apiJar)
 
