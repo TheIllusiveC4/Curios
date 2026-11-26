@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 to [Semantic Versioning](http://semver.org/spec/v2.0.0.html). Prior to version 5.2.0, this projected
 used [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [17.0.2+26.3] - 2026.11.25
+### Fixed
+- Fixed crafting grid items disappearing when closing the Curios menu [#665](https://github.com/TheIllusiveC4/Curios/issues/665)
+
 ## [17.0.1+26.3] - 2026.11.08
 ### Changed
 - Updated `uk_ua` localization (thanks StarmanMine142!) [#570](https://github.com/TheIllusiveC4/Curios/pull/570)
