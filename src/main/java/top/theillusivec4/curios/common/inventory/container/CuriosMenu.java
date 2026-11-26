@@ -38,12 +38,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractCraftingMenu;
 import net.minecraft.world.inventory.ArmorSlot;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.RecipeBookType;
-import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
@@ -69,8 +66,6 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
 
   private final boolean isLocalWorld;
 
-  private final CraftingContainer craftMatrix = new TransientCraftingContainer(this, 2, 2);
-  private final ResultContainer craftResult = new ResultContainer();
   public int currentPage;
   public int totalPages;
   public List<Integer> grid = new ArrayList<>();
@@ -91,6 +86,10 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
     this.isLocalWorld = this.player.level().isClientSide();
     this.curiosHandler = CuriosApi.getCuriosInventory(this.player).orElse(null);
     this.resetSlots();
+
+    if (!this.isLocalWorld) {
+      this.receivePlayerCraftGrid();
+    }
   }
 
   public void setPage(int page) {
@@ -250,6 +249,50 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
     this.setPage(this.currentPage);
   }
 
+  public void receivePlayerCraftGrid() {
+    InventoryMenu inventoryMenu = this.player.inventoryMenu;
+    int height = inventoryMenu.getGridHeight();
+    int width = inventoryMenu.getGridWidth();
+
+    if (this.getGridHeight() != height
+        || this.getGridWidth() != width
+        || inventoryMenu.getCraftSlots().isEmpty()) {
+      return;
+    }
+    for (int i = 0; i < this.getGridWidth(); i++) {
+
+      for (int j = 0; j < this.getGridHeight(); j++) {
+        int slot = j + i * this.getGridWidth();
+        this.craftSlots.setItem(slot, inventoryMenu.getCraftSlots().getItem(slot));
+        inventoryMenu.getCraftSlots().setItem(slot, ItemStack.EMPTY);
+      }
+    }
+    inventoryMenu.slotsChanged(inventoryMenu.getCraftSlots());
+    this.slotsChanged(this.craftSlots);
+  }
+
+  public void givePlayerCraftGrid() {
+    InventoryMenu inventoryMenu = this.player.inventoryMenu;
+    int height = inventoryMenu.getGridHeight();
+    int width = inventoryMenu.getGridWidth();
+
+    if (this.getGridHeight() != height
+        || this.getGridWidth() != width
+        || this.craftSlots.isEmpty()) {
+      return;
+    }
+    for (int i = 0; i < this.getGridWidth(); i++) {
+
+      for (int j = 0; j < this.getGridHeight(); j++) {
+        int slot = j + i * this.getGridWidth();
+        inventoryMenu.getCraftSlots().setItem(slot, this.craftSlots.getItem(slot));
+        this.craftSlots.setItem(slot, ItemStack.EMPTY);
+      }
+    }
+    inventoryMenu.slotsChanged(inventoryMenu.getCraftSlots());
+    this.slotsChanged(this.craftSlots);
+  }
+
   public void toggleCosmetics() {
     this.isViewingCosmetics = !this.isViewingCosmetics;
     this.resetSlots();
@@ -290,10 +333,10 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
   @Override
   public void removed(@Nonnull Player playerIn) {
     super.removed(playerIn);
-    this.craftResult.clearContent();
+    this.resultSlots.clearContent();
 
     if (!playerIn.level().isClientSide()) {
-      this.clearContainer(playerIn, this.craftMatrix);
+      this.clearContainer(playerIn, this.craftSlots);
     }
   }
 
@@ -448,12 +491,12 @@ public class CuriosMenu extends AbstractCraftingMenu implements ICuriosMenu {
 
   @Override
   public int getGridWidth() {
-    return this.craftMatrix.getWidth();
+    return this.craftSlots.getWidth();
   }
 
   @Override
   public int getGridHeight() {
-    return this.craftMatrix.getHeight();
+    return this.craftSlots.getHeight();
   }
 
   @Nonnull

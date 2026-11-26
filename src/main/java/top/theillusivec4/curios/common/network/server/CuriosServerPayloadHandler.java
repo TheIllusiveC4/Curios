@@ -111,6 +111,10 @@ public class CuriosServerPayloadHandler {
         ItemStack stack =
             player.isCreative() ? data.carried() : player.containerMenu.getCarried();
         player.containerMenu.setCarried(ItemStack.EMPTY);
+
+        if (player.containerMenu instanceof CuriosMenu curiosMenu) {
+          curiosMenu.givePlayerCraftGrid();
+        }
         serverPlayer.doCloseContainer();
 
         if (!stack.isEmpty()) {
